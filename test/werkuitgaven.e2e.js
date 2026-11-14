@@ -56,7 +56,8 @@ test('een uitgave gaat op het scherm van indienen via een ander naar betaald', {
         const k = document.getElementById('mKeuze'); k.value = 'uitgaven';
         k.dispatchEvent(new Event('change'));
       });
-      await wachtOpTekst(page, /Uitgave indienen/, { in: '#mActie' });
+      await page.waitForFunction(() => [...document.querySelectorAll('#mActie .kop')]
+        .some(el => el.textContent.includes('Uitgave indienen')), null, { timeout: 15000 });
     }
     const vul = (id, waarde) => page.evaluate(([i, v]) => { document.getElementById(i).value = v; }, [id, waarde]);
     async function druk(nr, verwacht) {

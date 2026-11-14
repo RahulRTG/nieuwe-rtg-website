@@ -3,9 +3,10 @@
   'use strict';
   w.RTGAanvraagActies = function (el, a, o) {
     var acties = a.acties || [], formulier;
+    function stijl(oud, ds) { return o.ds ? ds + ' ' + oud : oud; }
     function veld(naam, label, waarde) {
-      var l = document.createElement('label'); l.textContent = label;
-      var v = document.createElement('input'); v.className = 'veld'; v.name = naam;
+      var l = document.createElement('label'); l.textContent = label; if (o.ds) l.className = 'ds-veldlabel';
+      var v = document.createElement('input'); v.className = stijl('veld', 'ds-invoer'); v.name = naam;
       v.value = waarde == null ? '' : waarde; v.maxLength = naam === 'wat' ? 300 : naam === 'tekst' ? 400 : 60;
       if (naam === 'wanneer') v.type = 'date';
       if (naam === 'budget') { v.type = 'number'; v.min = '0'; }
@@ -20,18 +21,18 @@
         .catch(function (e) { o.meld(e.message); }).finally(function () { knop.disabled = false; });
     }
     acties.filter(function (x) { return !['kies', 'reageer'].includes(x.id); }).forEach(function (x) {
-      var b = document.createElement('button'); b.className = 'knop stil'; b.type = 'button'; b.textContent = x.label;
-      b.dataset.aanvraagActie = x.id; el.appendChild(b);
+      var b = document.createElement('button'); b.className = stijl('knop stil', 'ds-knop ds-knop--stil'); b.type = 'button'; b.textContent = x.label;
+      b.dataset.aanvraagActie = x.id; if (o.ds) b.setAttribute('data-ds-actie', x.label); el.appendChild(b);
       b.onclick = function () {
         if (!['wijzig', 'afronden', 'teruggeven'].includes(x.id)) return verstuur(x.id, {}, b);
         if (formulier) formulier.remove();
-        formulier = document.createElement('form'); formulier.className = 'rij ruim';
+        formulier = document.createElement('form'); formulier.className = stijl('rij ruim', 'ds-veldgroep');
         formulier.setAttribute('aria-label', x.label);
         if (x.id === 'wijzig') {
           veld('wat', 'Uw vraag', a.wat); veld('plek', 'Plaats', a.plek);
           veld('wanneer', 'Datum', a.wanneer); veld('budget', 'Budget in euro', a.budget);
         } else veld('tekst', 'Toelichting voor het lid', '');
-        var stuur = document.createElement('button'); stuur.type = 'submit'; stuur.className = 'knop'; stuur.textContent = 'Opslaan';
+        var stuur = document.createElement('button'); stuur.type = 'submit'; stuur.className = stijl('knop', 'ds-knop ds-knop--primair'); stuur.textContent = 'Opslaan';
         formulier.appendChild(stuur); el.appendChild(formulier); formulier.querySelector('input').focus();
         formulier.onsubmit = function (ev) {
           ev.preventDefault(); var data = Object.fromEntries(new FormData(formulier));

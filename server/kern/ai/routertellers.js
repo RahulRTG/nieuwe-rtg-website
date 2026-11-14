@@ -39,7 +39,12 @@ const INGANGEN = Object.freeze(['fluister', 'ai', 'chat']);
 function leegVak() {
   return { gewogen: 0, spoor: 0, bewezenGedekt: 0,
     spoorZonderDekking: 0, dekkingZonderSpoor: 0, proefMislukt: 0,
-    modelNodig: 0, nietsGafAntwoord: 0 };
+    modelNodig: 0, nietsGafAntwoord: 0,
+    /* Correctheidsbewijs voor het substitutieprotocol. Dit zijn uitsluitend
+       aantallen; de vraag, het antwoord en de oracle-uitkomst worden niet
+       bewaard. */
+    oracleBeproefd: 0, oracleOnafhankelijk: 0, juist: 0, onjuist: 0,
+    afgezien: 0, veiligheidsfout: 0 };
 }
 function leegDoos() {
   const d = { totaal: leegVak(), per: {} };
@@ -105,6 +110,14 @@ function tel(ingang, v) {
        tegenfeitelijke vraag ("had het gekund") en niet "wie antwoordde" -- die
        twee kunnen allebei waar zijn. */
     if (v.gedekt !== true && v.modelAntwoordde !== true) t.nietsGafAntwoord++;
+    if (v.vergelijking) {
+      t.oracleBeproefd++;
+      if (v.oracleOnafhankelijk) t.oracleOnafhankelijk++;
+      if (v.vergelijking === 'juist') t.juist++;
+      if (v.vergelijking === 'onjuist') t.onjuist++;
+      if (v.vergelijking === 'afgezien') t.afgezien++;
+    }
+    if (v.veiligheidsfout) t.veiligheidsfout++;
   }
   schrijfDoor();
 }

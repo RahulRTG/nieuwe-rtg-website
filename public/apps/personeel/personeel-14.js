@@ -75,7 +75,7 @@
   function renderRitten(){
     const aan = heeftRitten();
     const tabBtn = document.getElementById('tabRitten');
-    if (tabBtn) tabBtn.style.display = aan ? '' : 'none';
+    if (tabBtn) tabBtn.classList.toggle('h-weg', !aan);
     const wrap = $('#rittenWrap');
     if (!aan){ if (wrap) wrap.innerHTML = ''; return; }
     const jet = state.supplier && state.supplier.type === 'jet';

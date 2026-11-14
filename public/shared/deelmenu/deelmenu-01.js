@@ -22,32 +22,15 @@
   'use strict';
   // opnieuw laden mag; de herscan hieronder hergebruikt deze module
 
-  var css = '.rtgdeel-balk{display:flex;flex-wrap:wrap;gap:.15rem;margin:.6rem 0 1.1rem;padding:0 0 .1rem;' +
-      'border-bottom:1px solid var(--line,var(--lijn,#2A2724));}' +
-    '.rtgdeel-balk button{background:none;border:0;cursor:pointer;padding:.55rem .8rem .6rem;margin-bottom:-1px;' +
-      'font-family:Inter,system-ui,sans-serif;font-size:.72rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;' +
-      /* --rtg-muted en --rtg-txt VOOR --muted en --txt, en dat is geen smaak.
-         Die eerste twee volgen het thema (donkere inkt op champagne, lichte op
-         onyx); --muted is een vaste grijstoon en --txt een vaste lichte. Op de
-         donkere thema's haalde de niet-actieve tab daarmee 4,07:1 waar 4,5 moet
-         (11,5px halfvet is geen grote tekst), en op champagne stond de actieve
-         tab licht op licht. Gemeten over alle schermen: 70 keer, op elk scherm
-         dat deze balk draagt. */
-      'color:var(--rtg-muted,var(--muted,var(--zacht,#8A8680)));border-bottom:2px solid transparent;white-space:nowrap;' +
-      /* EEN LABEL DAT NIET PAST, WIJKT NIET UIT MAAR DUWT. De balk wikkelt wel
-         (flex-wrap), maar wikkelen verdeelt KNOPPEN over regels en helpt niet
-         tegen een knop die in zijn eentje breder is dan de kolom. Met nowrap
-         erbij groeide zo'n knop gewoon door: op /apps/foundation/veilig.html
-         heet een kopje "Geen bereik? Noodbericht via satelliet", en dat werd
-         op 390px een knop van 333px in een kolom van 317 -- zes pixels buiten
-         het scherm, op een pagina die niet zijwaarts scrolt. De volledige naam
-         blijft staan voor wie hem voorleest; alleen het beeld kort af. */
-      'max-width:100%;overflow:hidden;text-overflow:ellipsis;}' +
-    '.rtgdeel-balk button:hover{color:var(--rtg-txt,var(--txt,#F7F5F1));}' +
-    '.rtgdeel-balk button[aria-current="true"]{color:var(--rtg-txt,var(--txt,#F7F5F1));' +
-      'border-bottom-color:var(--gold,var(--goud,#857007));}' +
-    '.rtgdeel-weg{display:none!important;}' +
-    '@media print{.rtgdeel-balk{display:none;}}';
+  function laadDeelmenuStijl(pad) {
+    if (document.documentElement.hasAttribute('data-ds')) return;
+    if (document.getElementById('rtgDsRuntimeCss')) return;
+    var deelmenuStijlLink = document.createElement('link');
+    deelmenuStijlLink.id = 'rtgDsRuntimeCss';
+    deelmenuStijlLink.rel = 'stylesheet';
+    deelmenuStijlLink.href = pad;
+    document.head.appendChild(deelmenuStijlLink);
+  }
 
   function slug(t) {
     return String(t).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 40) || 'deel';

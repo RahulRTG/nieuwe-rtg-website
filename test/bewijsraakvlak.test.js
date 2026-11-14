@@ -44,6 +44,8 @@ const BESTANDEN = {
   'scripts/voltooiproef.js': "require('./lib/voltooi/a');\nrequire('./lib/voltooi/b');\n",
   'scripts/lib/voltooi/a.js': "module.exports = { pad: '/api/a/lijst' };\n",
   'scripts/lib/voltooi/b.js': "module.exports = { pad: '/api/b' };\n",
+  'package.json': '{"name":"bewijsraakvlak","private":true}\n',
+  'package-lock.json': '{"name":"bewijsraakvlak","lockfileVersion":3}\n',
   'README.md': '# proef\n'
 };
 const ROUTES = [
@@ -113,6 +115,7 @@ function metBevoegd(doe) {
     const bronnen = Object.entries(broninstrumenten).map(([register, instrument]) => {
       const stempel = { op: 'nu', commit: sha, boomVuil: false,
         instrument };
+      if (instrument === 'scripts/voltooiproef.js') stempel.node = process.version;
       const inhoud = JSON.stringify({ stempel, perRoute: instrument.includes('rolproef') ? [] : {} });
       schrijf(map, register, inhoud);
       return { register, stempel, sha256: crypto.createHash('sha256').update(inhoud).digest('hex') };
@@ -244,6 +247,121 @@ test('een script buiten de sluiting van het instrument maakt niets oud; erbinnen
   assert.equal(nu('a').stand, 'VERS');
   schrijf(map, 'scripts/lib/hulp.js', 'module.exports = 4;\n');
   assert.equal(nu('a').stand, 'VERVALLEN');
+}));
+
+test('een serverronde blijft vers na frontendwerk en vervalt bij iedere server- of instrumentwijziging', () => metRepo(({ map }) => {
+  schrijf(map, 'scripts/idorproef.js', "require('./lib/idor-hulp');\n");
+  schrijf(map, 'scripts/lib/idor-hulp.js', 'module.exports = 1;\n');
+  schrijf(map, 'package.json', '{"name":"proef"}\n');
+  const sha = commit(map, 'serverronde');
+  const st = { op: 'nu', commit: sha, boomVuil: false, instrument: 'scripts/idorproef.js' };
+  const vers = () => R.serverRondeVersheid(wereld(map), st, grofSpion());
+  assert.equal(vers().vers, true, vers().reden);
+  schrijf(map, 'public/apps/a.html', BESTANDEN['public/apps/a.html'] + '<p>nieuw</p>\n');
+  assert.equal(vers().vers, true, 'clientwerk raakt een serverbrede autorisatieronde niet');
+  schrijf(map, 'server/routes/b.js', BESTANDEN['server/routes/b.js'] + '// server anders\n');
+  assert.equal(vers().vers, false, 'ieder serverbestand telt mee');
+  schrijf(map, 'server/routes/b.js', BESTANDEN['server/routes/b.js']);
+  schrijf(map, 'scripts/lib/idor-hulp.js', 'module.exports = 2;\n');
+  assert.equal(vers().vers, false, 'de volledige instrumentsluiting telt mee');
+}));
+
+test('gemengde VOLTOOIPROEF-bronronde is nooit uitsluitend serverbewijs', () => metRepo(({ map, sha }) => {
+  const st = { op: 'nu', commit: sha, boomVuil: false, instrument: 'scripts/voltooiproef.js', node: process.version };
+  const vers = () => R.serverRondeVersheid(wereld(map), st, grofSpion());
+  assert.equal(vers().vers, true, vers().reden);
+  assert.equal(R.SERVERRONDE_INSTRUMENTEN.has(st.instrument), false);
+  assert.equal(R.serverRondeVersheid(wereld(map), { ...st, node: 'v0.0.0' }, grofSpion()).vers, false,
+    'een andere Node-runtime is een andere browsermeting');
+  assert.equal(R.serverRondeVersheid(wereld(map), { ...st, node: undefined }, grofSpion()).vers, false,
+    'de runtime mag niet door een datum of omgevingsnaam worden vervangen');
+  schrijf(map, 'public/apps/b.html', BESTANDEN['public/apps/b.html'] + '<p>andere bestemming</p>');
+  assert.equal(vers().vers, false, 'een bestemming buiten de API-route blijft deel van de gemengde ronde');
+  schrijf(map, 'public/apps/b.html', BESTANDEN['public/apps/b.html']);
+  fs.unlinkSync(path.join(map, 'public/apps/a.png'));
+  assert.equal(vers().vers, false, 'verwijderde visuele bron mag niet uit het bewijs verdwijnen');
+}));
+
+test('browservoltooiproef bewaart fysieke OS-ingang en vervalt bij gedeelde UI, bestemming en scenario', () => metRepo(({ map, sha }) => {
+  const st = { op: 'nu', commit: sha, boomVuil: false, instrument: 'scripts/voltooiproef.js', node: process.version };
+  const w = wereld(map);
+  const invoer = { ingang: '/apps/a.html', soort: 'browser', kanaal: 'browser',
+    scenario: 'scripts/lib/voltooi/a.js', routeInstrument: 'scripts/lib/voltooi/a.js' };
+  const v = R.versheidVoor(w, invoer, grofSpion())(st);
+  assert.equal(v.vers, true, v.reden);
+  assert.equal(v.raakvlak.browserIngang, '/apps/a.html');
+  assert.equal(v.raakvlak.node, process.version);
+  const H = R.hashes(w);
+  const nu = () => R.controleer(wereld(map), v.raakvlak, H, '(os:a)', grofSpion());
+  assert.equal(nu().stand, 'VERS');
+  for (const rel of ['public/shared/schil.js', 'public/apps/b.html', 'public/apps/a.png', 'scripts/lib/voltooi/a.js',
+    'package.json', 'package-lock.json']) {
+    schrijf(map, rel, BESTANDEN[rel] + '\ngewijzigd');
+    assert.equal(nu().stand, 'VERVALLEN', rel);
+    schrijf(map, rel, BESTANDEN[rel]);
+  }
+  fs.unlinkSync(path.join(map, 'public/apps/b.html'));
+  assert.equal(nu().stand, 'VERVALLEN', 'verwijderde bestemming vervalt ook');
+}));
+
+test('APPWERKT-querybinding wordt als echte browserbron geproduceerd en hercontroleerd', () => metRepo(({map,sha}) => {
+  const {browserRaakvlakInvoer} = require('../scripts/appwerkt');
+  const row = {functie:'tab:a',ingang:'(tab binnen de app)'};
+  const input = browserRaakvlakInvoer(row,{'tab:a':{ingang:'/apps/a.html?pas=rtg',via:'#tab=a'}});
+  const w = wereld(map), stamp = {op:'nu',commit:sha,boomVuil:false,instrument:'scripts/instr.js',node:process.version};
+  const measured = R.versheidVoor(w,input,grofSpion())(stamp);
+  assert.equal(measured.vers,true,measured.reden);
+  assert.equal(measured.raakvlak.browserIngang,'/apps/a.html?pas=rtg');
+  const hashes = R.hashes(w);
+  const check = () => R.controleer(wereld(map),measured.raakvlak,hashes,row.ingang,grofSpion());
+  assert.equal(check().stand,'VERS');
+  schrijf(map,'public/apps/a.html',BESTANDEN['public/apps/a.html']+'<button>Nieuwe taak</button>');
+  assert.equal(check().stand,'VERVALLEN','het querycontract blijft aan het echte document gebonden');
+  schrijf(map,'public/apps/a.html',BESTANDEN['public/apps/a.html']);
+  schrijf(map,'scripts/lib/hulp.js','module.exports = 3;\n');
+  assert.equal(check().stand,'VERVALLEN','gewijzigde meterlogica mag geen oud browserbewijs gebruiken');
+}));
+
+test('APPWERKT-linkbediening blijft aan de daadwerkelijk bezochte bestemmingsbron gebonden', () => metRepo(({map,sha}) => {
+  const {browserRaakvlakInvoer} = require('../scripts/appwerkt');
+  const row = {functie:'link:a',ingang:'/apps/a.html'};
+  const w = wereld(map), stamp = {op:'nu',commit:sha,boomVuil:false,instrument:'scripts/instr.js',node:process.version};
+  const measured = R.versheidVoor(w,browserRaakvlakInvoer(row),grofSpion())(stamp);
+  assert.equal(measured.vers,true,measured.reden);
+  const hashes = R.hashes(w);
+  const check = () => R.controleer(wereld(map),measured.raakvlak,hashes,row.ingang,grofSpion());
+  assert.equal(check().stand,'VERS');
+  schrijf(map,'public/apps/b.html',BESTANDEN['public/apps/b.html']+'<h1>Andere bestemming</h1>');
+  assert.equal(check().stand,'VERVALLEN','een echte ankertik bewijst ook de bestemming, niet uitsluitend de ingang');
+  schrijf(map,'public/apps/b.html',BESTANDEN['public/apps/b.html']);
+  fs.unlinkSync(path.join(map,'public/apps/b.html'));
+  assert.equal(check().stand,'VERVALLEN','verwijderde linkbestemming mag geen oud bedieningsbewijs behouden');
+}));
+
+test('browservoltooiproef vervalt bij ontbrekende of andere runtime en verwijderd pakketcontract', () => metRepo(({ map, sha }) => {
+  const invoer = { ingang: '/apps/a.html', soort: 'browser', kanaal: 'browser',
+    scenario: 'scripts/lib/voltooi/a.js', routeInstrument: 'scripts/lib/voltooi/a.js' };
+  const meet = node => R.versheidVoor(wereld(map), invoer, grofSpion())({
+    op: 'nu', commit: sha, boomVuil: false, instrument: 'scripts/voltooiproef.js', node
+  });
+  assert.equal(meet(undefined).vers, false);
+  assert.equal(meet('v0.0.0').vers, false);
+  const w = wereld(map), v = R.versheidVoor(w, invoer, grofSpion())({
+    op: 'nu', commit: sha, boomVuil: false, instrument: 'scripts/voltooiproef.js', node: process.version
+  });
+  const H = R.hashes(w);
+  assert.equal(R.controleer(wereld(map), { ...v.raakvlak, node: 'v0.0.0' }, H, '(os:a)', grofSpion()).stand, 'VERVALLEN');
+  fs.unlinkSync(path.join(map, 'package-lock.json'));
+  const weg = R.controleer(wereld(map), v.raakvlak, H, '(os:a)', grofSpion());
+  assert.equal(weg.stand, 'VERVALLEN');
+  assert.ok(weg.oorzaak.some(x => x.startsWith('package-lock.json')));
+}));
+
+test('nieuwe browserbronmeting blijft transitief relevant voor bevoegd', () => metBevoegd(({ map, nu }) => {
+  schrijf(map, 'public/apps/b.html', BESTANDEN['public/apps/b.html'] + '<p>browser anders</p>');
+  const uit = nu();
+  assert.equal(uit.stand, 'VERVALLEN');
+  assert.match(uit.reden, /VOLTOOIPROEF/);
 }));
 
 test('een nieuw serverbestand dat niemand statisch laadt, maakt alles oud: het kan dynamisch geladen worden', () => metRepo(({ map, nu }) => {

@@ -4,7 +4,7 @@
 const test = require('node:test'), assert = require('node:assert/strict');
 const fs = require('node:fs'), os = require('node:os'), path = require('node:path');
 const { randomUUID, randomBytes } = require('node:crypto'), { DatabaseSync } = require('node:sqlite');
-const { startServer, stop, laadPlaywright, browserOpties, geenBrowser, edgeActies, letOpFouten } = require('./helper');
+const { startServer, stop, laadPlaywright, browserOpties, geenBrowser, edgeBediening, letOpFouten } = require('./helper');
 const pw = laadPlaywright();
 const cases = [
   ['trash-allow', 'documents.trash', false, 'ALLOW'], ['trash-deny', 'documents.trash', false, 'DENY'],
@@ -64,7 +64,41 @@ test('UI Edge API Rahul equivalence: ALLOW DENY INVALID STALE with identical act
         if (caller === 'UI' || caller === 'Edge') {
           page = await browser.newPage({ viewport: { width: 1280, height: 1000 } });
           await page.addInitScript(token => { localStorage.setItem('rtg_member_token', token); localStorage.setItem('rtg_cookieinfo_v1', '1'); }, owner);
-          page.on('dialog', d => d.accept());
+          // De bevestigingsdialoog is hier niet het onderwerp; deze proef meet
+          // of dezelfde zichtbare handeling via UI, Edge, API en Rahul exact
+          // hetzelfde capability-contract uitvoert. Maak de bevestiging daarom
+          // deterministisch, zodat een headless dialoog de POST niet kan gijzelen.
+          await page.addInitScript(() => { window.confirm = () => true; });
+          /* Playwrights route.fetch() kan onder zwaar parallel CI-gebruik zelf
+             blijven wachten nadat de zichtbare handeling de POST al heeft
+             verstuurd. Leg daarom de adversarial actor/versie op dezelfde
+             browser-fetchgrens vast. De zichtbare UI/Edge-actie en de echte
+             server blijven ongewijzigd; alleen het testcredential en de
+             verwachte projectie worden voor deze negatieve proef vervangen. */
+          await page.addInitScript(() => {
+            const echteFetch = window.fetch.bind(window);
+            window.fetch = async (input, init) => {
+              const url = input instanceof Request ? input.url : String(input);
+              const probe = window.__rtgDocumentProbe;
+              if (!probe || new URL(url, location.href).pathname !== '/api/bestanden/actie') return echteFetch(input, init);
+              try {
+                const headers = new Headers((init && init.headers) || (input instanceof Request ? input.headers : undefined));
+                headers.set('authorization', 'Bearer ' + probe.token);
+                const verzonden = init && init.body != null
+                  ? JSON.parse(String(init.body))
+                  : input instanceof Request ? JSON.parse(await input.clone().text()) : null;
+                const reactie = await echteFetch(url, { ...(init || {}), method: 'POST', headers, body: JSON.stringify(probe.input) });
+                let body;
+                try { body = await reactie.clone().json(); }
+                catch { body = { error: await reactie.clone().text() }; }
+                probe.result = { status: reactie.status, body, request: verzonden };
+                return reactie;
+              } catch (error) {
+                probe.error = String(error && error.stack || error);
+                throw error;
+              }
+            };
+          });
           letOpFouten(page, browserErrors);
         }
         results[caller] = [];
@@ -85,16 +119,29 @@ test('UI Edge API Rahul equivalence: ALLOW DENY INVALID STALE with identical act
               file.weg = f.capability === 'documents.restore'; file.documentVersion = f.input.expectedVersion;
               window.RTGBestandenPaneel.open(file.id);
             }, { f });
-            await page.route('**/api/bestanden/actie', async route => {
-              const body = route.request().postDataJSON();
-              assert.equal(body.capability, f.capability); assert.equal(body.id, f.item.id); assert.equal(body.expectedVersion, f.input.expectedVersion);
-              await route.continue({ headers: { ...route.request().headers(), authorization: 'Bearer ' + token }, postData: JSON.stringify(f.input) });
-            });
-            const received = page.waitForResponse(r => new URL(r.url()).pathname === '/api/bestanden/actie');
-            if (caller === 'UI') await page.locator(f.capability === 'documents.restore' ? '#bkHerstel' : '#bkWeg').click();
-            else { await edgeActies(page); await page.locator('.rtg-adaptive-controls [data-cap="bestanden.' + (f.capability === 'documents.restore' ? 'herstel' : 'weg') + '"]').click(); }
-            const r = await received; response = { status: r.status(), body: await r.json() };
-            await page.unroute('**/api/bestanden/actie');
+            await page.evaluate(({ token, input }) => {
+              window.__rtgDocumentProbe = { token, input, result: null, error: null };
+            }, { token, input: f.input });
+            /* Afwezigheid blijft hard zakken op exact hetzelfde lastbudget. */
+            const received = page.waitForFunction(() => {
+              const probe = window.__rtgDocumentProbe;
+              return !!(probe && (probe.result || probe.error));
+            }, null, { timeout: 60000 });
+            const action = caller === 'UI'
+              ? page.locator(f.capability === 'documents.restore' ? '#bkHerstel' : '#bkWeg').click()
+              : edgeBediening(page, f.capability === 'documents.restore' ? 'Terugzetten' : 'Verwijder', f.capability);
+            try { await Promise.all([received, action]); }
+            catch (error) {
+              const probe = await page.evaluate(() => window.__rtgDocumentProbe).catch(() => null);
+              throw new Error(caller + ':' + f.name + ': geen /api/bestanden/actie-reactie binnen 60000ms; probe=' +
+                JSON.stringify(probe) + '; oorzaak=' + String(error && error.message || error));
+            }
+            const probe = await page.evaluate(() => window.__rtgDocumentProbe);
+            if (probe.error) throw new Error(caller + ':' + f.name + ': browsertransport: ' + probe.error);
+            assert.equal(probe.result.request.capability, f.capability);
+            assert.equal(probe.result.request.id, f.item.id);
+            assert.equal(probe.result.request.expectedVersion, f.input.expectedVersion);
+            response = { status: probe.result.status, body: probe.result.body };
           }
           const expected = { ALLOW: 200, NOOP: 200, DENY: 404, STALE: 409, INVALID: 409 }[f.scenario];
           assert.equal(response.status, expected, caller + ':' + f.name + ':' + JSON.stringify(response));

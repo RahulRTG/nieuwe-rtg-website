@@ -7,6 +7,8 @@ const http = require('node:http');
 const { browserOpties, geenBrowser, laadPlaywright, startServer, stop, letOpFouten } = require('./helper');
 const pw = laadPlaywright();
 const root = path.resolve(__dirname, '..');
+const sourceFaqCount = [...fs.readFileSync(path.join(root, 'index.html'), 'utf8')
+ .matchAll(/<details\b[^>]*\bdata-faq=["'][^"']+["']/g)].length;
 async function ready(page){
  await page.waitForSelector('body[data-platform-role="organisatie"]');
  await page.waitForSelector('.rtg-experience-edge .rtg-adaptive-bar');
@@ -28,14 +30,19 @@ test('De publieke B2B2C-ervaring wisselt van kant, zoekt in de echte app en past
    await page.goto(srv.base+'/',{waitUntil:'domcontentloaded'});await ready(page);
    await page.waitForFunction(()=>document.documentElement.dataset.websiteTruth==='actueel');
    assert.equal(await page.locator('.rtg-adaptive-bar').count(),1);
-   assert.match(await page.locator('#platform-story-title').innerText(),/Technologie die mensen dichter bij elkaar brengt/i);
-   assert.equal(await page.locator('.pp-story[data-public-story]').count(),4);
-   assert.match(await page.locator('.pp-technology-signal').innerText(),/SOCIAL TECHNOLOGY[\s\S]*LivingOS/i);
+   assert.match(await page.locator('#platform-story-title').innerText(),/Technologie rondom mensen/i);
+   assert.equal(await page.locator('.pp-story[data-public-story]').count(),1);
+   assert.equal(await page.locator('.pp-stories').isHidden(),true);
+   assert.equal(await page.locator('.pp-library-tools').isHidden(),true);
    assert.equal(new URL(await page.locator('.pp-secure-link').getAttribute('href')).pathname,'/apps/app.html');
    assert.match(await page.locator('[data-public-world-facts="work"]').innerText(),/17 apps.*MAPPEN/i);
-   await page.locator('#platform-search').fill('RTDocs');
-   assert.equal(await page.locator('[data-public-widget="work"]:visible').count(),1);
-   assert.equal(await page.locator('[data-public-widget="travel"]:visible').count(),0);
+   const dagdeel=await page.locator('html').getAttribute('data-dagdeel'),beelden={ochtend:'morning',middag:'afternoon',avond:'evening',nacht:'night'};
+   assert.match(await page.locator('.pp-feature-photo').getAttribute('src'),new RegExp('public-'+beelden[dagdeel]+'\\.webp$'));
+   await page.getByRole('button',{name:'Vertel Rahul wat u wilt bereiken'}).click();
+   await page.locator('#intent').fill('Ik wil met mijn gezin op reis');
+   await page.locator('#intentForm button').click();
+   assert.match(await page.locator('#intentFeedback').innerText(),/Amsterdam naar Ibiza/);
+   await page.locator('.wd-focus-head .wd-text-button').click();
    await page.locator('[data-public-widget="work"] .pp-widget-head').click();
    await page.locator('[data-room="work"] .app-truth-detail').click();
    assert.equal(await page.locator('[data-room="work"] .app-truth-groups a').count(),17);
@@ -45,9 +52,10 @@ test('De publieke B2B2C-ervaring wisselt van kant, zoekt in de echte app en past
    assert.ok(await eersteApp.locator('.app-truth-actions li').count()>0);
    assert.notEqual((await eersteApp.locator('.app-truth-note').innerText()).trim(),'');
    await page.locator('.rtg-adaptive-bar [data-rtg-adaptive-action="home"]').click();
-   await page.locator('#platform-search').fill('');
    assert.equal(await page.locator('.arrival-interface img').count(),3);
    assert.equal(await page.locator('[data-stage-screen] img').count(),3);
+   assert.equal(await page.locator('.wd-catalog [data-public-widget]').count(),4);
+   await page.locator('[data-public-sections-more] summary').click();
    assert.equal(await page.evaluate(()=>{const r=document.querySelector('.rtg-adaptive-bar').getBoundingClientRect();return r.left>=0&&r.right<=innerWidth&&r.bottom<=innerHeight}),true);
    assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),true);
    await page.locator('.pp-section-index button', {hasText:'Organisatie, partner en gebruiker'}).click();
@@ -96,6 +104,7 @@ test('static project path and JavaScript-disabled visitors retain content and re
     browser = await pw.chromium.launch(browserOpties(pw));
     for (const javaScriptEnabled of [true, false]) {
       const context = await browser.newContext({ javaScriptEnabled, viewport: { width: 390, height: 844 }, reducedMotion: 'reduce' });
+      await context.addInitScript(() => localStorage.setItem('rtg_lang', 'nl'));
       const page = await context.newPage(), failed = [];
       page.on('response', r => { if (r.status() >= 400) failed.push(r.url()); });
       await page.goto('http://127.0.0.1:' + server.address().port + prefix, { waitUntil: 'networkidle' });
@@ -103,9 +112,33 @@ test('static project path and JavaScript-disabled visitors retain content and re
         await ready(page);
         assert.equal(await page.locator('#roleCta').getAttribute('href'), 'https://app.rahultravelgroup.com/apps/werk.html');
         assert.equal(await page.evaluate(() => getComputedStyle(document.querySelector('.rtg-adaptive-bar')).getPropertyValue('--edge-bar-bg').trim()), '#1b1713');
+        assert.match(await page.locator('.pp-footer a[href$="/apps/juridisch/voorwaarden.html"]').innerText(), /bestaand/i,
+          'ook de door JavaScript opgebouwde footer wijst herkenbaar naar bestaande voorwaarden');
+        await page.locator('.pp-section-index button', { hasText: 'Wat wilt u weten?' }).click();
+        const faqPolicy = page.locator('[data-faq]').filter({ has: page.locator('a[href="#prijsbeleid"]') }).first();
+        await faqPolicy.locator('summary').click();
+        await faqPolicy.locator('a[href="#prijsbeleid"]').click();
+        await page.waitForFunction(() => document.querySelector('.pp-detail-content #prijsbeleid'));
+        assert.equal(await page.locator('#passen').isVisible(), true, 'een gewone nested ankerlink opent de canonieke passenscene');
+        assert.equal(await page.locator('#prijsbeleid').isVisible(), true);
+        await page.evaluate(() => { location.hash = 'commissie'; });
+        await page.waitForFunction(() => document.querySelector('.pp-detail-content #commissie')?.open === true);
+        assert.equal(await page.locator('#commissie table').isVisible(), true, 'hashchange opent ook de doel-details');
+        await page.goto('http://127.0.0.1:' + server.address().port + prefix + '#commissie', { waitUntil: 'networkidle' });
+        await ready(page);
+        await page.waitForFunction(() => document.querySelector('.pp-detail-content #commissie')?.open === true);
+        assert.equal(await page.locator('#commissie table').isVisible(), true, 'een rechtstreeks geopend nested fragment blijft bereikbaar');
       } else {
         assert.equal(await page.locator('[data-room]:visible').count(), 4);
-        assert.equal(await page.locator('[data-faq]:visible').count(), 23);
+        assert.ok(sourceFaqCount > 0, 'de broninventaris bevat werkelijk veelgestelde vragen');
+        assert.equal(await page.locator('[data-faq]:visible').count(), sourceFaqCount,
+          'iedere actuele bronvraag blijft zichtbaar zonder JavaScript');
+        for (const faq of await page.locator('[data-faq]').all()) {
+          assert.equal(await faq.locator('summary').count(), 1);
+          await faq.locator('summary').click();
+          assert.equal(await faq.locator('p').first().isVisible(), true, 'het native details-element ontsluit het antwoord');
+          assert.notEqual((await faq.locator('p').first().innerText()).trim(), '');
+        }
         await page.getByRole('link', { name: 'Passen', exact: true }).click();
         assert.equal(new URL(page.url()).hash, '#passen');
       }

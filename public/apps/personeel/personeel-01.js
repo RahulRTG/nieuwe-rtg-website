@@ -85,7 +85,7 @@
   }
   function renderGebouwPda(){
     const tabBtn = document.getElementById('tabGebouw');
-    if (tabBtn) tabBtn.style.display = heeftGebouw() ? '' : 'none';
+    if (tabBtn) tabBtn.classList.toggle('h-weg', !heeftGebouw());
     const wrap = $('#gebouwPdaWrap'); if (!wrap) return;
     if (!heeftGebouw()){ wrap.innerHTML = ''; return; }
     if (!pdGeb){ wrap.innerHTML = '<div class="card">…</div>'; laadGebouwPda(); return; }

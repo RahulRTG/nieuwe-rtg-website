@@ -50,26 +50,12 @@
      verschillende soorten toestemming zijn, en dat is hier niet zo. */
   function bied(naam) {
     return new Promise(function (klaar) {
-      var st = document.createElement('style');
-      st.textContent =
-        '.rtgdienst{position:fixed;left:50%;transform:translateX(-50%);z-index:9984;' +
-          'bottom:calc(env(safe-area-inset-bottom,0px) + 5.5rem);width:min(24rem,calc(100vw - 2rem));' +
-          'background:var(--paneel,#151312);border:1px solid var(--line,var(--lijn,#2A2724));' +
-          'border-radius:0;padding:1rem 1.1rem;color:var(--txt,#F7F5F1);' +
-          'font-family:Inter,system-ui,sans-serif;box-shadow:0 14px 40px rgba(0,0,0,.45);}' +
-        '.rtgdienst p{margin:0 0 .8rem;font-size:.85rem;line-height:1.55;color:var(--muted,var(--zacht,#8A8680));}' +
-        '.rtgdienst .rij{display:flex;gap:.6rem;}' +
-        '.rtgdienst button{flex:1;border:none;border-radius:0;padding:.6rem;font:inherit;' +
-          'font-size:.82rem;font-weight:600;cursor:pointer;}' +
-        '.rtgdienst .ja{background:var(--gold,#857007);color:#0C0C0B;}' +
-        '.rtgdienst .nee{background:none;color:var(--muted,#8A8680);font-weight:500;}';
-      document.head.appendChild(st);
-
       var doos = document.createElement('div');
-      doos.className = 'rtgdienst';
+      doos.className = 'ds-plaatsdienst';
       doos.setAttribute('role', 'dialog');
       doos.setAttribute('aria-label', 'Aanwezigheid tijdens je dienst');
       var p = document.createElement('p');
+      p.className = 'ds-plaatsdienst__uitleg';
       /* De tekst zegt wat er gebeurt EN wat er niet gebeurt. "Je werkgever ziet
          dat je er was, niet waar je bent geweest" is de hele belofte van deze
          laag in één zin, en juist bij aanwezigheid op het werk hoort die er te
@@ -77,9 +63,9 @@
       p.textContent = 'Je dienst bij ' + naam + ' loopt. Zal ik je aanwezigheid ' +
         'bijhouden? Je werkgever ziet dan dat je er was, niet waar je bent geweest. ' +
         'Je locatie blijft op je toestel, en het stopt als je uitklokt.';
-      var rij = document.createElement('div'); rij.className = 'rij';
-      var ja = document.createElement('button'); ja.className = 'ja'; ja.type = 'button'; ja.textContent = 'Aanzetten';
-      var nee = document.createElement('button'); nee.className = 'nee'; nee.type = 'button'; nee.textContent = 'Nu niet';
+      var rij = document.createElement('div'); rij.className = 'ds-plaatsdienst__acties';
+      var ja = document.createElement('button'); ja.className = 'ds-plaatsdienst__actie ds-plaatsdienst__actie--aan'; ja.type = 'button'; ja.textContent = 'Aanzetten';
+      var nee = document.createElement('button'); nee.className = 'ds-plaatsdienst__actie ds-plaatsdienst__actie--niet'; nee.type = 'button'; nee.textContent = 'Nu niet';
       rij.append(nee, ja);
       doos.append(p, rij);
       document.body.appendChild(doos);
@@ -87,7 +73,7 @@
       var vorigeFocus = document.activeElement;
       ja.focus();
       function sluit(antwoord) {
-        doos.remove(); st.remove();
+        doos.remove();
         try { if (vorigeFocus && vorigeFocus.focus && document.contains(vorigeFocus)) vorigeFocus.focus({ preventScroll: true }); } catch (e) {}
         klaar(antwoord);
       }

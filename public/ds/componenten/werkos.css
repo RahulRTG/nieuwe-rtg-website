@@ -1,0 +1,264 @@
+/* WerkOS-presentatie binnen het centrale Design System. */
+@layer rtg.component {
+/* Canonieke WerkOS-presentatie voor werktafel, Command Center en bordschil.
+   Gedrag en presentatie blijven gescheiden; alle hosts laden dit blad statisch. */
+
+  .ds-werkos.wos .tabbar{display:none;}
+  .ds-werkos.wos.wos-aan .content{padding-bottom:calc(env(safe-area-inset-bottom,0px) + 6.5rem);}
+  /* Nog niet gemigreerde WerkOS-hosts kunnen hun oude absolute tabbalk door
+     de on-gelaagde scherm-CSS zichtbaar houden. De centrale werkruimte geeft
+     daarom aan het einde van het echte werk voldoende scrollruimte. Zo kan
+     een actie volledig boven elke navigatielaag landen, zonder een nieuwe
+     pagina-eigen uitzondering of !important-regel. */
+  .ds-werkos.wos.wos-aan .content{scroll-padding-block-end:calc(env(safe-area-inset-bottom,0px) + 10rem);}
+  .ds-werkos.wos.wos-aan .content::after{content:"";display:block;block-size:4rem;inline-size:100%;pointer-events:none;}
+  .ds-werkos.wos #shell{background:var(--ds-grond);}
+  /* De accentstalen blijven in krappe werkbalken visueel compact, maar hun
+     centrale raakvlak voldoet op ieder scherm aan de RTG-doelmaat. */
+  .ds-werkos-kleurstaal{inline-size:var(--ds-doel);block-size:var(--ds-doel);min-inline-size:var(--ds-doel);min-block-size:var(--ds-doel);flex:0 0 var(--ds-doel);}
+  .ds-werkos.wos .topbar{
+    position:relative;z-index:5;background:color-mix(in srgb,var(--ds-cover-grond) 92%,transparent);
+    border-bottom-color:var(--ds-lijnkleur);box-shadow:none;
+    backdrop-filter:blur(18px) saturate(1.05);-webkit-backdrop-filter:blur(18px) saturate(1.05);
+  }
+
+  /* Functies komen na het echte werk van het thuisscherm. De kop markeert de
+     overgang; hij doet niet alsof een losse app een merk of een wereld is. */
+  .ds-werkos .wos-navkop{margin:2.4rem 0 0;padding:1rem 0 .75rem;border-top:1px solid var(--ds-lijnkleur);}
+  .ds-werkos .wos-navkop span{display:block;font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;color:var(--ds-inkt-zacht);font-weight:650;}
+  .ds-werkos .wos-navkop p{margin:.28rem 0 0;font-size:.82rem;line-height:1.5;color:var(--ds-inkt-zacht);}
+
+  /* Een register in plaats van een kaarten-dashboard. Geen doosjes om namen:
+     alleen glyph, naam, vaste referentie en haarlijnen. */
+  .ds-werkos .wos-grid{display:grid;grid-template-columns:1fr 1fr;margin:0 0 2.25rem;border-top:1px solid var(--ds-lijnkleur);}
+  .ds-werkos .wos-app{
+    position:relative;min-width:0;min-height:56px;padding:.65rem .9rem;
+    display:grid;grid-template-columns:34px minmax(0,1fr) auto;align-items:center;gap:.75rem;
+    border:0;border-bottom:1px solid var(--ds-lijnkleur);background:transparent;color:var(--ds-inkt);
+    font-family:var(--ds-letter-tekst);text-align:start;cursor:pointer;
+    transition:background var(--ds-duur-kort) var(--ds-curve);
+  }
+  .ds-werkos .wos-app:nth-child(odd){border-inline-end:1px solid var(--ds-lijnkleur);}
+  .ds-werkos .wos-app::after{content:"WOS-" attr(data-index);font-size:.5rem;letter-spacing:.12em;color:var(--ds-inkt-zacht);font-variant-numeric:tabular-nums;}
+  .ds-werkos .wos-app:hover{background:color-mix(in srgb,var(--ds-cover-inkt) 2.8%,transparent);}
+  .ds-werkos .wos-app:focus-visible{outline:1px solid var(--ds-focus);outline-offset:-2px;}
+  .ds-werkos .wos-app:active{background:color-mix(in srgb,var(--ds-cover-inkt) 4.5%,transparent);}
+  .ds-werkos .wos-tegel{width:34px;height:34px;display:flex;align-items:center;justify-content:flex-start;color:var(--ds-inkt-zacht);}
+  .ds-werkos .wos-tegel svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;}
+  .ds-werkos .wos-naam{min-width:0;font-size:.78rem;line-height:1.35;color:var(--ds-inkt);font-weight:550;overflow-wrap:anywhere;}
+  .ds-werkos .wos-grid + h2{margin-top:1.8rem;}
+
+  .ds-werkos.wos.wos-thuis .content{background:transparent;}
+  @media (min-width:700px){
+    .ds-werkos.wos.wos-thuis .view.active{min-height:calc(100dvh - 10.5rem);display:flex;flex-direction:column;}
+    .ds-werkos.wos.wos-thuis .wos-navkop{margin-top:auto;}
+    .ds-werkos.wos.wos-thuis .wos-app{min-height:64px;}
+  }
+  @media (max-width:620px){
+    .ds-werkos .wos-grid{grid-template-columns:1fr;}
+    .ds-werkos .wos-app:nth-child(odd){border-inline-end:0;}
+    .ds-werkos .wos-navkop{margin-top:2rem;}
+  }
+
+  /* De onderbalk is een onyx commandobalk, geen los merkobject. */
+  .ds-werkos .wos-dock{
+    position:fixed;inset-inline-start:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom,0px) + .8rem);
+    z-index:60;display:none;align-items:stretch;padding:0;
+    background:color-mix(in srgb,var(--ds-cover-grond) 94%,transparent);
+    border:1px solid var(--ds-lijnkleur);border-top-color:var(--ds-metaal);
+    box-shadow:none;backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+  }
+  .ds-werkos.wos.wos-aan .wos-dock,.ds-werkos.wos.wos-bord-aan .wos-dock{display:flex;}
+  .ds-werkos .wos-dock button{
+    position:relative;width:48px;height:48px;display:flex;align-items:center;justify-content:center;
+    border:0;border-inline-start:1px solid var(--ds-lijnkleur);border-radius:0;background:transparent;color:var(--ds-inkt-zacht);
+    cursor:pointer;transition:color var(--ds-duur-kort) var(--ds-curve),background var(--ds-duur-kort) var(--ds-curve);
+  }
+  .ds-werkos .wos-dock button:first-child{border-inline-start:0;}
+  .ds-werkos .wos-dock button:hover{background:color-mix(in srgb,var(--ds-cover-inkt) 3.5%,transparent);color:var(--ds-inkt);}
+  .ds-werkos .wos-dock button:focus-visible{outline:1px solid var(--ds-focus);outline-offset:-3px;}
+  .ds-werkos .wos-dock button svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;}
+  .ds-werkos .wos-dock button.actief{color:var(--ds-focus);background:color-mix(in srgb,var(--ds-cover-inkt) 2.5%,transparent);}
+  .ds-werkos .wos-dock button.actief::after{content:"";position:absolute;inset-inline-start:12px;inset-inline-end:12px;bottom:0;height:2px;background:var(--ds-metaal);}
+  @media (hover:hover) and (min-width:700px){
+    .ds-werkos .wos-dock button::before{
+      content:attr(data-label);position:absolute;inset-inline-start:50%;bottom:calc(100% + 9px);transform:translate(-50%,3px);opacity:0;
+      pointer-events:none;white-space:nowrap;background:var(--ds-cover-grond);border:1px solid var(--ds-lijnkleur);
+      padding:.32rem .48rem;color:var(--ds-inkt);font-size:.55rem;letter-spacing:.04em;transition:opacity .12s,transform .12s;
+    }
+    .ds-werkos .wos-dock button:hover::before{opacity:1;transform:translate(-50%,0);}
+  }
+
+  /* Command Center gebruikt op desktop het hele werkvlak: commando links,
+     resultaten in het midden en context rechts. */
+  .ds-werkos .wos-zoek{
+    position:fixed;inset:0;z-index:90;display:none;align-items:stretch;justify-content:center;
+    padding:clamp(1rem,3vw,2.4rem);background:color-mix(in srgb,var(--ds-cover-grond) 88%,transparent);
+    backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+  }
+  .ds-werkos .wos-zoek.open{display:flex;}
+  .ds-werkos.wos-command-open{overflow:hidden;}
+  .ds-werkos .wos-zoek-paneel{
+    width:min(1180px,100%);height:100%;min-height:0;display:grid;grid-template-rows:76px minmax(0,1fr) 44px;
+    border:1px solid var(--ds-lijnkleur);border-top-color:var(--ds-metaal);
+    background:var(--ds-cover-grond);box-shadow:none;overflow:hidden;
+  }
+  .ds-werkos .wos-zoek-kop{display:flex;align-items:center;padding:0 1.2rem;border-bottom:1px solid var(--ds-lijnkleur);background:transparent;}
+  .ds-werkos .wos-zoek-kop b{font-family:var(--ds-letter-display);font-size:1.35rem;font-weight:500;color:var(--ds-inkt);}
+  .ds-werkos .wos-zoek-kop span{display:block;margin-top:.15rem;font-size:.5rem;letter-spacing:.16em;text-transform:uppercase;color:var(--ds-inkt-zacht);font-weight:650;}
+  .ds-werkos .wos-zoek-sluit{margin-inline-start:auto;width:34px;height:34px;border:1px solid var(--ds-lijnkleur);border-radius:0;background:transparent;color:var(--ds-inkt-zacht);cursor:pointer;}
+  .ds-werkos .wos-zoek-sluit:hover{color:var(--ds-inkt);border-color:var(--gold-rand,var(--ds-lijnkleur));}
+  .ds-werkos .wos-zoek-sluit:focus-visible{outline:1px solid var(--ds-focus);outline-offset:2px;}
+  .ds-werkos .wos-zoek-body{min-height:0;display:grid;grid-template-columns:190px minmax(0,1fr) 260px;}
+  .ds-werkos .wos-zoek-rail{padding:1.25rem 1rem;border-inline-end:1px solid var(--ds-lijnkleur);}
+  .ds-werkos .wos-zoek-rail>span, .ds-werkos .wos-context>span{display:block;font-size:.5rem;letter-spacing:.18em;text-transform:uppercase;color:var(--ds-inkt-zacht);}
+  .ds-werkos .wos-zoek-rail ol{list-style:none;margin:1.1rem 0 0;padding:0;border-top:1px solid var(--ds-lijnkleur);counter-reset:stap;}
+  .ds-werkos .wos-zoek-rail li{counter-increment:stap;padding:.72rem 0;border-bottom:1px solid var(--ds-lijnkleur);color:var(--ds-inkt-zacht);font-size:.68rem;}
+  .ds-werkos .wos-zoek-rail li::before{content:"0" counter(stap);display:inline-block;width:2.2rem;color:var(--ds-inkt-zacht);font-size:.48rem;letter-spacing:.1em;}
+  .ds-werkos .wos-zoek-rail li:first-child{color:var(--ds-inkt);box-shadow:inset 2px 0 var(--ds-metaal);padding-inline-start:.55rem;}
+  .ds-werkos .wos-zoek-kern{min-width:0;min-height:0;display:grid;grid-template-rows:auto minmax(0,1fr);}
+  .ds-werkos .wos-zoek-veld{position:relative;margin:1.05rem;border-bottom:1px solid var(--ds-lijnkleur);padding-bottom:1.05rem;}
+  .ds-werkos .wos-zoek-veld::before{content:"/";position:absolute;inset-inline-start:.9rem;top:calc(50% - .5rem);transform:translateY(-50%);color:var(--ds-focus);font-family:var(--ds-letter-display);font-size:1.08rem;}
+  .ds-werkos .wos-zoek-paneel input{width:100%;padding:.84rem 1rem .84rem 2.05rem;border:1px solid var(--ds-lijnkleur);border-radius:0;background:color-mix(in srgb,var(--ds-cover-inkt) 2.5%,transparent);color:var(--ds-inkt);font-size:.86rem;outline:none;font-family:inherit;}
+  .ds-werkos .wos-zoek-paneel input::placeholder{color:var(--ds-inkt-zacht);}
+  .ds-werkos .wos-zoek-paneel input:focus{border-color:var(--gold-rand,var(--ds-lijnkleur));box-shadow:inset 2px 0 var(--ds-metaal);}
+  .ds-werkos .wos-zoek-lijst{min-height:0;height:100%;padding:0 1.05rem 1rem;display:grid;grid-auto-rows:minmax(58px,1fr);overflow-y:auto;}
+  .ds-werkos .wos-zoek-lijst button{width:100%;min-height:58px;display:grid;grid-template-columns:34px minmax(0,1fr) auto;align-items:center;gap:.72rem;padding:.55rem .55rem;text-align:start;cursor:pointer;border:0;border-bottom:1px solid var(--ds-lijnkleur);border-radius:0;background:transparent;color:var(--ds-inkt);font-size:.78rem;font-family:inherit;}
+  .ds-werkos .wos-zoek-lijst button:hover, .ds-werkos .wos-zoek-lijst button.is-selected{background:color-mix(in srgb,var(--ds-cover-inkt) 3.5%,transparent);box-shadow:inset 2px 0 var(--ds-metaal);}
+  .ds-werkos .wos-zoek-lijst button:focus-visible{outline:1px solid var(--ds-focus);outline-offset:-2px;}
+  .ds-werkos .wos-zoek-lijst .zi{width:34px;height:34px;display:flex;align-items:center;justify-content:flex-start;color:var(--ds-inkt-zacht);}
+  .ds-werkos .wos-zoek-lijst .zi svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.6;}
+  .ds-werkos .wos-zoek-code{margin-inline-start:auto;font-size:.48rem;letter-spacing:.12em;color:var(--ds-inkt-zacht);font-variant-numeric:tabular-nums;}
+  .ds-werkos .wos-zoek-leeg{padding:1.3rem .55rem;color:var(--ds-inkt-zacht);font-size:.72rem;}
+  .ds-werkos .wos-context{position:relative;padding:1.25rem;border-inline-start:1px solid var(--ds-lijnkleur);}
+  .ds-werkos .wos-context b{display:block;margin-top:1.2rem;font:500 1.45rem/1.08 var(--ds-letter-display);color:var(--ds-inkt);}
+  .ds-werkos .wos-context p{margin:.65rem 0 0;color:var(--ds-inkt-zacht);font-size:.72rem;line-height:1.6;}
+  .ds-werkos .wos-context code{position:absolute;inset-inline-start:1.25rem;inset-inline-end:1.25rem;bottom:1.25rem;padding-top:.75rem;border-top:1px solid var(--ds-lijnkleur);color:var(--ds-inkt-zacht);font:500 .5rem var(--rtg-interface,Inter,sans-serif);letter-spacing:.14em;text-transform:uppercase;}
+  .ds-werkos .wos-zoek-voet{display:flex;align-items:center;gap:1rem;padding:0 1.15rem;border-top:1px solid var(--ds-lijnkleur);font-size:.48rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ds-inkt-zacht);}
+  .ds-werkos .wos-zoek-voet span:last-child{margin-inline-start:auto;}
+  .ds-werkos .wos-zoek-voet kbd{font-family:inherit;color:var(--ds-inkt);border:1px solid var(--ds-lijnkleur);border-radius:0;padding:.08rem .24rem;margin-inline-end:.28rem;background:transparent;}
+  @media (max-width:820px){.ds-werkos .wos-zoek-body{grid-template-columns:1fr}.ds-werkos .wos-zoek-rail, .ds-werkos .wos-context{display:none}}
+  @media (min-width:901px){
+    .ds-werkos.wos.wos-aan .topbar,.ds-werkos.wos.wos-aan .content,.ds-werkos.wos.wos-bord-aan header,.ds-werkos.wos.wos-bord-aan #app{margin-inline-start:176px;}
+    .ds-werkos.wos.wos-aan .wos-dock,.ds-werkos.wos.wos-bord-aan .wos-dock{inset-inline-start:calc(50% + 88px);}
+  }
+  @media (min-width:621px) and (max-width:900px){
+    .ds-werkos.wos .wos-rail{width:64px;}.ds-werkos.wos .wos-rail-kop{font-size:0;height:42px;padding:0;}.ds-werkos.wos .wos-rail-kop::after{content:"WOS";height:42px;display:grid;place-items:center;font-size:.46rem;letter-spacing:.12em;color:var(--ds-inkt-zacht);}
+    .ds-werkos.wos .wos-rail button{grid-template-columns:1fr;padding:.55rem;justify-items:center;}.ds-werkos.wos .wos-rail button span{display:none;}
+    .ds-werkos.wos.wos-aan .topbar,.ds-werkos.wos.wos-aan .content,.ds-werkos.wos.wos-bord-aan header,.ds-werkos.wos.wos-bord-aan #app{margin-inline-start:64px;}
+    .ds-werkos.wos.wos-aan .wos-dock,.ds-werkos.wos.wos-bord-aan .wos-dock{inset-inline-start:calc(50% + 32px);}
+    .ds-werkos.wos .wos-top-huidig{min-width:130px;}
+  }
+
+  /* Op de telefoon blijft de driedelige WerkOS-schil volledig bruikbaar.
+     De contextbalk krijgt een eigen rij, de rail blijft een compacte
+     glyfenstrook en de dock houdt altijd Start en Command Center bereikbaar. */
+  @media (max-width:620px){
+    .ds-werkos.wos.wos-aan:not(.wos-thuis) .wos-pill{display:flex;}
+    .ds-werkos.wos .wos-rail{width:50px;}
+    .ds-werkos.wos .wos-rail-kop{font-size:0;height:36px;padding:0;}
+    .ds-werkos.wos .wos-rail-kop::after{content:"W";height:36px;display:grid;place-items:center;font:500 .75rem var(--ds-letter-display);color:var(--ds-focus);}
+    .ds-werkos.wos .wos-rail button{grid-template-columns:1fr;padding:.5rem;justify-items:center;min-height:48px;}
+    .ds-werkos.wos .wos-rail button span{display:none;}
+    .ds-werkos.wos.wos-aan .topbar,.ds-werkos.wos.wos-aan .content,.ds-werkos.wos.wos-bord-aan header,.ds-werkos.wos.wos-bord-aan #app{margin-inline-start:50px;}
+    .ds-werkos.wos.wos-aan .topbar{margin-block-start:calc(env(safe-area-inset-top,0px) + 3.6rem);padding-top:calc(env(safe-area-inset-top,0px) + 4.15rem);}
+    .ds-werkos.wos.wos-bord-aan header{margin-block-start:calc(env(safe-area-inset-top,0px) + 3.6rem);padding-top:calc(env(safe-area-inset-top,0px) + 4rem);}
+    .ds-werkos .wos-dock{inset-inline-start:calc(50% + 25px);bottom:calc(env(safe-area-inset-bottom,0px) + .65rem);max-width:calc(100vw - 62px);overflow:hidden;}
+    .ds-werkos .wos-dock button{width:44px;height:44px;}
+    .ds-werkos.wos .wos-top-context{position:fixed;z-index:55;top:calc(env(safe-area-inset-top,0px) + .55rem);inset-inline-end:.55rem;inset-inline-start:.55rem;transform:none;height:42px;}
+    .ds-werkos.wos .wos-top-context button{width:42px;flex:0 0 42px;}
+    .ds-werkos.wos .wos-top-huidig{display:flex;min-width:0;flex:1;overflow:hidden;}
+    .ds-werkos.wos .wos-top-huidig b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+    .ds-werkos .wos-zoek{padding:.65rem;}
+    .ds-werkos .wos-zoek-paneel{height:100%;grid-template-rows:64px minmax(0,1fr) 40px;}
+    .ds-werkos .wos-zoek-voet{gap:.55rem;}
+    .ds-werkos .wos-zoek-voet span:nth-child(2){display:none;}
+  }
+  @media (max-width:360px){.ds-werkos .wos-dock button:nth-child(n+5):not(:last-child){display:none;}}
+
+  /* Beweging bevestigt alleen een wissel van werkvlak. */
+  @media (prefers-reduced-motion:no-preference){
+    .ds-werkos.wos-aan .view.active{animation:wosOpen var(--ds-duur-vol) var(--ds-curve);}
+    @keyframes wosOpen{from{transform:translateY(4px);opacity:.72;}to{transform:none;opacity:1;}}
+    .ds-werkos.wos .content.wos-veeg-terug{transition:transform .18s var(--ds-curve),opacity .18s ease;}
+    .ds-werkos.wos .content.wos-veeg-weg{transition:transform .15s ease-in,opacity .15s ease-in;transform:translateY(-18px);opacity:0;}
+  }
+  .ds-werkos .wos-pill{
+    position:fixed;inset-inline-start:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom,0px) + .2rem);
+    z-index:61;width:116px;height:18px;background:none;border:0;padding:0;cursor:pointer;
+    display:none;align-items:center;justify-content:center;touch-action:none;
+  }
+  .ds-werkos .wos-pill::after{content:"";width:86px;height:2px;background:var(--ds-inkt-zacht);}
+  .ds-werkos .wos-pill:focus-visible{outline:1px solid var(--ds-focus);outline-offset:2px;}
+  .ds-werkos.wos-thuis .wos-pill,.ds-werkos:not(.wos-aan) .wos-pill{display:none;}
+
+  /* De vaste WerkOS-schil: links alle werkvlakken, boven de huidige context
+     en onder de snelle commando's. Elke balk bedient het geopende scherm. */
+  .ds-werkos .wos-rail{
+    position:fixed;z-index:50;inset-inline-start:0;top:var(--wos-top-h,64px);bottom:0;width:176px;display:none;
+    border-inline-end:1px solid var(--ds-lijnkleur);background:color-mix(in srgb,var(--ds-cover-grond) 97%,transparent);
+    overflow-y:auto;overscroll-behavior:contain;padding-bottom:calc(env(safe-area-inset-bottom,0px) + 5.5rem);
+  }
+  .ds-werkos.wos.wos-aan .wos-rail,.ds-werkos.wos.wos-bord-aan .wos-rail{display:block;}
+  .ds-werkos .wos-rail-kop{padding:1rem .85rem .7rem;border-bottom:1px solid var(--ds-lijnkleur);font-size:.5rem;letter-spacing:.18em;text-transform:uppercase;color:var(--ds-inkt-zacht);}
+  .ds-werkos .wos-rail button{position:relative;width:100%;min-height:52px;display:grid;grid-template-columns:28px minmax(0,1fr);align-items:center;gap:.55rem;padding:.55rem .75rem;border:0;border-bottom:1px solid var(--ds-lijnkleur);border-radius:0;background:transparent;color:var(--ds-inkt-zacht);font:500 .68rem/1.3 var(--rtg-interface,Inter,sans-serif);text-align:start;cursor:pointer;}
+  .ds-werkos .wos-rail button:hover{background:color-mix(in srgb,var(--ds-cover-inkt) 3%,transparent);color:var(--ds-inkt);}
+  .ds-werkos .wos-rail button:focus-visible{outline:1px solid var(--ds-focus);outline-offset:-2px;}
+  .ds-werkos .wos-rail button.actief{color:var(--ds-inkt);background:color-mix(in srgb,var(--ds-cover-inkt) 2.5%,transparent);box-shadow:inset 2px 0 var(--ds-metaal);}
+  .ds-werkos .wos-rail button svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;}
+  .ds-werkos .wos-top-context{position:fixed;z-index:55;top:.8rem;inset-inline-start:50%;transform:translateX(-50%);display:none;align-items:stretch;height:38px;border:1px solid var(--ds-lijnkleur);background:color-mix(in srgb,var(--ds-cover-grond) 26%,transparent);}
+  .ds-werkos.wos.wos-aan .wos-top-context,.ds-werkos.wos.wos-bord-aan .wos-top-context{display:flex;}
+  .ds-werkos .wos-top-context button{width:38px;border:0;border-radius:0;background:transparent;color:var(--ds-inkt-zacht);display:grid;place-items:center;cursor:pointer;}
+  .ds-werkos .wos-top-context button+button, .ds-werkos .wos-top-context .wos-top-huidig+button{border-inline-start:1px solid var(--ds-lijnkleur);}
+  .ds-werkos .wos-top-context button:hover{background:color-mix(in srgb,var(--ds-cover-inkt) 3.5%,transparent);color:var(--ds-inkt);}
+  .ds-werkos .wos-top-context button:focus-visible{outline:1px solid var(--ds-focus);outline-offset:-2px;}
+  .ds-werkos .wos-top-context svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;}
+  .ds-werkos .wos-top-huidig{min-width:170px;padding:.42rem .75rem;display:flex;flex-direction:column;justify-content:center;}
+  .ds-werkos .wos-top-huidig span{font-size:.47rem;letter-spacing:.13em;text-transform:uppercase;color:var(--ds-inkt);}
+  .ds-werkos .wos-top-huidig b{margin-top:.08rem;font:550 .66rem var(--rtg-interface,Inter,sans-serif);color:var(--ds-inkt);}
+
+.ds-werkos .wos-bord{
+      position:fixed;inset:0;z-index:80;display:none;height:100dvh;box-sizing:border-box;overflow-y:auto;
+      background:color-mix(in srgb,var(--ds-cover-grond) 96%,transparent);
+      backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+      padding:clamp(1.4rem,4vh,2.7rem) 1.4rem;
+    }
+    .ds-werkos .wos-bord.open{display:block;}
+    .ds-werkos .wos-bord-kader{width:min(1120px,100%);min-height:100%;margin:0 auto;display:grid;grid-template-rows:auto minmax(0,1fr);}
+    .ds-werkos .wos-bord-kop{position:relative;margin-bottom:1.2rem;padding:1.2rem 3.6rem 1.25rem 0;border-top:1px solid var(--gold-rand,var(--ds-lijnkleur));border-bottom:1px solid var(--ds-lijnkleur);background:transparent;}
+    .ds-werkos .wos-bord-kicker{font-size:.52rem;letter-spacing:.18em;text-transform:uppercase;color:var(--ds-inkt-zacht);font-weight:650;}
+    .ds-werkos .wos-bord-titel{margin-top:.52rem;font-family:var(--ds-letter-display);font-size:clamp(1.65rem,3.5vw,2.7rem);font-weight:500;line-height:1.02;letter-spacing:-.02em;color:var(--ds-inkt);}
+    .ds-werkos .wos-bord-sub{margin-top:.5rem;max-width:34rem;font-size:.72rem;line-height:1.58;color:var(--ds-inkt-zacht);}
+    .ds-werkos .wos-bord-sluit{position:absolute;inset-inline-end:0;top:1rem;width:34px;height:34px;border:1px solid var(--ds-lijnkleur);border-radius:0;background:transparent;color:var(--ds-inkt-zacht);cursor:pointer;}
+    .ds-werkos .wos-bord-sluit:hover{border-color:var(--gold-rand,var(--ds-lijnkleur));color:var(--ds-inkt);}
+    .ds-werkos .wos-bord-sluit:focus-visible{outline:1px solid var(--ds-focus);outline-offset:2px;}
+    .ds-werkos .wos-bord .wos-grid{width:100%;min-height:0;margin:0;align-self:stretch;grid-template-columns:1fr 1fr;grid-auto-rows:minmax(68px,1fr);}
+    .ds-werkos .wos-bord .wos-app{min-height:68px;}
+    .ds-werkos .wos-flits{outline:1px solid var(--ds-focus);outline-offset:3px;transition:outline-color .6s;}
+    .ds-werkos .wos-bord-knop{
+      display:inline-flex;align-items:center;gap:.45rem;cursor:pointer;
+      min-height:32px;border:0;border-bottom:1px solid var(--ds-lijnkleur);border-radius:0;
+      background:transparent;color:var(--ds-inkt-zacht);
+      padding:.48rem .78rem;font-size:.62rem;font-family:inherit;letter-spacing:.11em;text-transform:uppercase;
+      box-shadow:none;transition:border-color .12s,color .12s,background .12s;
+    }
+    .ds-werkos .wos-bord-knop:hover{border-color:var(--gold-rand,var(--ds-lijnkleur));background:color-mix(in srgb,var(--ds-cover-inkt) 2.5%,transparent);color:var(--ds-inkt);}
+    .ds-werkos .wos-bord-knop:focus-visible{outline:1px solid var(--ds-focus);outline-offset:2px;}
+    .ds-werkos .wos-bord-knop svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.6;}
+    @media (max-width:620px){.ds-werkos .wos-bord{height:auto;min-height:100dvh;padding:1.2rem .9rem 2rem}.ds-werkos .wos-bord-kader{min-height:auto}.ds-werkos .wos-bord-kop{padding:1.1rem 3rem 1.1rem 0}.ds-werkos .wos-bord .wos-grid{grid-template-columns:1fr;grid-auto-rows:minmax(68px,auto)}}
+
+  /* Staat na de algemene contextregel, zodat de mobiele vaste balk niet door
+     de algemene absolute desktoppositie wordt teruggenomen. */
+  @media (max-width:620px) {
+    .ds-werkos.wos .wos-top-context {
+      position: fixed;
+      z-index: 55;
+      top: calc(env(safe-area-inset-top, 0px) + .55rem);
+      inset-inline: .55rem;
+      transform: none;
+      block-size: 42px;
+    }
+    .ds-werkos.wos .wos-top-context button { inline-size: 42px; flex: 0 0 42px; }
+  }
+
+}

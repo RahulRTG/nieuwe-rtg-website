@@ -34,6 +34,7 @@
    <body data-appmenu-uit>. */
 (function (w, d) {
   'use strict';
+  const dsBijStart = document.documentElement.hasAttribute('data-ds');
   if (w.RTGAppMenu) return;
 
   var body = d.body;
@@ -41,6 +42,12 @@
   /* Het beginscherm doet niet mee: zie de kop. Daar is de bovenrand de ingang
      naar het systeem, niet een knop in beeld. */
   if (body.hasAttribute('data-ios-home')) return;
+
+  /* Eén controller, dezelfde hooks en één canonieke presentatie. De oude
+     klassennamen blijven als gedragscontract bestaan; de DS-klassen tekenen. */
+  function menuKlasse(oud, nieuw) {
+    return oud + ' ' + nieuw;
+  }
 
   var T = function (k, nl) { return (w.RTGi18n && w.RTGi18n.t) ? w.RTGi18n.t(k, nl) : nl; };
 
@@ -75,4 +82,3 @@
     w.I18N.en = w.I18N.en || {};
     for (var k in eigen) if (!(k in w.I18N.en)) w.I18N.en[k] = eigen[k];
   })();
-

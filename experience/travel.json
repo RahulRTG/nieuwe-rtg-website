@@ -1,6 +1,9 @@
 {
   "id": "travel",
-  "proofRefs": ["contract", "intent"],
+  "proofRefs": [
+    "contract",
+    "intent"
+  ],
   "version": 1,
   "purpose": "travel_request",
   "humanIntent": "Ik wil een reis aanvragen en weten wat de reisadviseur heeft bevestigd.",
@@ -172,6 +175,12 @@
       "layer": "RESILIENCE",
       "test": "test/experience-travel.e2e.js",
       "scope": "Chromium op 390 en 1440 px: Travel-ingang, expliciet contextbehoud, antwoordverlies, mislukte broncontrole, herstel en bevestigd reisoverzicht. Geen fysieke iPhone-proef."
+    },
+    {
+      "id": "hotels-destination",
+      "layer": "EXPERIENCE",
+      "test": "test/hotels-ds.e2e.js",
+      "scope": "Deelbewijs Hotels continuity:destination: echt aangemeld lid, normal-collectie, Chromium 390×844. Andere configuraties en volledige schermkwalificatie blijven open."
     }
   ],
   "humanReview": {

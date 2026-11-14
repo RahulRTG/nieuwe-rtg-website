@@ -52,6 +52,19 @@ function capabilityVan(pad, register, diepte = 0) {
 function vergelijk(ingang, landing, register) {
   const ingangCap = capabilityVan(ingang, register);
   const landingCap = capabilityVan(landing, register);
+  // Querycontext is alleen verplicht wanneer het contract haar benoemt. Een
+  // fysieke documentingang blijft compatibel met query's en bestaande tabs.
+  let verwacht, gezien;
+  try {
+    verwacht = new URL(ingang, 'https://rtg.invalid');
+    gezien = new URL(landing, 'https://rtg.invalid');
+  } catch {
+    return { uitkomst: 'andere-context', ingangCap, landingCap };
+  }
+  if (gezien.origin !== verwacht.origin || gezien.username || gezien.password ||
+      (verwacht.search && verwacht.search !== gezien.search)) {
+    return { uitkomst: 'andere-context', ingangCap, landingCap };
+  }
   if (schermpad(ingang) === schermpad(landing)) return { uitkomst: 'zelfde-scherm', ingangCap, landingCap };
   if (!ingangCap || !landingCap) return { uitkomst: 'onbekend', ingangCap, landingCap };
   return { uitkomst: ingangCap === landingCap ? 'zelfde-capability' : 'andere-capability', ingangCap, landingCap };
@@ -68,6 +81,10 @@ function beoordeel({ ingang, landing, register, persona, anderen }) {
     return { status: 'BEWEZEN', bestemming: v,
       reden: 'opent voor een ' + persona + ' zonder poort en zonder fout' +
         (v.uitkomst === 'zelfde-capability' ? ', via ' + schermpad(landing) + ' (dezelfde capability ' + v.ingangCap + ')' : '') };
+  }
+  if (v.uitkomst === 'andere-context') {
+    return { status: 'NIET_GETEST', bestemming: v,
+      reden: 'de landing behoudt niet de lokale origin en expliciete querycontext van de ingang ' + ingang };
   }
   if (v.uitkomst === 'onbekend') {
     return { status: 'NIET_GETEST', bestemming: v,

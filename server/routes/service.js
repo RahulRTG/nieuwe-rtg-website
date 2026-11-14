@@ -67,7 +67,7 @@ module.exports = (kern) => {
   }));
 
   app.post('/api/service/mijn', auth, (req, res) => veilig(res, () =>
-    ({ ok: true, zaken: serviceZaken.lijst({ melder: melder(req), max: 50 }) })));
+    ({ ok: true, zaken: serviceZaken.lijst({ melder: melder(req), max: 50, voorMelder: true }) })));
 
   /* Een zaak met zijn tijdlijn. Alleen die van de melder zelf: de controle
      staat hier en niet in de kern, want de kern kent het kantoor ook -- en dat
@@ -132,6 +132,7 @@ module.exports = (kern) => {
   app.post('/api/service/bel', auth, (req, res) => veilig(res, () =>
     serviceGesprek.bel({ melder: melder(req), tier: req.session.tier,
       zaakId: kort(lijf(req).id, 40), video: lijf(req).video === true,
+      ondersteuning: lijf(req).ondersteuning === true,
       titel: kort(lijf(req).titel, 200) })));
 
   /* Het doorgeefluik voor de WebRTC-onderhandeling. De kern kijkt niet in het
@@ -147,7 +148,12 @@ module.exports = (kern) => {
     return serviceGesprek.eind(g.id, { door: 'melder' });
   }));
 
-  app.post('/api/service/bel/mijn', auth, (req, res) => veilig(res, () =>
-    ({ ok: true, gesprekken: serviceGesprek.mijne(melder(req)),
-      mag: serviceGesprek.magBellen(req.session.tier) })));
+  app.post('/api/service/bel/mijn', auth, (req, res) => veilig(res, () => {
+    const z = serviceZaken.vind(kort(lijf(req).id, 40));
+    const ondersteuning = z && z.melder === melder(req);
+    return { ok: true, gesprekken: serviceGesprek.mijne(melder(req)),
+      mag: ondersteuning ? { mag: true, via: 'eigen zaak',
+        waarom: 'U kunt vanuit deze zaak een veilige meekijksessie starten.' }
+        : serviceGesprek.magBellen(req.session.tier) };
+  }));
 };

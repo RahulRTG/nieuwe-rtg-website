@@ -1,6 +1,8 @@
 /* Een scherm op het RTG Design System (ONTWERPSYSTEEM.md) heeft een andere
-   schil dan de oude: geen .rtg-adaptive-bar, geen editorial-v4, geen
-   wd-shell, maar /ds/rtg-ds.css en de Edge uit /ds/edge.js. De algemene
+   schil dan de oude: geen .rtg-adaptive-bar en geen editorial-v4, maar
+   /ds/rtg-ds.css en de Edge uit /ds/edge.js. Een wereldwerkruimte mag precies
+   één bestaande, directe .wd-shell behouden; die runtime draagt de levende
+   panelen en het DS bezit haar presentatie. De algemene
    schermronde meet hier dus DIE schil en niet de afwezigheid van de oude:
    de Edge staat (met Rahul), er is geen tweede, oude Edge, het systeem is
    geladen, niets loopt horizontaal over, beelden laden echt, en er is geen
@@ -10,16 +12,30 @@
 'use strict';
 module.exports = async function dsScherm(page, row, errors) {
   const voorbeeld = await page.evaluate(() => location.pathname.startsWith('/ds/'));
-  await page.waitForSelector(voorbeeld ? '.ds-toestel .ds-edge__balk' : '.ds-edge__balk [data-ds-edge="rahul"]', { timeout: 12000 });
+  await page.waitForFunction(({ voorbeeld }) => {
+    const zichtbaar = selector => [...document.querySelectorAll(selector)].some(e =>
+      e.getClientRects().length && getComputedStyle(e).visibility !== 'hidden');
+    return zichtbaar(voorbeeld ? '.ds-toestel .ds-edge__balk' : '.ds-edge__balk [data-ds-edge="rahul"]') ||
+      zichtbaar('.ds-foundation-toegang');
+  }, { voorbeeld }, { timeout: 12000 });
   await page.evaluate(() => document.fonts.ready);
   await page.waitForFunction(() => [...document.querySelectorAll('img')].filter(i => i.loading !== 'lazy' || i.getClientRects().length)
     .every(i => i.complete), null, { timeout: 12000 });
   row.state = await page.evaluate(() => {
-    const zichtbaar = s => [...document.querySelectorAll(s)].filter(e => e.getClientRects().length && getComputedStyle(e).visibility !== 'hidden').length;
+    const zichtbaarElement = e => e.getClientRects().length && getComputedStyle(e).visibility !== 'hidden';
+    const zichtbaar = s => [...document.querySelectorAll(s)].filter(zichtbaarElement).length;
+    const oudeShells = [...document.querySelectorAll('.wd-shell')].filter(e =>
+      zichtbaarElement(e) &&
+      !(document.body.classList.contains('ds-wereldwerkruimte') && e.parentElement === document.body)
+    ).length;
     return {
       world: document.body.dataset.rtgWorld,
       systeem: getComputedStyle(document.documentElement).getPropertyValue('--ds-schermhoogte').trim(),
-      edges: zichtbaar('.ds-edge__balk'), oudeEdges: zichtbaar('.rtg-adaptive-bar,.wd-shell'),
+      edges: zichtbaar('.ds-edge__balk'),
+      oudeEdges: zichtbaar('.rtg-adaptive-bar,.rtg-edge-chrome') + oudeShells,
+      toegang: zichtbaar('.ds-foundation-toegang'),
+      toegangRect: (() => { const e = document.querySelector('.ds-foundation-toegang'); if (!e) return null;
+        const r = e.getBoundingClientRect(); return { x:r.x, y:r.y, w:r.width, h:r.height, right:r.right, bottom:r.bottom }; })(),
       kapotteBeelden: [...document.querySelectorAll('img')].filter(i => i.complete && i.getClientRects().length && !i.naturalWidth).length,
       overflow: document.documentElement.scrollWidth > innerWidth + 1
     };
@@ -27,7 +43,9 @@ module.exports = async function dsScherm(page, row, errors) {
   const s = row.state; row.failures = [];
   if (row.http !== 200) row.failures.push('http-' + row.http);
   if (!s.systeem) row.failures.push('design-system-not-loaded');
-  if (!s.edges) row.failures.push('missing-ds-edge');
+  if (!s.edges && !s.toegang) row.failures.push('missing-ds-edge');
+  if (s.toegang && (!s.toegangRect || s.toegangRect.w < 280 || s.toegangRect.h < 180 ||
+    s.toegangRect.x < 0 || s.toegangRect.right > await page.evaluate(() => innerWidth) + 1)) row.failures.push('invalid-foundation-access-gate');
   if (s.oudeEdges) row.failures.push('legacy-shell-on-ds-screen');
   if (s.kapotteBeelden) row.failures.push('broken-image');
   if (s.overflow) row.failures.push('horizontal-overflow');

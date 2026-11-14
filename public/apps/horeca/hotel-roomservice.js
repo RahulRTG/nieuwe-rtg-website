@@ -21,10 +21,10 @@
       var d = r.body;
       if (d.error) return K.meld(d.error);
       $('sLijst').innerHTML = (d.rekeningen || []).map(function (x) {
-        return '<div class="item"><span><b>' + esc(x.tafel || x.kanaal) + '</b> <span class="stil">· ' +
-          x.regels + ' regel(s)</span></span><span class="rij"><span class="stil">' + K.euro(x.totalen.teBetalen) +
+        return '<div class="item ds-horeca-item"><span><b>' + esc(x.tafel || x.kanaal) + '</b> <span class="stil ds-horeca-meta">· ' +
+          x.regels + ' regel(s)</span></span><span class="rij ds-horeca-rij"><span class="stil ds-horeca-meta">' + K.euro(x.totalen.teBetalen) +
           '</span>' + K.knop('Openen', { rek: x.id }) + '</span></div>';
-      }).join('') || '<p class="stil">Er loopt geen roomservice.</p>';
+      }).join('') || '<p class="stil ds-horeca-meta">Er loopt geen roomservice.</p>';
       K.bind($('sLijst'), 'rek', function (b) { huidig = b.dataset.rek; toon(); });
       if (huidig) toon();
     });
@@ -38,8 +38,8 @@
       $('sKop').textContent = (rek.tafel || 'Roomservice') + ' · kamer ' + (rek.kamer || '?');
       $('sDetail').innerHTML = (rek.regels || []).map(function (x) {
         return K.rij(x.aantal + '× ' + esc(x.naam) +
-          (x.allergie ? ' <span class="allergie">' + esc(x.allergie) + '</span>' : '') +
-          ' <span class="tag' + (x.vrijAt ? ' aan' : '') + '">' + esc(x.vrijAt ? x.stand : 'niet vrijgegeven') + '</span>',
+          (x.allergie ? ' <span class="allergie ds-horeca-allergie">' + esc(x.allergie) + '</span>' : '') +
+          ' <span class="tag ds-horeca-tag' + (x.vrijAt ? ' aan' : '') + '">' + esc(x.vrijAt ? x.stand : 'niet vrijgegeven') + '</span>',
         K.euro(x.centen * x.aantal));
       }).join('') + K.rij('<b>Te betalen</b>', '<b>' + K.euro(rek.totalen.teBetalen) + '</b>');
     });

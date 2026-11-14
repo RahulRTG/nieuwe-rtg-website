@@ -43,7 +43,7 @@ test('Agenda: maandraster, Rahul plant, uitnodigen op codenaam, ja zeggen en ICS
         localStorage.setItem('rtg_lang', 'nl'); localStorage.setItem('rtg_cookieinfo_v1', '1');
       }, token);
       await page.goto(base + '/apps/agenda.html', { waitUntil: 'domcontentloaded' });
-      await page.waitForSelector('body[data-rtg-adaptive-ready="true"]');
+      await page.waitForSelector('body[data-rtg-adaptive-ready="true"], html[data-ds] .ds-edge__balk');
       await require('./helper').edgeBediening(page, 'Maand');
       await page.waitForSelector('.mgrid', { timeout: 15000 });
     };
@@ -59,13 +59,9 @@ test('Agenda: maandraster, Rahul plant, uitnodigen op codenaam, ja zeggen en ICS
       null, { timeout: 8000 });
 
     /* ---- A: het paneel, met herhaling en plek ---- */
-    await page.waitForSelector('body[data-rtg-edge-2-rendered="true"]', { timeout: 8000 });
-    const hoofdactie = '.rtg-edge-action > button:not(.rtg-edge-2-context-button)';
-    const zichtbareHoofdactie = hoofdactie + ' [data-rtg-action-copy-for="idle"][aria-hidden="false"]';
-    assert.equal(await page.textContent(zichtbareHoofdactie), 'Nieuwe afspraak',
-      'de enige onderrand biedt de echte Agenda-hoofdactie aan');
-    await require('./helper').edgeActies(page);
-    await page.click(hoofdactie);
+    assert.match(await require('./helper').edgeActies(page), /Nieuwe afspraak/,
+      'de centrale Edge biedt de echte Agenda-hoofdactie aan');
+    await require('./helper').edgeBediening(page, 'Nieuwe afspraak');
     await page.waitForSelector('#afScrim.open', { timeout: 5000 });
     await page.fill('#afTitel', 'Padel');
     await page.fill('#afDatum', morgen);
@@ -113,8 +109,7 @@ test('Agenda: maandraster, Rahul plant, uitnodigen op codenaam, ja zeggen en ICS
     await page.waitForFunction(() => /komt(?! niet)/.test(document.querySelector('#afDeelnemers').textContent),
       null, { timeout: 8000 });
     await page.click('#afDicht');
-    await require('./helper').edgeActies(page);
-    await page.locator('.rtg-adaptive-controls').getByRole('button', { name: 'Agenda exporteren', exact: true }).click();
+    await require('./helper').edgeBediening(page, 'Agenda exporteren');
     await page.waitForFunction(() => /rtg-agenda\.ics/.test(document.querySelector('#melding').textContent),
       null, { timeout: 8000 });
 

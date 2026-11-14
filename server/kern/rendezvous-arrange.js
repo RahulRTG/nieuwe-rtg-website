@@ -37,8 +37,22 @@ module.exports = (ctx) => {
   function nogGeldig(v, mij, zij) {
     if (!v) return false;
     if (v.stad) {
-      const samen = AW.overlapTussen(mij, zij);
-      if (!samen.some(s => s.stad.toLowerCase() === String(v.stad).toLowerCase() && s.tot >= v.van)) return false;
+      const stad = String(v.stad).toLowerCase();
+      if (v.van || v.tot) {
+        /* Een gedateerd voorstel is uit een aanwezigheidsdoorsnede ontstaan.
+           Diezelfde periode moet nog bestaan; alleen dezelfde stad is niet
+           genoeg wanneer een van beide leden het betreffende venster wist. */
+        const samen = AW.overlapTussen(mij, zij);
+        if (!samen.some(s => s.stad.toLowerCase() === stad &&
+          (!v.van || s.van <= v.van) && (!v.tot || s.tot >= v.tot))) return false;
+      } else {
+        /* Een ongedateerd voorstel komt uit de gedeelde voorkeurslocaties van
+           de match. Dat voorstel heeft nooit op aanwezigheid geleund en mag
+           daarom ook niet achteraf door een lege presence graph vervallen. */
+        const heeft = p => (Array.isArray(p.locaties) ? p.locaties : [])
+          .some(locatie => String(locatie).toLowerCase() === stad);
+        if (!heeft(mij) || !heeft(zij)) return false;
+      }
     }
     if (v.dagdeel) {
       const s = B.samenValt(mij.beschikbaar, zij.beschikbaar);

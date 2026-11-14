@@ -42,7 +42,7 @@
       project-room rtgone rtgschool rtmail sitemaker vertegenwoordiging werk \
       appcel appstore-kantoor appstore-uitgever architect-pda belastingkantoor bewijsmap boardroom \
       concern doos handel hardware-pda horeca-bar horeca-beheer horeca-bezorg horeca-club horeca-events \
-      horeca-expeditie horeca-haccp horeca-hotel horeca-pda horeca-vloer horeca kantoorpda kassa \
+      horeca-expeditie horeca-haccp horeca-hotel horeca-pda horeca-vloer horeca kassa \
       klankwerk-kantoor kosten leerhuis leerhuis-werk leverancier-aanvragen leverancier-commerce leverancier-rtmail \
       leverancier-service leverancier loonstrook loopbaan loopbaanbewijs magnaat-kantoor magnaat-partnerstudio meldkamer merken \
       pakketten partner-network partner-worden payroll platformregister redactie-pda redactie \
@@ -69,12 +69,12 @@
       foundation/veilig foundation/veilig-vertrouwd foundation/verhaaltje foundation/verjaardagen foundation/vrienden \
       foundation/wegwijzer foundation/werk foundation/winkel foundation/zakgeld foundation/zorg \
       connect defensie gemeente gemeenteloket gemeentepda lab lesmaker library livinglab overheid overheidspda \
-      rechtbank rijksloket schoolpartner zorgbalie')
+      rechtbank rijksloket schoolpartner')
   });
 
   var REDIRECTS = routes('\
-    balans bank berichten codewoord geld-command labfonds logboek mecenaat metier nalatenschap rtgcode thuisrust \
-    thuiswacht toestemming vandaag vitaal wallet wbw');
+    balans bank berichten codewoord geld-command kantoorpda labfonds logboek mecenaat metier nalatenschap rtgcode thuisrust \
+    thuiswacht toestemming vandaag vitaal wallet wbw zorgbalie');
   var ROUTES = Object.create(null);
   Object.keys(MANIFEST).forEach(function (wereld) {
     MANIFEST[wereld].forEach(function (pad) { ROUTES[pad] = wereld; });

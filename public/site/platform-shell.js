@@ -17,15 +17,15 @@
   var greeting=node('header',null,'wd-greeting');greeting.append(node('h1',company?'companyKicker':'welcomeApp'),node('span',company?'subCompany':'subApp','pp-subtitle'),node('p','tagline'));
   var people=node('aside',null,'wd-people'), home=node('section',null,'wd-home pp-home'), favorites=node('aside',null,'wd-favorites'), library=node('section',null,'wd-library');
   people.append(node('h2',company?'contact':'people'));if(!company)people.append(node('small','example','pp-overline'));
-  var contacts=company?[['about','about','people','origin'],['support','supportBody','people','support'],['cooperate','cooperateBody','brief','support']]:[['social','socialBody','people','verhaal'],['foundationAppCardTitle','freeFull','heart','world:foundation'],['support','supportBody','spark','service']];
-  contacts.forEach(function(item){var row=button(null,function(){o.open(item[3]);},'wd-person pp-person'), labels=node('span');labels.append(node('strong',item[0]),node('span',item[1],'wd-muted'));row.append(icon(item[2]),labels);people.append(row);});
+  var r=company?[['about','about','people','origin'],['support','supportBody','people','support'],['cooperate','cooperateBody','brief','support']]:[['worlds','libraryDemo','grid','werelden'],['accessCardTitle','accessCardBody','doc','passen'],['company','subCompany','brief','platform']];
+  r.forEach(function(item){var row=button(null,function(){o.open(item[3]);},'wd-person pp-person'), labels=node('span');labels.append(node('strong',item[0]),node('span',item[1],'wd-muted'));row.append(icon(item[2]),labels);people.append(row);});
   people.append(node('p',company?'peopleQuote':'anonymous','pp-people-note'));
   var stories=node('div',null,'pp-stories');stories.setAttribute('aria-label',copy('worlds'));
   data.stories.forEach(function(story){var b=button(null,function(){select(story.id,true);},'pp-story');b.dataset.publicStory=story.id;b.append(photo(story.photo),node('span',story.label));stories.append(b);});
   var more=button(null,function(){menu();},'pp-story pp-story-more');more.append(icon('menu'),node('span','more'));stories.append(more);
   // The feature is the mobile introduction. Do not add a second welcome block.
   var feature=node('article',null,'wh-photo pp-feature'), picture=photo(selected.photo,'pp-feature-photo',true), featureCopy=node('div',null,'pp-feature-copy');
-  var overline=node('span',company?'originLabel':'demo','pp-overline'), title=node('h1'), body=node('p'), action=button(company?'storyOpen':'worldOpen',function(){o.open(controller.selected().target);},'pp-button');
+  var overline=node('span',company?'originLabel':'demo','pp-overline'), title=node('h1'), body=node('p'), action=button(company?'storyOpen':'intentOpen',function(){o.open(controller.selected().target);},'pp-button');
   title.id='platform-story-title';feature.setAttribute('aria-labelledby',title.id);
   var summary=node('span',null,'pp-itinerary');summary.translate=false;summary.hidden=company;
   featureCopy.append(overline,title,summary,body,action);
@@ -61,7 +61,7 @@
   controller=w.RTGPublicController({o:o,data:data,company:company,root:root,detail:detail,focus:focus,focusTitle:focusTitle,home:home,favorites:favorites,library:library,title:title,body:body,picture:picture,stories:stories,stepper:stepper,overline:overline,summary:summary,signalWorld:front.world,signalCount:front.count,language:language,search:search,filter:filter,catalog:catalog,empty:empty,gridButton:gridButton,listButton:listButton,menuPanel:menuPanel,worldPanel:worldPanel});
   var widgets=(company?w.RTGCompanyWidgets:w.RTGPublicWidgets)({o:o,data:data,company:company,favorites:favorites,refresh:refresh});
   search.addEventListener('input',controller.filterCards);filter.addEventListener('change',controller.filterCards);
-  data.cards.filter(function(c){return c.id!=='support';}).forEach(function(card){catalog.append(widgets.widget(card));});
+  (company?data.cards:data.primary).filter(function(c){return c.id!=='support';}).forEach(function(card){catalog.append(widgets.widget(card));});
   widgets.favoritesPaint();controller.setView(false);select(selected.id,false);
   if(w.RTGWebsiteTruth&&w.RTGWebsiteTruthRefresh)w.RTGWebsiteTruthRefresh(w.RTGWebsiteTruth);
   w.addEventListener('rtg-website-truth',function(){select(controller.selected().id,false);controller.filterCards();});

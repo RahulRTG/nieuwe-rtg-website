@@ -22,7 +22,10 @@ async function api(pad, body, token) {
 const json = r => r.json();
 
 test.before(async () => {
-  ({ child, base: BASE } = await startServer({ env: { RTG_DATA_DIR: TMP, SMTP_URL: '' } }));
+  /* Een vaste UTC-runner net na Amsterdamse middernacht: precies de grens
+     waarop voorstel en zichtbaar rooster vroeger op twee dagen begonnen. */
+  ({ child, base: BASE } = await startServer({ env: { RTG_DATA_DIR: TMP, SMTP_URL: '',
+    TZ: 'UTC', RTG_KLOK: '2026-11-10T23:30:00Z' } }));
   const roster = await json(await api('/api/supplier/roster', { code: 'KIKUNOI' }));
   const man = roster.staff.find(x => x.role === 'manager');
   const kok = roster.staff.find(x => x.role !== 'manager');

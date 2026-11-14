@@ -12,6 +12,7 @@ const path = require('path');
 const { startServer, stop } = require('./helper');
 const { beeldVan, ONDERWERPEN, VENSTER } = require('../server/kern/metingen');
 const { magHerkomst, BESCHIKBAAR } = require('../server/kern/herkomst');
+const tijdzone = require('../server/kern/tijdzone');
 
 let srv, base, lid, lid2;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-metingen-'));
@@ -20,7 +21,7 @@ const api = (pad, body, t) => fetch(base + '/api/' + pad, {
   method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + t },
   body: JSON.stringify(body || {})
 }).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
-const overDagen = n => new Date(Date.now() + n * 86400000).toISOString().slice(0, 10);
+const overDagen = n => tijdzone.plusDagen(tijdzone.huis().datum, n);
 
 test.before(async () => {
   srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });

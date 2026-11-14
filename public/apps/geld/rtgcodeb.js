@@ -7,7 +7,6 @@
    uitslagkleuren en de puntjeslijst; alles erin hangt aan een rc-id. */
 (function (w, d) {
   'use strict';
-  var RCCSS = '#rcCode{min-height:16rem;display:flex;flex-direction:column;align-items:center;justify-content:center;}#rcCam{display:none;width:100%;max-width:22rem;border-radius:0;background:#000;margin-top:1rem;}#rcCam.aan{display:block;}#paneel .rcRij{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;margin-top:.9rem;}#paneel .rcRij input{flex:1;min-width:8rem;width:auto;}#rcMerk .knop[aria-pressed="true"]{border-color:var(--rtg-goud);}#rcUit{margin-top:.6rem;font-size:.88rem;}#rcUit.goed{color:#7CC389;}#rcUit.fout{color:#C23A5E;}#rcInlog{border:1px solid #C23A5E;border-radius:0;padding:.8rem 1rem;font-size:.88rem;margin-bottom:.8rem;}#rcWaarom{list-style:none;margin:.2rem 0 0;padding:0;display:flex;flex-direction:column;gap:.55rem;}#rcWaarom li{display:flex;gap:.6rem;font-size:.88rem;color:var(--rtg-soft);}#rcWaarom b{color:var(--rtg-txt);}#rcWaarom .punt{flex:0 0 auto;width:.5rem;height:.5rem;border-radius:50%;background:#C23A5E;margin-top:.45rem;}';
   var V = w.RTGGeld = w.RTGGeld || { standen: [] };
   var $ = function (s) { return d.querySelector(s); };
   var merk = 'lippen', dyn = null, scanner = null;
@@ -89,7 +88,6 @@
   }
 
   function start() {
-    stijl();
     $('#rcLip').addEventListener('click', function () { kiesMerk('lippen'); });
     $('#rcHor').addEventListener('click', function () { kiesMerk('horloge'); });
     $('#rcCheck').addEventListener('click', function () { verifieer($('#rcPlak').value); });
@@ -106,21 +104,6 @@
   function stop() {
     if (dyn) { dyn.stop(); dyn = null; }
     camUit();
-  }
-
-  /* De stijl via createElement en NIET als <style> in de html-string: de
-     voordeur (server/middleware/voordeur.js) stempelt elk element dat via
-     createElement('style') ontstaat met de CSP-nonce, maar een blok dat via
-     innerHTML wordt ontleed krijgt geen stempel en wordt door style-src
-     geweigerd. Dat gebeurde hier: de stand zag er ongestyled uit en de console
-     meldde een CSP-schending. Een id-guard, want start() draait bij elke
-     standwissel opnieuw. */
-  function stijl() {
-    if (d.getElementById('rcStijl')) return;
-    var st = d.createElement('style');
-    st.id = 'rcStijl';
-    st.textContent = RCCSS;
-    d.head.appendChild(st);
   }
 
   V.standen.push({

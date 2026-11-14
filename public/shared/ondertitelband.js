@@ -13,7 +13,7 @@
    de tijd, of een regel blijft hangen na het eind, of de band wordt opgeruimd
    als er een andere video in hetzelfde vlak komt.
 
-   HIJ BRENGT ZIJN EIGEN STIJL MEE, want anders werkt hij alleen op de schermen
+   HIJ HEEFT EEN GEDEELD STIJLBLAD, want anders werkt hij alleen op de schermen
    die toevallig een .ondert-regel in hun eigen blad hebben staan -- en dat was
    precies de situatie: clips.html en media.html hadden er elk een, met andere
    maten. Een pagina die zelf een .ondert-stijl heeft, wint nog steeds: deze
@@ -29,28 +29,14 @@
    vorige video is erger dan geen ondertitel. */
 (function (w, d) {
   'use strict';
+
   if (w.RTGOndertitelband) return;
-
-  var STIJL = '.ondert{position:absolute;left:0;right:0;bottom:1rem;text-align:center;' +
-    'padding:0 1.2rem;pointer-events:none;z-index:3;}' +
-    '.ondert span{display:inline-block;background:rgba(12,12,11,0.78);color:#F4F1EC;' +
-    'font:500 0.95rem/1.35 Inter,system-ui,sans-serif;padding:0.15rem 0.5rem;border-radius:0;}';
-
-  function stijlEenmalig() {
-    if (d.getElementById('rtg-ondert-stijl')) return;
-    var st = d.createElement('style');
-    st.id = 'rtg-ondert-stijl';
-    st.textContent = STIJL;
-    /* Als BASIS: vooraan in de head, zodat een pagina met een eigen .ondert-regel
-       die van zichzelf houdt. */
-    (d.head || d.documentElement).insertBefore(st, (d.head || d.documentElement).firstChild);
-  }
 
   function bandVan(vlak) {
     var band = vlak.querySelector(':scope > .ondert') || vlak.querySelector('.ondert');
     if (!band) {
       band = d.createElement('div');
-      band.className = 'ondert';
+      band.className = 'ondert ds-ondertitelband';
       /* aria-live=off met opzet: de tekst hoort BIJ het beeld en wordt door een
          schermlezer niet als melding voorgelezen. Wie geen beeld ziet, heeft aan
          een ondertitel niets -- die heeft audiodescriptie nodig, en dat is een
@@ -71,7 +57,6 @@
     if (!vlak || !video) return;
     weg(vlak);
     if (!regels || !regels.length) return;
-    stijlEenmalig();
     var band = bandVan(vlak);
     var lijst = regels.slice().sort(function (a, b) { return a.van - b.van; });
     var laatste = null;

@@ -1,0 +1,57 @@
+/* De bestaande Sprong-owner levert bestemmingen en appmenu-handelingen.
+   Deze component vervangt alleen zijn presentatie op volledige DS-hosts. */
+@layer rtg.component {
+  .ds-sprong-greep {
+    position: fixed; inset-inline-end: var(--ds-ruimte-4); inset-block-end: calc(4.75rem + env(safe-area-inset-bottom,0px)); z-index: 9970;
+    display: grid; place-items: center; inline-size: 3.25rem; block-size: 3.25rem;
+    color: var(--ds-accent-inkt); background: var(--ds-accent); border: 1px solid var(--ds-accent);
+    border-radius: var(--ds-radius-inhoud); box-shadow: var(--ds-schaduw-systeem); cursor: pointer;
+  }
+  .ds-sprong-greep:is([data-hand="links"] *) { inset-inline: var(--ds-ruimte-4) auto; }
+  .ds-sprong-greep:hover { background: var(--ds-accent-hover); }
+  .ds-sprong-greep:focus-visible { outline: 2px solid var(--ds-focus); outline-offset: 3px; }
+  .ds-sprong {
+    box-sizing: border-box; padding: 0;
+    inline-size: min(48rem, calc(100% - var(--ds-ruimte-6)));
+    max-inline-size: calc(100% - var(--ds-ruimte-6));
+    block-size: min(42rem, calc(100dvh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px) - var(--ds-ruimte-8)));
+    max-block-size: calc(100dvh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px) - var(--ds-ruimte-8));
+    overflow: hidden; font: 400 var(--ds-maat-tekst)/1.5 var(--ds-letter-tekst);
+    text-align: start;
+  }
+  .ds-sprong[open] { display: flex; flex-direction: column; }
+  .ds-sprong[hidden] { display: none; }
+  .ds-sprong .rtgsprong-kop {
+    display: flex; align-items: center; flex-wrap: wrap; gap: var(--ds-ruimte-2);
+    padding: var(--ds-ruimte-3); border-block-end: 1px solid var(--ds-lijnkleur);
+  }
+  .ds-sprong input, .ds-sprong button {
+    box-sizing: border-box; min-inline-size: var(--ds-doel); min-block-size: var(--ds-doel);
+    max-inline-size: 100%; font: inherit; color: var(--ds-inkt);
+    border: 1px solid var(--ds-lijnkleur); border-radius: var(--ds-radius-knop);
+    background: var(--ds-oppervlak); padding: var(--ds-ruimte-2) var(--ds-ruimte-3);
+  }
+  .ds-sprong input { flex: 1 1 12rem; inline-size: 0; }
+  .ds-sprong button { cursor: pointer; overflow-wrap: anywhere; }
+  .ds-sprong :is(button, input):focus-visible { outline: 2px solid var(--ds-focus); outline-offset: -2px; }
+  .ds-sprong .rtgsprong-lijst {
+    flex: 1; min-block-size: 0; overflow: auto; overscroll-behavior: contain;
+    padding-block-end: max(var(--ds-ruimte-4), env(safe-area-inset-bottom, 0px));
+  }
+  .ds-sprong .rtgsprong-wereld {
+    margin: 0; padding: var(--ds-ruimte-4) var(--ds-ruimte-4) var(--ds-ruimte-2);
+    font-size: var(--ds-maat-klein); font-weight: 600; letter-spacing: .1em;
+    text-transform: uppercase; color: var(--ds-metaal);
+  }
+  .ds-sprong .rtgsprong-rij {
+    display: flex; justify-content: space-between; align-items: center; gap: var(--ds-ruimte-3);
+    inline-size: 100%; border: 0; border-block-end: 1px solid var(--ds-lijnkleur); border-radius: 0;
+    padding: var(--ds-ruimte-3) var(--ds-ruimte-4); background: transparent; text-align: start;
+  }
+  .ds-sprong .rtgsprong-rij > span { min-inline-size: 0; }
+  .ds-sprong .rtgsprong-rij:hover, .ds-sprong .rtgsprong-rij:focus-visible { background: var(--ds-oppervlak-zacht); }
+  .ds-sprong .rtgsprong-rij em { font-size: var(--ds-maat-klein); font-style: normal; color: var(--ds-inkt-zacht); }
+  .ds-sprong .rtgsprong-leeg { padding: var(--ds-ruimte-4); color: var(--ds-inkt-zacht); overflow-wrap: anywhere; }
+  @media (min-width: 62.5rem) { .ds-sprong-greep { inset-inline: var(--ds-ruimte-4) auto; } .ds-sprong-greep:is([data-hand="links"] *) { inset-inline: auto var(--ds-ruimte-4); } }
+  @media print { .ds-sprong { display: none; } }
+}

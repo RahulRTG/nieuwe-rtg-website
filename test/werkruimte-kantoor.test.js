@@ -64,13 +64,24 @@ test('de standaard schil draagt navigatie over aan Edge System en geeft apps het
   assert.match(schilCss,/data-rtg-schil="standaard"[\s\S]*\.rtg-tab\[data-actief\]/);
   assert.match(schilCss,/data-rtg-schil="standaard"[\s\S]*\.rtg-onderbalk/);
   assert.match(cookie,/window\.self !== window\.top/,'surfaces mogen geen dubbele opslagmelding tonen');
-  assert.match(cookie,/data-rtg-schil="standaard"[\s\S]*66px/,
-    'de ene melding hoort boven de vaste onderbalk te staan');
+  assert.match(cookie,/var BODEM = '--ds-cookie-bodem'/,
+    'de opslagmelding mist de centrale variabele voor vaste schermlagen');
+  assert.match(cookie,/getComputedStyle\(n\)\.position !== 'fixed'/,
+    'de opslagmelding meet niet of een onderliggende balk werkelijk vast staat');
+  assert.match(cookie,/Math\.ceil\(b\.height\) \+ 'px'/,
+    'de opslagmelding gebruikt niet de werkelijke hoogte van de vaste schermlaag');
+  const cookieCss=fs.readFileSync(path.join(__dirname,'../public/ds/componenten/cookie.css'),'utf8');
+  assert.match(cookieCss,/var\(--ds-cookie-bodem, 0px\)/,
+    'de centrale cookiecomponent gebruikt de gemeten veilige bodem niet');
 });
 
 test('Agenda, Notities en Bestanden dragen dezelfde editorial inhoud in en buiten Work OS',()=>{
   for(const [naam,pagina] of [['Agenda',agenda],['Notities',notities],['Bestanden',bestanden]]){
-    assert.match(pagina,/rtg-daily-rooms\.css/,naam+' mist de gedeelde editorial laag');
+    assert.match(pagina,/<html[^>]*data-ds="1"/,naam+' staat niet op het centrale Design System');
+    assert.match(pagina,/href="\/ds\/rtg-ds\.css"/,naam+' mist de centrale DS-uitvoerlaag');
+    assert.match(pagina,/class="[^"]*ds-dagkamer/,naam+' mist het gedeelde dagkamerpatroon');
+    assert.match(pagina,/data-rtg-editorial-room=/,naam+' mist zijn editorial identiteit');
+    assert.match(pagina,/src="\/shared\/rtg-daily\.js"/,naam+' mist de gedeelde daily-runtime');
     assert.match(pagina,/data-kantoor-tool=/,naam+' mist zijn toolcontext');
     assert.match(pagina,/dataset\.rtgOppervlak='1'/,naam+' verbergt dubbele chrome niet');
     assert.match(pagina,/body\.setAttribute\('data-ios-uit',''\)/,naam+' mag geen tweede mobiele appbalk maken');

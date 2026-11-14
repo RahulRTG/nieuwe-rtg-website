@@ -105,19 +105,20 @@ test('de metgezel wijkt voor een venster en komt daarna terug',
        tussenstand, daarna de echte status met het aantal bevestigde bronnen.
        Toevallig zijn dat er ook vijf -- maar nu gemeten in plaats van beweerd.
 
-       Dus toetsen we niet langer de tekst maar de RONDE: de Proof Rail komt
-       alleen in de "n CONTROLES"-vorm te staan als de server werkelijk een
-       pakket met bronnen heeft geleverd (de beginstand is "2 SERVERBRONNEN").
+       Dus toetsen we niet langer een geslaagde controle maar de echte RONDE:
+       de Proof Rail komt alleen in de "n BRONVERMELDINGEN"-vorm te staan als
+       de server werkelijk een pakket met bronnen heeft geleverd. Een bron is
+       nog geen goedkeuring; de aparte uitvoeringsgrens blijft dus leidend.
        Deze toets zakt dus zodra die ronde stilvalt, en niet zodra iemand een
        woord in de koptekst wijzigt. */
     await page.locator('[data-build-plan]:visible').first().click();
     await page.waitForFunction(
-      () => /^\d+ CONTROLES$/.test(((document.querySelector('[data-proof-count]') || {}).textContent || '').trim()),
+      () => /^\d+ BRONVERMELDINGEN$/.test(((document.querySelector('[data-proof-count]') || {}).textContent || '').trim()),
       null, { timeout: 20000 });
-    const bronnen = (await page.textContent('[data-proof-count]')).trim().match(/^(\d+) CONTROLES$/);
+    const bronnen = (await page.textContent('[data-proof-count]')).trim().match(/^(\d+) BRONVERMELDINGEN$/);
     assert.ok(Number(bronnen[1]) >= 1, 'de server heeft minstens een bron bevestigd, dus de ronde is echt gelopen');
-    assert.match((await page.textContent('[data-flow-evidence]')).trim(), /^\d+ bevestigd$/,
-      'en de Evidence-stap telt diezelfde bevestigde bronnen');
+    assert.equal((await page.textContent('[data-flow-evidence]')).trim(), bronnen[1] + ' ontvangen bronvermeldingen',
+      'de Evidence-stap telt dezelfde ontvangen bronnen zonder ze controles te noemen');
     assert.notEqual((await page.textContent('[data-twin-state]')).trim(), 'BRONNEN CONTROLEREN',
       'de twin blijft niet in de tussenstand hangen');
 
@@ -125,11 +126,14 @@ test('de metgezel wijkt voor een venster en komt daarna terug',
        ook -- dat is de grens die deze PR bewaakt. Dus: hij antwoordt zichtbaar,
        en de uitvoeringsstand springt níet op uitgevoerd. */
     const logVoor = await page.evaluate(() => document.querySelector('.rtg-command-log').children.length);
+    const standVoor = (await page.textContent('[data-decision-state]')).trim();
     await page.click('[data-one-decision]');
     await page.waitForFunction(n => document.querySelector('.rtg-command-log').children.length > n,
       logVoor, { timeout: 10000 });
-    assert.equal((await page.textContent('[data-decision-state]')).trim(), 'GEEN UITVOERING',
-      'zonder wachtend voorstel blijft de uitvoeringsstand leeg');
+    const standNa = (await page.textContent('[data-decision-state]')).trim();
+    assert.equal(standNa, standVoor, 'zonder wachtend voorstel verandert de serveruitkomst niet');
+    assert.doesNotMatch(standNa, /SERVER BEVESTIGD|UITGEVOERD EN GELOGD/,
+      'zonder wachtend voorstel claimt de interface geen uitvoering');
 
     await page.click('.rtg-command-close');
     assert.equal(await page.evaluate(rahulStaat), 'zichtbaar', 'na de workspace blijft de tab bereikbaar');

@@ -59,7 +59,9 @@ test('chat uses the actual composer in the one Edge; resize, reply and real deli
   }finally{await ctx.close();}
 });
 test('the menu becomes the same Edge surface; apps scroll with dots and no swipe instruction',{skip},async()=>{
-  const {page,ctx}=await open('/apps/notities.html');
+  /* Notities is gemigreerd naar de DS Edge. Dit scenario bewaakt bewust de
+     bestaande Adaptive Edge op een nog legacy wereldhost. */
+  const {page,ctx}=await open('/apps/rtg.html');
   try{
     await page.locator('.rtg-adaptive-bar [data-rtg-adaptive-action="menu"]').click();
     await page.waitForSelector('.rtg-adaptive-sheet .rtg-edge-index');

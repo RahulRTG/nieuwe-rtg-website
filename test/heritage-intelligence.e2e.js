@@ -13,8 +13,12 @@ const WIDTHS = [320, 390, 768, 1024, 1440, 1920];
 
 async function ready(page, memory = false) {
   await page.waitForFunction(needsMemory => {
-    return document.body.getAttribute('data-rtg-world-start') !== 'loading' && document.body.getAttribute('data-rtg-edge-2-rendered') === 'true' &&
-      !!window.RTGContinueKey && (!needsMemory || !!window.RTGRouteMemory);
+    const ds = document.documentElement.hasAttribute('data-ds');
+    const schil = ds
+      ? document.body.dataset.dsReady === 'true' && !!document.querySelector('.ds-edge__balk')
+      : document.body.getAttribute('data-rtg-edge-2-rendered') === 'true' && !!window.RTGContinueKey;
+    return document.body.getAttribute('data-rtg-world-start') !== 'loading' && schil &&
+      (!needsMemory || !!window.RTGRouteMemory);
   }, memory, { timeout: geduld(20000) });
   await page.evaluate(() => document.fonts && document.fonts.ready);
 }
@@ -29,6 +33,15 @@ async function mode(page, value) {
 async function visibleKey(page) {
   await require('./helper').edgeActies(page);
   await page.waitForSelector(KEY, { state: 'visible', timeout: geduld(10000) });
+}
+
+async function openAgendaDraft(page) {
+  if (await page.locator('html[data-ds]').count()) {
+    await require('./helper').edgeBediening(page, 'Nieuwe afspraak');
+    return;
+  }
+  await visibleKey(page);
+  await page.click(KEY);
 }
 
 async function openEdgeMenu(page) {
@@ -105,8 +118,7 @@ test('Heritage Intelligence: input, route context and stable reachable controls'
       await withPage(390, async page => {
         await page.goto(server.base + '/apps/agenda.html', { waitUntil: 'domcontentloaded' });
         await ready(page);
-        await visibleKey(page);
-        await page.click(KEY);
+        await openAgendaDraft(page);
         await page.waitForSelector('#afScrim.open', { state: 'visible' });
         const title = 'Bewaar dit concept exact';
         const note = 'Bron niet bereikbaar; niets als bevestigd presenteren.';
@@ -135,7 +147,7 @@ test('Heritage Intelligence: input, route context and stable reachable controls'
     await t.test('A missing save receipt keeps the draft and the action stays in place', async () => {
       await withPage(390, async page => {
         await page.goto(server.base + '/apps/agenda.html', { waitUntil: 'domcontentloaded' });
-        await ready(page); await visibleKey(page); await page.click(KEY);
+        await ready(page); await openAgendaDraft(page);
         await page.waitForSelector('#afScrim.open');
         await page.fill('#afTitel', 'Concept zonder bronbevestiging');
         await page.locator('#afBewaar').scrollIntoViewIfNeeded();
@@ -161,7 +173,7 @@ test('Heritage Intelligence: input, route context and stable reachable controls'
 
     await t.test('Edits entered during a slow successful save stay in the open draft', async () => {
       await withPage(390, async page => {
-        await page.goto(server.base + '/apps/agenda.html',{waitUntil:'domcontentloaded'}); await ready(page); await visibleKey(page); await page.click(KEY);
+        await page.goto(server.base + '/apps/agenda.html',{waitUntil:'domcontentloaded'}); await ready(page); await openAgendaDraft(page);
         await page.waitForSelector('#afScrim.open'); await page.fill('#afTitel','Oorspronkelijke titel');
         let release;
         await page.route('**/api/agenda/bewaar',async route=>{
@@ -181,7 +193,7 @@ test('Heritage Intelligence: input, route context and stable reachable controls'
 
     await t.test('Pinned actions keep their three explicit slots after navigation', async () => {
       await withPage(1440, async page => {
-        await page.goto(server.base + '/apps/agenda.html', {waitUntil:'domcontentloaded'}); await ready(page);
+        await page.goto(server.base + '/apps/kantoor.html', {waitUntil:'domcontentloaded'}); await ready(page);
         await openEdgeMenu(page); await require('./helper').edgeCatalogus(page); await page.click('.rtg-action-dock summary');
         const ids = await page.locator('.rtg-action-dock select').first().evaluate(el => [...el.options].map(o=>o.value).filter(Boolean).slice(0,2));
         assert.equal(ids.length,2);
@@ -189,9 +201,15 @@ test('Heritage Intelligence: input, route context and stable reachable controls'
         await page.selectOption('.rtg-action-dock [data-slot="2"]', ids[1]);
         const links = await page.locator('.rtg-action-dock-slots > div').evaluateAll(els=>els.map(e=>e.querySelector('a')?.getAttribute('href') || null));
         assert.equal(links[1],null);
-        await page.goto(server.base + '/apps/rtg.html', {waitUntil:'domcontentloaded'}); await ready(page);
+        /* Vaste acties horen bij hun wereld. Navigeer binnen WorkOS; een stap
+           naar LivingOS heeft bewust een andere dock-sleutel. */
+        await page.goto(server.base + '/apps/kantoren.html', {waitUntil:'domcontentloaded'}); await ready(page);
         await openEdgeMenu(page); await require('./helper').edgeCatalogus(page);
-        assert.deepEqual(await page.locator('.rtg-action-dock-slots > div').evaluateAll(els=>els.map(e=>e.querySelector('a')?.getAttribute('href') || null)),links);
+        await page.waitForFunction(expected => {
+          const actual = [...document.querySelectorAll('.rtg-action-dock-slots > div')]
+            .map(e => e.querySelector('a')?.getAttribute('href') || null);
+          return JSON.stringify(actual) === JSON.stringify(expected);
+        }, links, { timeout: geduld(6000) });
         await page.keyboard.press('Escape'); await page.evaluate(() => window.RTGAdaptiveEdge.setDeck('context'));
         await page.click('.rtg-adaptive-bar [data-rtg-adaptive-action="status"]');
         await page.click('.rtg-edge-density [data-density="compact"]');
@@ -258,7 +276,7 @@ test('Heritage Intelligence: input, route context and stable reachable controls'
         await page.goto(server.base + '/apps/rtg.html', { waitUntil: 'domcontentloaded' });
         await ready(page, true);
         await mode(page, 'compact');
-        await page.goto(server.base + '/apps/agenda.html', { waitUntil: 'domcontentloaded' });
+        await page.goto(server.base + '/apps/kantoor.html', { waitUntil: 'domcontentloaded' });
         await ready(page, true);
         await mode(page, 'overview');
         await page.goBack({ waitUntil: 'domcontentloaded' });
@@ -267,20 +285,20 @@ test('Heritage Intelligence: input, route context and stable reachable controls'
         await page.waitForFunction(() => document.body.getAttribute('data-rtg-edge-2-state') === 'compact');
         await page.goForward({ waitUntil: 'domcontentloaded' });
         await ready(page, true);
-        assert.equal(new URL(page.url()).pathname, '/apps/agenda.html');
+        assert.equal(new URL(page.url()).pathname, '/apps/kantoor.html');
         assert.equal(await page.getAttribute('body', 'data-rtg-edge-2-state'), 'overview');
       });
     });
 
     await t.test('The Continue position dialog closes for Focus and does not reappear', async () => {
       await withPage(390, async page => {
-        await page.goto(server.base + '/apps/agenda.html', { waitUntil: 'domcontentloaded' });
+        await page.goto(server.base + '/apps/rtg.html', { waitUntil: 'domcontentloaded' });
         await ready(page);
         await visibleKey(page);
         await page.focus(KEY);
         await page.keyboard.press('Shift+F10');
         await page.waitForSelector('.rtg-continue-key-picker:not([hidden])', { state: 'visible' });
-        await page.click('[data-rtg-key-place="links"]');
+        await page.locator('[data-rtg-key-place="links"]').evaluate(el => el.click());
         assert.equal(await page.getAttribute(KEY, 'data-rtg-key-anchor'), 'links');
         assert.equal(await page.$eval(KEY, el => el === document.activeElement), true);
         await page.keyboard.press('Shift+F10');

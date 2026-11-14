@@ -48,7 +48,7 @@
         var b = d.createElement('button'), naam = d.createElement('span');
         b.type = 'button'; b.className = 'ds-keuze'; naam.textContent = f.naam; b.appendChild(naam);
         b.addEventListener('click', function () { kies(f.id); }); galerij.appendChild(b);
-        B.bestand(f.id).then(function (url) { var t = d.createElement('img'); t.className = 'ds-kaart__beeld'; t.src = url; t.alt = ''; b.prepend(t); })
+        B.bestand(f.id).then(function (url) { var eigenFotoMiniatuur = document.createElement('img'); eigenFotoMiniatuur.className = 'ds-kaart__beeld'; eigenFotoMiniatuur.src = url; eigenFotoMiniatuur.alt = ''; b.prepend(eigenFotoMiniatuur); })
           .catch(function () { b.disabled = true; });
       });
       zeg(lijst.length ? '' : 'Nog geen eigen foto’s. Kies Upload foto.');

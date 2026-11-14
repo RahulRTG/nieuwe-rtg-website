@@ -1,0 +1,38 @@
+/* Notities, bestanden en Pulse: broninhoud blijft bij de eigen controllers. */
+@layer rtg.component {
+ .ds-dag-nkaart, .ds-dag-post, .ds-dag-schrijf { padding: var(--ds-ruimte-6); margin-block: var(--ds-ruimte-4); border: 1px solid var(--ds-lijnkleur); background: var(--ds-oppervlak); border-radius: var(--ds-radius-inhoud); overflow-wrap: anywhere; }
+ .ds-dag-nkaart { display: block; inline-size: 100%; cursor: pointer; }
+ .ds-dag-nkaart.vast { border-color: var(--ds-accent); }
+ .ds-dag-nkaart h3, .ds-dag-profiel-naam { font-family: var(--ds-letter-display); font-size: var(--ds-maat-kop); }
+ .ds-dag-nkaart p, .ds-dag-tekst { white-space: pre-wrap; line-height: 1.7; overflow-wrap: anywhere; }
+ .ds-dag-taak { display: flex; align-items: center; gap: var(--ds-ruimte-2); }
+ .ds-dag-taak input[type="checkbox"] { flex: 0 0 var(--ds-doel); inline-size: var(--ds-doel); block-size: var(--ds-doel); accent-color: var(--ds-accent); }
+ .ds-dag-taak.af, .ds-dag-taakrij .af { text-decoration: line-through; }
+ .ds-dag-taakrij { padding-block: var(--ds-ruimte-3); border-block-end: 1px solid var(--ds-lijnkleur); }
+ .ds-dag-taakrij input { flex: 1 1 10rem; min-inline-size: 0; }
+ .ds-dag-taakrij input[type="checkbox"] { flex: 0 0 var(--ds-doel); inline-size: var(--ds-doel); block-size: var(--ds-doel); accent-color: var(--ds-accent); }
+ .ds-dag-taakrij button { min-inline-size: var(--ds-doel); min-block-size: var(--ds-doel); }
+ .ds-dag-meter { block-size: .3rem; background: var(--ds-oppervlak-sterk); margin-block: var(--ds-ruimte-3); }
+ .ds-dag-meter i { display: block; block-size: 100%; inline-size: 0; background: var(--ds-accent); }
+ .ds-dag-mapkaart, .ds-dag-item { display: flex; flex-wrap: wrap; align-items: center; gap: var(--ds-ruimte-3); padding: var(--ds-ruimte-4); margin-block: var(--ds-ruimte-3); min-block-size: var(--ds-doel); border: 1px solid var(--ds-lijnkleur); background: var(--ds-oppervlak); color: var(--ds-inkt); border-radius: var(--ds-radius-inhoud); cursor: pointer; font: inherit; max-inline-size: 100%; overflow-wrap: anywhere; }
+ .ds-dag-wat { flex: 1 1 10rem; min-inline-size: 0; }
+ .ds-dag-wat b, .ds-dag-wat span { display: block; overflow-wrap: anywhere; }
+ .ds-dag-ext { padding: var(--ds-ruimte-2); border: 1px solid var(--ds-lijnkleur); color: var(--ds-metaal); }
+ .ds-dag-item.weg .ds-dag-wat b { text-decoration: line-through; }
+ .ds-dag-sleep { display: none; padding: var(--ds-goot); border: 2px dashed var(--ds-accent); }
+ .ds-dagkamer.sleept .ds-dag-sleep { display: block; }
+ .ds-dag-schrijf textarea { inline-size: 100%; min-block-size: 6rem; }
+ .ds-dag-schrijf .ds-dag-voet { margin-block-start: var(--ds-ruimte-3); }
+ .ds-dag-schrijf .ds-dag-voet .ds-knop { flex: 1 1 100%; }
+ .ds-dag-teller { margin-inline-start: auto; color: var(--ds-inkt-zacht); }
+ .ds-dag-teller.vol { color: var(--ds-accent); }
+ .ds-dag-post .ds-dag-kop { display: flex; flex-wrap: wrap; align-items: center; gap: var(--ds-ruimte-3); }
+ .ds-dag-wie { min-block-size: var(--ds-doel); min-inline-size: var(--ds-doel); color: inherit; background: transparent; border: 0; font: inherit; text-align: start; cursor: pointer; }
+ .ds-dag-tijd { color: var(--ds-inkt-zacht); font-variant-numeric: tabular-nums; }
+ .ds-dag-reacties { border-block-start: 1px solid var(--ds-lijnkleur); margin-block-start: var(--ds-ruimte-4); padding-block-start: var(--ds-ruimte-3); }
+ .ds-dag-reactie { line-height: 1.6; overflow-wrap: anywhere; }
+ .ds-dag-rrij input { flex: 1 1 12rem; min-inline-size: 0; }
+ .ds-dag-profiel-eigen, .ds-dag-profiel-waarderingen { color: var(--ds-inkt-zacht); }
+ .ds-dag-paneel img { display: block; max-inline-size: 100%; max-block-size: 20rem; margin-inline: auto; }
+ .ds-dag-paneel pre { white-space: pre-wrap; overflow-wrap: anywhere; max-block-size: 18rem; overflow: auto; }
+}

@@ -284,109 +284,15 @@ const BEVEILIGING = [
 
    Deze trede kiest niet. Hij leest de routetabel uit de bron en klopt op alles
    aan zonder token. De regel is kort: een route die zonder inlog een 2xx geeft,
-   is publiek. Dat mag -- maar dan hoort hij hieronder te staan, MET REDEN. Wat
+   is publiek. Dat mag -- maar dan hoort hij in scripts/lib/publiek.js te staan,
+   MET REDEN. Wat
    er niet staat en toch opengaat, is een bevinding.
 
-   De lijst is dus geen onderdrukking maar een besluit-per-route. Hij hoort
-   te groeien met de app en zelden te krimpen. Een nieuwe route die per ongeluk
-   publiek is, valt hier meteen op. */
-const PUBLIEK = new Map([
-  /* De commerciele kern (#98): drie beweringen die ook in de voorwaarden staan.
-     Een voorwaardenpagina hoort ze HIER op te halen in plaats van ze zelf op te
-     schrijven -- dat uiteenlopen was de oorzaak van "0% commissie" naast een
-     knop op 12%. Zetten zit achter de boardroom-poort; dit is alleen lezen. */
-  ['GET /api/betaaldiensttarief', 'het tarief staat in de partnervoorwaarden en mag niet los lopen van wat de code rekent'],
-  ['POST /api/betaaldiensttarief', 'idem; de POST geeft dezelfde lijst terug als de GET'],
-  ['GET /api/sociaalbeleid', 'de verdeelregels van de bijdrage zijn een belofte aan leden, dus leesbaar zonder inlog'],
-  ['POST /api/sociaalbeleid', 'idem; de POST geeft dezelfde lijst terug als de GET'],
-  ['GET /api/claims', 'wat RTG publiek beweert, met per bewering de waarde, de bron en hoe hard hij is'],
-  ['POST /api/claims', 'idem; de POST geeft dezelfde lijst terug als de GET'],
-  // de voordeur zelf: zonder deze routes kan niemand ooit inloggen
-  ['POST /api/auth/register', 'aanmelden kan per definitie niet ingelogd'],
-  ['POST /api/auth/login', 'inloggen'],
-  ['POST /api/auth/forgot', 'wachtwoord vergeten; antwoordt bewust hetzelfde voor bekend en onbekend'],
-  ['POST /api/auth/reset', 'herstel met een bewijs uit de e-mail'],
-  ['POST /api/auth/verify-email', 'bevestigen met een bewijs uit de e-mail'],
-  ['POST /api/login', 'de demo-pas: kiest een persona zonder account'],
-  ['POST /api/supplier/login', 'de zaak logt in'],
-  ['POST /api/supplier/roster', 'de namenlijst van het inlogscherm; getemperd en beperkt tot wat de kiezer toont'],
-  ['POST /api/supplier/staff/join', 'aanmelden met een kassacode van de werkgever'],
-  ['POST /api/sso/wissel', 'het overdrachtsbewijs inruilen; eenmalig en ondertekend'],
-  ['POST /api/sso/waarheen', 'zegt alleen OF er sso is voor een domein'],
-  // gesprekken die juist bedoeld zijn voor wie nog niet binnen is
-  ['POST /api/aanmeld/start', 'de ballotage: Rahul vraagt wie je bent'],
-  ['POST /api/aanmeld/zeg', 'idem'],
-  ['POST /api/kantoor/gesprek/start', 'de kantoordeur loopt via het gesprek'],
-  ['POST /api/kantoor/gesprek/zeg', 'idem'],
-  ['POST /api/aanmelding/aanvraag', 'een partner meldt zich aan'],
-  // openbare etalage
-  ['POST /api/talen', 'de talenlijst'],
-  ['POST /api/pasprijzen', 'de prijzen van de passen staan op de site'],
-  ['GET /api/pasprijzen', 'idem'],
-  ['POST /api/partnertrips', 'het partnerkanaal is voor niet-leden'],
-  ['POST /api/book', 'het partnerkanaal boekt zonder pas'],
-  ['POST /api/krant/gids', 'de krant is openbaar'],
-  ['POST /api/krant/open', 'idem'],
-  ['POST /api/krant/artikel', 'idem'],
-  ['POST /api/rtf/vacatures', 'vacatures bekijken mag zonder pas'],
-  ['POST /api/les/apps', 'de lesmaker-etalage'],
-  ['POST /api/munt/opties', 'welke munten en tegen welke koers; geen gegevens'],
-  ['POST /api/gids/app', 'de app-gids'],
-  // techniek die van buiten moet kunnen
-  ['GET /api/health', 'levendheid, voor de toezichthouder'],
-  ['GET /api/ready', 'gereedheid, voor de load balancer'],
-  ['GET /api/rtc/stand', 'de afgeleide TURN-relaystand voor bewaking en de smoke na uitrol: geverifieerd ja/nee en de laatste proef per adres, zonder credentials of geheimen (kern/rtc/relaystand.js)'],
-  ['GET /api/sat/ping', 'de satelliet-ping van de zaakdoos'],
-  ['GET /api/ice', 'de STUN-servers voor bellen'],
-  ['GET /api/push/key', 'de publieke web-push-sleutel; publiek is de bedoeling'],
-  ['GET /api/pay/gezond', 'de sluitcontrole: klopt de som, ja of nee'],
-  ['POST /api/betaal/webhook', 'de betaalprovider; beveiligd met een handtekening, niet met een sessie'],
-  ['POST /api/munt/webhook', 'de munt-aanbieder; idem'],
-  ['GET /api/doos/status', 'elke app pollt dit om te weten of er een doos is en of die lokaal draait; zonder doos zegt hij {doos:false}'],
-  ['GET /api/zegel/sleutel', 'de PUBLIEKE sleutel waarmee een partner-app een zegel offline verifieert'],
-  ['POST /api/zegel/controleer', 'een zegel verifieren hoort te kunnen zonder account; dat is het hele idee'],
-  ['POST /api/webauthn/opties', 'passkey-inlog; geeft bewust hetzelfde antwoord voor een bekende en een onbekende login'],
-  ['POST /api/translate', 'de site vertaalt ook voor een uitgelogde bezoeker; getemperd, en de AI gaat pas aan met een inlog'],
-  ['POST /api/vertaal/ui', 'idem, voor de knoppen'],
-  /* Deze twee zijn WEL bewaakt -- maar met een slot dat de dwaler niet kan
-     voelen: RTG_METRICS_TOKEN, of anders alleen vanaf een intern adres. De
-     ladder klopt vanaf 127.0.0.1 en telt dus als intern. Dat staat hier zodat
-     niemand denkt dat ze open zijn; het betekent alleen dat DEZE trede er niets
-     over kan zeggen. */
-  ['GET /api/metrics', 'bewaakt met een token of een intern adres; de dwaler klopt van binnenuit en komt er daarom langs'],
-  ['GET /api/metrics/kort', 'idem'],
-  ['GET /api/loop/operations', 'de bedrijfstelling van de Loop Fabric (#502), achter dezelfde magMeten-poort (server/meetpoort.js); idem'],
-  /* ---- bijgewerkt na de ladderronde van 18 augustus 2026 ----
-     Twaalf routes die de dwaler als RAAK meldde en die stuk voor stuk BEWUST
-     openbaar zijn; bij elk staat de reden zoals hij ook in de broncode staat.
-     Ze stonden hier niet omdat deze lijst achterliep op de code, en het gevolg
-     was erger dan een verkeerd getal: een trede die twaalf verwachte meldingen
-     geeft, wordt niet meer gelezen -- en dan valt de dertiende, die er wel toe
-     doet, niemand op. */
-  ['POST /api/stad/algoritmes', 'het algoritmeregister van een stad: regels, geen mensen -- openbaar zoals het privacybeleid'],
-  ['GET /api/stad/algoritmes', 'idem'],
-  ['POST /api/stad/besluiten', 'het besluitenregister: fracties stemmen met zetels, er staat geen persoon in'],
-  ['GET /api/stad/besluiten', 'idem'],
-  /* De voordeur van de beschermzaak. Alleen deze ene van de vier komt hier
-     terecht: de andere drie geven zonder een geldig lijf een 400 of 404 en zijn
-     voor deze trede dus geen "geslaagd antwoord". Dat is geen verschil in
-     bedoeling -- alle vier staan met reden in scripts/lib/publiek.js -- maar in
-     wat de dwaler kan waarnemen. */
-  ['POST /api/bescherming/deur/steden', 'alleen de NAMEN van plaatsen die een beschermzaak kunnen oppakken. Geen enkel getal en geen enkele zaak, en met opzet zonder inlog: wie hier aanklopt heeft vaak geen account, en een deur die eerst een account vraagt is voor die mens geen deur'],
-  /* Besluit van de eigenaar, 23 september 2026: zonder deze catalogus doen de
-     keuzes op foundation/registreren.html niets, en de aanvrager heeft vóór
-     toelating nog geen account. Met reden ook in scripts/lib/publiek.js. */
-  ['POST /api/foundation/registratie/catalogus', 'de eisen per registratiesoort en de actieve steden: geen geheim, en een aanvrager leest ze voordat hij een account heeft; met rem per ip'],
-  /* rtfos/publiek/steden en campagnes, lab2/bewoner/labs en kader, en onderneming/
-     rechtsvormen vragen sinds het eigenaarsbesluit van 19 oktober 2026 een
-     account en horen hier dus niet meer. */
-  ['POST /api/rtfos/publiek/jaarverslagen', 'de ANBI-publicatie -- openbaar, want anders is het geen publicatie'],
-  ['POST /api/fout/client', 'de foutmelder van een kapot scherm; met opzet zonder inlog, met 4 kB-grens en rem'],
-  ['POST /api/arrival/interpret', 'leest vrije tekst en geeft een plan terug -- vraagt niets aan, bewaart niets, getemperd'],
-  // alleen in de testomgeving; de trede bewijst hieronder dat ze in productie weg zijn
-  ['POST /api/test/bug', 'opzettelijke storing, alleen bij NODE_ENV=test'],
-  ['POST /api/test/crash', 'opzettelijke storing, alleen bij NODE_ENV=test']
-]);
+   De lijst is dus geen onderdrukking maar een besluit-per-route. Er is één
+   bron voor: POORTWACHT is de gecontroleerde som van PUBLIEK en het expliciete
+   verschil ALLEEN_ANONIEM. Een nieuwe route die per ongeluk publiek is, valt
+   hier meteen op. */
+const { POORTWACHT } = require('../lib/publiek');
 
 /* Routes die we NIET aankloppen. Bewust kort, en elk met een reden -- een
    overslaan-lijst die groeit is een blinde vlek die groeit. */
@@ -472,7 +378,7 @@ BEVEILIGING.push({
       } else if (res.status >= 500) {
         w.raak('een verzoek zonder token gaf een serverfout', sleutel + ' -> ' + res.status + '  (' + r.bestand + ':' + r.regel + ')');
       } else if (res.status >= 200 && res.status < 300) {
-        if (PUBLIEK.has(sleutel)) { open++; w.afgeslagen(); }
+        if (POORTWACHT.has(r.pad)) { open++; w.afgeslagen(); }
         else w.raak('een route gaf zonder inlog een geslaagd antwoord', sleutel + '  (' + r.bestand + ':' + r.regel + ')');
       } else w.afgeslagen();
     }

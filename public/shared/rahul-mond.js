@@ -21,44 +21,25 @@
   try { supTok = localStorage.getItem('rtg_sup_token'); } catch (e) {}
   if (!supTok) return; // alleen de bedrijfssoftware (zaak)
 
-  var css =
-    '.rmond{position:fixed;left:50%;transform:translateX(-50%);' +
-    /* Rahul komt van de onderrand over de app heen; de werkschillen van de
-       zaak-apps staan zelf al vast op z-index 60 tot ruim 100, dus hij moet
-       daarboven. Alleen het bedieningspaneel (9995) gaat er nog overheen. */
-    'bottom:calc(env(safe-area-inset-bottom,0px) + 0.7rem);z-index:9981;' +
-    'display:flex;align-items:center;gap:.5rem;background:#0C0C0B;' +
-    'border:1px solid var(--gold,#857007);border-radius:0;padding:.32rem .4rem .32rem .32rem;' +
-    'box-shadow:0 10px 30px rgba(0,0,0,.5);font-family:Inter,system-ui,sans-serif;max-width:min(30rem,92vw);}' +
-    '.rmond canvas{width:2.2rem;height:2.2rem;border-radius:50%;background:#0C0C0B;flex:0 0 auto;cursor:pointer;display:block;}' +
-    '.rmond .rm-veld{flex:1;min-width:0;background:transparent;border:none;outline:none;color:#F4F1EC;font:inherit;font-size:.86rem;padding:.2rem .2rem;}' +
-    '.rmond .rm-veld::placeholder{color:rgba(244,241,236,.55);}' +
-    '.rmond .rm-go{flex:0 0 auto;width:1.9rem;height:1.9rem;border-radius:50%;border:none;cursor:pointer;' +
-    'background:var(--gold,#857007);color:#0C0C0B;font-size:1rem;line-height:1;display:flex;align-items:center;justify-content:center;}' +
-    '.rmond.rm-weg,.rm-uit.rm-weg{display:none;}' +
-    '.rm-uit{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom,0px) + 3.6rem);' +
-    'z-index:9982;max-width:min(30rem,92vw);background:#151312;border:1px solid var(--gold,#857007);border-radius:0;' +
-    'padding:.6rem .8rem;color:#eee;font-family:Inter,system-ui,sans-serif;font-size:.85rem;line-height:1.5;' +
-    'box-shadow:0 10px 30px rgba(0,0,0,.5);white-space:pre-wrap;max-height:40vh;overflow-y:auto;}' +
-    '.rm-uit[hidden]{display:none;}' +
-    '@media print{.rmond,.rm-uit{display:none;}}';
-
-  function stijl() { var s = document.createElement('style'); s.textContent = css; (document.head || document.documentElement).appendChild(s); }
+  if (!document.documentElement.hasAttribute('data-ds') && !document.getElementById('rtgDsRuntimeCss')) {
+    var link = document.createElement('link');
+    link.id = 'rtgDsRuntimeCss'; link.rel = 'stylesheet'; link.href = '/ds/rtg-ds.css';
+    document.head.appendChild(link);
+  }
 
   var bar, veld, uit, mond = { praat: function () {} };
 
   function bouw() {
-    stijl();
-    uit = document.createElement('div'); uit.className = 'rm-uit'; uit.hidden = true; uit.setAttribute('role', 'status'); uit.setAttribute('aria-live', 'polite');
+    uit = document.createElement('div'); uit.className = 'rm-uit ds-rahul-mond'; uit.hidden = true; uit.setAttribute('role', 'status'); uit.setAttribute('aria-live', 'polite');
     // weggelegd tot je hem van de onderrand omhoog haalt
-    bar = document.createElement('div'); bar.className = 'rmond rm-weg';
+    bar = document.createElement('div'); bar.className = 'rmond rm-weg ds-rahul-mond';
     // id 'rahulFab' is het huismerk voor "hier is Rahul al"; de metgezel-laag
     // ziet dit en laat zijn eigen Rahul-knop weg (alleen Samen blijft), zodat
     // er nooit twee monden naast elkaar staan -- nergens te druk.
     bar.id = 'rahulFab';
     bar.setAttribute('aria-label', 'Rahul, vraag of laat iets doen');
-    var can = document.createElement('canvas'); can.width = 132; can.height = 132;
-    can.title = 'Rahul wegleggen'; can.setAttribute('aria-label', 'Rahul wegleggen');
+    var can = document.createElement('canvas'); can.width = 132; can.height = 132; can.tabIndex = 0;
+    can.title = 'Rahul wegleggen'; can.setAttribute('aria-label', 'Rahul wegleggen'); can.setAttribute('role', 'button');
     veld = document.createElement('input'); veld.className = 'rm-veld'; veld.type = 'text'; veld.maxLength = 300;
     veld.placeholder = 'Vraag Rahul, of laat iets doen...';
     veld.setAttribute('aria-label', 'Vraag of opdracht aan Rahul');
@@ -82,16 +63,15 @@
       }, 4200);
     })();
 
-    // de lippen laden (shared/mond.js); lukt dat niet, dan een rustige stip
-    var s = document.createElement('script'); s.src = '/shared/mond.js';
-    s.onload = function () { try { if (window.RTGMond) mond = RTGMond.maak(can); } catch (e) {} };
-    s.onerror = function () { can.style.background = 'radial-gradient(circle,#C23A5E,#7F1634)'; };
-    document.head.appendChild(s);
+    // shared/mond.js staat expliciet voor deze module op iedere host.
+    try { if (window.RTGMond) mond = window.RTGMond.maak(can); else can.classList.add('rm-mond-fallback'); }
+    catch (e) { can.classList.add('rm-mond-fallback'); }
 
     /* De lippen tikken = wegleggen. Vroeger klapte hij in tot alleen de lippen,
        maar dat is weer een pil die blijft zweven; nu gaat hij helemaal weg en
        haal je hem opnieuw van de onderrand. */
     can.addEventListener('click', function () { window.RTGRahul.sluit(); });
+    can.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); window.RTGRahul.sluit(); } });
     go.addEventListener('click', vraag);
     veld.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); vraag(); } });
   }
@@ -144,12 +124,6 @@
         if (!el || !window.RTGRahul || !window.RTGRahul.vraag) return;
         ev.preventDefault(); window.RTGRahul.vraag(el.getAttribute('data-rahul-leeg'));
       });
-    }
-    // de knop-stijl, voor het geval de leden-metgezel niet meedraait op deze pagina
-    if (!document.getElementById('rahul-leeg-stijl')) {
-      var s2 = document.createElement('style'); s2.id = 'rahul-leeg-stijl';
-      s2.textContent = '.rahul-leeg-knop{display:inline-flex;align-items:center;gap:.4rem;background:transparent;border:1px solid var(--gold,#857007);color:var(--gold,#857007);border-radius:0;padding:.5rem .9rem;font-family:Inter,system-ui,sans-serif;font-size:.83rem;font-weight:600;cursor:pointer;}.rahul-leeg-knop:hover{background:var(--gold,#857007);color:#0C0C0B;}';
-      (document.head || document.documentElement).appendChild(s2);
     }
   }
 

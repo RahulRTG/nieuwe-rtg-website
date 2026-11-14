@@ -48,7 +48,7 @@
   function enterApp(){
     $('#gate').style.display = 'none';
     $('#app').classList.add('on');
-    $('#liveInd').style.display = 'inline-flex';
+    $('#liveInd').classList.remove('h-weg');
     startWerkOS();
     render();
     loadHandelsRegels();
@@ -513,10 +513,10 @@
     $('#ontLiveNaam').textContent = '' + naam;
     $('#ontLiveStatus').textContent = T('bo.ontwacht','Wachten op het camerabeeld van het lid…');
     $('#ontLiveVid').srcObject = null;
-    $('#ontLiveScrim').style.display = 'flex';
+    $('#ontLiveScrim').classList.remove('h-weg');
   }
   function ontLiveSluit(){
-    $('#ontLiveScrim').style.display = 'none';
+    $('#ontLiveScrim').classList.add('h-weg');
     const baan = $('#ontLiveTekst');
     if (baan){ baan.hidden = true; while (baan.firstChild) baan.removeChild(baan.firstChild); }
     if (ontPc){ try { ontPc.close(); } catch(e){} ontPc = null; }
@@ -527,7 +527,7 @@
     // een nieuw aanbod: open het scherm als dat nog niet openstaat
     if (d.payload.sdp && d.payload.sdp.type === 'offer'){
       ontLiveDate = d.dateId;
-      if ($('#ontLiveScrim').style.display !== 'flex'){ $('#ontLiveNaam').textContent = '' + (d.codenaam||'SOS'); $('#ontLiveScrim').style.display = 'flex'; }
+      if ($('#ontLiveScrim').classList.contains('h-weg')){ $('#ontLiveNaam').textContent = '' + (d.codenaam||'SOS'); $('#ontLiveScrim').classList.remove('h-weg'); }
       await ontHaalIce();
       if (ontPc){ try { ontPc.close(); } catch(e){} }
       ontPc = new RTCPeerConnection({ iceServers: ontIce || [{ urls:'stun:stun.l.google.com:19302' }] });
@@ -1010,7 +1010,7 @@
         '<div class="s-dkemdj"><div class="amt">'+eur(x.bedrag)+'</div><span class="pill '+pc+'">'+tStatus(x.status)+'</span></div></div></div>';
     }).join('') : '<div class="empty">'+T('bo.noorders','Nog geen bestellingen of ritten via partners.')+'</div>';
     const pager = $('#tlPager');
-    pager.style.display = tl.pages > 1 ? 'flex' : 'none';
+    pager.classList.toggle('h-weg', tl.pages <= 1);
     $('#tlWaar').textContent = T('bo.pagina','Pagina') + ' ' + tl.page + ' / ' + tl.pages;
     $('#tlPrev').disabled = tl.page <= 1;
     $('#tlNext').disabled = tl.page >= tl.pages;
@@ -1109,7 +1109,6 @@
   instellingKnop();
 
   window.addEventListener('rtglang', () => { if (state){ render(); loadVerify(); } });
-
   /* de backoffice: RENDEZ-VOUS -- THE TABLE
 
      Curatie is mensenwerk: hier stelt het kantoor een tafel samen van zes of

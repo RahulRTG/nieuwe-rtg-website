@@ -128,8 +128,18 @@ test('paginaopslag comprimeert werkelijk en decodeert slechts een begrensde lees
   const snapshot = projectie.volgende(null, nieuw, 1), lijst = projectie.lijst(snapshot, false);
   assert.equal(Object.getOwnPropertyDescriptor(lijst, 'length').value, 1024);
   assert.equal(Reflect.ownKeys(lijst).length, 1025);
-  const bytes = snapshot.paginas.reduce((n, p) => n + p.bytes.length + p.nummers.length * 8, 0);
-  assert.ok(bytes < Buffer.byteLength(JSON.stringify(nieuw)) / 2, 'ook gecomprimeerde bytes en nummerindex meetellen');
+  for (let i = 0; i < snapshot.paginas.length; i++) {
+    const tekst = '[' + nieuw.slice(i * 128, (i + 1) * 128).map(r => r.tekst).join(',') + ']';
+    assert.deepEqual(snapshot.paginas[i].bytes, zlib.deflateRawSync(tekst),
+      'de compacte pagina bewaart exact dezelfde gecomprimeerde inhoud');
+  }
+  const payloadBytes = snapshot.paginas.reduce((n, p) => n + p.bytes.length, 0);
+  const backingBytes = [...new Set(snapshot.paginas.map(p => p.bytes.buffer))]
+    .reduce((n, b) => n + b.byteLength, 0);
+  assert.equal(backingBytes, payloadBytes,
+    'gesloten pagina\'s houden geen grote zlib-werkbuffer achter hun kleine payload vast');
+  const bytes = backingBytes + snapshot.paginas.reduce((n, p) => n + p.nummers.length * 8, 0);
+  assert.ok(bytes < Buffer.byteLength(JSON.stringify(nieuw)) / 2, 'werkelijk vastgehouden buffers en nummerindex meetellen');
   assert.equal(gelezen, 0, 'schrijven decodeert geen leespagina');
   for (let i = 0; i < 5; i++) assert.equal(lijst[i * 128].nr, i * 128 + 1);
   assert.equal(gelezen, 5);
@@ -140,6 +150,7 @@ test('paginaopslag comprimeert werkelijk en decodeert slechts een begrensde lees
   assert.equal(projectie.lijst(later, true)[0].nr, 1025);
   assert.equal(lijst[0].nr, 1, 'retentie verandert geen oude snapshot');
   assert.equal(projectie.lijst(projectie.volgende(later, [], null), false).length, 0);
+  assert.deepEqual([...lijst], nieuw.map(r => JSON.parse(r.tekst)), 'ook de volledige oude snapshot blijft leesbaar');
   delete require.cache[pad];
 });
 

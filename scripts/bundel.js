@@ -24,6 +24,18 @@ const PUB = path.join(__dirname, '..', 'public');
 // gesorteerd samengevoegd (vandaar de NN- prefix), en rauw aaneengeplakt zodat
 // het resultaat exact de oorspronkelijke bron is.
 const bundels = {
+  // Grote browserowners blijven één bestand aan de clientkant; hun bron volgt
+  // de bestaande gesloten scope in leesbare delen onder de 10 kB-grens.
+  'apps/reizen-veilig.js': 'apps/reizen-veilig',
+  'shared/interface/world-desktop-frame.js': 'shared/interface/world-desktop-frame',
+  'shared/rahul-tab.js': 'shared/rahul-tab-entry',
+  'shared/rtg-edge-2-loader.js': 'shared/rtg-edge-2-loader',
+  'shared/wereldschil.js': 'shared/wereldschil',
+  // Bestaande owners houden hun ene browserbestand en gesloten scope. Bron
+  // volgt de grens tussen weergave/laden en bediening, byte voor byte gelijk.
+  'apps/voertuig.js': 'apps/voertuig',
+  'shared/randen.js': 'shared/randen',
+  'shared/rahul-tab/style-base.js': 'shared/rahul-tab/style-base',
   // Gedeelde scope behouden; de bron volgt de bestaande grens tussen
   // toegang/projectie en presentatie/editor. De uitvoer blijft byte-identiek.
   'apps/magnaat-leven.js': 'apps/magnaat-leven',
@@ -35,6 +47,7 @@ const bundels = {
   'shared/rtg-edge-smart-menu.js': 'shared/rtg-edge-smart-menu',
   'apps/boardroom.js': 'apps/boardroom',
   'apps/foundation/samen.js': 'apps/foundation/samen',
+  'apps/foundation/mediawijs.js': 'apps/foundation/mediawijs',
   'apps/rtg-protect.js': 'apps/rtg-protect',
   'apps/werkplek-bureaus.js': 'apps/werkplek-bureaus',
   'apps/defensie.js': 'apps/defensie',
@@ -73,6 +86,10 @@ const bundels = {
   'shared/appmenu.js': 'shared/appmenu',
   'shared/rtghorloge.js': 'shared/rtghorloge',
   'apps/residentie.js': 'apps/residentie',
+  // Zakelijk vervoer deelt één gesloten schermstaat tussen goedkeuringen,
+  // reisbeleid en maandoverzicht. De browser houdt daarom hetzelfde ene
+  // bestand; de bron volgt de bestaande grens vóór het reisbeleid.
+  'apps/zakelijk-voorzijde.js': 'apps/zakelijk-voorzijde',
   'apps/leverancier.js': 'apps/leverancier',
   'apps/app-main.js': 'apps/app-main',
   'apps/personeel.js': 'apps/personeel',
@@ -103,6 +120,7 @@ const bundels = {
   // daarmee over de 10 KB-lat; opgeknipt precies langs die grens
   'shared/uitvoer.js': 'shared/uitvoer',
   'apps/notities/app.js': 'apps/notities/app',
+  'apps/bestanden/app.js': 'apps/bestanden/app',
   // LibraryOS Studio + Reader delen één gesloten UI-staat; de browser krijgt
   // één bestand, de bron blijft langs de Reader-naad onder de modulegrens.
   'apps/library/app.js': 'apps/library/app',

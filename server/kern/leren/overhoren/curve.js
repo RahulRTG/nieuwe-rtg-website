@@ -10,13 +10,13 @@
    geheugen. De bakjes groeien lui mee met de lijst (nieuwe paren beginnen
    in bakje 1, vandaag). */
 const tijdzone = require('../../tijdzone');
+const klok = require('../../../lib/klok');
 module.exports = (ctx) => {
   const { save, L, schud } = ctx;
   // rustdagen per bakje (index = bakje): 1 dagelijks .. 5 elke twee weken
   const WACHT = [0, 1, 2, 4, 7, 14];
-  const dagStr = ms => tijdzone.datumIn(new Date(ms));
-  const vandaag = () => dagStr(Date.now());
-  const plus = n => dagStr(Date.now() + n * 86400000);
+  const vandaag = () => tijdzone.datumIn(klok.datum());
+  const plus = n => tijdzone.plusDagen(vandaag(), n);
 
   // de bakjes van een lijst, lui aangemaakt en meegroeiend met de paren
   function bakken(l) {

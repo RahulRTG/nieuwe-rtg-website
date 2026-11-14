@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="nl" data-rtg-thema="champagne">
+<html lang="nl" data-ds data-rtg-thema="champagne">
 <head>
 <script src="/shared/id.js"></script>
 <meta charset="utf-8">
@@ -7,108 +7,27 @@
 <title data-i18n="dailyField.pulsePage">Pulse · RTG</title>
 <link rel="icon" href="/icons/partners.svg">
 <link href="/fonts/fonts.css" rel="stylesheet">
-  <link href="/shared/rtg-uniform.css" rel="stylesheet">
-<link href="/shared/rtg-ui.css" rel="stylesheet">
-<style>
-  :root{ --bg:var(--rtg-bg); --card:var(--rtg-card); --card2:var(--rtg-card2); --line:var(--rtg-line);
-    --txt:var(--rtg-txt); --muted:var(--rtg-muted); --soft:var(--rtg-soft); --burgundy:#C23A5E; --gold:#A98F1C; }
-  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-  body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;padding-bottom:3rem;}
-  h1,h2{font-family:'Bodoni Moda',serif;font-weight:500;letter-spacing:-.01em;}
-  header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--bg),color-mix(in srgb,var(--bg) 86%,transparent));backdrop-filter:blur(8px);padding:1rem 1.1rem .7rem;border-bottom:1px solid var(--line);display:flex;align-items:flex-end;gap:.8rem;}
-  header .ey{font-size:.62rem;letter-spacing:.24em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));}
-  header h1{font-size:1.35rem;}
-  header .negen{margin-left:auto;font-size:.66rem;border:1px solid var(--gold);color:var(--rtg-leesgoud,var(--gold));border-radius:0;padding:.12rem .45rem;}
-  main{padding:1.1rem;max-width:640px;margin:0 auto;}
-  .schrijf{background:var(--card);border:1px solid var(--line);border-radius:0;padding:.9rem 1rem;margin-bottom:.9rem;}
-  .schrijf textarea{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:0;color:var(--txt);font:inherit;font-size:.95rem;padding:.6rem .7rem;min-height:3.2rem;resize:vertical;}
-  .schrijf .voet{display:flex;align-items:center;gap:.6rem;margin-top:.5rem;}
-  /* DE HOOFDHANDELING HOORT ONDER BEIDE DUIMEN. "Plaatsen" stond als laatste in
-     deze rij en kwam daarmee op x 301 van 390 uit: het kwart aan de ankerzijde
-     van een LINKSHANDIGE, waar zijn duim niet komt (ADAPTIEF.md, en de eigen
-     mobielkeuring meet het). Rechtshandig was hij prima -- precies het soort
-     gebrek dat je niet ziet als je zelf met een hand test. Op telefoonformaat
-     krijgt hij een eigen volle regel: dan is hij niet smal en niet aan een kant,
-     en bereikbaar ongeacht welke hand de telefoon vasthoudt. */
-  @media(max-width:560px){
-    .schrijf .voet{flex-wrap:wrap;}
-    .schrijf .voet #plaats{flex:1 0 100%;}
-  }
-  .teller{font-size:.75rem;color:var(--soft);margin-left:auto;}
-  .teller.vol{color:var(--burgundy);}
-  .knop{background:var(--gold);color:#000;border:none;border-radius:0;font:inherit;font-weight:600;font-size:.85rem;padding:.45rem 1rem;cursor:pointer;}
-  .knop.stil{background:transparent;color:var(--muted);border:1px solid var(--line);font-weight:400;font-size:.78rem;padding:.3rem .7rem;}
-  /* De feedkiezer (Volgend / Ontdek / Mijn plank) is de eigen schakelaar van
-     Pulse: EEN stroom tegelijk, precies wat het deelmenu elders doet. Het
-     mechanisme blijft ongemoeid; alleen de vorm gaat mee met het huis -- een
-     rustige balk met kleine kapitalen en een gouden streep onder de stroom waar
-     je staat, in plaats van een rij pillen. De selector moet dieper dan `.tab`:
-     de kit tekent die rij zelf al met `body.rtg-stijl .tab`. */
-  body.rtg-stijl .tabs{display:flex;flex-wrap:wrap;gap:.15rem;margin:0 0 .8rem;padding:0 0 .1rem;
-    border-bottom:1px solid var(--line);}
-  body.rtg-stijl .tabs > .tab{flex:0 0 auto;background:none;border:0;border-bottom:2px solid transparent;
-    margin-bottom:-1px;border-radius:0;cursor:pointer;padding:.55rem .7rem .6rem;text-align:center;
-    font-family:'Inter',system-ui,sans-serif;font-size:.72rem;font-weight:600;letter-spacing:.12em;
-    text-transform:uppercase;color:var(--muted);white-space:nowrap;}
-  body.rtg-stijl .tabs > .tab:hover{color:var(--txt);border-bottom-color:transparent;}
-  /* ook `background` en de randen hier herhalen: de kit heeft een eigen
-     `.tab.aan` met een gouden vulling, en die is net zo specifiek als de regel
-     hierboven -- alleen deze diepere selector wint er zeker van. */
-  body.rtg-stijl .tabs > .tab.aan{background:none;border-width:0 0 2px;color:var(--txt);border-bottom-color:var(--gold);}
-  .trend{display:flex;gap:.35rem;flex-wrap:wrap;margin-bottom:.8rem;}
-  .trend span{font-size:.74rem;border:1px solid var(--line);color:var(--muted);border-radius:0;padding:.22rem .6rem;}
-  .post{background:var(--card);border:1px solid var(--line);border-radius:0;padding:.85rem 1rem;margin-bottom:.7rem;}
-  .post .kop{display:flex;align-items:baseline;gap:.5rem;}
-  .post .wie{font-weight:600;font-size:.92rem;}
-  .post button.wie{padding:0;border:0;color:inherit;background:transparent;cursor:pointer;text-align:left;}
-  .post button.wie:hover,.post button.wie:focus-visible{color:var(--gold);text-decoration:underline;}
-  .post .tijd{font-size:.72rem;color:var(--soft);margin-left:auto;}
-  .post .tekst{font-size:.95rem;line-height:1.55;margin-top:.35rem;white-space:pre-wrap;word-break:break-word;}
-  .post .tekst .tag{color:var(--rtg-leesgoud,var(--gold));}
-  .post .acts{display:flex;gap:.4rem;margin-top:.6rem;align-items:center;flex-wrap:wrap;}
-  .post .acts .aan{border-color:var(--burgundy);color:var(--burgundy);}
-  .profiel-post{padding:1rem;}
-  .profiel-label{font-size:.65rem;letter-spacing:.16em;color:var(--gold);}
-  .profiel-naam{font-size:1.7rem;margin-top:.25rem;}
-  .profiel-eigen{color:var(--soft);font-size:.78rem;}
-  .profiel-waarderingen{color:var(--soft);font-size:.75rem;}
-  .reacties{border-top:1px solid var(--line);margin-top:.6rem;padding-top:.5rem;}
-  .reactie{font-size:.85rem;color:var(--muted);padding:.2rem 0;line-height:1.5;}
-  .reactie b{color:var(--txt);font-weight:600;}
-  .rrij{display:flex;gap:.4rem;margin-top:.4rem;}
-  .rrij input{flex:1;background:var(--bg);border:1px solid var(--line);border-radius:0;color:var(--txt);font:inherit;font-size:.84rem;padding:.4rem .6rem;}
-  .leeg{color:var(--soft);font-size:.9rem;text-align:center;padding:2rem 1rem;line-height:1.6;}
-  .melding{position:fixed;left:50%;bottom:1.2rem;transform:translateX(-50%);background:var(--card2);border:1px solid var(--line);border-radius:0;padding:.6rem 1rem;font-size:.85rem;opacity:0;transition:opacity .3s;z-index:30;pointer-events:none;}
-  .inlog{text-align:center;padding:2.5rem 1rem;}
-  .klaar{color:var(--soft);font-size:.8rem;text-align:center;padding:1rem 0;}
-</style>
-<link href="/shared/dagkleur.css" rel="stylesheet">
+
+
+
+
 <script src="/shared/seizoen.js" defer></script>
-<link href="/shared/ios.css" rel="stylesheet">
-<link href="/shared/rtg-worlds-2026.css" rel="stylesheet">
-<link href="/shared/rtg-daily.css" rel="stylesheet">
-<link href="/shared/rtg-daily-rooms.css" rel="stylesheet">
-<style data-rtg-stijlattr>
-/* Wat hier staat, stond als style="..." op de elementen zelf (in de markup
-   of in de sjablonen van de scripts die deze pagina laadt). Een stijlattribuut
-   houdt style-src-attr 'unsafe-inline' open in de CSP; een klasse niet
-   (NORM.json inlineStijlAttributen). De declaraties zijn letterlijk wat er
-   stond. :not(#_#_#_) geeft de klasse de voorrang die het attribuut had: hij
-   wint van elke gewone regel in de bladen, verliest net als het attribuut van
-   !important, en een el.style-schrijfactie wint er nog steeds van. */
-.s-13mw0os:not(#_#_#_){color:var(--muted);font-size:.8rem;margin-top:0.5rem}
-.s-1okci5r:not(#_#_#_){margin-top:.6rem;font-size:.88rem;color:var(--muted);line-height:1.55;border-top:1px solid var(--line);padding-top:.5rem}
-.s-1p274fk:not(#_#_#_){border-color:var(--gold)}
-.s-betnyq:not(#_#_#_){padding:1rem}
-</style>
+
+
+
+
+
 <script src="/shared/rtg-world-desktop.js" defer></script>
-<link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
+<script src="/shared/appmenu.js" defer></script>
+
+<link href="/ds/rtg-ds.css" rel="stylesheet">
+<script src="/ds/shell.js"></script>
 <script src="/shared/rtg-heritage-transition.js" blocking="render"></script>
 </head>
-<body class="rtg-stijl rtg-daily" data-rtg-daily="pulse" data-rtg-editorial-room="pulse" data-rtg-world="living" data-rtg-skin="heritage" data-rtg-layout="standard">
-<header><div><div class="ey" data-i18n="dailyField.pulseBrand">RTG Pulse</div><h1 data-i18n="dailyField.pulse">Pulse</h1></div><span class="negen">9+</span><div data-rtg-edge-bar><button type="button" id="dailyCompose" data-i18n="daily.postNew" data-stand="pulse-compose">Plaats een bericht</button><button type="button" id="dailyFollowing" data-i18n="daily.following" data-s="volgend" data-stand="pulse-volgend">Volgend</button><button type="button" id="dailyDiscover" data-i18n="daily.discover" data-s="ontdek" data-stand="pulse-ontdek">Ontdek mensen</button><button type="button" id="profielKnop" data-i18n="daily.myProfile" data-stand="pulse-profiel">Mijn profiel</button><button type="button" id="plankKnop" data-i18n="daily.mySaved" data-stand="pulse-plank">Mijn plank</button></div></header>
-<main id="main"><section id="dailyIntro" aria-label="Pulse" data-i18n-aria="dailyField.pulse"></section><div id="pulseContent" class="daily-content"></div></main>
-<div class="melding" id="melding" role="status"></div>
+<body class="ds-scherm ds-dagkamer rtg-stijl rtg-daily" data-rtg-daily="pulse" data-rtg-editorial-room="pulse" data-rtg-world="living" data-rtg-skin="heritage" data-rtg-layout="standard">
+<header class="ds-kop ds-dag-kop" data-rtg-menu-host><div><div class="ey" data-i18n="dailyField.pulseBrand">RTG Pulse</div><h1 data-i18n="dailyField.pulse">Pulse</h1></div><span class="negen" data-i18n="dailyField.livingOs">LivingOS</span><div data-rtg-edge-bar><button type="button" id="dailyCompose" data-i18n="daily.postNew" data-stand="pulse-compose" class="ds-knop" data-ds-actie>Plaats een bericht</button><button type="button" id="dailyFollowing" data-i18n="daily.following" data-s="volgend" data-stand="pulse-volgend" class="ds-knop" data-ds-actie>Volgend</button><button type="button" id="dailyDiscover" data-i18n="daily.discover" data-s="ontdek" data-stand="pulse-ontdek" class="ds-knop" data-ds-actie>Ontdek mensen</button><button type="button" id="profielKnop" data-i18n="daily.myProfile" data-stand="pulse-profiel" class="ds-knop" data-ds-actie>Mijn profiel</button><button type="button" id="plankKnop" data-i18n="daily.mySaved" data-stand="pulse-plank" class="ds-knop" data-ds-actie>Mijn plank</button></div></header>
+<main id="main" class="ds-dag-main"><section id="dailyIntro" aria-label="Pulse" data-i18n-aria="dailyField.pulse"></section><div id="pulseContent" class="daily-content ds-dag-daily-content"></div></main>
+<div class="melding ds-melding" id="melding" role="status"></div>
 <!-- uitvoer.js zonder defer en voor het eigen script: dat script meldt hieronder
      zijn eigen model aan met RTGUitvoer.bron() en moet de laag dus al vinden. -->
 <script src="/shared/rtg-daily-copy.js"></script>
@@ -128,7 +47,7 @@ const roep=(url,body)=>fetch(url,{method:'POST',headers:{'Content-Type':'applica
 const api=(pad,body)=>roep('/api/member/pulse/'+pad,body);
 const wauw=(pad,body)=>roep('/api/member/wauw/'+pad,body);
 const tijd=iso=>window.RTGDailyCopy.date(iso,{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
-const mooi=t=>esc(t).replace(/#([a-z0-9_]{2,30})/gi,'<span class="tag">#$1</span>');
+const mooi=t=>esc(t).replace(/#([a-z0-9_]{2,30})/gi,'<span class="tag ds-dag-tag">#$1</span>');
 // de wauw-laag naast de codenaam: de dag-stemming en de verjaardagsglans
 const glans=p=>(p.stemming?' '+esc(p.stemming):'')+(p.jarig?' ':'');
 let SOORT='volgend', DRAFT='', loadVersion=0, composing=false;
@@ -141,11 +60,11 @@ document.querySelectorAll('[data-s]').forEach(b=>b.onclick=()=>{SOORT=b.dataset.
 async function toonProfiel(key){
   let p; try{ p=await api('profiel',key?{key}:{}) }catch(e){ return meld(e.message); }
   rememberDraft(); loadVersion++; heading('ready'); FEED=null; PLANK=null;
-  const post=(x)=>'<div class="post"><div class="kop"><span class="wie" data-user-content>'+esc(p.codenaam)+glans(x)+'</span><span class="tijd" translate="no" data-daily-time="'+esc(x.at)+'">'+tijd(x.at)+'</span></div><div class="tekst" data-user-content>'+mooi(x.tekst)+'</div><div class="acts"><button class="knop stil" data-profiel-open="'+x.id+'">'+x.reacties.length+' '+L('replies','reacties')+'</button><span class="profiel-waarderingen">'+x.likes+' '+L('likes','waarderingen')+'</span></div><div class="reacties" id="pr-'+x.id+'" hidden>'+x.reacties.map(r=>'<div class="reactie" data-user-content><b>'+esc(r.codenaam)+'</b> '+mooi(r.tekst)+'</div>').join('')+'</div></div>';
-  $('#pulseContent').innerHTML='<div class="post profiel-post"><div class="kop"><div><div class="profiel-label">'+L('codenameProfile','CODENAAMPROFIEL')+'</div><h2 class="profiel-naam" data-user-content>'+esc(p.codenaam)+'</h2></div><span class="tijd">'+p.volgers+' '+L('followers','volgers')+'</span></div><div class="acts">'+
-    (!p.zelf?'<button class="knop" id="profielVolg">'+(p.volgIk?L('unfollow','Ontvolgen'):L('follow','Volgen'))+'</button>':'<span class="profiel-eigen">'+L('ownProfile','Dit is uw profiel.')+'</span>')+
-    '<button class="knop stil" id="profielTerug" data-contextactie>'+L('backFeed','Terug naar de feed')+'</button></div></div>'+
-    (p.posts.length?p.posts.map(post).join(''):'<div class="leeg">'+L('noPosts','Deze codenaam heeft nog niets geplaatst.')+'</div>');
+  const post=(x)=>'<div class="post ds-dag-post"><div class="kop ds-dag-kop"><span class="wie ds-dag-wie" data-user-content>'+esc(p.codenaam)+glans(x)+'</span><span class="tijd ds-dag-tijd" translate="no" data-daily-time="'+esc(x.at)+'">'+tijd(x.at)+'</span></div><div class="tekst ds-dag-tekst" data-user-content>'+mooi(x.tekst)+'</div><div class="acts ds-dag-acts"><button class="knop stil ds-knop ds-dag-stil" data-profiel-open="'+x.id+'">'+x.reacties.length+' '+L('replies','reacties')+'</button><span class="profiel-waarderingen ds-dag-profiel-waarderingen">'+x.likes+' '+L('likes','waarderingen')+'</span></div><div class="reacties ds-dag-reacties" id="pr-'+x.id+'" hidden>'+x.reacties.map(r=>'<div class="reactie ds-dag-reactie" data-user-content><b>'+esc(r.codenaam)+'</b> '+mooi(r.tekst)+'</div>').join('')+'</div></div>';
+  $('#pulseContent').innerHTML='<div class="post profiel-post ds-dag-post ds-dag-profiel-post"><div class="kop ds-dag-kop"><div><div class="profiel-label ds-dag-profiel-label">'+L('codenameProfile','CODENAAMPROFIEL')+'</div><h2 class="profiel-naam ds-dag-profiel-naam" data-user-content>'+esc(p.codenaam)+'</h2></div><span class="tijd ds-dag-tijd">'+p.volgers+' '+L('followers','volgers')+'</span></div><div class="acts ds-dag-acts">'+
+    (!p.zelf?'<button class="knop ds-knop" id="profielVolg">'+(p.volgIk?L('unfollow','Ontvolgen'):L('follow','Volgen'))+'</button>':'<span class="profiel-eigen ds-dag-profiel-eigen">'+L('ownProfile','Dit is uw profiel.')+'</span>')+
+    '<button class="knop stil ds-knop ds-dag-stil" id="profielTerug" data-contextactie>'+L('backFeed','Terug naar de feed')+'</button></div></div>'+
+    (p.posts.length?p.posts.map(post).join(''):'<div class="leeg ds-dag-leeg">'+L('noPosts','Deze codenaam heeft nog niets geplaatst.')+'</div>');
   $('#profielTerug').onclick=laad;
   const volg=$('#profielVolg'); if(volg) volg.onclick=async()=>{ try{ await api('volg',{key}); toonProfiel(key); }catch(e){ meld(e.message); } };
   document.querySelectorAll('[data-profiel-open]').forEach(b=>b.onclick=()=>{ const el=$('#pr-'+b.dataset.profielOpen); el.hidden=!el.hidden; });
@@ -182,21 +101,21 @@ async function laad(){
   heading(first?'empty':'ready');
   document.querySelectorAll('[data-s]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.s===SOORT)));
   FEED=d; PLANK=null;
-  let h='<div class="schrijf"'+(first?' hidden':'')+'><textarea id="nw" maxlength="280" aria-label="Wat wilt u delen?" data-i18n-aria="daily.postPrompt" data-i18n-ph="daily.postPrompt" placeholder="Wat wilt u delen?"></textarea><div class="voet"><button class="knop stil" id="stemKnop" title="Je stemming van vandaag" data-i18n-title="pulse.moodHint" data-stand="pulse-stemming">'+L('mood','Stemming')+'</button><button class="knop stil" id="terugKnop">'+L('myWeek','Mijn week')+'</button><span class="teller" id="teller">280</span><button class="knop" id="plaats">'+L('publish','Plaatsen')+'</button></div><div id="stemRij" hidden style="display:flex;gap:.3rem;flex-wrap:wrap;margin-top:.5rem;"></div><div id="terugBox" hidden class="s-1okci5r"></div></div>';
-  if(d.trending.length) h+='<div class="trend">'+d.trending.map(t=>'<span>#'+esc(t.tag)+' · '+t.n+'</span>').join('')+'</div>';
+  let h='<div class="schrijf ds-dag-schrijf"'+(first?' hidden':'')+'><textarea class="ds-invoer" id="nw" maxlength="280" aria-label="Wat wilt u delen?" data-i18n-aria="daily.postPrompt" data-i18n-ph="daily.postPrompt" placeholder="Wat wilt u delen?"></textarea><div class="voet ds-dag-voet"><button class="knop stil ds-knop ds-dag-stil" id="stemKnop" title="Je stemming van vandaag" data-i18n-title="pulse.moodHint" data-stand="pulse-stemming" data-ds-actie>'+L('mood','Stemming')+'</button><button class="knop stil ds-knop ds-dag-stil" id="terugKnop">'+L('myWeek','Mijn week')+'</button><span class="teller ds-dag-teller" id="teller">280</span><button class="knop ds-knop" id="plaats">'+L('publish','Plaatsen')+'</button></div><div id="stemRij" hidden style="display:flex;gap:.3rem;flex-wrap:wrap;margin-top:.5rem;"></div><div id="terugBox" hidden class="s-1okci5r ds-dag-reacties"></div></div>';
+  if(d.trending.length) h+='<div class="trend ds-dag-trend">'+d.trending.map(t=>'<span>#'+esc(t.tag)+' · '+t.n+'</span>').join('')+'</div>';
   // het Moment van de week: een enkel lichtpunt, geen ranglijst
-  if(SOORT==='ontdek'&&d.moment) h+='<div class="post s-1p274fk"><div class="kop"><button class="wie" data-user-content data-profiel="'+esc(d.moment.eigen?'':d.moment.van)+'">'+L('weekMoment','Moment van de week')+' · '+esc(d.moment.codenaam)+glans(d.moment)+'</button><span class="tijd" translate="no">'+d.moment.likes+'</span></div><div class="tekst" data-user-content>'+mooi(d.moment.tekst)+'</div></div>';
+  if(SOORT==='ontdek'&&d.moment) h+='<div class="post s-1p274fk ds-dag-post ds-dag-accent"><div class="kop ds-dag-kop"><button class="wie ds-dag-wie" data-user-content data-profiel="'+esc(d.moment.eigen?'':d.moment.van)+'">'+L('weekMoment','Moment van de week')+' · '+esc(d.moment.codenaam)+glans(d.moment)+'</button><span class="tijd ds-dag-tijd" translate="no">'+d.moment.likes+'</span></div><div class="tekst ds-dag-tekst" data-user-content>'+mooi(d.moment.tekst)+'</div></div>';
   h+= d.feed.length ? d.feed.map(p=>{
-    const acts='<div class="acts">'+
-      '<button aria-label="Waarderen" data-i18n-aria="daily.appreciate" aria-pressed="'+p.mijnLike+'" class="knop stil'+(p.mijnLike?' aan':'')+'" data-like="'+p.id+'"><span aria-hidden="true">♡ </span>'+p.likes+'</button>'+
-      '<button aria-label="Reacties bekijken" data-i18n-aria="daily.viewReplies" class="knop stil" data-open="'+p.id+'"><span aria-hidden="true">↳ </span>'+p.reacties.length+'</button>'+
-      '<button class="knop stil" data-bewaar="'+p.id+'" data-saved="'+p.bewaard+'">'+(p.bewaard?L('saved','bewaard'):L('save','bewaar'))+'</button>'+(p.versies?'<button class="knop stil" data-hist="'+p.id+'">'+L('history','geschiedenis')+' ('+p.versies+')</button>':'')+(p.eigen?'<button class="knop stil" data-bew="'+p.id+'">'+L('edit','bewerken')+'</button><button class="knop stil" data-weg="'+p.id+'">'+L('delete','verwijderen')+'</button>'
-        :(SOORT==='ontdek'?'<button class="knop stil" data-volg="'+p.van+'">+ '+L('follow','volgen')+'</button>':'')+'<button class="knop stil" data-meld="'+p.id+'">'+L('report','melden')+'</button>')+'</div>';
-    const reacties='<div class="reacties" id="re-'+p.id+'" hidden>'+p.reacties.map(r=>'<div class="reactie" data-user-content><b>'+esc(r.codenaam)+'</b> '+mooi(r.tekst)+'</div>').join('')+
-      '<div class="rrij"><input id="ri-'+p.id+'" maxlength="280" placeholder="Schrijf een reactie" aria-label="Schrijf een reactie" data-i18n-ph="daily.replyPrompt" data-i18n-aria="daily.replyPrompt"><button class="knop" aria-label="Reactie plaatsen" data-i18n-aria="daily.sendReply" data-re="'+p.id+'">→</button></div></div>';
-    return '<article class="post"><div class="kop"><span class="daily-avatar" aria-hidden="true" data-user-content>'+esc(Array.from(p.codenaam||'·')[0])+'</span><button class="wie" data-user-content data-profiel="'+esc(p.eigen?'':p.van)+'">'+esc(p.codenaam)+glans(p)+'</button><span class="tijd"><span translate="no" data-daily-time="'+esc(p.at)+'">'+tijd(p.at)+'</span>'+(p.bewerkt?' · '+L('edited','bewerkt'):'')+'</span></div><div class="tekst" data-user-content>'+mooi(p.tekst)+'</div>'+acts+reacties+'</article>';
-  }).join('')+'<div class="klaar">'+window.RTGDailyCopy.text('feedEnd')+'</div>'
-  : (first?'':'<p class="leeg">'+window.RTGDailyCopy.text(SOORT==='volgend'?'emptyFeed':'emptyDiscover')+'</p>');
+    const acts='<div class="acts ds-dag-acts">'+
+      '<button aria-label="Waarderen" data-i18n-aria="daily.appreciate" aria-pressed="'+p.mijnLike+'" class="knop stil'+(p.mijnLike?' aan':'')+' ds-knop ds-dag-stil" data-like="'+p.id+'"><span aria-hidden="true">♡ </span>'+p.likes+'</button>'+
+      '<button aria-label="Reacties bekijken" data-i18n-aria="daily.viewReplies" class="knop stil ds-knop ds-dag-stil" data-open="'+p.id+'"><span aria-hidden="true">↳ </span>'+p.reacties.length+'</button>'+
+      '<button class="knop stil ds-knop ds-dag-stil" data-bewaar="'+p.id+'" data-saved="'+p.bewaard+'">'+(p.bewaard?L('saved','bewaard'):L('save','bewaar'))+'</button>'+(p.versies?'<button class="knop stil ds-knop ds-dag-stil" data-hist="'+p.id+'">'+L('history','geschiedenis')+' ('+p.versies+')</button>':'')+(p.eigen?'<button class="knop stil ds-knop ds-dag-stil" data-bew="'+p.id+'">'+L('edit','bewerken')+'</button><button class="knop stil ds-knop ds-dag-stil" data-weg="'+p.id+'">'+L('delete','verwijderen')+'</button>'
+        :(SOORT==='ontdek'?'<button class="knop stil ds-knop ds-dag-stil" data-volg="'+p.van+'">+ '+L('follow','volgen')+'</button>':'')+'<button class="knop stil ds-knop ds-dag-stil" data-meld="'+p.id+'">'+L('report','melden')+'</button>')+'</div>';
+    const reacties='<div class="reacties ds-dag-reacties" id="re-'+p.id+'" hidden>'+p.reacties.map(r=>'<div class="reactie ds-dag-reactie" data-user-content><b>'+esc(r.codenaam)+'</b> '+mooi(r.tekst)+'</div>').join('')+
+      '<div class="rrij ds-dag-rrij"><input class="ds-invoer" id="ri-'+p.id+'" maxlength="280" placeholder="Schrijf een reactie" aria-label="Schrijf een reactie" data-i18n-ph="daily.replyPrompt" data-i18n-aria="daily.replyPrompt"><button class="knop ds-knop" aria-label="Reactie plaatsen" data-i18n-aria="daily.sendReply" data-re="'+p.id+'">→</button></div></div>';
+    return '<article class="post ds-dag-post"><div class="kop ds-dag-kop"><span class="daily-avatar" aria-hidden="true" data-user-content>'+esc(Array.from(p.codenaam||'·')[0])+'</span><button class="wie ds-dag-wie" data-user-content data-profiel="'+esc(p.eigen?'':p.van)+'">'+esc(p.codenaam)+glans(p)+'</button><span class="tijd ds-dag-tijd"><span translate="no" data-daily-time="'+esc(p.at)+'">'+tijd(p.at)+'</span>'+(p.bewerkt?' · '+L('edited','bewerkt'):'')+'</span></div><div class="tekst ds-dag-tekst" data-user-content>'+mooi(p.tekst)+'</div>'+acts+reacties+'</article>';
+  }).join('')+'<div class="klaar ds-dag-klaar">'+window.RTGDailyCopy.text('feedEnd')+'</div>'
+  : (first?'':'<p class="leeg ds-dag-leeg">'+window.RTGDailyCopy.text(SOORT==='volgend'?'emptyFeed':'emptyDiscover')+'</p>');
   $('#pulseContent').innerHTML=h;
   const nw=$('#nw'), teller=$('#teller'); nw.value=DRAFT; teller.textContent=280-nw.value.length;
   nw.addEventListener('input',()=>{ DRAFT=nw.value; const n=280-nw.value.length; teller.textContent=n; teller.classList.toggle('vol',n<20); });
@@ -204,7 +123,7 @@ async function laad(){
   // de stemmingkiezer: een dag-emoji uit de vaste 9+-lijst, overal zichtbaar naast je codenaam
   $('#stemKnop').onclick=async()=>{ const rij=$('#stemRij');
     if(rij.hidden){ try{ const s=await wauw('stemming',{});
-      rij.innerHTML=(s.keuzes||[]).map(e=>'<button class="knop stil" data-stem="'+e+'" data-contextactie>'+e+'</button>').join('')+'<button class="knop stil" data-stem="" data-contextactie>'+L('none','Geen')+'</button>';
+      rij.innerHTML=(s.keuzes||[]).map(e=>'<button class="knop stil ds-knop ds-dag-stil" data-stem="'+e+'" data-contextactie>'+e+'</button>').join('')+'<button class="knop stil ds-knop ds-dag-stil" data-stem="" data-contextactie>'+L('none','Geen')+'</button>';
       rij.querySelectorAll('[data-stem]').forEach(b=> b.onclick=async()=>{ try{ await wauw('stemming/zet',{emoji:b.dataset.stem}); meld(b.dataset.stem?T('moodToday','Uw stemming vandaag:')+' '+b.dataset.stem:T('moodRemoved','Uw stemming is weggehaald.')); laad(); }catch(e){ meld(e.message); } });
     }catch(e){ meld(T('moodFailed','Kon de stemmingen niet laden.')); } }
     rij.hidden=!rij.hidden; };
@@ -240,12 +159,12 @@ async function laad(){
   $('#plankKnop').onclick=async()=>{
     try{ const pl=await api('bewaard',{});
       rememberDraft(); loadVersion++; heading('ready'); PLANK=pl;
-      $('#pulseContent').innerHTML='<div class="post s-betnyq"><h2>'+L('savedHeading','Mijn plank')+'</h2>'+
-        (pl.mappen.length?'<div class="trend">'+pl.mappen.map(m=>'<span>'+esc(m.naam)+' · '+m.aantal+'</span>').join('')+'</div>':'')+
-        (pl.bewaard.length?pl.bewaard.map(x=>'<div class="post"><div class="kop"><span class="wie" data-user-content>'+esc(x.codenaam)+'</span><span class="tijd" translate="no">'+esc(x.map)+'</span></div><div class="tekst" data-user-content>'+mooi(x.tekst)+'</div></div>').join('')
-          :'<div class="leeg">'+L('emptySaved','U heeft nog geen berichten bewaard.')+'</div>')+
-        '<div class="h-mt80"><button class="knop" id="plankTerug" data-contextactie>'+L('backFeed','Terug naar de feed')+'</button></div>'+
-        '<p class="s-13mw0os">'+L('privateSaved','Uw bewaarde berichten zijn prive. De schrijver krijgt geen melding.')+'</p></div>';
+      $('#pulseContent').innerHTML='<div class="post s-betnyq ds-dag-post ds-dag-ruimte"><h2>'+L('savedHeading','Mijn plank')+'</h2>'+
+        (pl.mappen.length?'<div class="trend ds-dag-trend">'+pl.mappen.map(m=>'<span>'+esc(m.naam)+' · '+m.aantal+'</span>').join('')+'</div>':'')+
+        (pl.bewaard.length?pl.bewaard.map(x=>'<div class="post ds-dag-post"><div class="kop ds-dag-kop"><span class="wie ds-dag-wie" data-user-content>'+esc(x.codenaam)+'</span><span class="tijd ds-dag-tijd" translate="no">'+esc(x.map)+'</span></div><div class="tekst ds-dag-tekst" data-user-content>'+mooi(x.tekst)+'</div></div>').join('')
+          :'<div class="leeg ds-dag-leeg">'+L('emptySaved','U heeft nog geen berichten bewaard.')+'</div>')+
+        '<div class="ds-dag-secundair"><button class="knop ds-knop" id="plankTerug" data-contextactie>'+L('backFeed','Terug naar de feed')+'</button></div>'+
+        '<p class="s-13mw0os ds-dag-meta">'+L('privateSaved','Uw bewaarde berichten zijn prive. De schrijver krijgt geen melding.')+'</p></div>';
       $('#plankTerug').onclick=()=>laad();
     }catch(e){ meld(e.message); } };
   $('#profielKnop').onclick=()=>toonProfiel(null);

@@ -150,6 +150,20 @@ test('appkruisproef: volledige bevoegde workflow plus vreemde actor telt, samenv
   assert.equal(R.scenarioOordeel(rij, oud).status, 'NIET_GETEST');
 });
 
+test('appkruisproef: een app deelt alleen via een expliciet contract dezelfde bevoegdheidsgrens', () => {
+  const bewijs = { sluit: true, telling: { schakels: 2, gesloten: 2, open: 0, stuk: 0 }, schakels: [
+    { soort: 'bevoegde-workflow', stand: 'gesloten', wat: 'A voltooit' },
+    { soort: 'tegenproef', stand: 'gesloten', wat: 'B blijft buiten' }
+  ] };
+  const registers = { voltooiVervallen: [], voltooi: new Map([['os:bellen', bewijs]]) };
+  assert.equal(R.scenarioOordeel({ functie: 'os:video' }, registers, { contract: {} }).status, 'NIET_GETEST');
+  const via = R.scenarioOordeel({ functie: 'os:video' }, registers, {
+    contract: { 'os:video': { bevoegdVia: 'os:bellen' } }
+  });
+  assert.equal(via.status, 'BEWEZEN');
+  assert.equal(via.bronFunctie, 'os:bellen');
+});
+
 test('appkruisproef: concreet routelek wint, scenario vult alleen ontbrekend bewijs aan', () => {
   const dicht = { status: 'BEWEZEN', reden: 'alle routes dicht' };
   const open = { status: 'NIET_GETEST', reden: 'route ontbreekt' };
@@ -189,7 +203,47 @@ test('1. een ledenscherm is alleen BEWEZEN als elke route gemeten is', () => {
   assert.equal(oordeel(reg({ '/api/a/lijst': [idormeting('GET')], '/api/a/zet': [{ methode: 'POST', staat: 'onbereikbaar' }] }, {})).status, 'NIET_GETEST');
 });
 
-test('1a. een interne tab gebruikt alleen de bronbestanden uit zijn bestaande appcontract', () => {
+test('1a. alleen expliciete route-loze publieke inhoud en lokale navigatie sluiten zonder kunstmatige API', () => {
+  const rij = { functie: 'link:statisch', ingang: '/apps/statisch.html' };
+  const schermroutes = { perScherm: [
+    { bestand: 'public/apps/statisch.html', exact: [], voorvoegsels: [] },
+    { bestand: 'public/apps/app-main/kies.js', exact: [], voorvoegsels: [] }
+  ] };
+  const lees = () => '<!doctype html>';
+  const basis = { schermroutes, lees };
+  const open = R.ledenOordeel(rij, reg({}, {}), { ...basis, contract: {} });
+  assert.equal(open.status, 'NIET_GETEST');
+
+  const publiek = R.ledenOordeel(rij, reg({}, {}), { ...basis, contract: {
+    'link:statisch': { bevoegdContext: 'publieke-inhoud', bestanden: ['public/apps/statisch.html'] }
+  } });
+  assert.equal(publiek.status, 'BEWEZEN');
+  assert.equal(publiek.context, 'publieke-inhoud');
+
+  const navRij = { functie: 'os:kies', ingang: '(os in de app, geen eigen adres)' };
+  const navContract = { 'os:kies': { ingang: '/apps/app.html', via: 'open de kiezer', bestanden: ['public/apps/app-main/kies.js'],
+    adapter: { type: 'rahul-opdracht' }, bevoegdContext: 'lokale-navigatie',
+    bevoegdBestemmingen: ['/apps/doel.html?groep=een'] } };
+  const nav = R.ledenOordeel(navRij, reg({}, {}), { ...basis, contract: navContract });
+  assert.equal(nav.status, 'BEWEZEN');
+  assert.equal(nav.context, 'lokale-navigatie');
+
+  navContract['os:kies'].bevoegdBestemmingen = ['https://voorbeeld.nl/doel'];
+  assert.equal(R.ledenOordeel(navRij, reg({}, {}), { ...basis, contract: navContract }).status, 'NIET_GETEST',
+    'een externe of onbegrensde bestemming mag niet als lokale navigatie sluiten');
+});
+
+test('1b. camera sluit alleen als beeld lokaal blijft en Rahul werkelijk per sessie is gescheiden', () => {
+  const goed = { beeld: true, fotoLokaal: true, apiTijdensFoto: [], aOnthoud: 200, aWeet: 200,
+    bWeet: 200, anoniem: 401, aZietGeheim: true, bZietGeheim: false };
+  assert.equal(R.cameraOordeel(goed).status, 'BEWEZEN');
+  assert.equal(R.cameraOordeel({ ...goed, bZietGeheim: true }).status, 'GEBLOKKEERD_DOOR_DEFECT');
+  assert.equal(R.cameraOordeel({ ...goed, apiTijdensFoto: ['POST /api/upload'] }).status, 'GEBLOKKEERD_DOOR_DEFECT');
+  assert.equal(R.cameraOordeel({ ...goed, anoniem: 200 }).status, 'GEBLOKKEERD_DOOR_DEFECT');
+  assert.equal(R.cameraOordeel({ ...goed, fotoLokaal: false }).status, 'NIET_GETEST');
+});
+
+test('1c. een interne tab gebruikt alleen de bronbestanden uit zijn bestaande appcontract', () => {
   const schermroutes = { perScherm: [
     { bestand: 'public/apps/app-main/tab-a.js', exact: ['/api/a/lijst'], voorvoegsels: [] },
     { bestand: 'public/apps/app-main/tab-b.js', exact: ['/api/b/geheim'], voorvoegsels: [] }
@@ -285,7 +339,7 @@ test('5. het echte register spreekt zichzelf niet tegen', () => {
   const tel = {};
   for (const r of reg.regels) {
     tel[r.status] = (tel[r.status] || 0) + 1;
-    if (r.status === 'BEWEZEN' && r.persona === 'lid' && !r.scenario) assert.ok(r.routes > 0, r.functie + ': BEWEZEN zonder een route');
+    if (r.status === 'BEWEZEN' && r.persona === 'lid' && !r.scenario && !r.context) assert.ok(r.routes > 0, r.functie + ': BEWEZEN zonder een route of expliciete route-loze context');
     if (r.status === 'BEWEZEN' && r.persona === 'gezin' && !r.scenario) {
       assert.ok(r.kruisparen?.length > 0, r.functie + ': BEWEZEN zonder kruisparen');
       for (const p of r.kruisparen) {

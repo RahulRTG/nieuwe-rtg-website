@@ -123,12 +123,17 @@ function tekenLijst(l) {
   $('#volgende').disabled = l.pagina >= l.paginas;
 }
 
+let actueleVraag = 0;
 async function ververs() {
+  // Alleen de laatste filter-/paginakeuze bezit het scherm. Een trager oud
+  // antwoord (ook een fout) mag de actuele zoekstand niet overschrijven.
+  const vraagnummer = ++actueleVraag;
   try {
     const d = await haal();
-    if (!d) return;
+    if (!d || vraagnummer !== actueleVraag) return;
     tekenStand(d); tekenDomeinen(d); tekenLijst(d.lijst);
   } catch (e) {
+    if (vraagnummer !== actueleVraag) return;
     $('#lijst').innerHTML = leeg(e.message);
     $('#melding').textContent = e.message;
   }

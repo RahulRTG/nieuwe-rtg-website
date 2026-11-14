@@ -42,15 +42,28 @@
    <body data-ios-home>: die krijgt geen indicator en geen balk. */
 (function (w, d) {
   'use strict';
+  const dsBijStart = document.documentElement.hasAttribute('data-ds');
   if (w.RTGiOS) return;
 
   var THUIS = '/apps/app.html';
   var body = d.body;
   if (!body || body.hasAttribute('data-ios-uit')) return;
 
+  var isDs = dsBijStart;
   var isThuis = body.hasAttribute('data-ios-home');
+  var inPaneel = false;
+  try { inPaneel = w.self !== w.top; } catch (e) { inPaneel = true; }
   var rustig = false;
   try { rustig = w.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) {}
+
+  function laadIosComponent(path) {
+    if (dsBijStart || inPaneel) return;
+    if (document.querySelector('link[href^="' + path + '"]')) return;
+    var iosStyleNode = document.createElement('link');
+    iosStyleNode.rel = 'stylesheet'; iosStyleNode.href = path;
+    document.head.appendChild(iosStyleNode);
+  }
+  laadIosComponent('/shared/ios.css');
 
   function el(tag, klas, tekst) {
     var e = d.createElement(tag);
@@ -109,4 +122,3 @@
 
   function merkWegChrome(wortel) { weghalen(wortel, MERK_CHROME); }
   function merkWegPagina() { weghalen(d.body, MERK_PAGINA); }
-

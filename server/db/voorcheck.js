@@ -128,7 +128,11 @@ function magOverslaan(k, waarde, force, nu) {
 function onthoud(k, jsonBytes, waarde, nu) {
   laatsteCheck.set(k, nu || Date.now());
   laatsteGrootte.set(k, jsonBytes);
-  laatsteLengte.set(k, lengteVan(waarde));
+  /* magOverslaan leest de lengte alleen voor grote niet-geldcollecties.
+     Kleine en exact verplichte collecties worden toch volledig nagekeken.
+     Bij opnieuw groeien wordt de actuele lengte hieronder opnieuw gemeten. */
+  if (exactNodig(k) || jsonBytes <= GROOT_BYTES) laatsteLengte.delete(k);
+  else laatsteLengte.set(k, lengteVan(waarde));
 }
 
 /* Vergeet wat we van een collectie wisten. Nodig zodra de inhoud van BUITEN

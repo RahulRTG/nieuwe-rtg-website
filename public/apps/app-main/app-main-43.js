@@ -37,11 +37,11 @@
   function esc(t){ return String(t==null?'':t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
   function renderFoundation(){
     const homeEl = $('#homeFoundation'), tab = $('#tabGezin'), dot = $('#tabGezinDot');
-    if (!user || !user.account){ if(homeEl) homeEl.style.display='none'; if(tab) tab.style.display='none'; return; }
+    if (!user || !user.account){ if(homeEl) homeEl.style.display='none'; if(tab) tab.classList.add('h-weg'); return; }
     const g = (rtf.gekoppeld || []), m = (rtf.meldingen || []);
     const ongelezen = m.filter(x=>!x.gelezen).length;
-    if (tab) tab.style.display = g.length ? '' : 'none';
-    if (dot) dot.style.display = (g.length && ongelezen) ? 'block' : 'none';
+    if (tab) tab.classList.toggle('h-weg', !g.length);
+    if (dot) dot.classList.toggle('h-weg', !(g.length && ongelezen));
     // compacte ingang op Home
     if (homeEl){
       homeEl.style.display='';

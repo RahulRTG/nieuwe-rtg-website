@@ -215,3 +215,26 @@ test('11. een MISLUKTE verhuizing gooit de oude collectie NIET weg', () => {
   assert.ok(Array.isArray(db.data.doorgeefjournaal), 'de oude collectie staat er nog');
   assert.equal(db.data.doorgeefjournaal.length, 3, 'compleet, met alle drie de regels');
 });
+
+test('12. meer dan een stapel verhuist precies eenmaal, ook bij een tweede server', () => {
+  /* De echte productiecollectie telde 8.611 regels. Bij 500 begon de gewone
+     schrijfweg asynchroon te spoelen; spoelNu() zag daardoor alleen de laatste
+     8.111 en iedere serverstart schreef de collectie opnieuw. Deze proef kiest
+     bewust dezelfde aantallen als het incident. */
+  const map = verseMap();
+  const oud = Array.from({ length: 8611 }, (_, i) => regel(i));
+  const db1 = { data: { doorgeefjournaal: oud.slice() } };
+  const { maakDoorgeefjournaal } = require('../server/kern/doorgeefjournaal.js');
+  const eerste = maakJournaalbestand({ dir: map, stapelMax: 500 });
+  maakDoorgeefjournaal({ db: db1, save: () => {}, bestand: eerste });
+  assert.equal(db1.data.doorgeefjournaal, undefined, 'de bewezen verhuizing ruimt de oude collectie op');
+  assert.equal(eerste.aantal(), 8611, 'alle 8.611 regels staan in het bestand');
+
+  const db2 = { data: { doorgeefjournaal: oud.slice() } };
+  const tweede = maakJournaalbestand({ dir: map, stapelMax: 500 });
+  maakDoorgeefjournaal({ db: db2, save: () => {}, bestand: tweede });
+  assert.equal(db2.data.doorgeefjournaal, undefined, 'een achterlopende tweede server mag ook opruimen');
+  assert.equal(tweede.aantal(), 8611, 'maar schrijft dezelfde collectie niet nog eens');
+  assert.equal(fs.readdirSync(map).filter(n => /^migratie-v1-.*\.log$/.test(n)).length, 1,
+    'er bestaat precies één atomisch migratiebestand');
+});

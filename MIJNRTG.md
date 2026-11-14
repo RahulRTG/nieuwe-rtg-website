@@ -35,6 +35,11 @@ machtigingen blijven de delegatiebron. MIJN RTG **componeert** ze. Elke
 projectie in deze laag is leesbaar afgeleid van zijn bron en schrijft nooit een
 tweede waarheid.
 
+`PERSONALOS.md` bouwt binnen precies die grens de persoonlijke werktafel. Het
+is de presentatiesamensteller van Mijn RTG, niet een tweede vertrouwenslaag:
+PersonalOS ordent bestaande capabilities, terwijl Mijn RTG verklaart en bewijst
+waar identiteit, toegang, toestemming en context vandaan komen.
+
 ---
 
 ## 1. Twee correcties op de opzet, gemeten in de code

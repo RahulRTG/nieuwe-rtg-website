@@ -35,6 +35,8 @@ module.exports = function maakLoop({ zaken, save, notify }) {
     if (z.tijdlijn.length > MAX_REGELS) z.tijdlijn.splice(1, z.tijdlijn.length - MAX_REGELS);
   }
 
+  const rahulAdvies = require('./rahul-lijn')({ vind, kort, schoon, noteer, save });
+
   const VAN = ['melder', 'ai', 'mens', 'systeem'];
 
   /* Een bericht. `van` is niet cosmetisch: de klokken in ./klok.js rekenen erop
@@ -168,5 +170,5 @@ module.exports = function maakLoop({ zaken, save, notify }) {
     catch (e) { console.error('[service] melden', e && e.message); }
   }
 
-  return { bericht, stand, mensVraag, eigenaar, weeg, koppel, zetStand, noteer };
+  return { bericht, stand, mensVraag, eigenaar, weeg, koppel, rahulAdvies, zetStand, noteer };
 };

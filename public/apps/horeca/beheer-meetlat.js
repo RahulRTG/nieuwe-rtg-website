@@ -34,10 +34,10 @@
   function regel(m) {
     var waarde = m.soort === 'gemeten'
       ? '<b>' + esc(String(m.waarde)) + (m.eenheid ? ' ' + esc(m.eenheid) : '') + '</b>'
-      : (m.soort === 'constructie' ? '<b>0</b>' : '<span class="stil">&mdash;</span>');
-    return '<div class="item"><span>' +
-      '<b>' + esc(m.naam) + '</b> <span class="stil">· ' + esc(WOORD[m.soort] || m.soort) + '</span>' +
-      '<div class="stil">' + esc(m.rekensom) + '</div>' +
+      : (m.soort === 'constructie' ? '<b>0</b>' : '<span class="stil ds-horeca-meta">&mdash;</span>');
+    return '<div class="item ds-horeca-item"><span>' +
+      '<b>' + esc(m.naam) + '</b> <span class="stil ds-horeca-meta">· ' + esc(WOORD[m.soort] || m.soort) + '</span>' +
+      '<div class="stil ds-horeca-meta">' + esc(m.rekensom) + '</div>' +
       '</span><span>' + waarde + '</span></div>';
   }
 

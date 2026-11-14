@@ -30,11 +30,11 @@ module.exports = (kern) => {
   /* Dezelfde drie grendels als de ledenbalie, in dezelfde volgorde en om
      dezelfde reden: een kantoorsessie, een MENS erachter, en een zetel. De
      weigering legt uit wat er ontbreekt -- een medewerker met een geldige
-     kantoorcode hoort niet te hoeven raden wat hij verkeerd doet. */
+     kantoorsessie hoort niet te hoeven raden wat hij verkeerd doet. */
   function balieAuth(req, res, next) {
     const key = boardroomWie(req);
     if (!magBalie(key)) {
-      return res.status(403).json({ error: 'RTG Service vraagt een zetel op naam. De gedeelde kantoorcode opent wel de ruimte, maar wijst niemand aan, en werk aan de zaak van een lid hoort herleidbaar te zijn tot een mens. De eigenaar deelt de zetels uit.' });
+      return res.status(403).json({ error: 'RTG Service vraagt een zetel op naam. Meld u aan met uw gewone RTG-account; een gedeelde kantoorcode geeft geen toegang tot zaken van leden. De eigenaar deelt de zetels uit.' });
     }
     req.balieKey = key;
     next();

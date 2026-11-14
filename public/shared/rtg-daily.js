@@ -5,7 +5,7 @@
   var C = w.RTGDailyCopy, last = '', retry;
   var targets = { pulse: 'dailyCompose', agenda: 'nieuwBtn', bestanden: 'kies', notities: 'nieuwNotitie' };
   function button(key, target, secondary) {
-    return '<button type="button" class="daily-action' + (secondary ? ' daily-secondary' : '') + '" data-daily-target="' + target + '">'
+    return '<button type="button" class="daily-action' + (secondary ? ' daily-secondary ds-dag-secundair' : '') + ' ds-knop ds-dag-actie" data-daily-target="' + target + '">'
       + C.text(key) + (secondary ? '' : '<span aria-hidden="true">→</span>') + '</button>';
   }
   function render(kind, state, options) {
@@ -21,19 +21,19 @@
     if (!empty && kind === 'bestanden') label = 'archiveLabel';
     if (!empty && kind === 'notities') label = 'notebook';
     var title = options.title ? '<span translate="no">' + C.esc(options.title) + '</span>' : C.text(kind + (empty ? 'Title' : 'Ready'));
-    var photo = empty ? '<img class="daily-photo" src="' + ('/images/daily/' + kind + '.webp') + '" width="1088" height="1456" alt="" fetchpriority="high">' : '';
-    host.innerHTML = '<div class="daily-hero">' + photo + '<div class="daily-heading"><p class="daily-eyebrow">' + C.text(label)
-      + '</p><h1>' + title + '</h1></div>' + (photo ? '<p class="daily-caption">' + C.text('atmosphere') + '</p>' : '') + '</div>';
-    if (state === 'loading') host.innerHTML += '<p class="daily-message" role="status">' + C.text('loading') + '</p>';
-    else if (state === 'error') host.innerHTML += '<div class="daily-copy" role="status"><p>' + C.text('failed') + '</p>' + button('retry', 'retry') + '</div>';
+    var photo = empty ? '<img class="daily-photo ds-dag-daily-photo" src="' + ('/images/daily/' + kind + '.webp') + '" width="1088" height="1456" alt="" fetchpriority="high">' : '';
+    host.innerHTML = '<div class="daily-hero ds-dag-daily-hero">' + photo + '<div class="daily-heading ds-dag-daily-heading"><p class="daily-eyebrow ds-dag-daily-eyebrow">' + C.text(label)
+      + '</p><h1>' + title + '</h1></div>' + (photo ? '<p class="daily-caption ds-dag-daily-caption">' + C.text('atmosphere') + '</p>' : '') + '</div>';
+    if (state === 'loading') host.innerHTML += '<p class="daily-message ds-dag-daily-message" role="status">' + C.text('loading') + '</p>';
+    else if (state === 'error') host.innerHTML += '<div class="daily-copy ds-dag-daily-copy" role="status"><p>' + C.text('failed') + '</p>' + button('retry', 'retry') + '</div>';
     else if (empty) {
-      var h = '<div class="daily-copy"><p class="daily-intro">' + C.text(state === 'guest' ? 'guest' : kind + 'Intro') + '</p>';
-      if (state === 'guest') h += '<a class="daily-action" href="/apps/app.html">' + C.text('login') + '<span aria-hidden="true">→</span></a>';
+      var h = '<div class="daily-copy ds-dag-daily-copy"><p class="daily-intro ds-dag-daily-intro">' + C.text(state === 'guest' ? 'guest' : kind + 'Intro') + '</p>';
+      if (state === 'guest') h += '<a class="daily-action ds-knop ds-dag-actie" href="/apps/app.html">' + C.text('login') + '<span aria-hidden="true">→</span></a>';
       else {
         h += button(kind + 'Action', targets[kind]);
         if (kind === 'pulse') h += button('discover', 'dailyDiscover', true);
         if (kind === 'bestanden') h += button('folder', 'nieuwMap', true);
-        h += '<p class="daily-note">' + C.text(kind + 'Note') + '</p>';
+        h += '<p class="daily-note ds-dag-daily-note">' + C.text(kind + 'Note') + '</p>';
       }
       host.innerHTML += h + '</div>';
     }

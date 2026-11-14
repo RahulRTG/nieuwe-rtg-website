@@ -77,7 +77,8 @@ function nepServer(antwoord) {
       if (pad === '/api/pay/oplaad') { saldo += 137; return { status: 200, data: { ok: true } }; }
       if (pad === '/api/pay/overzicht') return { status: 200, data: { saldo, geschiedenis: [], aanMij: [], vanMij: [] } };
       if (pad === '/api/verkoop/mijn') return { status: 200, data: { deals: [] } };
-      if (pad === '/api/supplier/backoffice') return { status: 200, data: { toppers: [], alerts: [] } };
+      if (pad === '/api/supplier/backoffice') return { status: 200, data: { toppers: [], alerts: [],
+        alertBron: { schema: 1, bereik: 'zaakcommand-signalen', sha256: 'a'.repeat(64) } } };
       if (pad === '/api/auth/me' || pad === '/api/office/state') return { status: 200, data: {} };
       gezien.push({ pad, tok });
       return antwoord(pad, tok);
@@ -134,6 +135,25 @@ test('een route die netjes weigert maar de naam noemt, komt als LEK per route te
   const r = uit.perRoute['POST /api/zaak/prijs'];
   assert.equal(r.acl, 'dicht', 'niemand kwam binnen');
   assert.equal(r.privacy, 'LEK');
+});
+
+test('een lekmelding bewaart route, rol en status maar nooit het antwoord of credentials', async () => {
+  const geheim = 'SYNTHETISCHE-ANTWOORDSLEUTEL-7cc19';
+  const antwoord = 'PRIVE-ANTWOORDLIJF-2ab44';
+  const tokens = { member: 'INVOERSLEUTEL-LID-61e2', supplier: 'INVOERSLEUTEL-ZAAK-91b3', office: 'INVOERSLEUTEL-KANTOOR-732f' };
+  const nep = nepServer(() => ({ status: 403, data: { token: geheim, error: antwoord } }));
+  const uit = await draaiRolproef({ post: nep.post, routes: ROUTES, tokensVoor: () => tokens });
+  assert.equal(uit.bevindingen.lekken.length, 2, 'beide gevonden lekken blijven meetellen');
+  assert.deepEqual(uit.bevindingen.lekken, [
+    'POST /api/zaak/prijs [member -> 403] geheim veld',
+    'POST /api/zaak/prijs [office -> 403] geheim veld'
+  ]);
+  const rij = uit.perRoute['POST /api/zaak/prijs'];
+  assert.equal(rij.privacy, 'LEK', 'het weglaten van de inhoud mag de bevinding niet groen maken');
+  assert.deepEqual(rij.antwoorden.map(a => [a.status, a.eigenVoor, a.eigenNa, a.lek]),
+    [[403, 200, 200, 'geheim veld'], [403, 200, 200, 'geheim veld']]);
+  const bewaard = JSON.stringify(uit);
+  for (const waarde of [geheim, antwoord, ...Object.values(tokens)]) assert.equal(bewaard.includes(waarde), false);
 });
 
 test('een route die netjes en zwijgzaam weigert, is op beide punten in orde', async () => {
@@ -395,4 +415,57 @@ test('een mislukte nameting is een meetfout, geen bewezen toestandswijziging', a
   const uit = await draaiRolproef({ post, routes: ROUTES, tokensVoor: TOKENS });
   assert.match(uit.bevindingen.meterStuk, /toestandscontrole/);
   assert.deepEqual(uit.bevindingen.gewijzigd, []);
+});
+
+test('tijdsafgeleide alerts blijven waarnemingen naast een stabiele bron', async () => {
+  const nep = nepServer(() => ({ status: 403, data: {} }));
+  let gemeten = 0;
+  const post = async (pad, lijf, token) => {
+    const r = await nep.post(pad, lijf, token);
+    if (pad === '/api/supplier/backoffice' && lijf.bronstempel === true) {
+      gemeten++;
+      r.data.alerts = gemeten === 4 ? Array(4).fill({ text: 'CANARY-TOKEN-ALERT-783' }) : [];
+    }
+    return r;
+  };
+  const uit = await draaiRolproef({ post, routes: ROUTES, tokensVoor: TOKENS });
+  assert.equal(gemeten, 4, 'ijking en voor/na vragen de bron expliciet op');
+  assert.deepEqual(uit.bevindingen.gewijzigd, []);
+  assert.equal(uit.bevindingen.meterStuk, undefined);
+  assert.deepEqual(uit.voor.waarnemingen, { alerts: 0 });
+  assert.deepEqual(uit.na.waarnemingen, { alerts: 4 });
+  assert.equal(JSON.stringify(uit).includes('CANARY-TOKEN-ALERT-783'), false);
+});
+
+test('een geweigerde schrijfpoging met gewijzigde signalenbron blijft rood bij gelijke alerttelling', async () => {
+  let hash = 'a'.repeat(64);
+  const nep = nepServer(() => { hash = 'b'.repeat(64); return { status: 403, data: {} }; });
+  const post = async (...args) => {
+    const r = await nep.post(...args);
+    if (args[0] === '/api/supplier/backoffice') r.data.alertBron.sha256 = hash;
+    return r;
+  };
+  const uit = await draaiRolproef({ post, routes: ROUTES, tokensVoor: TOKENS });
+  assert.equal(uit.bevindingen.tweexx.length, 0);
+  assert.ok(uit.bevindingen.gewijzigd.some(x => x.startsWith('alertBron:')));
+  assert.equal(uit.voor.waarnemingen.alerts, uit.na.waarnemingen.alerts);
+});
+
+test('een ontbrekende of ongeldige signalenbron blokkeert ijking en nameting', async () => {
+  for (const ongeldig of [undefined, null, {}, { schema: 2, bereik: 'zaakcommand-signalen', sha256: 'a'.repeat(64) },
+    { schema: 1, bereik: 'alle-data', sha256: 'a'.repeat(64) },
+    { schema: 1, bereik: 'zaakcommand-signalen', sha256: 'geen-hash' }]) {
+    for (const pasNa of [false, true]) {
+      const nep = nepServer(() => ({ status: 403, data: {} })); let gelezen = 0;
+      const post = async (...args) => {
+        const r = await nep.post(...args);
+        if (args[0] === '/api/supplier/backoffice' && args[1].bronstempel === true &&
+            (++gelezen === 4 || !pasNa)) r.data.alertBron = ongeldig;
+        return r;
+      };
+      const uit = await draaiRolproef({ post, routes: ROUTES, tokensVoor: TOKENS });
+      assert.ok(uit.bevindingen.meterStuk, JSON.stringify({ ongeldig, pasNa }));
+      assert.deepEqual(uit.bevindingen.gewijzigd, []);
+    }
+  }
 });

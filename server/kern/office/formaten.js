@@ -20,6 +20,7 @@
 'use strict';
 
 const { poort } = require('./uitgangspoort');
+const csvcel = require('../../lib/csvcel');
 const { schrijfXlsx } = require('./xlsx-schrijf');
 const { leesXlsx } = require('./xlsx-lees');
 const { htmlNaarDocx } = require('./docx-schrijf');
@@ -43,10 +44,7 @@ const MAX_XLSX = 420000;   // in bytes, na base64: past onder de ruime grens van
 const esc = t => String(t == null ? '' : t).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 /* Een veld dat met = + - @ begint, voert een rekenprogramma uit als formule
    (=HYPERLINK(...) in een kaarttitel). Een apostrof ervoor maakt het tekst. */
-const csvVeld = v => {
-  const s = String(v == null ? '' : v);
-  return '"' + (/^[=+\-@\t\r]/.test(s) ? "'" + s : s).replace(/"/g, '""') + '"';
-};
+const csvVeld = v => csvcel(v, { altijdQuotes: true });
 const bestandsnaam = (titel, label, ext) => (String(titel || 'document').replace(/[\\/:*?"<>|\u0000-\u001f]/g, ' ').trim().slice(0, 100) || 'document') +
   (label !== 'Intern' ? ' (' + label + ')' : '') + '.' + ext;
 

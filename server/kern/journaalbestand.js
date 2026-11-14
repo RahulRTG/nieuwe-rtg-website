@@ -134,13 +134,18 @@ function maakJournaalbestand({ dir, nu, maxBytes, maxBestanden, vensterMs, stape
     } catch (e) { meldEens(e); return 0; }
   }
 
+  const { verhuisEenmalig } = require('./journaalmigratie').maakJournaalmigratie({
+    pad, zorgMap, regelTekst, meldEens, stuk: () => stuk, telGeschreven: n => { geschreven += n; }
+  });
+
   const { lees, aantal } = require('./journaallezen').maakLezer({
     pad, huidig: HUIDIG, oudeBestanden, klok,
     stapel: () => stapel, telOvergeslagen: () => { overgeslagen++; } });
 
   const stand = () => ({ geschreven, overgeslagen, wachtend: stapel.length, stuk, map });
 
-  return { noteerRegel, lees, aantal, spoelNu, stand, maxBytes: GRENS_BYTES, maxBestanden: GRENS_BESTANDEN };
+  return { noteerRegel, lees, aantal, spoelNu, verhuisEenmalig, stand,
+    maxBytes: GRENS_BYTES, maxBestanden: GRENS_BESTANDEN };
 }
 
 /* HET STANDAARDJOURNAAL. Staat hier en niet bij de aanroeper, om twee redenen:

@@ -7,7 +7,7 @@ var labels={draft:'Privéconcept',published:'Gedeeld',withdrawn:'Ingetrokken',pl
 function render(host,view,selection,tab,act,open){
   host.textContent='';
   if(view.context.unavailable.length)host.appendChild(el('p','ds-detail__status','Niet opnieuw gecontroleerd: '+view.context.unavailable.join(', ')+'.'));
-  function link(type,row){var a=el('a','',row.title);a.href=row.url;a.onclick=function(e){e.preventDefault();open(type,row.id);};return a;}
+  function link(type,row){var livingWorldCardLink=document.createElement('a');livingWorldCardLink.textContent=row.title;livingWorldCardLink.href=row.url;livingWorldCardLink.onclick=function(e){e.preventDefault();open(type,row.id);};return livingWorldCardLink;}
   function actions(row,type){
     var box=el('div','ds-veldgroep');
     (row.actions||[]).forEach(function(a){var b=el('button','ds-knop ds-knop--stil ds-knop--klein',a.label);b.type='button';b.dataset.lwAction=a.id;

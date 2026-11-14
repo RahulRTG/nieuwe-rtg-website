@@ -80,9 +80,12 @@
   // twee apps naast elkaar (split screen)
   const ccSplit = $('#osCcSplit');
   if (ccSplit) ccSplit.addEventListener('click', () => { sluitScrims(); if (window.RTGSplit) RTGSplit.open(); });
-  // licht/donker: de (verborgen) gedeelde themaknop blijft de motor
+  // licht/donker is een korte ingang naar dezelfde OS-themamotor als de drie
+  // zichtbare keuzes hierboven; er is geen tweede opslag of verborgen knop.
   const ccLicht = $('#osCcLicht');
-  if (ccLicht) ccLicht.addEventListener('click', () => { const b = $('#rtg-thema-knop'); if (b) b.click(); });
+  if (ccLicht) ccLicht.addEventListener('click', () => {
+    if (window.RTGOSThema) { RTGOSThema.wissel(); ccSync(); }
+  });
   const ccUit = $('#osCcUit');
   if (ccUit) ccUit.addEventListener('click', () => { sluitScrims(); const b = $('#logoutBtn'); if (b) b.click(); });
   // helderheid: puur visueel, onthouden per browser

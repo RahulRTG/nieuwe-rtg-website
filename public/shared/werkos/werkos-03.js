@@ -76,40 +76,7 @@
   /* Backoffice-commandolaag: kiezen scrolt naar het juiste paneel. */
   function bord(opts) {
     opts = opts || {};
-    document.body.classList.add('wos', 'wos-bord-aan');
-    const stijl = document.createElement('style');
-    stijl.textContent = CSS + `
-    .wos-bord{
-      position:fixed;inset:0;z-index:80;display:none;height:100dvh;box-sizing:border-box;overflow-y:auto;
-      background:color-mix(in srgb,var(--onyx-basis,#0C0C0B) 96%,transparent);
-      backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
-      padding:clamp(1.4rem,4vh,2.7rem) 1.4rem;
-    }
-    .wos-bord.open{display:block;}
-    .wos-bord-kader{width:min(1120px,100%);min-height:100%;margin:0 auto;display:grid;grid-template-rows:auto minmax(0,1fr);}
-    .wos-bord-kop{position:relative;margin-bottom:1.2rem;padding:1.2rem 3.6rem 1.25rem 0;border-top:1px solid var(--gold-rand,var(--rtg-line));border-bottom:1px solid var(--rtg-line);background:transparent;}
-    .wos-bord-kicker{font-size:.52rem;letter-spacing:.18em;text-transform:uppercase;color:var(--rtg-soft);font-weight:650;}
-    .wos-bord-titel{margin-top:.52rem;font-family:var(--rtg-display,'Bodoni Moda',serif);font-size:clamp(1.65rem,3.5vw,2.7rem);font-weight:500;line-height:1.02;letter-spacing:-.02em;color:var(--rtg-txt);}
-    .wos-bord-sub{margin-top:.5rem;max-width:34rem;font-size:.72rem;line-height:1.58;color:var(--rtg-muted);}
-    .wos-bord-sluit{position:absolute;right:0;top:1rem;width:34px;height:34px;border:1px solid var(--rtg-line);border-radius:0;background:transparent;color:var(--rtg-muted);cursor:pointer;}
-    .wos-bord-sluit:hover{border-color:var(--gold-rand,var(--rtg-line));color:var(--rtg-txt);}
-    .wos-bord-sluit:focus-visible{outline:1px solid var(--gold-tekst,var(--rtg-goud));outline-offset:2px;}
-    .wos-bord .wos-grid{width:100%;min-height:0;margin:0;align-self:stretch;grid-template-columns:1fr 1fr;grid-auto-rows:minmax(68px,1fr);}
-    .wos-bord .wos-app{min-height:68px;}
-    .wos-flits{outline:1px solid var(--gold-tekst,var(--rtg-goud)) !important;outline-offset:3px;transition:outline-color .6s;}
-    .wos-bord-knop{
-      display:inline-flex;align-items:center;gap:.45rem;cursor:pointer;
-      min-height:32px;border:0;border-bottom:1px solid var(--rtg-line);border-radius:0;
-      background:transparent;color:var(--rtg-muted);
-      padding:.48rem .78rem;font-size:.62rem;font-family:inherit;letter-spacing:.11em;text-transform:uppercase;
-      box-shadow:none;transition:border-color .12s,color .12s,background .12s;
-    }
-    .wos-bord-knop:hover{border-color:var(--gold-rand,var(--rtg-line));background:rgba(255,255,255,.025);color:var(--rtg-txt);}
-    .wos-bord-knop:focus-visible{outline:1px solid var(--gold-tekst,var(--rtg-goud));outline-offset:2px;}
-    .wos-bord-knop svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:var(--rtg-stroke,1.6);}
-    @media (max-width:620px){.wos-bord{height:auto;min-height:100dvh;padding:1.2rem .9rem 2rem}.wos-bord-kader{min-height:auto}.wos-bord-kop{padding:1.1rem 3rem 1.1rem 0}.wos-bord .wos-grid{grid-template-columns:1fr;grid-auto-rows:minmax(68px,auto)}}
-    `;
-    document.head.appendChild(stijl);
+    document.body.classList.add('ds-werkos', 'wos', 'wos-bord-aan');
 
     const scrim = document.createElement('div');
     scrim.className = 'wos-bord';

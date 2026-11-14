@@ -3,10 +3,8 @@
    De regel: wat geld kost of ergens toe verplicht, TYP je. "Boek een taxi",
    "stuur 20 euro", "betaal dit" gaan standaard niet op je woord alleen.
 
-   Waarom deze grens er is, in gewone taal: spraakherkenning verstaat soms iets
-   anders dan je zei, en een telefoon in je zak hoort de kamer mee. Een verkeerd
-   verstane routebeschrijving is hinderlijk. Een verkeerd verstane betaling is
-   geld dat weg is. Bij twijfel hoort de trage weg de standaard te zijn.
+   Spraak kan verkeerd worden verstaan of omstanders oppikken. Daarom is
+   typen de standaard voor opdrachten die geld kosten.
 
    Wie het toch met de mond wil, zet het zelf aan. Dan geldt:
 
@@ -19,8 +17,7 @@
         ook nog "zeg ja". Met de mond zijn dat dus twee poorten meer dan met
         getypte tekst, precies zoals bedoeld.
 
-   Deze laag houdt tegen; hij voert nooit iets uit. De herkenning zelf
-   (Handenvrij.geldZin) is los getoetst in test/handenvrij.test.js. */
+   Deze laag voert niets uit. test/handenvrij.test.js toetst geldZin. */
 (function (root) {
   'use strict';
   if (root.__handenvrijGeld) return; root.__handenvrijGeld = true;
@@ -39,32 +36,18 @@
     tekenRegel();
   }
 
-  var css =
-    '.hv-regel{display:flex;gap:.5rem;align-items:center;justify-content:space-between;' +
-    'padding:.35rem .1rem .1rem;font-size:.72rem;color:#8A8680;border-bottom:1px solid #2a2a28;margin-bottom:.2rem;}' +
-    '.hv-regel button{background:transparent;border:1px solid #444;border-radius:0;color:#ddd;' +
-    'font:inherit;font-size:.7rem;padding:.2rem .55rem;cursor:pointer;white-space:nowrap;}' +
-    '.hv-regel button[aria-pressed="true"]{background:#7F1634;border-color:#7F1634;color:#fff;font-weight:700;}' +
-    /* de disclaimer: een kaart in het gesprek, niet een browservenster, zodat hij
-       in dezelfde taal en dezelfde huisstijl staat als de rest */
-    '.hv-kaart{border:1px solid #857007;border-radius:0;padding:.7rem .8rem;background:#151312;color:#e8e6e3;' +
-    'font-size:.83rem;line-height:1.55;}' +
-    '.hv-kaart h4{margin:0 0 .35rem;font-size:.8rem;letter-spacing:.04em;text-transform:uppercase;color:#857007;}' +
-    '.hv-kaart p{margin:0 0 .55rem;}' +
-    '.hv-kaart .hv-rij{display:flex;gap:.5rem;flex-wrap:wrap;}' +
-    '.hv-kaart button{border-radius:0;border:1px solid #444;background:transparent;color:#eee;' +
-    'font:inherit;font-size:.8rem;padding:.4rem .8rem;cursor:pointer;}' +
-    '.hv-kaart button.ja{background:#7F1634;border-color:#7F1634;color:#fff;font-weight:700;}' +
-    '.hv-kaart button:focus-visible{outline:2px solid #857007;outline-offset:2px;}';
-  var st = document.createElement('style'); st.textContent = css; document.head.appendChild(st);
+  // Presentatie komt op iedere host uit de centrale DS-component.
+  /* Presentatie: public/ds/componenten/handenvrij.css. */
+
+
 
   /* ---------- de schakelaar, in het gespreksvenster ----------
      Niet in de balk: die is op een telefoon van 390px al vol, en dit is geen
      knop die je vaak nodig hebt. */
   var regel = document.createElement('div');
-  regel.className = 'hv-regel';
+  regel.className = 'ds-handenvrij__geldregel hv-regel';
   var knop = document.createElement('button');
-  knop.type = 'button';
+  knop.className = 'ds-handenvrij__geldknop'; knop.type = 'button';
   var label = document.createElement('span');
   regel.appendChild(label); regel.appendChild(knop);
   function tekenRegel() {
@@ -88,17 +71,17 @@
   function toonKaart(kop, tekst, knoppen) {
     kaartWeg();
     kaart = document.createElement('div');
-    kaart.className = 'hv-beurt hij';
+    kaart.className = 'ds-handenvrij__beurt hv-beurt hij';
     var vak = document.createElement('div');
-    vak.className = 'hv-kaart';
+    vak.className = 'ds-handenvrij__geldkaart hv-kaart';
     vak.setAttribute('role', 'alertdialog');
     var h = document.createElement('h4'); h.textContent = kop;
     var p = document.createElement('p'); p.textContent = tekst;
-    var rij = document.createElement('div'); rij.className = 'hv-rij';
+    var rij = document.createElement('div'); rij.className = 'ds-handenvrij__geldacties hv-rij';
     knoppen.forEach(function (k) {
       var b = document.createElement('button');
       b.type = 'button'; b.textContent = k.tekst;
-      if (k.ja) b.className = 'ja';
+      b.className = 'ds-handenvrij__geldknop' + (k.ja ? ' ja' : '');
       b.addEventListener('click', function () { kaartWeg(); k.doen(); });
       rij.appendChild(b);
     });

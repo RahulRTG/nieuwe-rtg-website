@@ -4,10 +4,17 @@
     }
     async function submit(){
       if (busy) return;
+      if(view==='register' && steps()[step].kind){
+        if(steps()[step].kind==='goals' && !draft.goals.length){
+          message(()=>T('personalos.onboarding.goals.required','Kies ten minste één doel. U kunt dit later altijd wijzigen.'),true);
+          const eerste=el('agPersonal').querySelector('button'); if(eerste)eerste.focus(); return;
+        }
+        step++; render('register',true); return;
+      }
       const value = inp.type === 'password' || el('agShowPassword').getAttribute('aria-pressed') === 'true' ? inp.value : inp.value.trim();
       inp.removeAttribute('aria-invalid'); el('agError').textContent='';
       if (!value || !inp.checkValidity()) return invalid(()=>T('access.portal.please_check_this_field_and_complete_it','Controleer dit veld en vul het volledig in.'));
-      if (view === 'register' && step < 3) {
+      if (view === 'register' && step < 5) {
         const s=steps()[step];
         if (step === 1 && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(value)) return invalid(()=>T('access.portal.enter_a_valid_email_address_such_as_name_example_com','Vul een geldig e-mailadres in, bijvoorbeeld naam@voorbeeld.nl.'));
         if (step === 2) {
@@ -31,8 +38,9 @@
       message(()=>T('access.portal.one_moment_we_are_processing_your_request','Een ogenblik, we verwerken uw verzoek.'));
       try {
         if (view === 'register') {
-          const result=await login('rtg',{register:true,name:draft.name,u:draft.email,geboortedatum:draft.geboortedatum,p:value,tier:'guest',portal:true});
-          if (result) { Object.keys(draft).forEach(key=>{draft[key]='';}); inp.value=''; }
+          const result=await login('rtg',{register:true,name:draft.name,u:draft.email,geboortedatum:draft.geboortedatum,p:value,tier:'guest',portal:true,
+            personalOS:{goals:draft.goals.slice(),layout:draft.layout,preferenceVersion:0}});
+          if (result) { draft.name='';draft.email='';draft.geboortedatum='';draft.goals=[];draft.layout='balanced';inp.value=''; }
         } else if (view === 'password') {
           const result=await login('rtg',{u:accountName,p:value});
           inp.value='';
@@ -79,7 +87,7 @@
         step--; render('register',true);
       } else if (view==='password' || view==='second' || view==='forgot' || view==='sent') {
         secondProof=''; render('login',true);
-      } else { Object.keys(draft).forEach(key=>{draft[key]='';}); render('welcome',true); }
+      } else { draft.name='';draft.email='';draft.geboortedatum='';draft.goals=[];draft.layout='balanced';render('welcome',true); }
     });
     window.addEventListener('rtglang',()=>{ if (gate.style.display !== 'none') render(view,false,true); });
     render(resetToken?'reset':'welcome',false);

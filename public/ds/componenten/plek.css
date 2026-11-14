@@ -1,0 +1,31 @@
+/* Niet-modale locatievraag: zoeken en de bestaande Edge blijven bruikbaar. */
+@layer rtg.component {
+  .ds-plek {
+    position: fixed;
+    inset-inline: var(--ds-ruimte-4);
+    inset-block-end: calc(var(--ds-edge-hoogte) + var(--ds-ruimte-6) + env(safe-area-inset-bottom, 0px));
+    z-index: 30;
+    max-inline-size: 24rem;
+    max-block-size: calc(100dvh - var(--ds-edge-hoogte) - var(--ds-ruimte-12) - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
+    margin-inline: auto;
+    overflow-y: auto;
+    padding: var(--ds-ruimte-4);
+    background: var(--ds-oppervlak-sterk);
+    color: var(--ds-inkt);
+    border: 1px solid var(--ds-lijnkleur);
+    border-radius: var(--ds-radius-systeem);
+    box-shadow: var(--ds-schaduw-systeem);
+    font-family: var(--ds-letter-tekst);
+    overflow-wrap: anywhere;
+  }
+  .ds-plek p { margin-block: 0 var(--ds-ruimte-4); font-size: var(--ds-maat-tekst); line-height: 1.55; }
+  .ds-plek .rij { display: flex; flex-wrap: wrap; gap: var(--ds-ruimte-3); }
+  .ds-plek button { flex: 1 1 8rem; min-block-size: var(--ds-doel); white-space: normal; padding-block: var(--ds-ruimte-3); }
+  .ds-plek :focus-visible { outline: 2px solid var(--ds-focus); outline-offset: 3px; }
+  /* Op lage vensters blijft de bovenliggende zoektaak bereikbaar. De kaart
+     behoudt haar leesbare tekst en doelen; alleen haar eigen inhoud scrolt. */
+  @media (max-height: 36rem) {
+    .ds-plek { max-block-size: min(30dvh, calc(100dvh - var(--ds-edge-hoogte) - var(--ds-ruimte-12) - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px))); }
+  }
+  @media print { .ds-plek { display: none; } }
+}

@@ -35,7 +35,7 @@ test('alle toegangsschermen bewegen mee zonder invoer, voortgang of akkoord te v
       const codes=await p.evaluate(()=>{RTGi18n.openModal();return RTGi18n._lijst.map(t=>t.code);});
       assert.deepEqual(codes,TALEN.map(t=>t.code));await offline.close();
     });
-    await t.test('welkom, alle vier vragen en foutmeldingen volgen Nederlands en Engels',async()=>{
+    await t.test('welkom, alle zes vragen en foutmeldingen volgen Nederlands en Engels',async()=>{
       // Access has its own small language route. The Edge stays visible as the
       // shared RTG shell, while identity fields remain owned by the gateway.
       await page.locator('#agLanguage').click();
@@ -61,7 +61,20 @@ test('alle toegangsschermen bewegen mee zonder invoer, voortgang of akkoord te v
       assert.match(await page.locator('#agError').innerText(),/Please check/);
       await change('nl');assert.match(await page.locator('#agError').innerText(),/Controleer/);
       await enter('taalproef@voorbeeld.test');await enter('1992-03-14');
-      await change('en');assert.match(await page.locator('#agTitle').innerText(),/secure your account/);
+      await change('en');assert.match(await page.locator('#agTitle').innerText(),/achieve first/);
+      await page.getByRole('button',{name:'Travel',exact:true}).click();
+      assert.equal(await page.getByRole('button',{name:/^Travel · selected$/}).getAttribute('aria-pressed'),'true');
+      await change('nl');
+      assert.equal(await page.getByRole('button',{name:/^Reizen · gekozen$/}).getAttribute('aria-pressed'),'true');
+      await change('en');await page.locator('#agGo').click();
+      assert.match(await page.locator('#agTitle').innerText(),/like to use RTG/);
+      await page.getByRole('button',{name:'Advanced',exact:true}).click();
+      assert.equal(await page.getByRole('button',{name:/^Advanced · selected$/}).getAttribute('aria-pressed'),'true');
+      await page.waitForFunction(()=>/Your RTG starts with:/.test(document.getElementById('agPersonalPreview').textContent));
+      await change('nl');
+      assert.equal(await page.getByRole('button',{name:/^Uitgebreid · gekozen$/}).getAttribute('aria-pressed'),'true');
+      await change('en');await page.locator('#agGo').click();
+      assert.match(await page.locator('#agTitle').innerText(),/secure your account/);
       await page.locator('#agIn').fill('Synthetisch testwachtwoord 2026');
       await page.locator('#agShowPassword').click();
       await change('nl');assert.equal(await page.locator('#agIn').getAttribute('type'),'text');

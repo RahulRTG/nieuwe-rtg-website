@@ -1,16 +1,16 @@
 {
   "uitleg": "Gemeten met scripts/objectmodel.js; de vraag en de methode staan in de kop van dat bestand en in DEVELOPERCLOUD.md par. 2. Een gedeelde NAAM is geen gedeelde BETEKENIS: dit wijst kandidaten aan, een mens beslist.",
-  "vastgelegd": "2026-10-23",
+  "vastgelegd": "2026-11-13",
   "gemeten": {
-    "bestanden": 3026,
-    "vormen": 1620,
-    "velden": 2318,
-    "modules": 912,
-    "domeinen": 324,
+    "bestanden": 3059,
+    "vormen": 1630,
+    "velden": 2337,
+    "modules": 918,
+    "domeinen": 328,
     "envelopDrempel": 20,
     "envelop": 29,
-    "veldenDomeineigen": 1621,
-    "veldenGedeeldVanafVier": 237,
+    "veldenDomeineigen": 1636,
+    "veldenGedeeldVanafVier": 239,
     "gelijkendeVormparen": 64
   },
   "envelop": [
@@ -58,6 +58,18 @@
       ]
     },
     {
+      "veld": "supplierCode",
+      "domeinen": 19,
+      "waar": [
+        "kern/arrivalpas",
+        "kern/autoverkoop",
+        "kern/beveiliging",
+        "kern/comm",
+        "kern/commercie",
+        "kern/ervaring"
+      ]
+    },
+    {
       "veld": "code",
       "domeinen": 19,
       "waar": [
@@ -91,18 +103,6 @@
         "kern/gemeente",
         "kern/instant-reality",
         "kern/ledenbalie-inzage"
-      ]
-    },
-    {
-      "veld": "supplierCode",
-      "domeinen": 17,
-      "waar": [
-        "kern/arrivalpas",
-        "kern/autoverkoop",
-        "kern/beveiliging",
-        "kern/comm",
-        "kern/commercie",
-        "kern/ervaring"
       ]
     },
     {
@@ -190,6 +190,18 @@
       ]
     },
     {
+      "veld": "name",
+      "domeinen": 14,
+      "waar": [
+        "kern/agent",
+        "kern/experience",
+        "kern/gast",
+        "kern/kantoor",
+        "kern/leverancier",
+        "kern/lidacties"
+      ]
+    },
+    {
       "veld": "ingetrokken",
       "domeinen": 14,
       "waar": [
@@ -259,18 +271,6 @@
         "kern/klok",
         "kern/lidboard",
         "kern/pay"
-      ]
-    },
-    {
-      "veld": "name",
-      "domeinen": 13,
-      "waar": [
-        "kern/agent",
-        "kern/experience",
-        "kern/gast",
-        "kern/kantoor",
-        "kern/leverancier",
-        "kern/lidacties"
       ]
     },
     {
@@ -957,9 +957,9 @@
     },
     {
       "gelijkenis": 0.91,
-      "a": "server/kern/reisbureau-betaling.js",
+      "a": "server/kern/reisbureau-betalingsrijen.js",
       "b": "server/kern/reisbureau-teruggave.js",
-      "domeinA": "kern/reisbureau-betaling",
+      "domeinA": "kern/reisbureau-betalingsrijen",
       "domeinB": "kern/reisbureau-teruggave",
       "gedeeld": [
         "bedragCenten",

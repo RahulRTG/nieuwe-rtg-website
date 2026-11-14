@@ -1,57 +1,7 @@
-/* Foundation OS (kern/rtfos): het bestuurssysteem van de RTFoundation.
-
-   WAT DIT IS. RTF is een landelijke stichting die per stad met bestaande lokale
-   partijen samenwerkt: eigen bestuur, eigen projecten, eigen budgetten, eigen
-   mensen -- onder een centrale governance. Dat is een federatief model, en de
-   software moet het dragen in plaats van het te beschrijven. Alles wat het
-   landelijke toezicht draagt (steden activeren, modules per stad, goedkeurings-
-   limieten, oormerken op geld, meldingen die niet gewist kunnen worden) is hier
-   code en geen afspraak.
-
-   DE OPBOUW. Een gedeelde context (./basis) gaat EEN keer bij het opstarten
-   rond; elk deel krijgt hem mee en geeft zijn eigen functies terug. Geen kosten
-   per verzoek, en er is precies EEN plek waar "wie mag wat, waar" wordt
-   beantwoord. De delen:
-
-     basis            de bodem: opslag, audit, zetels, rechten, vlaggen
-     steden + zetels  de organisatieboom en wie er in een stad iets mag
-     partners         de lokale stichtingen, hun dossier en hun portaal
-     projecten        het centrale object van de uitvoering
-     vrijwilligers    het register, de VOG-grendel, uren en planning
-     geld             bronnen met een oormerk, uitgaven met vier ogen
-     casus            de individuele hulpvraag (codenaam, toestemming)
-     integriteit      incidenten, klachten, klokkenluider
-     rapport          impact per stad en landelijk
-     gemeente         de verantwoording aan de gemeente (geteld, nooit gelezen)
-     ondernemers      het lokale maatschappelijke ondernemersnetwerk
-     subsidies        aanvragen, voorwaarden, rapportagemomenten, terugvordering
-     voorraad         goederen als batch: houdbaarheid, restant, bestemming
-     activiteiten     inschrijven, wachtlijst, toestemming, incheck aan de deur
-     berichten        communicatie per stad, publiek pas na landelijk akkoord
-     netwerk          blauwdrukken delen tussen steden, en eerlijk vergelijken
-     inkoop           samen kopen zonder de goedkeuring van een stad te omzeilen
-     uitwisseling     vrijwilligers tussen steden, met toestemming en einddatum
-     campagnes        landelijk werven, centnauwkeurig verdelen over steden
-     koppeling        wat er naar RTG loopt, en wat er eerlijk NIET loopt
-     vrijwilligerportaal  de vrijwilliger zelf: planning, uren, VOG-datum
-     deelnemerportaal     de hulpvrager zelf: de stand, en toestemming intrekken
-     publiek          de app voor de buurt: geen inlog, dus de strengste grens
-     veld             de medewerker op pad: alleen wat aan hem is toegewezen
-     donateur         de gever: zijn eigen giften, en zijn giftbewijs
-     bestuur          vergaderingen, quorum, besluiten en vastgestelde notulen
-     beleid           landelijke regels; een nieuwe versie wist alle bevestigingen
-     jaarverslag      het ANBI-jaarstuk, met bevroren cijfers en een besluit eronder
-     risico           het risicoregister: beheerst is een bewering, niet een vinkje
-     herkomst         grote en contante giften: het geld staat stil tot er gekeken is
-     meldcode         de vijf wettelijke stappen bij zorg om een kind
-     beschermzaak     geweld en uitbuiting: een EIGEN klasse, in ../beschermzaak/
-     ruil             de buurtruil tussen leden: spullen, zonder geld
-     gift             de giftstand, het voornemen en de bevestigde gift
-     winkel           kopen bij de stichting -- en dat is met opzet GEEN gift
-
-   WAT DIT NIET IS. Geen tweede ledenadministratie en geen tweede boekhouding.
-   De 30%-afdracht van RTG naar de stichting blijft in kern/fonds.js; dit OS
-   gaat over wat de stichting met dat geld DOET. */
+/* Foundation OS: federatief bestuur en uitvoering van de RTFoundation.
+   Alle delen delen een context en dezelfde bevoegdheidscontrole. Dit is geen
+   tweede ledenadministratie of boekhouding; kern/fonds.js blijft eigenaar van
+   de 30%-afdracht, FoundationOS bestuurt wat de stichting ermee doet. */
 
 const kluis = require('../../kluis');
 
@@ -113,9 +63,6 @@ module.exports = (state) => {
   const inkoop = require('./inkoop')(ctx, { boekAanvraag: geld.boekAanvraag });
   const campagnes = require('./campagnes')(ctx, { bronUitCampagne: geld.bronUitCampagne });
   const koppeling = require('./koppeling')(ctx, { agenda: state.agenda });
-  /* De drie doelgroepen die tot nu toe wel in het systeem stonden maar er niet
-     in konden: de vrijwilliger, de hulpvrager en de buurt. Alle drie op een
-     eigen ingang met een eigen, engere blik -- zie de kop van elke module. */
   /* Fase drie: de governance-laag. Het bestuur zelf (vergaderingen, quorum,
      besluiten), de regels die het stelt, de verantwoording achteraf en de
      dingen die mis kunnen gaan. Het jaarverslag leunt op drie delen -- rapport.js
@@ -132,6 +79,8 @@ module.exports = (state) => {
   const meldcode = require('./meldcode')(ctx);
   // Buiten deze map, en dat is het punt (../beschermzaak/index.js).
   const beschermzaak = require('../beschermzaak')(ctx);
+  const opvang = require('./opvang')(ctx, { beschermzaak, partners });
+  ctx.opvangStopVoorZaak = opvang.stopVoorZaak;
 
   const vrijwilligerportaal = require('./vrijwilligerportaal')(ctx);
   const deelnemerportaal = require('./deelnemerportaal')(ctx, { toestemmingWegDirect: casus.toestemmingWegDirect });
@@ -158,7 +107,7 @@ module.exports = (state) => {
     partners, projecten, vrijwilligers, geld, casus, integriteit, rapport, gemeente, ondernemers,
     subsidies, voorraad, ruil, gift, winkel, activiteiten, berichten,
     netwerk, inkoop, uitwisseling, campagnes, koppeling,
-    bestuur, beleid, jaarverslag, risico, herkomst, meldcode, beschermzaak,
+    bestuur, beleid, jaarverslag, risico, herkomst, meldcode, beschermzaak, opvang,
     vrijwilligerportaal, deelnemerportaal, publiek,
     veld, donateur, codeRoteren: require('./coderoteer')(ctx, { partners, gemeente, ondernemers }),
     VLAGGEN: ctx.VLAGGEN, ROLLEN: ctx.ROLLEN

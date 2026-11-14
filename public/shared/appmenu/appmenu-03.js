@@ -26,7 +26,7 @@
          net had geopend. En erger: die ene tegel maakte de lijst niet-leeg,
          waardoor de terugval op de kopjes van de inhoud nooit aan bod kwam en
          apps zonder tabs een menu kregen met alleen zichzelf erin. */
-      if (k === knop || k.closest('.amn-blad')) continue;
+      if (k === knop || k.closest('.amn-blad,.bdn-scrim')) continue;
       if (k.disabled || k.hidden) continue;
       var l = labelVan(k);
       if (!l || gezien[l.toLowerCase()]) continue;
@@ -54,6 +54,7 @@
     var vakken = wortel.querySelectorAll('div, nav, section, ul, p');
     for (var i = 0; i < vakken.length && i < 400; i++) {
       var vak = vakken[i], kids = vak.children;
+      if (vak.closest('.amn-blad,.bdn-scrim')) continue;
       if (kids.length < 3 || kids.length > 8) continue;
       var labels = [], goed = true;
       for (var j = 0; j < kids.length; j++) {
@@ -110,4 +111,3 @@
     }
     return uit;
   }
-

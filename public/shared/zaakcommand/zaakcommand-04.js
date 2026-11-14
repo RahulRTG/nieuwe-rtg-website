@@ -80,8 +80,8 @@
             return '<div class="zc-kaart"><h3>' + esc(g.wat) + '</h3>' +
               '<p class="zc-meta">' + esc(g.id) + ' · versie ' + g.versie + (g.sinds ? ' · sinds ' + esc(tijd(g.sinds)) + ' door ' + esc(g.door) : ' · startwaarde') + '</p>' +
               '<div class="zc-rij"><b>' + esc(String(g.waarde)) + '</b><span class="zc-meta">' + esc(g.eenheid) + '</span>' +
-              '<input class="zc-veld" data-n="' + esc(g.id) + '" placeholder="nieuw" style="width:6rem;">' +
-              '<input class="zc-veld" data-w="' + esc(g.id) + '" placeholder="waarom" style="flex:1;min-width:8rem;">' +
+              '<input class="zc-veld zc-veld-waarde" data-n="' + esc(g.id) + '" placeholder="nieuw">' +
+              '<input class="zc-veld zc-veld-regelreden" data-w="' + esc(g.id) + '" placeholder="waarom">' +
               '<button class="zc-knop vol" data-zet="' + esc(g.id) + '">Zetten</button>' +
               (g.versies > 1 ? '<button class="zc-knop" data-terug2="' + esc(g.id) + '">Eén terug</button>' : '') + '</div></div>';
           }).join('');

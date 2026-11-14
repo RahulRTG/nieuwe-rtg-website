@@ -133,13 +133,13 @@ async function betaalRitVoor(session, body) {
   r.paidAt = new Date().toISOString();
   if (r.status === 'wacht-op-betaling') r.status = 'aangevraagd';
   verdienPunten(session.key, r.quote - kortingR - voordeelR, r.supplierName);
-  save();
+  save(['rides', 'punten']);
   // en de factuur, net als bij een bestelling (zie ../lidacties.js)
   factuurVoorLid({ soort: 'dienst', supplierCode: r.supplierCode, supplierNaam: r.supplierName,
     codenaam: r.customerCodename, ref: r.ref, methode: 'rtg',
     regels: [{ omschrijving: (r.type === 'jet' ? 'Vlucht ' : 'Rit ') + r.from + ' naar ' + (r.to || 'bestemming'),
       aantal: 1, stuk: r.quote || 0 }] });
-  meld(r.supplierCode, { icon: r.type === 'jet' ? 'vluchten' : 'auto', title: 'Nieuwe ritaanvraag (betaald)', body: r.customerCodename + ': ' + r.from + ' naar ' + (r.to || 'bestemming') + ' \u00B7 ' + r.passengers + 'p \u00B7 \u20AC ' + r.quote + (r.plannedFor ? ' \u00B7 ' + r.when : '') });
+  (meld.naOpslag || meld)(r.supplierCode, { icon: r.type === 'jet' ? 'vluchten' : 'auto', title: 'Nieuwe ritaanvraag (betaald)', body: r.customerCodename + ': ' + r.from + ' naar ' + (r.to || 'bestemming') + ' \u00B7 ' + r.passengers + 'p \u00B7 \u20AC ' + r.quote + (r.plannedFor ? ' \u00B7 ' + r.when : '') });
   sseToSupplier(r.supplierCode, 'sync', { scope: 'orders' });
   sseToOffice('sync', { scope: 'orders' });
   pushLive(session.key);

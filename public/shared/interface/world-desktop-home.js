@@ -5,14 +5,27 @@
     if (d.querySelector('.wd-shell')) return;
     var home = w.RTGDesktopSurface.prepare(), world = d.body.dataset.rtgWorld, U = w.RTGDesktopUI;
     if (!home) throw new Error('desktop-content-missing');
+    // De bestaande runtime houdt ook native canvassen; DS draagt hun begrensde
+    // presentatie. Wereldbeginschermen volgen hun afzonderlijke migratie.
+    if (d.documentElement.hasAttribute('data-ds') && !d.body.dataset.worldHome) {
+      d.body.classList.add('ds-wereldwerkruimte');
+    }
     d.body.dataset.rtgDesktop = world;
     d.body.dataset.rtgDesktopState = 'loading';
       var root = U.el('div', 'wd-shell'), people = U.label(U.el('aside', 'wd-people'), 'people');
       var favorites = U.label(U.el('aside', 'wd-favorites'), 'favorites'), surface = U.el('section', 'wd-focus');
       var library = U.label(U.el('section', 'wd-library'), 'library'), announcement = U.el('p', 'wd-announcement');
       announcement.setAttribute('role', 'status'); announcement.hidden = true; surface.hidden = true;
-      home.before(root); home.classList.add('wd-home'); root.appendChild(people); w.RTGDesktopSurface.move(root, home);
-      root.appendChild(favorites); root.appendChild(surface); root.appendChild(announcement); root.appendChild(library);
+      home.before(root); home.classList.add('wd-home');
+      if (d.body.classList.contains('ds-wereldwerkruimte')) {
+        // Eén leesvolgorde: de hoofdtaak vóór ondersteuning. Alleen bij de
+        // eerste constructie; schermkeuze en formaat verhuizen geen live frames.
+        w.RTGDesktopSurface.move(root, home); root.appendChild(surface);
+        root.appendChild(people); root.appendChild(favorites); root.appendChild(library); root.appendChild(announcement);
+      } else {
+        root.appendChild(people); w.RTGDesktopSurface.move(root, home);
+        root.appendChild(favorites); root.appendChild(surface); root.appendChild(announcement); root.appendChild(library);
+      }
       w.RTGDesktopSurface.guard(root, home);
       // De schilvlakken zeggen zelf welke taal zij tonen; de inhoud van de pagina staat in root en houdt <html lang>.
       function talen() { [people, favorites, library, announcement].forEach(function (n) { n.lang = U.taal(); }); }

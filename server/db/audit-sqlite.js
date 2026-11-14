@@ -1,5 +1,5 @@
 'use strict';
-/* Rijopslag voor twee auditjournalen. Een normale toevoeging leest alleen de
+/* Rijopslag voor auditjournalen. Een normale toevoeging leest alleen de
    DB-kop en schrijft één versleutelde rij. Import, wissing en retentie zijn
    expliciete transacties; geen tweede blobschrijver naast deze eigenaar. */
 const vorm = require('./audit-vorm');
@@ -48,6 +48,16 @@ module.exports = ({ db, kv, decode, encode, bump }) => {
       if (q.meta.get(naam)) return;
       const bron = q.bron.get(naam);
       const waarde = bron ? JSON.parse(decode(bron.val)) : db.data?.[naam];
+      vorm.rijen(naam, waarde); // valideer vóór de leeg-standaard, ook opgeslagen null
+      if (naam === 'securityLog' && bron) {
+        // De lazy overgang mag geen lokale retentie/vervanging/verwijdering
+        // wegdrukken. Niet automatisch flushen of mergen: beide beelden blijven
+        // intact totdat de eigenaar zijn open werk bewaart of opnieuw inleest.
+        const lokaal = db.data;
+        if (!lokaal || !Object.hasOwn(lokaal, naam) ||
+            JSON.stringify(waarde) !== JSON.stringify(lokaal[naam]))
+          throw new Error('securityLog heeft openstaand lokaal werk vóór de rijmigratie.');
+      }
       vervang(naam, waarde || vorm.pak(naam, [], 0, {}), null);
       });
     }

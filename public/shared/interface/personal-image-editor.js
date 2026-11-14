@@ -18,7 +18,8 @@
     var main = node('div', 'pi-main'), tools = node('div', 'pi-tools'), mine = button('Mijn foto’s', loadFiles), defaults = button('RTG-beeld', restore);
     var upload = node('input'); upload.type = 'file'; upload.accept = 'image/jpeg,image/png,image/webp'; upload.id = 'piUpload'; upload.hidden = true;
     var uploadButton = button('Upload foto', function () { upload.click(); }); tools.append(mine, defaults, uploadButton, upload);
-    var crop = node('div', 'pi-crop'), img = node('img'); img.alt = 'Voorbeeld van uw uitsnede'; img.draggable = false; crop.appendChild(img);
+    var crop = document.createElement('div'); crop.className = 'pi-crop';
+    var previewImage = document.createElement('img'); previewImage.alt = 'Voorbeeld van uw uitsnede'; previewImage.draggable = false; crop.appendChild(previewImage);
     var note = node('p', 'pi-note', 'Versleep de foto of gebruik de schuifregelaars voor de uitsnede.');
     var sliders = node('div', 'pi-sliders'), inputs = {};
     [['zoom', 'Vergroten', 1, 3, .01], ['x', 'Horizontaal', 0, 100, 1], ['y', 'Verticaal', 0, 100, 1]].forEach(function (r) {
@@ -37,9 +38,9 @@
     picker.onchange = function () { current = all.find(function (r) { return r.id === picker.value; }); choose(); };
     function button(label, run) { var b = node('button', '', label); b.type = 'button'; b.onclick = run; return b; }
     function paint() {
-      img.src = src || current.original; crop.dataset.preview = view;
+      previewImage.src = src || current.original; crop.dataset.preview = view;
       var c = draft ? draft[view] : { x: 50, y: 50, zoom: 1 };
-      img.style.objectPosition = c.x + '% ' + c.y + '%'; img.style.transform = 'scale(' + c.zoom + ')'; img.style.transformOrigin = c.x + '% ' + c.y + '%';
+      previewImage.style.objectPosition = c.x + '% ' + c.y + '%'; previewImage.style.transform = 'scale(' + c.zoom + ')'; previewImage.style.transformOrigin = c.x + '% ' + c.y + '%';
       Object.keys(inputs).forEach(function (key) { inputs[key].value = c[key]; inputs[key].disabled = !draft; });
       desktop.setAttribute('aria-pressed', String(view === 'desktop')); mobile.setAttribute('aria-pressed', String(view === 'mobile'));
     }
@@ -61,7 +62,7 @@
         gallery.textContent = ''; var files = j.items.filter(function (f) { return f.vanMij && !f.weg && /^image\/(jpeg|png|webp|gif)$/.test(f.mime); });
         files.slice(0, 60).forEach(function (f) {
           var b = button(f.naam, function () { selectFile(f.id); }); gallery.appendChild(b);
-          P.file(f.id).then(function (url) { var thumbnail = node('img'); thumbnail.src = url; thumbnail.alt = ''; b.prepend(thumbnail); }).catch(function () { b.disabled = true; });
+          P.file(f.id).then(function (url) { var thumbnailImage = document.createElement('img'); thumbnailImage.src = url; thumbnailImage.alt = ''; b.prepend(thumbnailImage); }).catch(function () { b.disabled = true; });
         }); status.textContent = files.length ? '' : 'Nog geen eigen foto’s. Kies Upload foto.';
       }).catch(function (e) { status.textContent = e.message; });
     }

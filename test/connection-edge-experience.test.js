@@ -94,6 +94,12 @@ test('de Edge heeft toetsenbord, screenreader, touch target, safe area, RTL en r
   assert.match(css, /\[dir="rtl"\]/); assert.match(css, /prefers-reduced-motion:reduce/);
 });
 
+test('Connection-acties gebruiken op DS-schermen hetzelfde declaratieve actiecontract', () => {
+  const js = lees('public/shared/connection-edge.js');
+  assert.match(js, /setAttribute\('data-ds-actie', label\.textContent\)/);
+  assert.doesNotMatch(js, /RTGDs\.edge\.registreer|RTGDs\.edge\.modus/);
+});
+
 test('scroll verandert uitsluitend de presentatiemodus van de Edge', () => {
   const invoer = lees('public/shared/connection-edge-input.js');
   const fn = invoer.slice(invoer.indexOf('function scrollvorm'), invoer.indexOf('function haptic'));

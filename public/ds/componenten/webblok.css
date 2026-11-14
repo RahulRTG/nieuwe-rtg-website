@@ -1,0 +1,53 @@
+/* De gepubliceerde bloktaal blijft van de maker. Vaste presentatie komt uit
+   DS; accent, vrije kleuren en ruimtehoogte blijven begrensde ontwerpdata. */
+@layer rtg.component {
+  .ds-webblok {
+    inline-size: 100%; max-inline-size: 1080px; margin-inline: auto;
+    overflow: hidden; container: webblok / inline-size;
+    background: var(--ds-webblok-grond); color: var(--ds-webblok-inkt);
+    font-family: var(--ds-letter-tekst);
+  }
+  .ds-webblok[data-thema="licht"] {
+    --ds-webblok-grond: var(--ds-webblok-licht-grond);
+    --ds-webblok-inkt: var(--ds-webblok-licht-inkt);
+    --ds-webblok-inkt-zacht: var(--ds-webblok-licht-inkt-zacht);
+    --ds-webblok-lijn: var(--ds-webblok-licht-lijn);
+    --ds-webblok-kaart: var(--ds-webblok-licht-kaart);
+  }
+  .ds-webblok__blok { position: relative; }
+  .ds-webblok .wb-blok :is(h1,h2,h3) { font-family: var(--ds-letter-display); font-weight: 500; color: var(--ds-webblok-inkt); line-height: 1.1; }
+  .ds-webblok .b-hero { padding-block: clamp(2.4rem,7cqw,5rem); padding-inline: clamp(1.4rem,5cqw,3.4rem); text-align: center; background: linear-gradient(160deg,color-mix(in srgb,var(--ds-webblok-accent) 22%,var(--ds-webblok-grond)),var(--ds-webblok-grond)); }
+  .ds-webblok .b-hero h1 { font-size: clamp(1.9rem,5cqw,3.4rem); }
+  .ds-webblok .b-hero .sub { color: var(--ds-webblok-inkt-zacht); font-size: clamp(1rem,2cqw,1.2rem); margin-block: .9rem 0; margin-inline: auto; max-inline-size: 44ch; line-height: 1.6; }
+  .ds-webblok .b-knop { display: inline-block; margin-block-start: 1.4rem; background: var(--ds-webblok-accent); color: var(--ds-webblok-knop-inkt); border-radius: 0; padding-block: .7rem; padding-inline: 1.5rem; font-weight: 600; font-size: .95rem; text-decoration: none; border: 0; cursor: inherit; }
+  .ds-webblok .b-kop { padding-block: 1.6rem .3rem; padding-inline: clamp(1.4rem,5cqw,3.4rem); }
+  .ds-webblok .b-kop h2 { font-size: clamp(1.4rem,3cqw,2rem); }
+  .ds-webblok .b-tekst { padding-block: .6rem; padding-inline: clamp(1.4rem,5cqw,3.4rem); color: var(--ds-webblok-inkt-zacht); font-size: 1rem; line-height: 1.7; max-inline-size: 62ch; }
+  .ds-webblok :is(.b-knoprij,.b-beeld) { padding-block: 1rem; padding-inline: clamp(1.4rem,5cqw,3.4rem); }
+  .ds-webblok .b-beeld img { inline-size: 100%; border-radius: 0; display: block; }
+  .ds-webblok .b-beeld .bij { font-size: .78rem; color: var(--ds-webblok-inkt-zacht); margin-block-start: .4rem; text-align: center; }
+  .ds-webblok .b-kol { display: grid; grid-template-columns: 1fr 1fr; gap: 1.4rem; padding-block: 1.2rem; padding-inline: clamp(1.4rem,5cqw,3.4rem); }
+  .ds-webblok .b-kol h3 { font-size: 1.15rem; margin-block-end: .4rem; }
+  .ds-webblok .b-kol .kt { color: var(--ds-webblok-inkt-zacht); line-height: 1.6; font-size: .95rem; }
+  .ds-webblok .b-gal { display: grid; grid-template-columns: repeat(auto-fill,minmax(160px,1fr)); gap: .6rem; padding-block: 1.2rem; padding-inline: clamp(1.4rem,5cqw,3.4rem); }
+  .ds-webblok .b-gal img { inline-size: 100%; aspect-ratio: 4/3; object-fit: cover; border-radius: 0; display: block; }
+  .ds-webblok .b-citaat { padding-block: 2rem; padding-inline: clamp(1.4rem,5cqw,3.4rem); text-align: center; }
+  .ds-webblok .b-citaat .q { font-family: var(--ds-letter-display); font-size: clamp(1.3rem,3cqw,1.9rem); line-height: 1.35; color: var(--ds-webblok-inkt); }
+  .ds-webblok .b-citaat .bron { color: var(--ds-webblok-accent); font-size: .82rem; letter-spacing: .1em; text-transform: uppercase; margin-block-start: .8rem; }
+  .ds-webblok .b-voet { padding-block: 1.6rem; padding-inline: clamp(1.4rem,5cqw,3.4rem); border-block-start: 1px solid var(--ds-webblok-lijn); color: var(--ds-webblok-inkt-zacht); font-size: .82rem; text-align: center; }
+  .ds-webblok__formuliertitel { margin-block-end: .6rem; }
+  .ds-webblok__invoer { inline-size: 100%; background: transparent; border: 1px solid currentColor; border-radius: 0; padding: .7rem; color: inherit; font: inherit; opacity: .9; }
+  .ds-webblok .ds-webblok__verzend { min-block-size: var(--ds-doel); min-inline-size: var(--ds-doel); margin-block-start: .6rem; cursor: pointer; }
+  .ds-webblok__rijtitel { margin-block-end: .8rem; }
+  .ds-webblok__vraag { margin-block-end: .9rem; }
+  .ds-webblok__nadruk { font-weight: 600; }
+  .ds-webblok__antwoord { opacity: .8; }
+  .ds-webblok__prijsrij { display: flex; gap: .8rem; align-items: baseline; border-block-end: 1px solid currentColor; padding-block: .5rem; }
+  .ds-webblok__prijsnaam { flex: 1; }
+  .ds-webblok__prijsdetail { opacity: .75; font-size: .9em; }
+  .ds-webblok__prijs { white-space: nowrap; }
+  @container webblok (max-width: 640px) {
+    .ds-webblok .b-kol { grid-template-columns: 1fr; }
+    .ds-webblok .b-gal { grid-template-columns: repeat(auto-fill,minmax(46%,1fr)); }
+  }
+}

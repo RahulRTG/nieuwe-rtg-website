@@ -1,13 +1,20 @@
 /* De centrale controllers laden één keer, ook als een route een adapter vóór
-   basis nodig heeft. Ze behouden de bestaande nodes en bevoegdheden. */
-  [['rtg-route-memory-core', 'RTGRouteMemoryCore'], ['rtg-route-memory', 'RTGRouteMemory'], ['rtg-heritage-transition', 'RTGHeritageTransition'], ['rtg-action-dock', 'RTGActionDock'], ['rtg-edge-preferences', 'RTGEdgePreferences'],
-    ['rtg-heritage-registry', 'RTGHeritageRegistry'],
-    ['rtg-heritage-components', 'RTGHeritageComponents'],
-    ['rtg-editorial-v4-model', 'RTGEditorialV4Model'],
-    ['rtg-editorial-v4-header', 'RTGEditorialV4Header'],
-    ['rtg-editorial-v4', 'RTGEditorialV4']].forEach(function (bron) {
-    if (ds || window[bron[1]] || document.querySelector('script[src="/shared/' + bron[0] + '.js"]')) return;
-    var script = document.createElement('script');
-    script.src = '/shared/' + bron[0] + '.js'; script.async = false;
-    (document.head || document.documentElement).appendChild(script);
-  });
+   basis nodig heeft. Ze behouden de bestaande nodes en bevoegdheden. De
+   letterlijke callsites zijn tevens het controleerbare laadcontract. */
+  function laadBasisController(pad, global) {
+    if (document.documentElement.hasAttribute('data-ds')) return;
+    if (window[global] || document.querySelector('script[src="' + pad + '"]')) return;
+    var basisControllerNode = document.createElement('script');
+    basisControllerNode.src = pad; basisControllerNode.async = false;
+    document.head.appendChild(basisControllerNode);
+  }
+  laadBasisController('/shared/rtg-route-memory-core.js', 'RTGRouteMemoryCore');
+  laadBasisController('/shared/rtg-route-memory.js', 'RTGRouteMemory');
+  laadBasisController('/shared/rtg-heritage-transition.js', 'RTGHeritageTransition');
+  laadBasisController('/shared/rtg-action-dock.js', 'RTGActionDock');
+  laadBasisController('/shared/rtg-edge-preferences.js', 'RTGEdgePreferences');
+  laadBasisController('/shared/rtg-heritage-registry.js', 'RTGHeritageRegistry');
+  laadBasisController('/shared/rtg-heritage-components.js', 'RTGHeritageComponents');
+  laadBasisController('/shared/rtg-editorial-v4-model.js', 'RTGEditorialV4Model');
+  laadBasisController('/shared/rtg-editorial-v4-header.js', 'RTGEditorialV4Header');
+  laadBasisController('/shared/rtg-editorial-v4.js', 'RTGEditorialV4');

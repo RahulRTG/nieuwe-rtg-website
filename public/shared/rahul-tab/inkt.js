@@ -29,6 +29,9 @@
   'use strict';
   var tab = d.querySelector('.rtg-rahul-tab');
   if (!tab) return;
+  // Een volledig DS-scherm heeft een dekkende, door tokens bepaalde knop.
+  // Alleen legacy-gastheren vragen nog de bestaande contrastreparatie.
+  if (d.documentElement.hasAttribute('data-ds')) return;
 
   /* GEEN GROND IS GEEN ZWART, en dat is de reparatie van 19 augustus 2026.
      Hieronder viel deze functie terug op de achtergrondkleur van body, en die
@@ -99,7 +102,7 @@
   var gekozen = null;
   function kies() {
   var ouder = tab.parentElement || tab;
-  var grond = grondVan(ouder);
+  var grond = grondVan(tab);
   var licht;                                      // IS DE GROND LICHT?
   if (grond) {
     licht = verhouding(rgbVan('#14110E'), grond) > verhouding(rgbVan('#FFFFFF'), grond);

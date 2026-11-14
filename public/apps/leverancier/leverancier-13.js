@@ -13,6 +13,7 @@
       ['vandaag','\u2600\uFE0F',T('kt.vandaag','Vandaag')],
       ['diensten','\uD83D\uDDC2\uFE0F',T('kt.diensten','Aanbod')]
     );
+    secs.push(['reiscontracten', '', 'Reisopdrachten']);
     secs.push(['marketing','\uD83D\uDCE3','Marketing']);
     /* TREASURY voor elke zaak, ongeacht genre. Geld dat binnenkomt is niet
        hetzelfde als geld dat van u is: er zit btw in en er komt een loonrun aan.
@@ -23,4 +24,7 @@
     let html = '<div class="st-chips">'+secs.map(s2 =>
       '<button data-ksec="'+s2[0]+'"'+(kantoorSec===s2[0]?' class="on"':'')+'>'+s2[1]+' '+s2[2]+'</button>').join('')+'</div>';
     if (kantoorMsg){ html += '<div class="tkc s-9ncju4">'+kantoorMsg+'</div>'; }
-
+    if (kantoorSec === 'reiscontracten') {
+      if (type === 'reisbureau') html += '<div class="tkc h-volbreed" id="zaakReisContracten"></div>';
+      html += '<div class="tkc h-volbreed" id="zaakReisOpdrachten"></div>';
+    }

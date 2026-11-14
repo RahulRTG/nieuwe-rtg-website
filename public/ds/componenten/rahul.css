@@ -1,0 +1,127 @@
+/* Presentatie voor de bestaande Rahul, Kompas en Live Twin. */
+@layer rtg.component {
+  .ds-rahul-eigenaar :is(button#rahulFab.rahulfab, .mgz-blok, .rv-rahul, .lo-rahul, .pn-rahul, .po-rahul, .ir-rahul, .gd-rahul, .cmd-console) { display: none; }
+  .ds-rahul-eigenaar:has(> .ds-edge:not([hidden]) > :is([data-ds-modus=navigatie],[data-ds-modus=object],[data-ds-modus=rahul])) .ds-rahul-tab { display: none; }
+  .ds-kop:has(> .ds-rahul-tab:not([hidden])):not(.ds-rahul-eigenaar:has(> .ds-edge:not([hidden]) > :is([data-ds-modus=navigatie],[data-ds-modus=object],[data-ds-modus=rahul])) *) { grid-template-columns: auto minmax(0, 1fr) auto; }
+  .ds-rahul-tab {
+    box-sizing: border-box;
+    display: inline-flex;
+    flex-direction: column;
+    justify-content: center;
+    min-block-size: var(--ds-doel);
+    min-inline-size: var(--ds-doel);
+    padding: var(--ds-ruimte-2) var(--ds-ruimte-4);
+    border: 1px solid var(--ds-lijnkleur);
+    border-radius: var(--ds-radius-knop);
+    background: var(--ds-oppervlak);
+    color: var(--ds-inkt);
+    font: 600 var(--ds-maat-klein)/1.4 var(--ds-letter-tekst);
+    text-align: start;
+    cursor: pointer;
+  }
+  .ds-rahul-tab small { display: block; color: inherit; font-size: var(--ds-maat-meta); }
+  .ds-rahul-tab.actief { border-color: var(--ds-accent); }
+  .ds-rahul-tab[hidden], .ds-rahul[hidden], .ds-rahul [hidden] { display: none; }
+  .ds-rahul {
+    box-sizing: border-box;
+    position: fixed;
+    z-index: 9970;
+    inset: 0;
+    overflow: auto;
+    overscroll-behavior: contain;
+    container: rahul / inline-size;
+    background: var(--ds-cover-grond);
+    color: var(--ds-cover-inkt);
+    font: var(--ds-maat-tekst)/1.6 var(--ds-letter-tekst);
+    padding-block-end: calc(var(--ds-edge-hoogte) + env(safe-area-inset-bottom, 0px));
+    color-scheme: dark;
+  }
+  .ds-rahul *, .ds-rahul *::before, .ds-rahul *::after { box-sizing: border-box; }
+  .ds-rahul :is(button, input) {
+    min-block-size: var(--ds-doel);
+    min-inline-size: var(--ds-doel);
+    border: 1px solid var(--ds-glasrand);
+    border-radius: var(--ds-radius-knop);
+    background: var(--ds-cover-grond);
+    color: var(--ds-cover-inkt);
+    font: inherit;
+    padding: var(--ds-ruimte-2) var(--ds-ruimte-3);
+  }
+  .ds-rahul button { cursor: pointer; }
+  .ds-rahul :is(button, input):focus-visible {
+    outline: 2px solid var(--ds-cover-metaal);
+    outline-offset: 3px;
+  }
+  .ds-rahul-tab:focus-visible { outline: 2px solid var(--ds-focus); outline-offset: 3px; }
+  .ds-rahul :is(button, input):disabled { cursor: not-allowed; opacity: .7; }
+  .ds-rahul :is(h1, h2, h3) { font-family: var(--ds-letter-display); font-weight: 500; line-height: 1.15; margin-block: var(--ds-ruimte-4); }
+  .ds-rahul h1 { font-size: var(--ds-maat-titel); }
+  .ds-rahul h2 { font-size: var(--ds-maat-kop); }
+  .ds-rahul h3 { font-size: var(--ds-maat-kop); }
+  .ds-rahul :is(p, dl) { margin-block: var(--ds-ruimte-3); }
+  .ds-rahul :is(small, em) { font-size: var(--ds-maat-meta); font-style: normal; }
+  .ds-rahul .rtg-command-head {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto auto;
+    align-items: center;
+    gap: var(--ds-ruimte-3);
+    padding: max(var(--ds-ruimte-4), env(safe-area-inset-top, 0px)) var(--ds-goot) var(--ds-ruimte-4);
+    border-block-end: 1px solid var(--ds-glasrand);
+  }
+  .ds-rahul .rtg-command-head > span { display: grid; }
+  .ds-rahul .rtg-command-head b { font: 500 var(--ds-maat-kop)/1.2 var(--ds-letter-display); }
+  .ds-rahul .rtg-command-head .rtg-command-state { display: flex; gap: var(--ds-ruimte-2); align-items: center; font-size: var(--ds-maat-meta); }
+  .ds-rahul :is(.rtg-mouth, .rtg-command-close) { border-radius: var(--ds-radius-cirkel); color: var(--ds-cover-metaal); }
+  .ds-rahul .rtg-command-grid { display: grid; grid-template-columns: minmax(0, .8fr) minmax(0, 1.6fr) minmax(0, 1fr); }
+  .ds-rahul .rtg-command-grid > section { min-inline-size: 0; padding: var(--ds-ruimte-8) var(--ds-goot); border-block-end: 1px solid var(--ds-glasrand); }
+  .ds-rahul :is(.rtg-command-ey, .rtg-command-fact > span) { font-size: var(--ds-maat-meta); letter-spacing: .12em; color: var(--ds-cover-metaal); }
+  .ds-rahul .rtg-command-rule { border-block-start: 1px solid var(--ds-glasrand); padding-block: var(--ds-ruimte-4); font-size: var(--ds-maat-klein); }
+  .ds-rahul :is(.rtg-command-fact, .rtg-intent, .rtg-one, .rtg-automation, .rtg-proof) { border: 1px solid var(--ds-glasrand); border-radius: var(--ds-radius-inhoud); padding: var(--ds-ruimte-4); margin-block: var(--ds-ruimte-4); }
+  .ds-rahul :is(.rtg-command-fact b, .rtg-command-fact small) { display: block; margin-block-start: var(--ds-ruimte-2); }
+  .ds-rahul .rtg-command-chat { display: flex; flex-direction: column; background: radial-gradient(ellipse at 80% 0, color-mix(in srgb, var(--ds-accent) 24%, transparent), transparent 65%); }
+  .ds-rahul .rtg-command-suggest { display: flex; flex-wrap: wrap; gap: var(--ds-ruimte-2); }
+  .ds-rahul .rtg-command-suggest button { font-size: var(--ds-maat-klein); }
+  .ds-rahul .rtg-command-log { flex: 1; min-block-size: 12rem; max-block-size: 45dvh; overflow: auto; margin-block: var(--ds-ruimte-4); overflow-wrap: anywhere; }
+  .ds-rahul .rtg-command-msg { max-inline-size: 95%; border: 1px solid var(--ds-glasrand); border-radius: var(--ds-radius-inhoud); padding: var(--ds-ruimte-3); margin-block: var(--ds-ruimte-3); }
+  .ds-rahul .rtg-command-msg.user { margin-inline-start: auto; border-color: var(--ds-cover-metaal); }
+  .ds-rahul .rtg-command-msg b { display: block; font-size: var(--ds-maat-meta); color: var(--ds-cover-metaal); }
+  .ds-rahul .rtg-command-noot { display: block; white-space: pre-line; font-size: var(--ds-maat-klein); border-block-start: 1px solid var(--ds-glasrand); padding-block-start: var(--ds-ruimte-2); margin-block-start: var(--ds-ruimte-2); }
+  .ds-rahul .rtg-command-form { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: var(--ds-ruimte-2); }
+  .ds-rahul .rtg-command-form input { inline-size: 100%; min-inline-size: 0; }
+  .ds-rahul .rtg-command-form input::placeholder { color: var(--ds-cover-inkt); opacity: .8; }
+  .ds-rahul :is(.rtg-decision, .rtg-kompas) { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: var(--ds-ruimte-3); align-items: center; padding-block: var(--ds-ruimte-3); border-block-start: 1px solid var(--ds-glasrand); }
+  .ds-rahul :is(.rtg-decision p, .rtg-kompas > div:nth-child(2)) { display: grid; min-inline-size: 0; gap: var(--ds-ruimte-1); }
+  .ds-rahul :is(.rtg-decision > i, .rtg-kompas-dial) { display: grid; place-items: center; inline-size: var(--ds-doel); block-size: var(--ds-doel); border: 1px solid var(--ds-glasrand); border-radius: var(--ds-radius-cirkel); font-style: normal; color: var(--ds-cover-metaal); }
+  .ds-rahul .rtg-kompas { position: relative; overflow: hidden; }
+  .ds-rahul .rtg-kompas::after { content: ''; position: absolute; inset-block-end: 0; inset-inline: 0; block-size: 2px; background: var(--ds-cover-metaal); transform: scaleX(0); transform-origin: center; }
+  .ds-rahul .rtg-kompas.denkt::after { animation: ds-rahul-denkt 1.3s ease-in-out infinite alternate; }
+  .ds-rahul :is(.rtg-intent, .rtg-twin, .rtg-proof, .rtg-one, .rtg-automation) > header { display: flex; flex-wrap: wrap; gap: var(--ds-ruimte-2); justify-content: space-between; font-size: var(--ds-maat-meta); color: var(--ds-cover-metaal); }
+  .ds-rahul :is(.rtg-intent-grid, .rtg-twin-packet, .rtg-proof > div) { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--ds-ruimte-3); margin-block: var(--ds-ruimte-3); }
+  .ds-rahul :is(.rtg-intent-grid div, .rtg-twin-packet div, .rtg-proof > div > span) { min-inline-size: 0; display: grid; gap: var(--ds-ruimte-1); overflow-wrap: anywhere; }
+  .ds-rahul :is(.rtg-intent-grid small, .rtg-twin-packet small) { color: var(--ds-cover-metaal); }
+  .ds-rahul :is(.rtg-intent > button, .rtg-one > button) { inline-size: 100%; }
+  .ds-rahul .rtg-twin { border-block: 1px solid var(--ds-glasrand); padding-block: var(--ds-ruimte-4); margin-block: var(--ds-ruimte-4); }
+  .ds-rahul .rtg-twin-flow { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 7rem), 1fr)); gap: var(--ds-ruimte-2); margin-block: var(--ds-ruimte-3); }
+  .ds-rahul .rtg-twin-flow div { display: grid; min-inline-size: 0; gap: var(--ds-ruimte-1); padding: var(--ds-ruimte-2); border: 1px solid var(--ds-glasrand); overflow-wrap: anywhere; }
+  .ds-rahul .rtg-twin-flow i { inline-size: var(--ds-ruimte-2); block-size: var(--ds-ruimte-2); border: 1px solid currentColor; border-radius: var(--ds-radius-cirkel); }
+  .ds-rahul .rtg-twin-flow .ok i { background: var(--ds-cover-metaal); }
+  .ds-rahul :is(.rtg-twin[data-live-status="menselijk-akkoord"], .rtg-one.attention) { border-color: var(--ds-cover-metaal); }
+  .ds-rahul .rtg-twin-foot { display: flex; flex-wrap: wrap; gap: var(--ds-ruimte-3); justify-content: space-between; font-size: var(--ds-maat-meta); }
+  .ds-rahul .rtg-one dl div { display: flex; flex-wrap: wrap; gap: var(--ds-ruimte-2); justify-content: space-between; border-block-start: 1px solid var(--ds-glasrand); padding-block: var(--ds-ruimte-2); }
+  .ds-rahul .rtg-one dd { margin: 0; }
+  @keyframes ds-rahul-denkt { to { transform: scaleX(1); } }
+  @container rahul (max-width: 68rem) {
+    .ds-rahul .rtg-command-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); }
+    .ds-rahul .rtg-command-decisions { grid-column: 1 / -1; }
+  }
+  @container rahul (max-width: 42rem) {
+    .ds-rahul .rtg-command-head { grid-template-columns: auto minmax(0, 1fr) auto; }
+    .ds-rahul .rtg-command-state { grid-column: 1 / -1; grid-row: 2; }
+    .ds-rahul .rtg-command-close { grid-column: 3; grid-row: 1; }
+    .ds-rahul .rtg-command-grid { display: flex; flex-direction: column; }
+    .ds-rahul :is(.rtg-intent-grid, .rtg-twin-packet, .rtg-proof > div) { grid-template-columns: 1fr; }
+    .ds-rahul :is(.rtg-decision, .rtg-kompas) { grid-template-columns: auto minmax(0, 1fr); }
+    .ds-rahul :is(.rtg-decision, .rtg-kompas) > em { grid-column: 2; }
+  }
+  @media (prefers-reduced-motion: reduce) { .ds-rahul .rtg-kompas.denkt::after { animation: none; transform: scaleX(1); } }
+}

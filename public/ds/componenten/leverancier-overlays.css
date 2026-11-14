@@ -1,0 +1,92 @@
+/* Drie bestaande leveranciersdialogen. Zaaklogica en DOM-contracten blijven in
+   leverancier.js; deze centrale component bezit alleen hun presentatie. */
+@layer rtg.component {
+  .ds-leverancier-overlay.zc-ov, .ds-leverancier-overlay.aw-ov, .ds-leverancier-overlay.tt-ov {
+    position: fixed;
+    inset: 0;
+    z-index: 100000;
+    display: flex;
+    justify-content: center;
+    background: color-mix(in srgb, var(--ds-cover-grond) 78%, transparent);
+  }
+  .ds-leverancier-overlay.zc-ov {
+    align-items: center;
+    padding: max(var(--ds-ruimte-4), env(safe-area-inset-top, 0px))
+      max(var(--ds-ruimte-4), env(safe-area-inset-right, 0px))
+      max(var(--ds-ruimte-4), env(safe-area-inset-bottom, 0px))
+      max(var(--ds-ruimte-4), env(safe-area-inset-left, 0px));
+  }
+  .ds-leverancier-overlay.aw-ov, .ds-leverancier-overlay.tt-ov { align-items: flex-end; }
+
+  .ds-leverancier-overlay .zc-card, .ds-leverancier-overlay .aw-card, .ds-leverancier-overlay .tt-card {
+    inline-size: 100%;
+    color: var(--ds-inkt);
+    background: var(--ds-oppervlak);
+    border-radius: var(--ds-radius-inhoud);
+  }
+  .ds-leverancier-overlay .zc-card {
+    max-inline-size: 24rem;
+    padding: var(--ds-ruimte-6);
+    text-align: center;
+    border: 1px solid var(--ds-lijnkleur);
+  }
+  .ds-leverancier-overlay .zc-card.ok { border-color: var(--ds-metaal); box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--ds-metaal) 20%, transparent); }
+  .ds-leverancier-overlay .zc-card.nee { border-color: var(--ds-status-fout); box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--ds-status-fout) 20%, transparent); }
+  .ds-leverancier-overlay .zc-icon {
+    display: grid;
+    place-items: center;
+    inline-size: var(--ds-ruimte-16);
+    block-size: var(--ds-ruimte-16);
+    margin: 0 auto var(--ds-ruimte-2);
+    font-size: var(--ds-maat-titel);
+    font-weight: 700;
+  }
+  .ds-leverancier-overlay .zc-card.ok .zc-icon { color: var(--ds-metaal); background: color-mix(in srgb, var(--ds-metaal) 14%, transparent); }
+  .ds-leverancier-overlay .zc-card.nee .zc-icon { color: var(--ds-status-fout); background: color-mix(in srgb, var(--ds-status-fout) 14%, transparent); }
+  .ds-leverancier-overlay .zc-kop { margin-block-end: var(--ds-ruimte-2); font-family: var(--ds-letter-display); font-size: var(--ds-maat-kop); }
+  .ds-leverancier-overlay .zc-claims { display: grid; gap: var(--ds-ruimte-2); margin-block: var(--ds-ruimte-2); }
+  .ds-leverancier-overlay .zc-claim { padding: var(--ds-ruimte-2) var(--ds-ruimte-3); color: var(--ds-metaal); background: color-mix(in srgb, var(--ds-metaal) 10%, transparent); font-size: var(--ds-maat-klein); font-weight: 600; }
+  .ds-leverancier-overlay .zc-tot { margin-block: var(--ds-ruimte-1); color: var(--ds-inkt-zacht); font-size: var(--ds-maat-klein); }
+  .ds-leverancier-overlay .zc-priv { margin-block: var(--ds-ruimte-3) 0; color: var(--ds-inkt-zacht); font-size: var(--ds-maat-meta); line-height: 1.5; }
+
+  .ds-leverancier-overlay .zc-btn, .ds-leverancier-overlay .aw-acts button, .ds-leverancier-overlay .tt-btn, .ds-leverancier-overlay .tt-in { min-block-size: var(--ds-doel); font-family: inherit; }
+  .ds-leverancier-overlay .zc-btn, .ds-leverancier-overlay .tt-btn { inline-size: 100%; color: var(--ds-accent-inkt); background: var(--ds-accent); border: 0; border-radius: var(--ds-radius-knop); font-weight: 600; cursor: pointer; }
+  .ds-leverancier-overlay .zc-btn { margin-block-start: var(--ds-ruimte-4); padding: var(--ds-ruimte-3); }
+
+  .ds-leverancier-overlay .aw-card, .ds-leverancier-overlay .tt-card {
+    max-inline-size: 30rem;
+    padding: var(--ds-ruimte-6)
+      max(var(--ds-ruimte-4), env(safe-area-inset-right, 0px))
+      max(calc(var(--ds-ruimte-6) + env(safe-area-inset-bottom, 0px)), var(--ds-ruimte-6))
+      max(var(--ds-ruimte-4), env(safe-area-inset-left, 0px));
+  }
+  .ds-leverancier-overlay .tt-card { max-block-size: 84dvh; overflow-y: auto; }
+  .ds-leverancier-overlay .aw-kop, .ds-leverancier-overlay .tt-kop { display: flex; align-items: baseline; gap: var(--ds-ruimte-3); }
+  .ds-leverancier-overlay .aw-kop { margin-block-end: var(--ds-ruimte-1); }
+  .ds-leverancier-overlay .tt-kop { margin-block-end: var(--ds-ruimte-3); }
+  .ds-leverancier-overlay .aw-kop h3, .ds-leverancier-overlay .tt-kop h3 { flex: 1; margin: 0; font-family: var(--ds-letter-display); font-size: var(--ds-maat-kop); font-weight: 500; }
+  .ds-leverancier-overlay .aw-binnen { margin-block: var(--ds-ruimte-2) var(--ds-ruimte-4); text-align: center; }
+  .ds-leverancier-overlay .aw-binnen b { font-size: var(--ds-maat-display); font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1; }
+  .ds-leverancier-overlay .aw-binnen span { display: block; color: var(--ds-inkt-zacht); font-size: var(--ds-maat-meta); letter-spacing: .04em; text-transform: uppercase; }
+  .ds-leverancier-overlay .aw-rij { display: flex; align-items: center; gap: var(--ds-ruimte-3); padding: var(--ds-ruimte-3) var(--ds-ruimte-1); border-block-start: 1px solid var(--ds-lijnkleur); }
+  .ds-leverancier-overlay .aw-rij .lbl { flex: 1; }
+  .ds-leverancier-overlay .aw-rij .n { min-inline-size: 2.2rem; font-size: var(--ds-maat-kop); font-weight: 700; font-variant-numeric: tabular-nums; text-align: center; }
+  .ds-leverancier-overlay .aw-btn, .ds-leverancier-overlay .tt-sluit { inline-size: var(--ds-doel); block-size: var(--ds-doel); padding: 0; color: var(--ds-inkt); background: var(--ds-grond); border: 1px solid var(--ds-lijnkleur); border-radius: var(--ds-radius-knop); cursor: pointer; line-height: 1; }
+  .ds-leverancier-overlay .aw-btn { font-size: var(--ds-maat-kop); }
+  .ds-leverancier-overlay .tt-sluit { font-size: var(--ds-maat-tekst); }
+  .ds-leverancier-overlay .aw-btn.plus { color: var(--ds-accent-inkt); background: var(--ds-accent); border-color: var(--ds-accent); }
+  .ds-leverancier-overlay .aw-acts { display: flex; gap: var(--ds-ruimte-3); margin-block-start: var(--ds-ruimte-4); }
+  .ds-leverancier-overlay .aw-acts button { flex: 1; padding: var(--ds-ruimte-3); color: var(--ds-inkt-zacht); background: transparent; border: 1px solid var(--ds-lijnkleur); border-radius: var(--ds-radius-knop); font-weight: 600; cursor: pointer; }
+  .ds-leverancier-overlay .tt-in { inline-size: 100%; padding: var(--ds-ruimte-3); color: var(--ds-inkt); background: var(--ds-grond); border: 1px solid var(--ds-lijnkleur); border-radius: var(--ds-radius-knop); font-size: var(--ds-maat-klein); }
+  .ds-leverancier-overlay .tt-gast { display: flex; justify-content: space-between; gap: var(--ds-ruimte-3); padding: var(--ds-ruimte-2) var(--ds-ruimte-1); border-block-start: 1px solid var(--ds-lijnkleur); font-size: var(--ds-maat-klein); }
+  .ds-leverancier-overlay .tt-gast .n { font-weight: 600; font-variant-numeric: tabular-nums; }
+  .ds-leverancier-overlay .tt-bon { padding: var(--ds-ruimte-1) 0 var(--ds-ruimte-1) var(--ds-ruimte-3); color: var(--ds-inkt-zacht); font-size: var(--ds-maat-meta); }
+  .ds-leverancier-overlay .tt-tot { display: flex; justify-content: space-between; gap: var(--ds-ruimte-3); padding: var(--ds-ruimte-3) var(--ds-ruimte-1) var(--ds-ruimte-1); border-block-start: 2px solid var(--ds-lijnkleur); font-weight: 700; font-variant-numeric: tabular-nums; }
+  .ds-leverancier-overlay .tt-zegel { margin-block: var(--ds-ruimte-2); color: var(--ds-inkt-zacht); font-size: var(--ds-maat-meta); letter-spacing: .04em; overflow-wrap: anywhere; }
+  .ds-leverancier-overlay .tt-btn { margin-block-start: var(--ds-ruimte-3); padding: var(--ds-ruimte-3); font-size: var(--ds-maat-klein); }
+  .ds-leverancier-overlay :is(.zc-btn, .ds-leverancier-overlay .aw-btn, .ds-leverancier-overlay .aw-acts button, .ds-leverancier-overlay .tt-in, .ds-leverancier-overlay .tt-btn, .ds-leverancier-overlay .tt-sluit):focus-visible { outline: 2px solid var(--ds-focus); outline-offset: 3px; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ds-leverancier-overlay.zc-ov, .ds-leverancier-overlay.aw-ov, .ds-leverancier-overlay.tt-ov, .ds-leverancier-overlay .zc-card, .ds-leverancier-overlay .aw-card, .ds-leverancier-overlay .tt-card { animation: none; scroll-behavior: auto; transition: none; }
+  }
+}

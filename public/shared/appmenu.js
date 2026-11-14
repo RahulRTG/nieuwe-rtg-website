@@ -34,6 +34,7 @@
    <body data-appmenu-uit>. */
 (function (w, d) {
   'use strict';
+  const dsBijStart = document.documentElement.hasAttribute('data-ds');
   if (w.RTGAppMenu) return;
 
   var body = d.body;
@@ -41,6 +42,12 @@
   /* Het beginscherm doet niet mee: zie de kop. Daar is de bovenrand de ingang
      naar het systeem, niet een knop in beeld. */
   if (body.hasAttribute('data-ios-home')) return;
+
+  /* Eén controller, dezelfde hooks en één canonieke presentatie. De oude
+     klassennamen blijven als gedragscontract bestaan; de DS-klassen tekenen. */
+  function menuKlasse(oud, nieuw) {
+    return oud + ' ' + nieuw;
+  }
 
   var T = function (k, nl) { return (w.RTGi18n && w.RTGi18n.t) ? w.RTGi18n.t(k, nl) : nl; };
 
@@ -75,84 +82,22 @@
     w.I18N.en = w.I18N.en || {};
     for (var k in eigen) if (!(k in w.I18N.en)) w.I18N.en[k] = eigen[k];
   })();
-
 /* de stijl van het bedieningspaneel */
   /* De vormtaal van het bedieningspaneel (shared/bediening.js): een blad dat
      van onderen opkomt, donker, met een gouden accent. Bewust dezelfde vorm --
      het is hetzelfde soort ding, en twee soorten bladen naast elkaar is weer
      een device erbij. */
-  function stijl() {
-    if (d.getElementById('amnCss')) return;
-    var s = d.createElement('style'); s.id = 'amnCss';
-    s.textContent =
-      /* de knop zelf */
-      '.amn-knop{position:relative;background:none;border:none;padding:0;cursor:pointer;' +
-        'color:var(--muted,#8A8680);width:34px;height:34px;flex-shrink:0;' +
-        'display:flex;align-items:center;justify-content:center;}' +
-      '.amn-knop svg{width:21px;height:21px;stroke:currentColor;fill:none;' +
-        'stroke-width:1.7;stroke-linecap:round;}' +
-      '.amn-knop:hover{color:var(--txt,#F7F5F1);}' +
-      '.amn-knop:focus-visible{outline:2px solid var(--gold,#857007);outline-offset:3px;border-radius:0;}' +
-      /* de linkercel van de navigatiebalk: hamburger, dan de terugweg */
-      '.ios-nav-links{grid-column:1;justify-self:start;display:flex;align-items:center;gap:0.15rem;}' +
-      /* de hamburger naast de eigen terugweg van een pagina zonder kopbalk */
-      '.amn-koprij{display:flex;align-items:center;gap:0.5rem;}' +
-      '.amn-koprij > .amn-knop{margin-left:-0.35rem;}' +
-      /* zwevend, voor de paar pagina\'s zonder eigen kopbalk. LINKS en zonder
-         vlak: geen achtergrond, geen rand, geen afgeronde doos. Dat was het
-         zwaarste element van de kopbalk terwijl het het lichtste hoort te zijn. */
-      '.amn-knop.amn-zweef{position:fixed;z-index:9970;' +
-        'top:calc(env(safe-area-inset-top,0px) + .55rem);' +
-        'left:calc(env(safe-area-inset-left,0px) + .7rem);' +
-        'width:38px;height:38px;border-radius:0;color:var(--txt,#EDE9E3);' +
-        'background:none;border:0;backdrop-filter:none;-webkit-backdrop-filter:none;}' +
-      /* het blad */
-      '.amn-scrim{position:fixed;inset:0;z-index:9994;display:none;' +
-        'align-items:flex-end;justify-content:center;background:rgba(6,5,5,.62);' +
-        'backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);}' +
-      '.amn-scrim.amn-open{display:flex;}' +
-      '.amn-blad{width:min(430px,100%);max-height:86vh;overflow-y:auto;' +
-        'background:linear-gradient(180deg,#151312,#0C0C0B);color:#F4F1EC;' +
-        'border:1px solid var(--line,rgba(255,255,255,.14));border-bottom:none;' +
-        'border-radius:0;' +
-        'padding:.7rem 1.1rem calc(env(safe-area-inset-bottom,0px) + 1.1rem);' +
-        'font-family:Inter,system-ui,sans-serif;box-shadow:0 -18px 50px rgba(0,0,0,.5);}' +
-      '@media (min-width:640px){.amn-scrim{align-items:center;}' +
-        '.amn-blad{border-radius:0;border-bottom:1px solid var(--line,rgba(255,255,255,.14));}}' +
-      '.amn-greep{width:38px;height:4px;border-radius:0;margin:0 auto .7rem;' +
-        'background:rgba(255,255,255,.18);}' +
-      '.amn-kop{display:flex;align-items:baseline;justify-content:space-between;gap:.8rem;}' +
-      '.amn-kop b{font-family:"Bodoni Moda",Georgia,serif;font-weight:500;font-size:1.2rem;' +
-        'letter-spacing:-.01em;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}' +
-      '.amn-x{background:none;border:none;color:#8A8680;font-size:1rem;cursor:pointer;padding:.3rem .1rem;}' +
-      '.amn-x:hover{color:#F4F1EC;}' +
-      '.amn-sectie{color:#8A8680;font-size:.6rem;letter-spacing:.16em;text-transform:uppercase;' +
-        'margin:1.1rem 0 .5rem;}' +
-      /* de tegels: de functies van deze app, twee op een rij */
-      '.amn-rooster{display:grid;grid-template-columns:1fr 1fr;gap:.5rem;}' +
-      '.amn-tegel{display:flex;align-items:center;gap:.55rem;text-align:left;cursor:pointer;' +
-        'background:rgba(255,255,255,.04);border:1px solid var(--line,rgba(255,255,255,.12));' +
-        'border-radius:0;padding:.7rem .75rem;color:#F4F1EC;font:inherit;font-size:.82rem;' +
-        'line-height:1.25;min-height:52px;}' +
-      '.amn-tegel:hover{border-color:color-mix(in srgb, var(--gold,#857007) 55%, ' +
-        'var(--line,rgba(255,255,255,.12)));}' +
-      '.amn-tegel span{min-width:0;overflow:hidden;text-overflow:ellipsis;}' +
-      '.amn-tegel svg,.amn-rij svg{width:17px;height:17px;flex-shrink:0;stroke:var(--gold,#857007);' +
-        'fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;}' +
-      /* de vaste rijen: overal hetzelfde, dus een lijst en geen tegels */
-      '.amn-lijst{display:flex;flex-direction:column;}' +
-      '.amn-rij{display:flex;align-items:center;gap:.7rem;width:100%;cursor:pointer;' +
-        'background:none;border:none;border-top:1px solid var(--line,rgba(255,255,255,.1));' +
-        'padding:.85rem .1rem;color:#F4F1EC;font:inherit;font-size:.88rem;text-align:left;}' +
-      '.amn-lijst .amn-rij:first-child{border-top:none;}' +
-      '.amn-rij:hover{color:#fff;}' +
-      '.amn-rij em{font-style:normal;margin-left:auto;color:#8A8680;font-size:.72rem;' +
-        'font-variant-numeric:tabular-nums;}' +
-      '.amn-tegel:focus-visible,.amn-rij:focus-visible{outline:2px solid var(--gold,#857007);' +
-        'outline-offset:2px;border-radius:0;}' +
-      '.amn-leeg{color:#8A8680;font-size:.78rem;line-height:1.5;margin:0;}';
-    (d.head || d.documentElement).appendChild(s);
+  function laadAppmenuPresentatie(pad) {
+    if (document.documentElement.hasAttribute('data-ds')) return;
+    if (document.getElementById('rtgDsRuntimeCss')) return;
+    var appmenuStijlLink = document.createElement('link');
+    appmenuStijlLink.id = 'rtgDsRuntimeCss';
+    appmenuStijlLink.rel = 'stylesheet';
+    appmenuStijlLink.href = pad;
+    document.head.appendChild(appmenuStijlLink);
   }
+
+  function stijl() { laadAppmenuPresentatie('/ds/rtg-ds.css'); }
 
   /* ------------------------------------------------------------ tekens */
   /* Een handvol lijntekeningen, in dezelfde taal als de rest van het OS
@@ -185,7 +130,6 @@
     svg.appendChild(p);
     return svg;
   }
-
   /* -------------------------------------------------- de eigen functies */
   /* Wat een app kan, staat al op zijn scherm. Vier bronnen, van beste naar
      minst goede, en we stoppen zodra er genoeg is. De volgorde is niet
@@ -214,7 +158,7 @@
          net had geopend. En erger: die ene tegel maakte de lijst niet-leeg,
          waardoor de terugval op de kopjes van de inhoud nooit aan bod kwam en
          apps zonder tabs een menu kregen met alleen zichzelf erin. */
-      if (k === knop || k.closest('.amn-blad')) continue;
+      if (k === knop || k.closest('.amn-blad,.bdn-scrim')) continue;
       if (k.disabled || k.hidden) continue;
       var l = labelVan(k);
       if (!l || gezien[l.toLowerCase()]) continue;
@@ -242,6 +186,7 @@
     var vakken = wortel.querySelectorAll('div, nav, section, ul, p');
     for (var i = 0; i < vakken.length && i < 400; i++) {
       var vak = vakken[i], kids = vak.children;
+      if (vak.closest('.amn-blad,.bdn-scrim')) continue;
       if (kids.length < 3 || kids.length > 8) continue;
       var labels = [], goed = true;
       for (var j = 0; j < kids.length; j++) {
@@ -298,7 +243,6 @@
     }
     return uit;
   }
-
   /* ------------------------------------------------- de vaste functies */
   function el(id) { return d.getElementById(id); }
   function klik(id) { var k = el(id); if (k) k.click(); }
@@ -330,9 +274,9 @@
         doe: function () { w.RTGMetgezel.rahul(); } });
     }
 
-    if (w.RTGVol && w.RTGVol.wissel) {
-      uit.push({ label: T('os.cc.vol', 'Volledig scherm'), icoon: 'vol',
-        doe: function () { w.RTGVol.wissel(); } });
+    if (w.RTGVol && w.RTGVol.wissel && w.RTGVol.mogelijk && w.RTGVol.mogelijk()) {
+      uit.push({ label: T('bdn.vol.aan', 'Rand tot rand'), icoon: 'vol',
+        doe: function () { if (w.RTGVol.mogelijk()) w.RTGVol.wissel(); } });
     }
 
     /* Delen kan alleen als de browser het aanbiedt (en dat is buiten https
@@ -350,7 +294,6 @@
     }
     return uit;
   }
-
 /* het blad dat van onderen opkomt */
   var scrim = null, blad = null, knop = null, laatstFocus = null;
 
@@ -369,7 +312,7 @@
 
   function maakTegel(item) {
     var b = d.createElement('button');
-    b.type = 'button'; b.className = 'amn-tegel';
+    b.type = 'button'; b.className = menuKlasse('amn-tegel', 'ds-appmenu__tegel');
     /* Alleen een teken als er een teken IS. De functies die hier gevonden
        worden ("Feed", "Ontdekken", "Alle", "Hotels") hebben er geen, en er dan
        maar een neutrale stip bij zetten geeft zes identieke stipjes onder
@@ -384,7 +327,7 @@
 
   function maakRij(item) {
     var b = d.createElement('button');
-    b.type = 'button'; b.className = 'amn-rij';
+    b.type = 'button'; b.className = menuKlasse('amn-rij', 'ds-appmenu__rij');
     b.appendChild(teken(item.icoon || 'stip'));
     var s = d.createElement('span'); s.textContent = item.label;
     b.appendChild(s);
@@ -409,11 +352,12 @@
   }
 
   function bouw() {
-    scrim = d.createElement('div'); scrim.className = 'amn-scrim';
-    blad = d.createElement('div'); blad.className = 'amn-blad';
+    scrim = d.createElement('div'); scrim.className = menuKlasse('amn-scrim', 'ds-appmenu');
+    blad = d.createElement('div'); blad.className = menuKlasse('amn-blad', 'ds-dialoog ds-appmenu__blad');
     blad.setAttribute('role', 'dialog');
     blad.setAttribute('aria-modal', 'true');
     blad.setAttribute('aria-label', T('menu.label', 'Menu'));
+    blad.setAttribute('tabindex', '-1');
     scrim.appendChild(blad);
     scrim.addEventListener('click', function (e) { if (e.target === scrim) sluit(); });
     d.body.appendChild(scrim);
@@ -421,12 +365,12 @@
 
   function vul() {
     blad.textContent = '';
-    blad.appendChild(Object.assign(d.createElement('div'), { className: 'amn-greep' }));
+    blad.appendChild(Object.assign(d.createElement('div'), { className: menuKlasse('amn-greep', 'ds-appmenu__greep') }));
 
-    var kop = d.createElement('div'); kop.className = 'amn-kop';
+    var kop = d.createElement('div'); kop.className = menuKlasse('amn-kop', 'ds-appmenu__kop');
     var naam = d.createElement('b'); naam.textContent = titel();
     var x = d.createElement('button');
-    x.type = 'button'; x.className = 'amn-x'; x.textContent = '✕';
+    x.type = 'button'; x.className = menuKlasse('amn-x', 'ds-appmenu__sluit'); x.textContent = '✕';
     x.setAttribute('aria-label', T('menu.sluit', 'Menu sluiten'));
     x.addEventListener('click', sluit);
     kop.appendChild(naam); kop.appendChild(x);
@@ -435,7 +379,7 @@
     var eigen = eigenFuncties();
     if (eigen.length) {
       blad.appendChild(sectie(T('menu.deze', 'Deze app')));
-      var rooster = d.createElement('div'); rooster.className = 'amn-rooster';
+      var rooster = d.createElement('div'); rooster.className = menuKlasse('amn-rooster', 'ds-appmenu__rooster');
       for (var i = 0; i < eigen.length; i++) rooster.appendChild(maakTegel(eigen[i]));
       blad.appendChild(rooster);
     }
@@ -443,20 +387,20 @@
     var vast = vasteFuncties();
     if (vast.length) {
       blad.appendChild(sectie(T('menu.overal', 'Overal')));
-      var lijst = d.createElement('div'); lijst.className = 'amn-lijst';
+      var lijst = d.createElement('div'); lijst.className = menuKlasse('amn-lijst', 'ds-appmenu__lijst');
       for (var j = 0; j < vast.length; j++) lijst.appendChild(maakRij(vast[j]));
       blad.appendChild(lijst);
     }
 
     if (!eigen.length && !vast.length) {
-      var p = d.createElement('p'); p.className = 'amn-leeg';
+      var p = d.createElement('p'); p.className = menuKlasse('amn-leeg', 'ds-appmenu__leeg');
       p.textContent = T('menu.niets', 'Op dit scherm valt niets extra\'s te doen.');
       blad.appendChild(p);
     }
   }
 
   function sectie(tekst) {
-    var s = d.createElement('div'); s.className = 'amn-sectie'; s.textContent = tekst;
+    var s = d.createElement('div'); s.className = menuKlasse('amn-sectie', 'ds-appmenu__sectie'); s.textContent = tekst;
     return s;
   }
 
@@ -465,10 +409,11 @@
        dan nog wel in deze variabele maar niet meer in het document, en dan gaat
        er bij een tik niets open zonder dat er iets misgaat -- de stilste storing
        die er is. */
+    var wasOpen = scrim && scrim.isConnected && scrim.classList.contains('amn-open');
     if (scrim && !scrim.isConnected) scrim = null;
     if (!scrim) bouw();
+    if (!wasOpen) laatstFocus = d.activeElement;
     vul();
-    laatstFocus = d.activeElement;
     scrim.classList.add('amn-open');
     if (knop) knop.setAttribute('aria-expanded', 'true');
     d.addEventListener('keydown', opEsc);
@@ -481,13 +426,27 @@
     scrim.classList.remove('amn-open');
     if (knop) knop.setAttribute('aria-expanded', 'false');
     d.removeEventListener('keydown', opEsc);
-    if (laatstFocus && laatstFocus.focus) { try { laatstFocus.focus(); } catch (e) {} }
+    var terug = laatstFocus && laatstFocus.isConnected ? laatstFocus : knop;
+    if (terug && terug.isConnected && terug.focus) { try { terug.focus({ preventScroll: true }); } catch (e) {} }
     laatstFocus = null;
   }
 
-  function opEsc(e) { if (e.key === 'Escape') { e.stopPropagation(); sluit(); } }
-  function wissel() { (scrim && scrim.classList.contains('amn-open')) ? sluit() : open(); }
-
+  function opEsc(e) {
+    if (!scrim || !scrim.isConnected || !scrim.classList.contains('amn-open') || blad.closest('[inert]')) return;
+    if (e.key === 'Escape') { e.stopPropagation(); sluit(); return; }
+    if (e.key !== 'Tab') return;
+    /* De bestaande basislaag sluit de achtergrond met inert. Ook zonder die
+       laag blijft de toetsenbordvolgorde in dit menu: geen tweede controller. */
+    var kan = [].filter.call(blad.querySelectorAll('button'), function (b) {
+      return !b.disabled && b.tabIndex >= 0 && zichtbaar(b) && !b.closest('[inert]');
+    });
+    var eerste = kan[0], laatste = kan[kan.length - 1];
+    if (!eerste) { e.preventDefault(); blad.focus(); return; }
+    if (!blad.contains(d.activeElement) || (e.shiftKey && d.activeElement === eerste) || (!e.shiftKey && d.activeElement === laatste)) {
+      e.preventDefault(); (e.shiftKey ? laatste : eerste).focus();
+    }
+  }
+  function wissel() { (scrim && scrim.isConnected && scrim.classList.contains('amn-open')) ? sluit() : open(); }
 /* de knop: de hamburger staat links, en verder niets */
   /* DE RTG-HEADERSTANDAARD: de hamburger staat LINKS, en verder niets.
      Hij stond rechtsboven in een afgerond vierkant met een eigen achtergrond,
@@ -505,7 +464,7 @@
   function plaatsKnop() {
     knop = d.createElement('button');
     knop.type = 'button';
-    knop.className = 'amn-knop';
+    knop.className = menuKlasse('amn-knop', 'ds-appmenu__knop');
     knop.id = 'osMenuBtn';
     knop.setAttribute('aria-label', T('menu.label', 'Menu'));
     knop.setAttribute('aria-haspopup', 'dialog');
@@ -531,7 +490,7 @@
     var cel = rij.querySelector(':scope > .ios-nav-links');
     if (cel) return cel;
     cel = d.createElement('div');
-    cel.className = 'ios-nav-links';
+    cel.className = menuKlasse('ios-nav-links', 'ds-appmenu__links');
     rij.insertBefore(cel, rij.firstChild);
     var terug = rij.querySelector(':scope > .ios-terug');
     if (terug) cel.appendChild(terug);
@@ -577,9 +536,29 @@
        linksboven is alleen veilig als er links bovenin niets staat.
        Daarom krijgen die twee samen een rij. */
     var kop = null;
-    var koppen = d.querySelectorAll('header.kop, header.merkkop, body > header');
+    /* World Desktop verplaatst ook eigen werkbalken (zoals de browser) onder
+       .wd-page. Die behouden hun eigen rij; de knop mag er niet over zweven. */
+    /* Expliciete geneste DS-hosts bieden ruimte in hun bestaande koprij.
+       Geen algemene headerzoektocht: kaartkoppen zijn geen menu-eigenaar. */
+    var koppen = d.querySelectorAll('header.kop, header.merkkop, body > header' +
+      (d.documentElement.hasAttribute('data-ds') ? ', header.ds-kop, header[data-rtg-menu-host], .ds-wereldwerkruimte .wd-page > header' : ''));
     for (var i = 0; i < koppen.length; i++) { if (zichtbaar(koppen[i])) { kop = koppen[i]; break; } }
-    if (kop) { kop.insertBefore(knop, kop.firstChild); return; }
+    if (kop) {
+      if (d.documentElement.hasAttribute('data-ds') && kop.classList.contains('ds-kop')) {
+        /* De DS-kop heeft drie plaatsen. Menu + bestaande terug-/zoekactie
+           delen de eerste; merk en profiel blijven op hun eigen plaats. */
+        var cel = kop.querySelector(':scope > .ds-appmenu__links');
+        if (!cel) {
+          var eerste = kop.firstElementChild;
+          cel = d.createElement('div'); cel.className = 'ds-appmenu__links';
+          kop.insertBefore(cel, kop.firstChild);
+          if (eerste && !eerste.classList.contains('ds-kop__merk')) cel.appendChild(eerste);
+        }
+        kop.classList.add('ds-appmenu__host');
+        cel.insertBefore(knop, cel.firstChild);
+      } else kop.insertBefore(knop, kop.firstChild);
+      return;
+    }
 
     /* De terugweg staat lang niet altijd direct onder de body -- op
        boardroom.html zit hij binnen <main class="rtg-wrap">. Zoeken op de
@@ -590,7 +569,7 @@
     if (terug && (!zichtbaar(terug) || terug.getBoundingClientRect().top > 220)) terug = null;
     if (terug && terug.parentNode) {
       var rijtje = d.createElement('div');
-      rijtje.className = 'amn-koprij';
+      rijtje.className = menuKlasse('amn-koprij', 'ds-appmenu__koprij');
       terug.parentNode.insertBefore(rijtje, terug);
       rijtje.appendChild(knop);
       rijtje.appendChild(terug);
@@ -640,6 +619,10 @@
        pagina op dat moment heeft (de delenbalk, de tabs, de navigatiebalk, of
        wat de app zelf opgaf). Een tweede lijst handelingen aanleggen zou hier
        dezelfde fout zijn als een tweede lijst apps in de bank. */
-    functies: function () { try { return eigenFuncties(); } catch (e) { return []; } }
+    functies: function () { try { return eigenFuncties(); } catch (e) { return []; } },
+    /* De vaste systeemfuncties blijven van Appmenu: deze accessor laat de
+       canonieke DS Edge dezelfde actuele, capability-gebonden lijst tonen
+       zonder haar opnieuw te definiëren. */
+    systeemfuncties: function () { try { return vasteFuncties(); } catch (e) { return []; } }
   };
 })(window, document);

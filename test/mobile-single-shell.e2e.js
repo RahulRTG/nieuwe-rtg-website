@@ -88,7 +88,7 @@ test('the four mobile worlds expose their original content and keep it when chan
   }
 });
 test('one Edge responds to nested human scroll, keeps five reachable actions and respects focused input and open panels', { skip }, async () => {
-  const { page, ctx } = await open('/apps/notities.html', 320);
+  const { page, ctx } = await open('/apps/rtg.html', 320);
   try {
     // An isolated scroll fixture exercises input routing, not a simulated
     // domain transaction. The real page, Edge and event handlers are used.
@@ -99,6 +99,9 @@ test('one Edge responds to nested human scroll, keeps five reachable actions and
       content.textContent = 'Scroll fixture'; scroller.appendChild(content); document.body.appendChild(scroller);
     });
     const host = page.locator('.rtg-adaptive-edge'), bar = page.locator('.rtg-adaptive-bar');
+    assert.equal(await page.locator('link[href^="/ds/componenten/randen.css"]').count(), 1,
+      'legacy gebruikt de ene centrale randencomponent en geen stijlinjectie');
+    assert.equal(await page.locator('#rndCss').count(), 0);
     const normal = await bar.boundingBox();
     await page.locator('#scroll-fixture').hover(); await page.mouse.wheel(0, 200);
     await page.waitForSelector('.rtg-adaptive-edge[data-rtg-adaptive-motion="reading"]');
@@ -136,7 +139,7 @@ test('one Edge responds to nested human scroll, keeps five reachable actions and
 
 
 test('custom Edge menus replace screen controls without reserving an empty action strip', { skip }, async () => {
-  const { page, ctx } = await open('/apps/notities.html');
+  const { page, ctx } = await open('/apps/rtg.html');
   try {
     await page.locator('.rtg-adaptive-bar [data-rtg-adaptive-action="menu"]').click();
     await page.waitForSelector('.rtg-adaptive-sheet[data-rtg-custom-panel="true"]');
@@ -150,7 +153,7 @@ test('custom Edge menus replace screen controls without reserving an empty actio
 });
 
 test('all registered apps remain reachable through one mobile Edge, including retry after catalog failure', { skip }, async () => {
-  const { page, ctx } = await open('/apps/notities.html');
+  const { page, ctx } = await open('/apps/rtg.html');
   try {
     const catalog = require('../public/shared/interface/world-widget-catalog.json');
     const pattern = '**/shared/interface/world-widget-catalog.json';
@@ -182,18 +185,29 @@ test('all registered apps remain reachable through one mobile Edge, including re
 
 
 test('a catalog response belongs to its exact menu host, including in-flight context changes', { skip }, async () => {
-  const { page, ctx } = await open('/apps/notities.html');
+  /* Notities is inmiddels een data-ds-scherm met de compacte ds-Edge. Deze
+     proef hoort bij het slimme Adaptive-Edge-menu en gebruikt daarom bewust
+     de actuele LivingOS-schil die dat menu bezit. */
+  const { page, ctx } = await open('/apps/rtg.html');
   const catalog = require('../public/shared/interface/world-widget-catalog.json');
   const pattern = '**/shared/interface/world-widget-catalog.json';
   const pending = [], requests = [];
   const invalid = ['javascript:alert(1)','https://example.test/apps/test.html','/apps/../test.html',['/apps/unsafe.html']].map((url,i)=>({id:'invalid-'+i,world:'living',name:'Invalid '+i,url}));
   try {
+    /* Recente navigatie is sessie-invoer, geen vertrouwde configuratie. Een
+       oude of gemanipuleerde waarde mag nooit als protocol- of traversal-link
+       in de universele Edge terechtkomen. */
+    await page.evaluate(() => sessionStorage.setItem('rtg.edge.recent.v1', '//example.test/overname'));
     await page.route(pattern, async route => {
       requests.push(route.request());
       await new Promise(resolve => pending.push(resolve));
       await route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({apps:[...catalog.apps,...invalid,catalog.apps[0]]})});
     });
     await page.locator('.rtg-adaptive-bar [data-rtg-adaptive-action="menu"]').click();
+    await page.locator('button[data-edge-face="here"]').click();
+    const recentHref = await page.getByRole('link', {name:'Recent bezocht'}).getAttribute('href');
+    assert.match(recentHref, /^\/apps\//, 'recente navigatie valt veilig terug op een interne app-route');
+    assert.doesNotMatch(recentHref, /example\.test|\.\./, 'sessie-invoer wordt niet als navigatie gepubliceerd');
     const zoeken = async () => {
       await page.locator('button[data-edge-face="all"]').click();
       const begun = page.waitForRequest(pattern);

@@ -1,0 +1,4 @@
+/* Legacy-documenten laden alleen de tokens en het bestaande taalcomponent.
+   Dit is geen tweede presentatie: rtg-ds.css importeert hetzelfde component. */
+@import url("tokens.css");
+@import url("componenten/taalkeuze.css");

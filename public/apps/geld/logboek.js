@@ -26,32 +26,6 @@
   /* Alleen wat geld.html niet levert: de aandachtkaart, de klikbare
      objectkaart, de regelrij met wegknop en de soortchip. Met id-wacht,
      want tien standen delen een document. */
-  function stijl() {
-    if (d.getElementById('lbStijl')) return;
-    var st = d.createElement('style');
-    st.id = 'lbStijl';
-    st.textContent =
-      '#paneel .lb-attn{border-left:3px solid var(--rtg-rood,#DE6E92);}' +
-      '#paneel .lb-attn p{margin:.2rem 0;font-size:.85rem;}' +
-      '#paneel .lb-obj{cursor:pointer;}' +
-      '#paneel .lb-obj:hover{border-color:var(--gold-rand,#C0A544);}' +
-      '#paneel .lb-obj .nm{font-weight:600;}' +
-      '#paneel .lb-meta{font-size:.82rem;color:var(--rtg-soft);margin-top:.2rem;}' +
-      '#paneel .lb-naam{font-family:"Bodoni Moda",serif;font-size:1.2rem;}' +
-      '#paneel .lb-rij{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.5rem;}' +
-      '#paneel .lb-rij>*{flex:1;min-width:6rem;width:auto;}' +
-      '#paneel .lb-knoppen{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.7rem;}' +
-      '#paneel .lb-rood{color:var(--rtg-leesrood,var(--rtg-rood,#DE6E92));border-color:var(--rtg-leesrood,var(--rtg-rood,#DE6E92));}' +
-      '#paneel .lb-item{display:flex;gap:.6rem;align-items:flex-start;' +
-        'border-top:1px solid var(--rtg-line);padding:.55rem 0;font-size:.9rem;}' +
-      '#paneel .lb-item:first-child{border-top:0;}' +
-      '#paneel .lb-item .b{flex:1;min-width:0;}' +
-      '#paneel .lb-soort{font-size:.66rem;border:1px solid var(--rtg-line);border-radius:0;' +
-        'padding:.1rem .5rem;color:var(--rtg-soft);text-transform:capitalize;white-space:nowrap;}' +
-      '#paneel .lb-weg{width:1.8rem;height:1.8rem;padding:0;border-radius:0;flex-shrink:0;}' +
-      '#paneel .lb-hint{font-size:.72rem;color:var(--rtg-soft);margin-top:.35rem;}';
-    d.head.appendChild(st);
-  }
 
   function opties(lijst) {
     return (lijst || []).map(function (s) {
@@ -138,5 +112,5 @@
   }
 
   var Deel = w.RTGGeldDeel = w.RTGGeldDeel || {};
-  Deel.logboek = { S: S, stijl: stijl, hoofd: hoofd, detail: detail, model: model };
+  Deel.logboek = { S: S, hoofd: hoofd, detail: detail, model: model };
 })(window, document);

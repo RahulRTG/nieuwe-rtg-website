@@ -120,7 +120,7 @@ async function dsPalette(scope, world, card) {
   }, null, { timeout: 15000 });
 }
 async function kleur(scope, route, world, card) { return dsRoutes.has(route) ? dsPalette(scope, world, card) : palette(scope, world, card); }
-async function ready(page) { await page.waitForSelector('body[data-rtg-desktop-state="ready"]'); }
+async function ready(page) { await h.wachtOpSchil(page); }
 async function klaar(page, route) { if (dsRoutes.has(route)) await page.waitForSelector('.ds-edge__balk [data-ds-edge="rahul"]'); else await ready(page); }
 async function activeFrame(page, selector) {
   const handle = await page.waitForSelector(selector);
@@ -143,7 +143,9 @@ for (const engine of engines) for (const width of [390,1440]) {
       // Same genuine app, standalone and in the desktop app frame.
       for (const [route,world,card] of [['muziek','living','.speler'],['media','living','.media-bank'],['werk','work','#inlog'],['reizen','travel','.ds-kaart']]) {
         await page.goto(srv.base+'/apps/'+route+'.html'); await klaar(page,route); await kleur(page,route,world,card);
-        await page.goto(srv.base+'/apps/notities.html'); await ready(page);
+        /* Een DS-scherm bezit geen legacy desktopframe. Open dezelfde app
+           daarom vanuit de echte Pass-werktafel, die het venstercontract bezit. */
+        await page.goto(srv.base+'/apps/app.html?pas=rtg'); await ready(page);
         assert.equal(await page.evaluate(route => RTGDesktopFrame.open('/apps/'+route+'.html',route),route),true);
         const frame = await activeFrame(page,'.wd-app-frame:not([hidden])'); await kleur(frame,route,world,card);
         await palette(page,world,'.wd-focus');

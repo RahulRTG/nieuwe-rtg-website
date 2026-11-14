@@ -78,29 +78,17 @@
     return /Android/i.test((root.navigator && root.navigator.userAgent) || '');
   }
 
-  function stijl() {
-    if (doc.getElementById('rtg-kaart-stijl')) return;
-    var css =
-      '.krt-waas{position:fixed;inset:0;z-index:70;background:rgba(6,6,6,.55);' +
-        'display:flex;align-items:center;justify-content:center;padding:1rem;}' +
-      '.krt-kaart{width:min(360px,94vw);background:#151312;border:1px solid var(--gold,#A98F1C);' +
-        'border-radius:0;padding:1.1rem;color:#eee;font-family:Inter,system-ui,sans-serif;' +
-        'box-shadow:0 14px 40px rgba(0,0,0,.55);display:flex;flex-direction:column;gap:.7rem;}' +
-      '.krt-kop{display:flex;align-items:center;justify-content:space-between;gap:.6rem;' +
-        'font-weight:600;font-size:.95rem;}' +
-      '.krt-x{background:transparent;border:1px solid #444;border-radius:0;color:#eee;' +
-        'padding:.12rem .5rem;cursor:pointer;font:inherit;line-height:1;}' +
-      '.krt-x:hover{border-color:var(--gold,#A98F1C);color:#fff;}' +
-      '.krt-val{font-size:1.12rem;font-weight:600;color:var(--gold,#C9A24B);word-break:break-word;' +
-        'line-height:1.4;user-select:all;font-variant-numeric:tabular-nums;}' +
-      '.krt-uitleg{font-size:.8rem;color:#bbb;line-height:1.55;}' +
-      '.krt-doe{background:var(--gold,#A98F1C);border:none;border-radius:0;color:#0C0C0B;' +
-        'font:600 .9rem Inter,system-ui,sans-serif;padding:.6rem .8rem;cursor:pointer;}' +
-      '.krt-doe:hover{filter:brightness(1.08);}' +
-      '.krt-doe:focus-visible{outline:2px solid #fff;outline-offset:2px;}';
-    var st = doc.createElement('style'); st.id = 'rtg-kaart-stijl'; st.textContent = css;
-    (doc.head || doc.documentElement).appendChild(st);
+  function laadKaartStijl(pad) {
+    if (document.documentElement.hasAttribute('data-ds')) return;
+    if (document.getElementById('rtgDsRuntimeCss')) return;
+    var kaartStijlLink = document.createElement('link');
+    kaartStijlLink.id = 'rtgDsRuntimeCss';
+    kaartStijlLink.rel = 'stylesheet';
+    kaartStijlLink.href = pad;
+    document.head.appendChild(kaartStijlLink);
   }
+
+  function stijl() { laadKaartStijl('/ds/rtg-ds.css'); }
 
   var open = null, vorigeFocus = null;
   function sluit() {
@@ -131,24 +119,24 @@
     stijl();
     sluit();
     vorigeFocus = doc.activeElement;
-    var waas = doc.createElement('div'); waas.className = 'krt-waas';
+    var waas = doc.createElement('div'); waas.className = 'krt-waas ds-kaartuitwijk';
     var kaart = doc.createElement('section');
-    kaart.className = 'krt-kaart';
+    kaart.className = 'krt-kaart ds-dialoog ds-kaartuitwijk__kaart';
     kaart.setAttribute('role', 'dialog');
     kaart.setAttribute('aria-modal', 'true');
     kaart.setAttribute('aria-label', 'Locatie');
 
-    var kop = doc.createElement('div'); kop.className = 'krt-kop';
+    var kop = doc.createElement('div'); kop.className = 'krt-kop ds-kaartuitwijk__kop';
     var titel = doc.createElement('span'); titel.textContent = info.heeftCoord ? 'Coördinaten' : 'Adres';
-    var x = doc.createElement('button'); x.type = 'button'; x.className = 'krt-x'; x.setAttribute('aria-label', 'Sluiten'); x.textContent = '✕';
+    var x = doc.createElement('button'); x.type = 'button'; x.className = 'krt-x ds-knop ds-knop--secundair'; x.setAttribute('aria-label', 'Sluiten'); x.textContent = '✕';
     kop.appendChild(titel); kop.appendChild(x);
 
-    var val = doc.createElement('div'); val.className = 'krt-val'; val.textContent = info.label || '-';
+    var val = doc.createElement('div'); val.className = 'krt-val ds-kaartuitwijk__waarde'; val.textContent = info.label || '-';
 
-    var uitleg = doc.createElement('div'); uitleg.className = 'krt-uitleg';
+    var uitleg = doc.createElement('div'); uitleg.className = 'krt-uitleg ds-kaartuitwijk__uitleg';
     uitleg.textContent = 'Op deze computer opent de kaart niet vanzelf. Kopieer de locatie en plak die in je eigen kaart-app.';
 
-    var doe = doc.createElement('button'); doe.type = 'button'; doe.className = 'krt-doe';
+    var doe = doc.createElement('button'); doe.type = 'button'; doe.className = 'krt-doe ds-knop';
     doe.textContent = info.heeftCoord ? 'Kopieer coördinaten' : 'Kopieer adres';
 
     kaart.appendChild(kop); kaart.appendChild(val); kaart.appendChild(uitleg); kaart.appendChild(doe);

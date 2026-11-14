@@ -1,18 +1,5 @@
-    /* Each question is a full sentence; labels and keyboard hints stay explicit. */
-    const steps = () => [
-      { key:'name', type:'text', auto:'name', label:T('access.portal.full_name','Volledige naam'),
-        title:T('access.portal.what_is_your_name','Hoe mogen we u noemen?'),
-        text:T('access.portal.enter_your_full_name_we_use_it_for_your_account_and_the_agreement','Vul uw volledige naam in. We gebruiken deze voor uw account en de overeenkomst.') },
-      { key:'email', type:'email', auto:'email', label:T('access.portal.email_address','E-mailadres'),
-        title:T('access.portal.which_email_address_can_we_reach_you_at','Op welk adres kunnen we u bereiken?'),
-        text:T('access.portal.you_use_this_email_address_to_sign_in_and_recover_your_account','U gebruikt dit e-mailadres om in te loggen en uw account te herstellen.') },
-      { key:'geboortedatum', type:'date', auto:'bday', label:T('access.portal.date_of_birth','Geboortedatum'),
-        title:T('access.portal.what_is_your_date_of_birth','Wat is uw geboortedatum?'),
-        text:T('access.portal.your_age_determines_which_features_you_can_use_you_must_be_at_lea','Uw leeftijd bepaalt welke onderdelen u kunt gebruiken. Voor dit account moet u minimaal 15 jaar zijn.') },
-      { key:'password', type:'password', auto:'new-password', label:T('access.portal.password','Wachtwoord'),
-        title:T('access.portal.how_would_you_like_to_secure_your_account','Hoe wilt u uw account beveiligen?'),
-        text:T('access.portal.choose_a_unique_password_of_at_least_six_characters_you_are_creat','Kies een uniek wachtwoord van minstens zes tekens. U maakt een gratis account aan; een betaalde pas kiest u apart. Daarna leest en bevestigt u de overeenkomst.') }
-    ];
+/* Aanmeldformulier en de progressieve accountstappen. */
+
     let presentationOnly=false;
     function field(type, label, auto, value){
       if(!presentationOnly){inp.type = type; inp.value = value || '';} inp.name = auto || 'answer';
@@ -43,7 +30,8 @@
       el('agError').textContent = ''; el('agStatus').textContent = '';
       el('agWelcome').hidden = view !== 'welcome'; form.hidden = view === 'welcome' || view === 'sent';
       el('agBack').hidden = view === 'welcome'; el('agStappen').hidden = view !== 'register';
-      el('agSummary').hidden = view !== 'register' || step !== 3;
+      el('agSummary').hidden = view !== 'register' || step !== 5;
+      el('agPersonal').hidden = true;
       el('agCodeLabel').hidden = view !== 'reset'; el('agForgot').hidden = view !== 'password';
       el('agFoundation').hidden = true;
       el('agGo').textContent = T('access.portal.continue','Ga verder');
@@ -53,10 +41,13 @@
         const brand = document.createElement('em'); brand.textContent=T('access.portal.brand','RTG.'); title.appendChild(brand);
         el('agZin').textContent = T('access.portal.one_place_for_life_travel_work_and_opportunity','Eén account voor RTG, Connect, Travel en Work.');
       } else if (view === 'register') {
-        const s = steps()[step]; title.textContent = s.title; el('agZin').textContent = s.text;
-        el('agStappen').textContent = T('access.portal.progress','Stap {step} van 4').replace('{step}',String(step+1));
-        field(s.type, s.label, s.auto, draft[s.key]);
-        if (step === 3) {
+        const reeks=steps(), s = reeks[step]; title.textContent = s.title; el('agZin').textContent = s.text;
+        el('agStappen').textContent = T('access.portal.progress_total','Stap {step} van {total}')
+          .replace('{step}',String(step+1)).replace('{total}',String(reeks.length));
+        el('agLabel').hidden=!!s.kind;
+        if(s.kind){el('agShowPassword').hidden=true;personalKeuzes(s);if(s.kind==='layout')personalPreview();}
+        else field(s.type, s.label, s.auto, draft[s.key]);
+        if (step === 5) {
           el('agGo').textContent = T('access.portal.create_my_account','Maak mijn account aan');
           const review = el('agReview'); review.textContent = '';
           steps().slice(0,3).forEach((s,i) => {
@@ -68,6 +59,8 @@
             button.addEventListener('click', () => { step=i; render('register',true); });
             review.appendChild(button);
           });
+          const p=document.createElement('p'); p.textContent=T('personalos.onboarding.review','Uw RTG: {goals} · {layout}')
+            .replace('{goals}',draft.goals.map(function(x){return personalGoalLabel(x)}).join(', ')).replace('{layout}',personalLayoutLabel(draft.layout)); review.appendChild(p);
         }
       } else {
         const copy = {
@@ -83,7 +76,8 @@
         if (view === 'forgot') el('agGo').textContent = T('access.portal.request_recovery','Vraag herstel aan');
         if (view === 'reset') el('agGo').textContent = T('access.portal.save_my_password','Sla mijn wachtwoord op');
       }
-      const action={password:'identity.session.open',second:'identity.second_factor.verify',forgot:'identity.recovery.request',reset:'identity.password.replace'}[view] || (view==='register' && step===3?'identity.account.create':'');
+      if(view!=='register')el('agLabel').hidden=false;
+      const action={password:'identity.session.open',second:'identity.second_factor.verify',forgot:'identity.recovery.request',reset:'identity.password.replace'}[view] || (view==='register' && step===5?'identity.account.create':'');
       el('agGo').dataset.rtgMeaning=action;
       if (saved) {
         // Do not rewrite a focused input: it would collapse its selection or IME composition.

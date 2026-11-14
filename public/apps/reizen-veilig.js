@@ -1,9 +1,13 @@
+// Initialiseert de gedeelde bediening van Reizen Veilig.
 (function(){
   'use strict';
   var $=function(s){return document.querySelector(s)}, panes=[],actief=-1,meldAdaptief=function(){};
   var apps={reisbureau:['Reisbureau','/apps/reisbureau.html'],move:['Haal ik het?','/apps/move.html'],overzicht:['Vandaag',null],reisblad:['Reizen',null],vervoer:['Gaan','/apps/ov.html'],reizen:['Mijn reizen','/apps/reizen.html'],veilig:['RTG Veilig','/apps/veilig.html#wacht'],navigatie:['Navigatie','/apps/navigatie.html'],instellingen:['Instellingen','/apps/veilig.html#rust']};
   var bank=[['overzicht','Vandaag'],['vervoer','Gaan'],['reisblad','Reizen'],['veilig','RTG Veilig'],['navigatie','Navigatie'],['instellingen','Instellingen']];
-  function ingebed(pad){var u=new URL(pad,location.href);u.searchParams.set('embed','1');return u.pathname+u.search+u.hash}
+  function ingebed(pad){
+    try{var u=new URL(String(pad||''),location.href);if(u.origin!==location.origin||u.pathname.indexOf('/apps/')!==0)return null;u.searchParams.set('embed','1');return u.pathname+u.search+u.hash}
+    catch(e){return null}
+  }
   function commandHost(){
     try{return parent!==window&&document.documentElement.classList.contains('rtg-command-blad')&&
       parent.location.origin===location.origin&&parent.RTGCommand&&parent.RTGCommand.actief()}
@@ -11,20 +15,20 @@
   }
   function token(){try{return localStorage.getItem('rtg_member_token')}catch(e){return null}}
   async function api(pad,body){var r=await fetch(pad,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+(token()||'')},body:JSON.stringify(body||{})}),j=await r.json().catch(function(){return {}});if(!r.ok)throw new Error(j.error||'Dit lukte niet.');return j}
-  function open(id,naast,pad){var a=apps[id]||apps.overzicht,gevonden=panes.findIndex(function(p){return p.id===id});if(pad)a=[a[0],pad];if(gevonden>=0){var fr=pad&&panes[gevonden].el.querySelector('iframe');if(fr)fr.src=ingebed(pad);kies(gevonden);return}
+  function open(id,naast,pad){var a=apps[id]||apps.overzicht,gevonden=panes.findIndex(function(p){return p.id===id});if(pad)a=[a[0],pad];if(gevonden>=0){var fr=pad&&panes[gevonden].el.querySelector('iframe'),verversAdres=pad&&ingebed(pad);if(fr&&verversAdres)fr.setAttribute('src',verversAdres);kies(gevonden);return}
     /* Binnen Command is de buitenste werktafel de enige frame-eigenaar. Een
        externe reismodule wordt daar een direct tweede blad; bron en module
        blijven dus bestaan zonder Command -> Reizen & Veilig -> app-nesting.
        Standalone blijft dezelfde lokale tweepaneel-werkruimte gebruiken. */
     if(a[1]&&commandHost()){
-      var url=ingebed(a[1]);
+      var url=ingebed(a[1]);if(!url)return;
       parent.RTGCommand.open(url,a[0],'rechts');
       return;
     }
     if(!naast||innerWidth<761){panes.forEach(function(p){p.el.remove()});panes=[]}
     if(panes.length>=2){panes.shift().el.remove()}
     var el=document.createElement('section');el.className='ds-paneel';el.dataset.id=id;
-    if(a[1]){var f=document.createElement('iframe');f.className='ds-kader';f.src=ingebed(a[1]);f.title=a[0];RTGMedia.kader(f);el.appendChild(f)}else el.appendChild($(id==='reisblad'?'#rvReizen':'#rvOverzicht').content.cloneNode(true));
+    if(a[1]){var paneelFrameAdres=ingebed(a[1]);if(!paneelFrameAdres)return;var reisVeiligPaneelFrame=document.createElement('iframe');reisVeiligPaneelFrame.src=paneelFrameAdres;reisVeiligPaneelFrame.className='ds-kader';reisVeiligPaneelFrame.title=a[0];RTGMedia.kader(reisVeiligPaneelFrame);el.appendChild(reisVeiligPaneelFrame)}else el.appendChild($(id==='reisblad'?'#rvReizen':'#rvOverzicht').content.cloneNode(true));
     $('#rvPanes').appendChild(el);panes.push({id:id,titel:a[0],el:el});$('#rvPanes').classList.toggle('ds-panelen--twee',panes.length>1);kies(panes.length-1);haak(el);if(id==='overzicht'){laadMomenten(el);reis().volgende(el);reis().groet(el)}if(id==='reisblad')reis().aanbod(el)
   }
   function kies(i){actief=i;panes.forEach(function(p,n){p.el.toggleAttribute('data-actief',n===i)});teken();document.querySelectorAll('[data-open]').forEach(function(b){b.setAttribute('aria-pressed',String(b.dataset.open===panes[i].id))});context();meldAdaptief()}
@@ -42,6 +46,7 @@
       return {titel:kop?kop.textContent.trim():'',rechts:[doen],links:[K.overnemen()]};
     });
   }
+// Beheert gedeelde reismomenten en hun actuele veiligheidsstatus.
   async function laadMomenten(el){var vak=el.querySelector('[data-momenten]');if(!vak)return;try{var d=await api('/api/veiligheid/moment'),m=d.momenten||[],voor=d.voorMij||[],regels=m.map(function(x){return '<div class="ds-veld" data-moment><span></span><span><span class="ds-veld__label">'+esc(x.titel)+'</span><span class="ds-veld__waarde">'+esc(x.status)+(x.eta?' · '+esc(x.eta):'')+(x.gepauzeerd?' · gepauzeerd':'')+'</span><span class="ds-chips"><button class="ds-chip" type="button" data-status="'+esc(x.id)+'">Aangekomen</button><button class="ds-chip" type="button" data-pauze="'+esc(x.id)+'" data-aan="'+(!x.gepauzeerd)+'">'+(x.gepauzeerd?'Hervat':'Pauze')+'</button><button class="ds-chip" type="button" data-stop="'+esc(x.id)+'">Stop</button></span></span><span></span></div>'});voor.forEach(function(x){regels.push('<div class="ds-veld" data-moment="ontvangen"><span></span><span><span class="ds-veld__label">'+esc(x.eigenaar)+' deelt: '+esc(x.titel)+'</span><span class="ds-veld__waarde">'+(x.status?esc(x.status):'')+(x.eta?' · '+esc(x.eta):'')+'</span></span><span></span></div>')});vak.innerHTML=regels.length?regels.join(''):'<p class="ds-meta">Nog niets live gedeeld</p>';vak.querySelectorAll('[data-status]').forEach(function(b){b.onclick=async function(){await api('/api/veiligheid/moment/status',{id:b.dataset.status,status:'aangekomen'});laadMomenten(el)}});vak.querySelectorAll('[data-pauze]').forEach(function(b){b.onclick=async function(){await api('/api/veiligheid/moment/pauze',{id:b.dataset.pauze,aan:b.dataset.aan==='true'});laadMomenten(el)}});vak.querySelectorAll('[data-stop]').forEach(function(b){b.onclick=async function(){await api('/api/veiligheid/moment/stop',{id:b.dataset.stop});laadMomenten(el)}})}catch(e){vak.innerHTML='<p class="ds-meta">Log in om uw Live Circle te beheren.</p>'}}
   /* Het eerstvolgende moment (RTG Move) en het aanbod (het Reisbureau) wonen in
      reizen-veilig-reis.js; dit bestand geeft ze alleen zijn api, esc en open. */

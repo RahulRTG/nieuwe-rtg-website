@@ -258,6 +258,12 @@ test('12. een reis ZONDER samenstelling wordt geweigerd met de reden', async () 
       password: 'geheim123', geboortedatum: '1990-01-01', pasApp: 'rtg' });
     const token = reg.body.token;
     assert.ok(token, 'registratie mislukt: ' + JSON.stringify(reg.body).slice(0, 200));
+    // Deze proef meet de ontbrekende reisgrond, niet de identiteitspoort.
+    // Gebruik dezelfde bestaande persoonlijke keuring als de positieve keten;
+    // de afzonderlijke financiële grensproef eist juist 403 na intrekking.
+    await keurLidGoed(srv.base, token, reg.body.state.user.codename, '1990-01-01');
+    const geldVoor = await post(srv.base, '/api/pay/overzicht', {}, token);
+    assert.equal(geldVoor.status, 200);
 
     const aanvraag = await post(srv.base, '/api/reisbureau/boek', { tripId: 'lissabon-nieuw', personen: 1 }, token);
     assert.equal(aanvraag.status, 200, JSON.stringify(aanvraag.body).slice(0, 200));
@@ -274,6 +280,8 @@ test('12. een reis ZONDER samenstelling wordt geweigerd met de reden', async () 
       'herkomst in het grootboek, en die ziet er in de meter uit als een meting.');
     assert.ok(String(betaal.body.hoe || '').length > 40,
       'de weigering draagt geen reden; dan weet niemand wat er moet gebeuren');
+    assert.deepEqual((await post(srv.base, '/api/pay/overzicht', {}, token)).body, geldVoor.body,
+      'de geweigerde inning mag geen geld of grootboekhistorie wijzigen');
   } finally { await stop(srv); }
 });
 

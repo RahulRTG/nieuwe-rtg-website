@@ -68,6 +68,10 @@
         b.tabIndex = index === 0 || staat.gekozen === actie.id ? 0 : -1;
         var merk = d.createElement('span'); merk.className = 'connection-edge__mark'; merk.setAttribute('aria-hidden', 'true');
         var label = d.createElement('span'); label.className = 'connection-edge__label'; label.textContent = tekst(actie);
+        /* Het gemigreerde Design System leest contextacties uit hetzelfde
+           schermcontract. Dit attribuut laat zijn bestaande Acties-blad de
+           echte knop projecteren; de DS Edge krijgt geen tweede uitvoerder. */
+        b.setAttribute('data-ds-actie', label.textContent);
         b.appendChild(merk); b.appendChild(label); rail.appendChild(b);
       });
       var terug = actief && rail.querySelector('[data-connection-action="' + CSS.escape(actief) + '"]');

@@ -14,6 +14,10 @@
     text-align: center;
   }
   .ds-cover__beeld { position: absolute; inset: 0; z-index: -2; inline-size: 100%; block-size: 100%; object-fit: cover; object-position: var(--ds-beeld-positie); }
+  /* De donkere onderring houdt de focus ook op lichte fotografie leesbaar.
+     Deze regel blijft bij het covervlak; lichte dialogen erboven houden
+     hun eigen focuscontract. */
+  .ds-cover :focus-visible { outline-color: var(--ds-cover-metaal); box-shadow: 0 0 0 5px var(--ds-cover-grond); }
   .ds-cover::after { content: ""; position: absolute; inset: 0; z-index: -1; background: var(--ds-cover-sluier); }
   .ds-cover__wereld { margin: 0; font-family: var(--ds-letter-display); font-weight: 400; font-size: clamp(2.75rem, 1.8rem + 4.5cqi, 5rem); line-height: 1; letter-spacing: -.01em; }
   .ds-cover__ondertitel { margin: var(--ds-ruimte-2) 0 0; font-family: var(--ds-letter-display); font-size: 1.0625rem; opacity: .9; }

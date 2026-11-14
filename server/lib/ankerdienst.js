@@ -14,9 +14,6 @@
    schrijven. Zonder die stap bleef de control AUDIT-KETEN-VERANKERD op
    "niet in bedrijf": het mechanisme was bewezen en werd door niemand gebruikt.
 
-   ------------------------------------------------------------------------
-   WAT DEZE DIENST WEL EN NIET DOET
-
    Hij VERZAMELT de koppen van alle journalen en levert ze als één blok, met een
    tijdstempel en een handtekening over het geheel. Hij VERGELIJKT een eerder
    blok met de huidige stand en zegt per journaal of er regels zijn verdwenen.
@@ -27,12 +24,6 @@
    besluit over de infrastructuur -- een tweede machine, een andere partij, een
    uitdraai in een kluis -- en dat besluit hoort bij een mens.
 
-   Wat de dienst daarom levert is een blok dat je ergens ANDERS neerzet, en een
-   functie die met zo'n blok afrekent zodra je hem terugvoert. Zolang niemand
-   het blok wegzet, bewijst deze laag niets over kopafknipping, en dat zegt
-   `stand()` dan ook met zoveel woorden in plaats van groen te tonen.
-
-   ------------------------------------------------------------------------
    DE ZEGEL bindt de koppen aan elkaar, zodat er niet een journaal uit een blok
    te knippen valt. DE HANDTEKENING (Ed25519, sleutel buiten de database; zie
    hieronder) bewijst dat het blok van deze installatie komt.
@@ -48,6 +39,7 @@ const klok = require('./klok');
    ./ankerjournalen.js. De handtekening: ./ankerzegel.js. */
 const { JOURNALEN, BEWARING, zegelRij } = require('./ankerjournalen');
 const { zaadUit, sleutelpaar, kanoniek, teTekenen, DOEL } = require('./ankerzegel');
+const { maakHerstel, tijdvakVan } = require('./ankerherstel');
 
 function maakAnkerdienst({ db, nu, sleutel, omgeving }) {
   const tijd = nu || klok.nu;
@@ -81,9 +73,12 @@ function maakAnkerdienst({ db, nu, sleutel, omgeving }) {
 
   /* Het blok dat naar buiten moet. Geef dit aan een gescheiden systeem; bewaar
      het NIET alleen hier, want dan ankert het niets. */
+  const herstel = maakHerstel({ omgeving: env });
+
   function blok() {
     const punten = {};
-    for (const [naam, haal] of Object.entries(JOURNALEN)) punten[naam] = verankerPunt(haal(data()));
+    for (const [naam, haal] of Object.entries(JOURNALEN))
+      punten[naam] = herstel.punt(naam, verankerPunt(haal(data())));
     punten.ledenBoardLog = boardroomPunt();
     const kaal = { at: new Date(tijd()).toISOString(), punten };
     const zegel = crypto.createHash('sha256').update(JSON.stringify(kaal)).digest('hex').slice(0, 32);
@@ -128,11 +123,23 @@ function maakAnkerdienst({ db, nu, sleutel, omgeving }) {
     const teken = handtekeningGeldig(eerder);
     if (teken.geldig === false) return { ok: false, ondertekend: false, reden: teken.reden, blokAt: eerder.at };
     const perJournaal = {};
-    let alles = true; const ingekort = []; const gebruikt = [];
+    let alles = true; const ingekort = []; const gebruikt = [], herstelverklaringen = [];
     for (const [naam, haal] of Object.entries(JOURNALEN)) {
       const anker = eerder.punten[naam];
       if (!anker) { perJournaal[naam] = { ok: true, reden: 'stond niet in het blok' }; continue; }
-      let uit = verifieerTegenAnker(haal(data()), anker, Object.assign({ nu: tijd }, BEWARING[naam] || {}));
+      const regels = haal(data());
+      const lokaal = herstel.punt(naam, verankerPunt(regels));
+      let uit;
+      if (lokaal && tijdvakVan(lokaal) !== tijdvakVan(anker)) {
+        const verklaring = herstel.verklaar({ naam, anker, regels });
+        if (verklaring.verklaard && tijdvakVan(lokaal) === tijdvakVan(anker) + 1) {
+          herstelverklaringen.push(verklaring.verklaring);
+          uit = { ok: true, auditbreuk: true, herstelId: verklaring.verklaring.id,
+            vanTijdvak: tijdvakVan(anker), tijdvak: tijdvakVan(lokaal), reden: verklaring.reden };
+        } else uit = { ok: false, auditbreuk: true, reden: 'de tijdvakwissel is niet geldig verklaard: ' + verklaring.reden };
+      } else {
+        uit = verifieerTegenAnker(regels, anker, Object.assign({ nu: tijd }, BEWARING[naam] || {}));
+      }
       /* Een herschreven zegelketen is alleen in orde als een GETEKENDE
          herzegeling hem precies verklaart (./ankerherzegel.js). */
       const verklaring = verklaarHerschrijving(naam, anker, uit);
@@ -144,7 +151,8 @@ function maakAnkerdienst({ db, nu, sleutel, omgeving }) {
       perJournaal[naam] = uit;
       if (!uit.ok) { alles = false; if (uit.ingekort) ingekort.push(naam); }
     }
-    return { ok: alles, ondertekend: teken.geldig, ingekort, perJournaal, blokAt: eerder.at, herzegelingen: gebruikt };
+    return { ok: alles, ondertekend: teken.geldig, ingekort, perJournaal, blokAt: eerder.at,
+      herzegelingen: gebruikt, herstelverklaringen };
   }
 
   /* De stand, en hij liegt niet over wat hij bewijst.

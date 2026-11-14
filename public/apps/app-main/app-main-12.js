@@ -67,15 +67,19 @@
 
      De indeling hieronder is afgeleid en niet bedacht: per lader is opgezocht
      welke element-ids hij vult, en in welke .view die in apps/app.html staan.
-     Drie laders (laadCare, laadBestellen, loadCv) schrijven nergens zo'n id;
-     die blijven bij het openen laden, want stil iets NIET tonen is erger dan
-     een verzoek te veel. Na de eerste keer blijft een tabblad gevuld, en de
-     live-verbinding (syncScope) houdt bij wat er verandert. */
+     Twee laders (laadBestellen en loadCv) schrijven nergens zo'n id; die
+     blijven bij het openen laden, want stil iets NIET tonen is erger dan een
+     verzoek te veel. Zorg heeft wel een eigen tab en hoort dus bij die tab te
+     laden. Dat voorkomt zowel onnodige zorgverzoeken op Home als een lege
+     directe ingang terwijl de uitgestelde achtergrondtaak nog wacht. Na de
+     eerste keer blijft een tabblad gevuld, en de live-verbinding (syncScope)
+     houdt bij wat er verandert. */
   const LADERS_PER_TAB = {
     reizen:     [['renderTrip', () => renderTrip()], ['laadShowroom', () => laadShowroom()]],
     betalen:    [['renderPay', () => renderPay()]],
     ai:         [['renderAI', () => renderAI()], ['renderFluister', () => renderFluister()]],
     assets:     [['renderAssets', () => renderAssets()]],
+    zorg:       [['laadCare', () => laadCare()]],
     salon:      [['renderSalon', () => renderSalon()], ['loadVacatures', () => loadVacatures()],
                  ['laadOntmoet', () => laadOntmoet()]],
     bestellen:  [['laadBoodschappen', () => laadBoodschappen()]],

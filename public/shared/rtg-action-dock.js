@@ -40,7 +40,9 @@
         cells[i].hidden = !item && !settings.open;
         var el = d.createElement(item ? 'a' : 'span'); el.textContent = item ? item[1] : 'Vrije plek ' + (i + 1);
         if (item) {
-          el.href = item[3];
+          /* model() accepteert uitsluitend een enkel-root relatief pad. Gebruik
+             het DOM-attribuut expliciet: dit is navigatie, geen laadbron. */
+          el.setAttribute('href', item[3]);
           if (edge.onTool) el.onclick = function (ev) {
             if(ev.metaKey || ev.ctrlKey || ev.shiftKey || ev.altKey)return;
             ev.preventDefault(); edge.onTool(item[0],item[3]);

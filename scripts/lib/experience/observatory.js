@@ -1,9 +1,24 @@
 'use strict';
+const typed=require('./typed');
+const contract=require('../../../experience-architecture/coverage-contract.json');
+const signatures=require('../../../experience-architecture/signatures.json');
 const escape = value => String(value ?? '').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function render(report) {
   const e=escape, graph=report.graph, screens=graph.nodes.filter(n=>n.route);
   const proofIds=j=>[...j.proofs.map(p=>p.id),...(j.proofRefs||[])];
-  const journeyState=j=>!graph.valid?'CONTRACT_INVALID':proofIds(j).every(id=>report.proofs.some(p=>p.id===id&&p.state==='PROVEN'))?'PROVEN_IN_SCOPE':'INCOMPLETE';
+  const scoped=id=>{
+    const rows=report.proofs.filter(p=>p.id===id),p=rows[0];
+    if(!(rows.length===1&&report.worktreeDirty===false&&!!report.commit&&!!report.sourceHash&&
+      p.state==='PROVEN'&&p.scopedStatus==='PROVEN_IN_SCOPE'&&p.worktreeDirty===false&&p.sourceChanged===false&&
+      p.commit===report.commit&&p.sourceHash===report.sourceHash&&!!p.runId))return false;
+    try {
+      const required=typed.bindings(contract,signatures,p);
+      const actual=(report.scopedProofs||[]).filter(s=>s?.scope?.proof===id&&s.scope.runId===p.runId);
+      return required.length>0&&actual.length===required.length&&required.every(binding=>
+        actual.filter(s=>s.status==='PROVEN_IN_SCOPE'&&typed.covers(s.scope,binding)).length===1);
+    } catch(_){return false;}
+  };
+  const journeyState=j=>!graph.valid?'CONTRACT_INVALID':proofIds(j).length>0&&proofIds(j).every(scoped)?'PROVEN_IN_SCOPE':'INCOMPLETE';
   const proof=report.proofs.map(p=>`<tr data-status="${e(p.state)}" data-journeys="${e(graph.journeys.filter(j=>proofIds(j).includes(p.id)).map(j=>j.id).join(' '))}"><td>${e(p.id)}</td><td>${e(p.layer)}</td><td><strong>${e(p.state)}</strong></td><td>${e(p.scope)}<details><summary>Herkomst en bewijs</summary><p>Test: ${e(p.test)}</p><p>Gemeten: ${e(p.at||'Niet gemeten')}</p><p>Werkboom gewijzigd tijdens vastleggen: ${p.worktreeDirty?'ja':'nee'}</p><p>Bron: ${e(p.sourceHash||'Geen')}</p>${p.log?`<a href="${e(p.log)}">Testlog openen</a>`:''}</details></td></tr>`).join('');
   const journeys=graph.journeys.map(j=>`<article id="journey-${e(j.id)}"><h2>${e(j.humanIntent)}</h2><p>Automatisch bewijs voor deze reis: <strong>${e(journeyState(j))}</strong></p><p>Verantwoordelijk: ${e(j.owner)} · Object: ${e(j.domainObject)}</p><ol>${j.steps.map(s=>`<li><strong>${e(s.capability)}</strong> · ${e(s.world)}<p>${e(s.screen)} → ${e(s.destination)}</p><details><summary>Resultaat, bevoegdheid en herstel</summary><p>${e(s.result)}</p><p>${e(s.authority)}</p><p>Terug: ${e(s.recovery)}</p></details></li>`).join('')}</ol><p>Menselijke beoordeling: <strong>${e(j.humanReview.status)}</strong></p><p>Inspanningsbudget (doel, nog geen meting): ${e(JSON.stringify(j.effortBudget))}</p></article>`).join('');
   return `<!doctype html><html lang="nl"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>RTG Experience Observatory</title><style>

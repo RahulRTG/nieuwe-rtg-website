@@ -11,7 +11,7 @@
    herhaald verzoek, een afgebroken verzoek en een crash). De ketenproeven
    leveren alleen het eerste, en met opzet (scripts/lib/appcontract.js, kop):
    ze herstarten niets en laten niets crashen. Deze proef doet dat wel, en mag
-   daarom alle drie leveren -- en geen ander.
+   daarom alle drie leveren. Menselijk krijgt hieronder een afzonderlijk contract.
 
    DE TESTWERELD (BETROUWBAARHEID.md par. 4) is hier een wegwerpserver met:
      - een eigen datamap (wegwerpdata),
@@ -33,7 +33,7 @@
    handeling lukte maar de uitkomst niet klopt, `stuk` als het werk zelf al niet
    lukte. Dezelfde woorden als de ketenregisters, want dezelfde lezer leest ze.
 
-   BEWIJS 8 (MENSELIJK) WORDT AFGELEID, NIET GESCHREVEN (18 oktober 2026).
+   BEWIJS 8 (MENSELIJK) BIJ API-SCENARIO'S (18 oktober 2026).
    scripts/appwerkt.js ziet op het scherm of een kale fout de gebruiker bereikt
    en zei bij elke rij: "of een foutMELDING bruikbaar is, vraagt de storingen
    uit bewijs 7". Die storingen staan hier. Daarom leidt deze proef per
@@ -44,7 +44,10 @@
    dat geen enkele weigering uitlokte, heeft dat laatste niet laten zien: dan
    draagt menselijk GEEN schakels en `nietBeproefd` met de reden, en APPWERKT
    leest dat als NIET_GETEST en nooit als bewezen. Een scenario kan dit bewijs
-   niet zelf schrijven: `stap()` kent alleen de drie hierboven.
+   niet zelf schrijven. Expliciete browser-scenario's toetsen daarentegen echte
+   zichtbare feedback en bediening met afzonderlijke menselijk-stappen. De
+   browserbinding eist de geobserveerde ingang, toestand en bestemmingen en
+   weigert paginafouten. Dit is geen menselijke EXPERIENCEWERKT-beoordeling.
 
    BEWIJS 6 (BEVOEGD) KAN EXPLICIET WORDEN AANGELEVERD AAN DE BEVOEGDRONDE.
    Een scenario markeert daarvoor een daadwerkelijk uitgevoerde vreemde-actor-
@@ -55,7 +58,8 @@
    APPWERKT voor bewijs 6 leest en laat concrete IDOR/rollekken altijd winnen.
 
    WAT DEZE PROEF NIET IS, en dat staat per onderdeel onder `grens`:
-     - geen browser: de routes van het scherm, niet het scherm (dat is bewijs 2);
+     - API-scenario's lezen routes; expliciete browser-scenario's lezen echte
+       schermtaken. Hun bronbinding en versheid omvatten ook de UI-bronnen;
      - geen Redis en geen PostgreSQL: herstelbaar is hier een proces dat sterft
        op SQLite, niet een gedeelde opslag die wegvalt;
      - geen bezorging: de postvanger bewijst wat het huis wilde versturen en dat
@@ -75,7 +79,7 @@ const WORTEL = path.join(__dirname, '..');
 const DOEL = path.join(WORTEL, 'VOLTOOIPROEF.json');
 const MAP = path.join(__dirname, 'lib', 'voltooi');
 const BEWIJZEN = ['voltooibaar', 'persistent', 'herstelbaar'];
-/* Afgeleid uit de antwoorden, niet door een scenario geschreven (zie de kop). */
+/* API: afgeleid uit antwoorden. Browser: afzonderlijke zichtbare proeven. */
 const AFGELEID = 'menselijk';
 /* Een scenario mag een stap die een vreemde actor werkelijk uitvoert expliciet
    als `bevoegd` aanmerken. Die stap blijft onderdeel van `voltooibaar`; voor
@@ -94,6 +98,10 @@ const BEVOEGD = 'bevoegd';
    bestand in de map dat hier niet staat, laat de proef weigeren in plaats van
    stil niet mee te tellen. */
 const SCENARIOS = {
+  'camera.js': require('./lib/voltooi/camera'),
+  'videobellen.js': require('./lib/voltooi/videobellen'),
+  'juridisch.js': require('./lib/voltooi/juridisch'),
+  'rtfoundation-keuze.js': require('./lib/voltooi/rtfoundation-keuze'),
   'aankomst.js': require('./lib/voltooi/aankomst'),
   'appdossier.js': require('./lib/voltooi/appdossier'),
   'attenties.js': require('./lib/voltooi/attenties'),
@@ -232,24 +240,68 @@ function bevoegdUit(kern, tegenproeven, afgebroken) {
     sluit: telling.gesloten === telling.schakels && !afgebroken };
 }
 
+function sluitDeel(bewijs, schakels, herstarts, afgebroken, browser = false) {
+  const telling = { schakels: schakels.length, gesloten: 0, open: 0, stuk: 0 };
+  for (const s of schakels) {
+    if (!['gesloten', 'open', 'stuk'].includes(s.stand)) throw new Error('onbekende schakelstand');
+    telling[s.stand]++;
+  }
+  const ontbreekt = [];
+  if (schakels.length < 3) ontbreekt.push('minder dan drie uitgevoerde schakels');
+  if (bewijs === 'persistent' && !(herstarts?.netjes >= 1)) ontbreekt.push('geen uitgevoerde nette herstart');
+  if (bewijs === 'herstelbaar' && !(herstarts?.crash >= 1)) ontbreekt.push('geen uitgevoerde crash');
+  if (browser) {
+    const fout = require('./lib/browservoltooicontract').browserHerstartKoppeling(bewijs, schakels, herstarts);
+    if (fout) ontbreekt.push(fout);
+  }
+  return { schakels, storingen: [], telling,
+    sluit: !ontbreekt.length && telling.open === 0 && telling.stuk === 0 && !afgebroken,
+    ...(ontbreekt.length ? { ontbreekt } : {}) };
+}
+
+function controleerBrowserResultaat(sc, uit) {
+  const { CONTRACT } = require('./lib/appcontract');
+  const { browserKoppeling } = require('./lib/browservoltooicontract');
+  const c = CONTRACT[sc.functie];
+  if (!c) return 'browser-scenario heeft geen appcontract';
+  const reg = JSON.stringify({ stempel: { instrument: 'scripts/voltooiproef.js' }, apps: { [sc.functie]: uit } });
+  const lees = rel => rel === 'VOLTOOIPROEF.json' ? reg : fs.readFileSync(path.join(WORTEL, rel), 'utf8');
+  for (const b of BEWIJZEN.concat(AFGELEID)) {
+    if (!c[b] || c[b].kanaal !== 'browser') return 'geen browsercontract voor ' + b;
+    const koppeling = browserKoppeling(sc.functie, sc.ingang, c, c[b], lees, b);
+    if (koppeling.fout) return koppeling.fout;
+    if (koppeling.defect) return 'browser- of documentfouten tijdens de taak';
+  }
+  return null;
+}
+
 async function meetScenario(sc) {
-  const boek = Object.fromEntries(BEWIJZEN.map((b) => [b, []]));
+  if (sc.kanaal && sc.kanaal !== 'browser') throw new Error('onbekend scenario-kanaal: ' + sc.kanaal);
+  const dimensies = sc.kanaal === 'browser' ? BEWIJZEN.concat(AFGELEID) : BEWIJZEN;
+  const boek = Object.fromEntries(dimensies.map((b) => [b, []]));
   const tegenproeven = [];
+  let w;
   /* Een stap faalt nooit stil: een uitzondering wordt `stuk` met de fout erbij,
-     en de volgende stap loopt gewoon -- een keten die na de eerste fout stopt,
-     verbergt hoeveel er verder nog kapot is. */
+     en API-scenario's kunnen onafhankelijke vervolgstappen blijven meten.
+     Browserketens breken via toets() af na een ongeldige schermtoestand; de
+     fout blijft vastgelegd en alle dimensies blijven dan niet-groen. */
   const stap = async (bewijs, wat, fn) => {
     const doel = bewijs === BEVOEGD ? 'voltooibaar' : bewijs;
     if (!boek[doel]) throw new Error('onbekend bewijs ' + bewijs + ' in ' + sc.bestand);
     const t0 = Date.now();
     const nr = boek[doel].length + 1;
+    const herstartsVoor = sc.kanaal === 'browser'
+      ? { netjes: w.herstarts.netjes, crash: w.herstarts.crash }
+      : null;
     try {
       const r = await fn();
-      const regel = { nr, wat, stand: r && r.klopt ? 'gesloten' : 'open', ziet: r && r.ziet || null, ms: Date.now() - t0 };
+      const regel = { nr, wat, stand: r && r.klopt ? 'gesloten' : 'open', ziet: r && r.ziet || null, ms: Date.now() - t0,
+        ...(herstartsVoor ? { herstartsVoor } : {}) };
       boek[doel].push(regel);
       if (bewijs === BEVOEGD) tegenproeven.push({ ...regel, nr: tegenproeven.length + 2, soort: 'tegenproef' });
     } catch (e) {
-      const regel = { nr, wat, stand: 'stuk', fout: String(e && e.message || e).slice(0, 300), ms: Date.now() - t0 };
+      const regel = { nr, wat, stand: 'stuk', fout: String(e && e.message || e).slice(0, 300), ms: Date.now() - t0,
+        ...(herstartsVoor ? { herstartsVoor } : {}) };
       boek[doel].push(regel);
       if (bewijs === BEVOEGD) tegenproeven.push({ ...regel, nr: tegenproeven.length + 2, soort: 'tegenproef' });
     }
@@ -257,7 +309,7 @@ async function meetScenario(sc) {
   /* `omgeving`: een scenario dat een herleidbaar mens van het kantoor nodig
      heeft, draait in de kantoorwereld (KANTOORWERELD in ./lib/voltooiwereld.js).
      De postvanger-grendel geldt daar net zo. */
-  const w = await maakWereld(path.basename(sc.bestand, '.js'), sc.omgeving);
+  w = await maakWereld(path.basename(sc.bestand, '.js'), sc.omgeving, { behoudAdres: sc.kanaal === 'browser' });
   let afgebroken = null;
   try { await sc.loop(w, stap); }
   catch (e) { afgebroken = String(e && e.message || e).slice(0, 300); }
@@ -270,18 +322,25 @@ async function meetScenario(sc) {
        dat het nergens heen ging, bewijst de grendel. */
     post: { gevangen: post.length, naarBuiten: 0,
       onderwerpen: post.map((b) => b.soort + ': ' + (b.onderwerp || '(geen onderwerp)')) } };
-  uit[AFGELEID] = menselijkUit(w.antwoorden(), afgebroken);
-  for (const b of BEWIJZEN) {
-    const schakels = boek[b];
-    const t = { schakels: schakels.length, gesloten: 0, open: 0, stuk: 0 };
-    for (const s of schakels) t[s.stand]++;
+  if (sc.kanaal === 'browser') {
+    uit.kanaal = 'browser';
+    uit.browser = w.browser || null;
+  } else uit[AFGELEID] = menselijkUit(w.antwoorden(), afgebroken);
+  for (const b of dimensies) {
     /* Een bewijs zonder stappen sluit NIET: niets gemeten is geen groen. En een
        scenario dat halverwege afbrak, sluit ook niet -- ook als de stappen die
        wel liepen allemaal dicht waren. */
-    uit[b] = { schakels, storingen: [], telling: t,
-      sluit: schakels.length > 0 && t.open === 0 && t.stuk === 0 && !afgebroken };
+    uit[b] = sluitDeel(b, boek[b], w.herstarts, afgebroken, sc.kanaal === 'browser');
   }
-  uit[BEVOEGD] = bevoegdUit(uit.voltooibaar, tegenproeven, afgebroken);
+  if (sc.kanaal === 'browser') {
+    uit[AFGELEID].kanaal = 'browser';
+    const fout = controleerBrowserResultaat(sc, uit);
+    if (fout) {
+      uit.afgebroken = uit.afgebroken || fout;
+      for (const b of dimensies) uit[b].sluit = false;
+    }
+  }
+  uit[BEVOEGD] = bevoegdUit(uit.voltooibaar, tegenproeven, uit.afgebroken);
   return uit;
 }
 
@@ -331,7 +390,8 @@ async function meet(opties) {
   const o = opties || {};
   const reg = {
     stempel: huisStempel(),
-    uitleg: 'Bewijs 3 (voltooibaar), 5 (persistent) en 7 (herstelbaar) uit BETROUWBAARHEID.md, per onderdeel uit MAPPEN, in de gecontroleerde testwereld: wegwerpdata, postvanger en sms-sandbox, een nette herstart en een crash op dezelfde datamap, en een lezer van de opslag buiten de server om. Bewijs 8 (menselijk) wordt per onderdeel AFGELEID uit alle antwoorden die het lid daarbij kreeg: geen kale 5xx, geen leeg antwoord, en elke weigering met een melding in woorden; zonder uitgelokte weigering is het niet beproefd.',
+    uitleg: 'Bewijs 3 (voltooibaar), 5 (persistent) en 7 (herstelbaar) uit BETROUWBAARHEID.md, per onderdeel uit MAPPEN, in de gecontroleerde testwereld: wegwerpdata, postvanger en sms-sandbox, een nette herstart en een crash op dezelfde datamap, en een lezer van de opslag buiten de server om. Bewijs 8 (menselijk) wordt per onderdeel AFGELEID uit alle antwoorden die het lid daarbij kreeg: geen kale 5xx, geen leeg antwoord, en elke weigering met een melding in woorden; zonder uitgelokte weigering is het niet beproefd. Expliciete browser-scenario' +
+      's meten menselijk met zichtbare schermstappen; de bronbinding vereist waargenomen ingangen, toestanden en bestemmingen zonder browserfouten. Dit vervangt geen menselijke Experience-beoordeling.',
     grens: 'Gemeten in de gecontroleerde testwereld (wegwerpdata, postvanger, sms-sandbox), niet op productie: een onderdeel dat hier voltooibaar, persistent en herstelbaar is, kan dat buiten die wereld nog niet zijn. Een geslaagd scenario geldt voor DAT scenario en die invoer, niet voor elke variant van het onderdeel.',
     hoe: 'npm run voltooiproef:vast',
     testwereld: {
@@ -358,7 +418,8 @@ async function meet(opties) {
     if (b.nietBeproefd) t.bevoegdNietBeproefd++; else if (b.sluit) t.bevoegdGesloten++; else t.bevoegdOpen++;
   }
   reg.telling = t;
-  reg.sluit = t.apps > 0 && t.bewijzenOpen === 0;
+  reg.sluit = t.apps > 0 && t.bewijzenOpen === 0 &&
+    Object.values(reg.apps).every(a => a.kanaal !== 'browser' || a[AFGELEID].sluit);
   return reg;
 }
 
@@ -371,7 +432,7 @@ function druk(reg) {
         (s.ziet ? '\n         ziet: ' + s.ziet : '') + (s.fout ? '\n         FOUT: ' + s.fout : ''));
     }
     const m = a[AFGELEID];
-    console.log('  ' + AFGELEID + ' (afgeleid): ' + (m.nietBeproefd ? 'NIET BEPROEFD -- ' + m.nietBeproefd : (m.sluit ? 'sluit' : 'SLUIT NIET') + ' (' + m.telling.gesloten + '/' + m.telling.schakels + ')'));
+    console.log('  ' + AFGELEID + (a.kanaal === 'browser' ? ' (schermstappen): ' : ' (afgeleid): ') + (m.nietBeproefd ? 'NIET BEPROEFD -- ' + m.nietBeproefd : (m.sluit ? 'sluit' : 'SLUIT NIET') + ' (' + m.telling.gesloten + '/' + m.telling.schakels + ')'));
     for (const s of m.schakels) console.log('    ' + String(s.nr).padStart(2) + ' ' + s.stand.padEnd(9) + s.wat + (s.ziet ? '\n         ziet: ' + s.ziet : ''));
     const q = a[BEVOEGD];
     console.log('  ' + BEVOEGD + ' (expliciet): ' + (q.nietBeproefd ? 'NIET BEPROEFD -- ' + q.nietBeproefd : (q.sluit ? 'sluit' : 'SLUIT NIET') + ' (' + q.telling.gesloten + '/' + q.telling.schakels + ')'));
@@ -379,11 +440,11 @@ function druk(reg) {
     console.log('  post: ' + a.post.gevangen + ' gevangen, ' + a.post.naarBuiten + ' naar buiten');
   }
   console.log(reg.sluit ? '\nAlle bewijzen sluiten.' : '\nNIET ALLE BEWIJZEN SLUITEN (' + reg.telling.bewijzenOpen + ' open).');
-  console.log('menselijk (afgeleid): ' + reg.telling.menselijkGesloten + ' gesloten, ' + reg.telling.menselijkOpen + ' open, ' + reg.telling.menselijkNietBeproefd + ' niet beproefd.');
+  console.log('menselijk (antwoordafleiding of expliciete schermstappen): ' + reg.telling.menselijkGesloten + ' gesloten, ' + reg.telling.menselijkOpen + ' open, ' + reg.telling.menselijkNietBeproefd + ' niet beproefd.');
   console.log('bevoegd (expliciet): ' + reg.telling.bevoegdGesloten + ' gesloten, ' + reg.telling.bevoegdOpen + ' open, ' + reg.telling.bevoegdNietBeproefd + ' niet beproefd.');
 }
 
-module.exports = { meet, scenarios, DOEL, BEWIJZEN, AFGELEID, BEVOEGD, bevoegdUit, menselijkUit, inWoorden };
+module.exports = { meet, scenarios, DOEL, BEWIJZEN, AFGELEID, BEVOEGD, bevoegdUit, menselijkUit, inWoorden, sluitDeel, controleerBrowserResultaat };
 
 if (require.main === module) {
   const vast = process.argv.includes('--vastleggen');

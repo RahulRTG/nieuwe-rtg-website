@@ -57,6 +57,20 @@ async function tekenOnboarding(base, token) {
   assert.equal(d.klaar, true, 'de proefgebruiker hoort na tekenen binnen te mogen');
 }
 
+/* Een pseudo-laag met pointer-events:none kan het scherm volledig bedekken
+   terwijl zichtbaarheid, elementFromPoint en echte klikken groen blijven.
+   #shell is bij Command een doorzichtige ladehouder, ook na het inloggen. */
+async function verwachtDoorzichtigeSchil(page, toestand) {
+  await page.waitForFunction(() => document.getElementById('levendegrond-stijl')?.sheet,
+    null, { timeout: 20000 });
+  const inhoud = await page.evaluate(() => {
+    const shell = document.querySelector('body.rtg-command #shell[data-levendegrond]');
+    return shell ? getComputedStyle(shell, '::before').content : null;
+  });
+  assert.notEqual(inhoud, null, toestand + ': de proef vereist de levende Command-schil');
+  assert.equal(inhoud, 'none', toestand + ': de transparante schil mag geen ondoorzichtige pseudo-laag boven de werkvloer schilderen');
+}
+
 /* De stand van het scherm in EEN oogopslag. `bovenop` is de kern van geval 1:
    niet "staat de deur in de DOM" maar "wie raakt de muis in het midden van de
    deur" -- want de bug was juist dat de deur er wel stond en onbereikbaar was. */
@@ -414,6 +428,7 @@ test('inlogscherm: de werktafel is de deur, en een wereld erin opent hem niet',
     await page.goto(srv.base + '/apps/app.html', { waitUntil: 'domcontentloaded', timeout: 45000 });
     await page.waitForSelector('#agPasskey', { timeout: 20000 });
     await page.waitForFunction(() => document.styleSheets.length > 0, null, { timeout: 20000 });
+    await verwachtDoorzichtigeSchil(page, 'inlogdeur op desktop');
 
     const uit = await page.evaluate(() => {
       const r = document.getElementById('rtgCommand'), g = document.getElementById('gate');
@@ -542,6 +557,7 @@ test('passkey-first opent zonder e-mailadres en landt op de lege wereldkiezer',
        en een ::after). Precies dat, en niets meer. */
     await page.goto(srv.base + '/apps/app.html?pas=rtg', { waitUntil: 'domcontentloaded', timeout: 45000 });
     await page.waitForSelector('#agPasskey', { state: 'visible', timeout: 20000 });
+    await verwachtDoorzichtigeSchil(page, 'inlogdeur op mobiel');
     /* Passkey-first betekent de eerste en primaire deur, niet dat biometrie
        zonder een handeling van de bezoeker mag openen. De toets raakt daarom
        dezelfde knop aan die een mens in de officiële toegangspoort ziet. */
@@ -555,6 +571,7 @@ test('passkey-first opent zonder e-mailadres en landt op de lege wereldkiezer',
       const beeld = document.querySelector('.cmd-startwereld:first-child .cmd-wereldbeeld');
       return beeld && beeld.complete && beeld.naturalWidth > 0;
     }, null, { timeout: 20000 });
+    await verwachtDoorzichtigeSchil(page, 'wereldkiezer na inloggen');
 
     assert.equal(optiesBody.login, undefined, 'de eerste optiesvraag bevat geen login');
     assert.equal(optiesBody.email, undefined, 'de eerste optiesvraag bevat geen e-mailadres');
@@ -571,6 +588,8 @@ test('passkey-first opent zonder e-mailadres en landt op de lege wereldkiezer',
       poortVerborgen: getComputedStyle(document.getElementById('gate')).display === 'none',
       intentie: document.querySelector('.cmd-intentie').getBoundingClientRect().toJSON(),
       eersteWereld: document.querySelector('.cmd-startwereld').getBoundingClientRect().toJSON(),
+      eersteWereldMin: getComputedStyle(document.querySelector('.cmd-startwereld')).minHeight,
+      mobielVenster: matchMedia('(max-width:767px)').matches,
       beeldLaden: [...document.querySelectorAll('.cmd-wereldbeeld')].map(x => x.loading),
     }));
     assert.equal(geland.poortVerborgen, true, 'de passkey sluit de inlogpoort na de echte sessie');
@@ -600,7 +619,8 @@ test('passkey-first opent zonder e-mailadres en landt op de lege wereldkiezer',
     assert.ok(geland.intentie.height >= 44, 'de Rahul-ingang is kleiner dan een toegankelijk raakvlak');
     assert.ok(geland.eersteWereld.left >= 15 && geland.eersteWereld.right <= 375,
       'de filmische wereld respecteert de mobiele schermrand niet');
-    assert.ok(geland.eersteWereld.height >= 280, 'de primaire wereld mist de bedoelde filmische diepte');
+    assert.ok(geland.eersteWereld.height >= 280,
+      'de primaire wereld mist de bedoelde filmische diepte: ' + JSON.stringify({ hoogte: geland.eersteWereld.height, min: geland.eersteWereldMin, mobiel: geland.mobielVenster }));
     assert.deepEqual(geland.beeldLaden, ['eager','lazy','lazy','lazy'],
       'alle wereldbeelden worden tegelijk geladen in plaats van op zichtbaarheid');
     assert.deepEqual(fouten, [], 'geen JS-fouten');

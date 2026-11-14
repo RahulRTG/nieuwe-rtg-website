@@ -138,5 +138,6 @@ module.exports = (kern) => {
     (req, res) => veilig(res, () => rtfos.winkel.standZet(req.body, kern.boardroomWie && kern.boardroomWie(req))));
 
   require('./portalen')({ app, auth, officeAuth, rtfos, veilig, genootschapDrager: kern.genootschapDrager });
+  require('./opvang')({ app, auth, officeAuth, rtfos, veilig, H });
   require('./voordeur')({ app, rtfos, veilig });
 };

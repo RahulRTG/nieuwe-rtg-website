@@ -42,6 +42,7 @@
 const fs = require('fs');
 const path = require('path');
 const { BEWIJZEN, BRONSOORTEN, CONTRACT, ALGEMEEN } = require('./appcontract');
+const { browserKoppeling } = require('./browservoltooicontract');
 
 const WORTEL = path.join(__dirname, '..', '..');
 
@@ -280,6 +281,26 @@ function bewijsVoor(functie, naam, ingang, opties = {}) {
     throw new Error('appcontract: een ' + bron.soort + ' mag geen ' + naam + ' leveren (' + functie + ')');
   }
   const lees = opties.lees || leesStandaard;
+  if (bron.kanaal !== undefined && bron.kanaal !== 'browser')
+    return { status: 'NIET_GETEST', bewijs: null, reden: 'onbekend bewijskanaal' };
+  if (bron.kanaal === 'browser') {
+    if (bron.soort !== 'voltooiproef') return { status: 'NIET_GETEST', bewijs: null, reden: 'browserkanaal vereist de bestaande voltooiproef' };
+    const koppeling = browserKoppeling(functie, ingang, c, bron, lees, naam);
+    if (koppeling.fout) return { status: 'NIET_GETEST', bewijs: null, reden: koppeling.fout };
+    const invoer = { ingang: koppeling.scherm.ingang, soort: 'browser', kanaal: 'browser',
+      routeInstrument: bron.instrument, scenario: bron.instrument };
+    const uit = ketenUitslag(bron.register, {
+      lees: rel => rel === bron.register ? koppeling.tekst : lees(rel),
+      versheid: opties.versheid || opRaakvlak(invoer, opties), deel: ['apps', functie, naam]
+    });
+    uit.bron = { soort: bron.soort, kanaal: 'browser', instrument: bron.instrument,
+      belofte: c.belofte, scherm: koppeling.scherm };
+    if (uit.status === 'BEWEZEN' && koppeling.defect) {
+      uit.status = 'GEBLOKKEERD_DOOR_DEFECT';
+      uit.reden = 'vers browserbewijs bevat ' + koppeling.defect + ' browser- of documentfouten, ook al sloten de taakstappen';
+    }
+    return uit;
+  }
   const proef = proefRoutes(bron.instrument, lees);
   const ing = ingangVan(ingang, c, { lees, schermroutes: opties.schermroutes });
   const raak = proef && ing ? gedeeld(proef, ing) : [];
@@ -322,4 +343,5 @@ function stelSamen(r, opties = {}) {
   return gedaan;
 }
 
-module.exports = { proefRoutes, ingangRoutes, ingangVan, routesVanBestanden, gedeeld, smalVoorvoegsel, ketenUitslag, rondeUitslag, bewijsVoor, stelSamen };
+module.exports = { proefRoutes, ingangRoutes, ingangVan, routesVanBestanden, gedeeld, smalVoorvoegsel, browserKoppeling,
+  ketenUitslag, rondeUitslag, bewijsVoor, stelSamen };

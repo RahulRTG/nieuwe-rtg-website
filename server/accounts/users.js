@@ -296,10 +296,8 @@ const { issueToken, verifyToken, apparaatVanToken, sessieVan, trekIn, trekInActi
 // De clientprojectie kan geen account wijzigen of token uitgeven.
 const { publicUser } = require('./profiel')({ realNameOf, emailOf, phoneOf });
 
-/* Het ledendossier, de verificatie, de kantoorlijsten en de AVG-vergetelheid
-   staan in ./dossier.js; ook dat deel krijgt getUserById mee en verhuist mee in
-   de export, zodat aanroepers niets merken. */
-const { getMemberState, saveMemberState, setVerification, listByVerification,
+/* Ledendossier, verificatie en AVG-vergetelheid wonen in ./dossier.js. */
+const { getMemberState, saveMemberState, wijzigMemberState, setVerification, listByVerification,
   conversations, ledenRegisterRijen, deleteUser } = require('./dossier').maakDossier(getUserById);
 
 const { findByPublicMail, reservePublicMail } = require('./publiekmail')({ getUserById, getMemberState, saveMemberState });
@@ -313,5 +311,5 @@ module.exports = {
   zetSessiegrens,
   issueToken, verifyToken, apparaatVanToken, sessieVan, trekIn, trekInActie, isIngetrokken, trekInSessie, sessieIngetrokken, wachtIntrekkingen, issueActionToken, verifyActionToken,
   setEmailVerified, createReset, findByReset, consumeReset, setPassword, setPasswordSync, setPasswordZaai, vernieuwWachtwoordHash,
-  getMemberState, saveMemberState, setVerification, listByVerification, conversations, ledenRegisterRijen, deleteUser
+  getMemberState, saveMemberState, wijzigMemberState, setVerification, listByVerification, conversations, ledenRegisterRijen, deleteUser
 };

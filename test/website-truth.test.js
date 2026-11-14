@@ -100,12 +100,17 @@ test('wereld- en paspagina’s lezen de actuele appwaarheid bij het openen', () 
   }
 });
 
-test('de prijstabel is gebonden aan de centrale pasladder', () => {
+test('productidentiteit blijft appwaarheid; nieuwe beleidsprijzen zijn geen oude runtime-prijzen', () => {
   const html = lees('index.html');
   for (const pas of ['community', 'rtg', 'business-lite', 'business', 'lifestyle']) {
     assert.match(html, new RegExp('data-app-truth-pass="' + pas + '"'));
   }
   for (const bestand of PAGINAS.filter((naam) => naam.includes('/passen/'))) {
-    assert.match(lees(bestand), /data-app-truth-price/, bestand + ' mist de prijsbinding');
+    const pagina = lees(bestand);
+    assert.match(pagina, /data-commercial-policy="2026-11-12\.1"/, bestand + ' mist de beleidsversie');
+    assert.match(pagina, /data-policy-price/, bestand + ' mist de afzonderlijk gepubliceerde beleidsprijs');
+    assert.match(pagina, /data-policy-billing/, bestand + ' mist de bijbehorende btw-/looptijduitleg');
+    assert.doesNotMatch(pagina, /data-app-truth-(?:price|billing)/,
+      bestand + ' laat de oude runtime-ladder niet over nieuw commercieel beleid schrijven');
   }
 });

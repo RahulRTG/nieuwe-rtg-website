@@ -35,7 +35,22 @@
     return node;
   }
 
+  /* Een springlink verwijst uitsluitend naar een werkelijk DOM-doel. De
+     helper houdt fragmentnavigatie op één begrensd contract en voorkomt dat
+     presentatiecode willekeurige URL's uit samengestelde tekst kan bouwen. */
+  function spring(anchor, target) {
+    if (!anchor || !target) return anchor;
+    if (!target.id) target.id = 'rtg-inhoud';
+    anchor.setAttribute('href', '#' + target.id);
+    return anchor;
+  }
+
   function ensureSectionMasthead(doc, body, route, name) {
+    var toegang = doc.getElementById('rtf-toegang-slot');
+    if (toegang) {
+      Array.from(toegang.querySelectorAll(':scope > .rtg-v4-section-masthead')).forEach(function (node) { node.remove(); });
+      return;
+    }
     if (body.dataset.rtgV4Kind === 'cover' || body.dataset.rtgV4Kind === 'canvas') return;
     var main = doc.querySelector('main,[data-rtg-screen-root="content"]');
     if (main && main.querySelector(':scope > #dailyIntro')) return;
@@ -56,6 +71,11 @@
   }
 
   function ensurePhotoLead(doc, body, route, world) {
+    var toegang = doc.getElementById('rtf-toegang-slot');
+    if (toegang) {
+      Array.from(toegang.querySelectorAll(':scope > .rtg-v4-photo-lead')).forEach(function (node) { node.remove(); });
+      return;
+    }
     if (body.dataset.rtgV4Kind === 'cover' || body.dataset.rtgV4Kind === 'canvas') return;
     var main = doc.querySelector('main,[data-rtg-screen-root="content"]');
     if (!main || main.querySelector(':scope > .rtg-v4-photo-lead')) return;
@@ -128,8 +148,7 @@
     if (!skip) {
       var target = body.querySelector('main,[role="main"],.wd-page>main,.wrap,body>div');
       if (target) {
-        if (!target.id) target.id = 'rtg-inhoud';
-        skip = make(doc, 'a', 'skip', 'Naar inhoud'); skip.href = '#' + target.id;
+        skip = spring(make(doc, 'a', 'skip', 'Naar inhoud'), target);
         body.insertBefore(skip, body.firstChild);
       }
     }
@@ -169,7 +188,7 @@
     if (canvasToolbar) canvasToolbar.dataset.rtgV4CanvasToolbar = 'true';
     if (!embedded && !header && (body.dataset.rtgV4Kind !== 'canvas' || !canvasToolbar)) header = buildHeader(doc, body, name);
     var jump = body.querySelector('a[href^="#"]'), main = doc.querySelector('main,[role="main"],#main');
-    if (jump && main) { if (!main.id) main.id = 'rtg-inhoud'; jump.href = '#' + main.id; if (body.firstChild !== jump) body.insertBefore(jump, body.firstChild); }
+    if (jump && main) { spring(jump, main); if (body.firstChild !== jump) body.insertBefore(jump, body.firstChild); }
     if (header) {
       if (header.parentNode !== body) body.insertBefore(header, body.firstChild);
       header.removeAttribute('data-rtg-edge-2-contextual');
@@ -198,9 +217,8 @@
       // die laag neemt hem daarna over in plaats van een tweede te maken.
       var inhoud = doc.querySelector('main,[role="main"],[data-rtg-screen-root],#rtgWorldContent');
       if (inhoud) {
-        if (!inhoud.id) inhoud.id = 'rtg-inhoud';
         if (!inhoud.hasAttribute('tabindex')) inhoud.setAttribute('tabindex', '-1');
-        skipLink = make(doc, 'a', 'skip', 'Naar de inhoud'); skipLink.href = '#' + inhoud.id;
+        skipLink = spring(make(doc, 'a', 'skip', 'Naar de inhoud'), inhoud);
       }
     }
     if (header && header.parentNode === body && skipLink && skipLink.parentNode !== body) body.insertBefore(skipLink, header);

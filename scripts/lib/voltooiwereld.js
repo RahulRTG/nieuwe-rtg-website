@@ -43,14 +43,34 @@ function wachtOpEinde(kind, ms) {
   });
 }
 
-async function maakWereld(naam, eigenEnv) {
+async function maakWereld(naam, eigenEnv, opties = {}) {
   const datamap = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-voltooi-' + naam + '-'));
   const env = Object.assign({ NODE_ENV: 'test' }, eigenEnv || {}, postvanger.omgeving());
   /* Dezelfde omgeving die het kind krijgt, en dezelfde waaromNiet() die de
      server leest: de vraag "kan hier post naar buiten" heeft een antwoord. */
-  postvanger.eis(gereedschapsomgeving({ poort: 0, datamap }, env));
-  let srv = await start({ naam: 'voltooi-' + naam, datamap, env, gereed: 'ready' });
+  let srv;
   const herstarts = { netjes: 0, crash: 0 };
+  async function eigenServer() {
+    if (!opties.behoudAdres) return;
+    try {
+      const r = await fetch(srv.basis + '/api/health', { signal: AbortSignal.timeout(5000) });
+      const j = await r.json();
+      if (!r.ok || j.pid !== srv.kind.pid || srv.kind.exitCode !== null || srv.kind.signalCode !== null)
+        throw new Error('de vaste origin antwoordt niet namens het eigen testproces');
+    } catch (e) {
+      srv.klaar();
+      throw e;
+    }
+  }
+  try {
+    postvanger.eis(gereedschapsomgeving({ poort: 0, datamap }, env));
+    srv = await start({ naam: 'voltooi-' + naam, datamap, env, gereed: 'ready' });
+    await eigenServer();
+  } catch (e) {
+    if (srv) srv.klaar();
+    fs.rmSync(datamap, { recursive: true, force: true });
+    throw e;
+  }
 
   /* ELK ANTWOORD DAT HET LID KREEG, voor bewijs 8 (menselijk). De scenario's
      schrijven hun eigen schakels voor voltooibaar, persistent en herstelbaar;
@@ -100,7 +120,11 @@ async function maakWereld(naam, eigenEnv) {
   }
 
   async function opnieuw() {
-    srv = await start({ naam: 'voltooi-' + naam, datamap, env, gereed: 'ready' });
+    // Browseropslag is aan de origin gebonden. Een herstelproef mag haar niet
+    // naar een nieuwe origin kopiëren en dat vervolgens persistentie noemen.
+    const poort = opties.behoudAdres ? srv.poort : undefined;
+    srv = await start({ naam: 'voltooi-' + naam, datamap, env, poort, gereed: 'ready' });
+    await eigenServer();
   }
 
   async function herstart() {
@@ -117,7 +141,7 @@ async function maakWereld(naam, eigenEnv) {
 
   async function crash() {
     srv.kind.kill('SIGKILL');
-    await wachtOpEinde(srv.kind, 5000);
+    if (!await wachtOpEinde(srv.kind, 5000)) throw new Error('de server stierf niet na SIGKILL; crashherstel is niet te meten');
     herstarts.crash++;
     await opnieuw();
   }

@@ -204,6 +204,36 @@ async function verbindProeflid(basis) {
   return { ok: true, codenaam, token: eerste, contactToken: tweede };
 }
 
+/* De stand Gezin bestaat pas NADAT een gewoon lid een persoonlijke
+   uitnodiging van een RTFoundation-gezin heeft aanvaard. Een kaal lid ziet de
+   tab terecht niet; hem toch meten leverde daarom nul bediening op. Bouw hier
+   de kleinste echte wereld via de publieke productroutes: een gezin, een
+   persoonlijke uitnodiging en een afzonderlijk lid dat haar aanvaardt. De
+   gewone ledenpersona blijft onaangeraakt, zodat deze fixture geen bediening
+   in andere appstanden laat verschijnen. */
+async function verbindGezinProeflid(basis) {
+  const gezin = await ROLLEN.gezin.haal(basis);
+  if (!gezin || !gezin.code || !gezin.token) {
+    return { ok: false, reden: 'het RTFoundation-proefgezin kon niet worden gemaakt' };
+  }
+  const lid = await ROLLEN.lid.haal(basis);
+  if (!lid) return { ok: false, reden: 'het gezinsproeflid kon niet worden gemaakt' };
+  const gemaakt = await post(basis + '/api/foundation/gezin/uitnodiging/maak', {
+    code: gezin.code, token: gezin.token, naam: 'Oppas APPWERKT', rol: 'gast', relatie: 'oppas'
+  });
+  const uitnodiging = gemaakt && gemaakt.uitnodiging;
+  if (!uitnodiging) return { ok: false, reden: 'het proefgezin gaf geen persoonlijke uitnodiging uit' };
+  const aanvaard = await postAls(basis + '/api/rtf/uitnodiging/accepteer', { uitnodiging }, lid);
+  if (aanvaard.status >= 400 || !aanvaard.data || !aanvaard.data.gezinNaam) {
+    return { ok: false, reden: 'de persoonlijke gezinsuitnodiging aanvaarden gaf HTTP ' + aanvaard.status };
+  }
+  const overzicht = await postAls(basis + '/api/rtf/overzicht', {}, lid);
+  if (overzicht.status !== 200 || !overzicht.data || !(overzicht.data.gezinnen || []).length) {
+    return { ok: false, reden: 'het gekoppelde gezin verscheen niet in het ledenoverzicht' };
+  }
+  return { ok: true, token: lid, gezinNaam: aanvaard.data.gezinNaam };
+}
+
 /* Haalt de gevraagde rollen op (standaard allemaal) tegen een draaiende
    server. Geeft { sessies, overgeslagen }: sessies is wat er in localStorage
    moet, overgeslagen zegt per mislukte rol waarom. */
@@ -232,4 +262,5 @@ function opslagVoor(sessies) {
   return uit;
 }
 
-module.exports = { ROLLEN, haalSessies, haalLifestyleLid, opslagVoor, verbindProeflid, rondLidAf };
+module.exports = { ROLLEN, haalSessies, haalLifestyleLid, opslagVoor,
+  verbindProeflid, verbindGezinProeflid, rondLidAf };

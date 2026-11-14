@@ -22,11 +22,11 @@
 
   function toonZones() {
     $('bZones').innerHTML = zones.map(function (z) {
-      return K.rij('<b>' + esc(z.naam) + '</b> <span class="stil">· ' +
+      return K.rij('<b>' + esc(z.naam) + '</b> <span class="stil ds-horeca-meta">· ' +
         (z.postcodes.length ? z.postcodes.join(', ') : (z.straalKm || 0) + ' km') + ' · ' + z.minuten + ' min</span>',
       K.euro(z.kostenCenten) + (z.minimumCenten ? ' · min. ' + K.euro(z.minimumCenten) : '') +
         (z.gratisVanafCenten ? ' · gratis vanaf ' + K.euro(z.gratisVanafCenten) : ''));
-    }).join('') || '<p class="stil">Er zijn nog geen zones. Zonder zone kan er niets bezorgd worden.</p>';
+    }).join('') || '<p class="stil ds-horeca-meta">Er zijn nog geen zones. Zonder zone kan er niets bezorgd worden.</p>';
   }
 
   function neem(d) {
@@ -57,10 +57,10 @@
         var d = r.body;
         if (d.error) return K.meld(d.error);
         $('bSloten').innerHTML = (d.sloten || []).map(function (s) {
-          return K.rij('<b>' + esc(s.tijd) + '</b> <span class="tag' + (s.vol ? ' laat' : ' aan') + '">' +
+          return K.rij('<b>' + esc(s.tijd) + '</b> <span class="tag ds-horeca-tag' + (s.vol ? ' laat' : ' aan') + '">' +
             s.gebruiktMinuten + ' van ' + s.capaciteitMinuten + ' min</span>',
           s.vol ? 'vol' : s.vrij + ' min vrij');
-        }).join('') || '<p class="stil">Nog geen tijdsloten ingesteld.</p>';
+        }).join('') || '<p class="stil ds-horeca-meta">Nog geen tijdsloten ingesteld.</p>';
       });
   }
 
@@ -68,7 +68,7 @@
     $('bStops').innerHTML = stops.map(function (s, i) {
       return K.rij((i + 1) + '. ' + esc(s.adres), s.lat + ', ' + s.lng +
         (s.kmVanVorige != null ? ' · ' + s.kmVanVorige + ' km' : ''));
-    }).join('') || '<p class="stil">Nog geen stops. Twee is het minimum om een volgorde uit te rekenen.</p>';
+    }).join('') || '<p class="stil ds-horeca-meta">Nog geen stops. Twee is het minimum om een volgorde uit te rekenen.</p>';
   }
 
   if (!K.poort()) return;

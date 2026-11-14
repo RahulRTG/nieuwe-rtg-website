@@ -580,6 +580,52 @@ ontbreekt: een scenario (de testwereld staat), een eigen adres (een stand of tab
 in de app), of een adapter (`TESTWERELD_ONTBREEKT` in
 `scripts/lib/appcontract.js`: bellen en videobellen, WebRTC).
 
+### Browserkanaal voor lokale en vluchtige taken (30 oktober 2026)
+
+De historische stand hierboven beschrijft de eerste API-scenario's. Dezelfde
+VOLTOOIPROEF heeft nu een expliciet browserkanaal voor Juridisch, Camera,
+RTFoundation-keuze en Videobellen. Er is geen tweede bewijsregister. E2E en
+meetronde gebruiken dezelfde taakimplementaties in `scripts/lib/voltooi/`.
+
+- Juridisch bewijst zichtbare documenten, terugkeer en publicatiecontinuïteit;
+  het verzint geen persoonlijke opslag voor openbare tekst.
+- Camera bewijst synthetische videoframes, een gedecodeerde lokale JPEG-export,
+  heropenen na serveruitval, annulering, native browserweigering en een apart
+  ingespoten herstelgeval. Niet-opgeslagen camerabeeld hoeft niet te overleven.
+- RTFoundation bewijst de vijf echte leeftijdskeuzes, het toegankelijke
+  vervolg via het volledige overzicht, geschiedenis en lokale keuzeherinnering.
+  Het bewijst geen gezinsaanmaak. De werktafel is de daadwerkelijke
+  `/apps/app.html?pas=rtg`; de groepwaarden zijn `mini/kind/tiener/jong/volw`.
+- Videobellen bewijst twee richtingen met voortlopende gedecodeerde frames en
+  ontvangen audiopakketten, samples, duur en energie,
+  dezelfde peers bij signalingherstart/crash, beëindigde tracks en geen
+  herleving na herladen. Het bewaart of claimt geen gespreksopname.
+
+De runner en APPWERKT-lezer delen één browsercontractcontrole. De gemeten
+ingang, zichtbare toestand en verplichte bestemmingen moeten exact bij het
+scenario horen. Ontbrekende browserwaarneming, paginafouten en documentfouten
+sluiten groen uit. Iedere taakdimensie vereist minimaal drie werkelijke
+schakels; persistent vereist een nette herstart, herstelbaar een crash.
+Iedere browserstap draagt de werkelijke herstarttellers bij aanvang. Ten minste
+één geslaagde toepasselijke stap moet ná de betreffende herstart/crash beginnen;
+een globale teller zonder zo'n vervolgcontrole volstaat niet. Ontbrekende,
+teruglopende of toekomstige snapshots worden afgewezen.
+Browserherstel houdt dezelfde origin en controleert het PID van de eigen
+testserver. Er worden geen localStorage-gegevens naar een nieuwe origin
+gekopieerd om herstel te suggereren.
+
+API-scenario's houden hun afgeleide menselijk-bewijs uit ontvangen antwoorden.
+Browser-scenario's meten zichtbare feedback en bediening afzonderlijk. Dit is
+**geen menselijke EXPERIENCEWERKT-beoordeling** en geen bewijs voor echte
+mobiele camera's, alle browsers, internet-TURN of productieconfiguratie.
+
+De browserbronbinding omvat voorlopig conservatief alle `public/`- en
+`server/`-bronnen, instrumenthelpers, package/lock en de Node-runtime. Zolang
+dynamische navigatieafhankelijkheden niet volledig zijn bewezen, blijft breder
+verval de veilige keuze. Engine, browserversie en platform worden bij de
+waarnemingen opgeslagen. Een andere browseromgeving vraagt een eigen proef;
+deze binding kwalificeert niet vanzelf ieder geïnstalleerd browserapparaat.
+
 ## 4i. Versheid per bewijs — het raakvlak
 
 **Staat** (19 oktober 2026, eis van de eigenaar: "een bewijs moet opnieuw

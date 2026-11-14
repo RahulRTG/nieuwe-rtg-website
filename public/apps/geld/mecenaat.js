@@ -16,26 +16,6 @@
      bordeauxrode label (betaald en RTFoundation, kleur als betekenis), de
      kleine tekstknop bij een rij, en het antwoordvak van de adviseur. Een
      keer injecteren, met id-wacht, want tien standen delen dit document. */
-  M.stijl = function () {
-    if (d.getElementById('mcStijl')) return;
-    var s = d.createElement('style');
-    s.id = 'mcStijl';
-    s.textContent =
-      '#paneel .mc-tx{flex:1;min-width:0;}' +
-      '#paneel .mc-tx .badge{margin-left:.35rem;}' +
-      '#paneel .mc-zg{color:var(--gold-tekst);border-color:var(--gold-rand);}' +
-      '#paneel .mc-fd{color:var(--rtg-leesrood,var(--rtg-rood,#C23A5E));border-color:rgba(194,58,94,.4);}' +
-      '#paneel .mc-mini{background:none;border:0;color:var(--gold-tekst);font-size:.75rem;' +
-        'cursor:pointer;padding:0;text-decoration:underline;font-family:inherit;}' +
-      '#paneel .mc-rechts{text-align:right;flex-shrink:0;}' +
-      '#paneel .mc-half{display:flex;gap:.4rem;margin-top:.4rem;}' +
-      '#paneel .mc-half>*{flex:1;min-width:0;}' +
-      '#paneel .mc-vraag{display:flex;gap:.5rem;margin-top:.4rem;}' +
-      '#paneel .mc-vraag input{flex:1;width:auto;}' +
-      '#paneel .mc-uit{border:1px solid var(--rtg-line);border-radius:0;padding:.6rem .8rem;' +
-        'margin-top:.6rem;font-size:.85rem;line-height:1.55;white-space:pre-wrap;}';
-    d.head.appendChild(s);
-  };
 
   /* Bedragen in dit dossier zijn hele euro's, zo bewaart de kern ze. Geld.euro
      rekent in centen, dus EEN keer maal honderd hier en nergens anders. */

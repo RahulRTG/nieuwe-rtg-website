@@ -131,6 +131,10 @@ module.exports = ({ saldi, saldoVan, grootboek, payBoekingenVoegToe, save, id, s
       r = await motorklant.boekGuard({ van, naar, centen, soort, oms, ref, economischeSleutel: k.sleutel });
     }
     if (!r || r.error) return { status: (r && r.status) || 502, error: (r && r.error) || 'Motor onbereikbaar.' };
+    return bevestigMotor(r);
+  }
+
+  function bevestigMotor(r) {
     // Neem de door de motor bevestigde boeking exact over (id, at, bedragen).
     const b = r.boeking;
     const rij = { id: b.id, van: b.van, naar: b.naar, centen: Math.round(Number(b.centen)), soort: b.soort || 'boeking', oms: b.oms || '', ref: b.ref || null, at: b.at || nu() };
@@ -146,6 +150,7 @@ module.exports = ({ saldi, saldoVan, grootboek, payBoekingenVoegToe, save, id, s
   /* De sleutel van de VOLGENDE boeking vooraf vastleggen (./dekking.js boekt
      twee keer met dezelfde). Buiten motorstand: null, en dan telt er niets. */
   const reserveerSleutel = () => { const k = sleutelVan(undefined); return k ? k.sleutel : null; };
+  const boekBekend = require('./boeking-bekend')({ geldModus, motorklant, grootboek, boekEenmaal, bevestigMotor });
 
-  return { pasToe, boek, boekAsync, reserveerSleutel };
+  return { pasToe, boek, boekAsync, boekBekend, reserveerSleutel };
 };

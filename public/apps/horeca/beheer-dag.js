@@ -27,20 +27,20 @@
       $('mGasten').textContent = d.gasten;
       $('mGemiddeld').textContent = d.gemiddeldePerBon == null ? '-' : K.euro(d.gemiddeldePerBon);
       $('mKanalen').innerHTML = (d.perKanaal || []).map(function (k) {
-        return K.rij('<b>' + esc(k.kanaal) + '</b> <span class="stil">· ' + k.bonnen + ' bon(nen) · ' +
+        return K.rij('<b>' + esc(k.kanaal) + '</b> <span class="stil ds-horeca-meta">· ' + k.bonnen + ' bon(nen) · ' +
           k.gasten + ' gast(en)</span>',
-        K.euro(k.omzetCenten) + ' <span class="stil">· ' +
+        K.euro(k.omzetCenten) + ' <span class="stil ds-horeca-meta">· ' +
           (k.gemiddeldePerBon == null ? 'geen gemiddelde' : K.euro(k.gemiddeldePerBon) + ' per bon') + '</span>');
-      }).join('') || '<p class="stil">Op deze datum is er nog geen bon afgerekend.</p>';
+      }).join('') || '<p class="stil ds-horeca-meta">Op deze datum is er nog geen bon afgerekend.</p>';
       $('mWijzen').innerHTML = Object.keys(d.perBetaalwijze).map(function (w) {
         return K.rij(esc(w), K.euro(d.perBetaalwijze[w]));
-      }).join('') || '<p class="stil">Nog niets afgerekend.</p>';
+      }).join('') || '<p class="stil ds-horeca-meta">Nog niets afgerekend.</p>';
       $('mApart').innerHTML =
-        K.rij('Fooi <span class="stil">· gaat naar het personeel, telt niet in de omzet</span>', K.euro(d.fooiCenten)) +
+        K.rij('Fooi <span class="stil ds-horeca-meta">· gaat naar het personeel, telt niet in de omzet</span>', K.euro(d.fooiCenten)) +
         K.rij('Korting', K.euro(d.kortingCenten)) +
-        K.rij('Oninbaar <span class="stil">· ' + (d.oninbaar.redenen.length ? esc(d.oninbaar.redenen.join('; ')) : 'geen') + '</span>',
+        K.rij('Oninbaar <span class="stil ds-horeca-meta">· ' + (d.oninbaar.redenen.length ? esc(d.oninbaar.redenen.join('; ')) : 'geen') + '</span>',
           d.oninbaar.bonnen + ' bon(nen) · ' + K.euro(d.oninbaar.centen)) +
-        K.rij('Nog open <span class="stil">· oudste ' + esc((d.nogOpen.oudste || '-').slice(0, 16).replace('T', ' ')) + '</span>',
+        K.rij('Nog open <span class="stil ds-horeca-meta">· oudste ' + esc((d.nogOpen.oudste || '-').slice(0, 16).replace('T', ' ')) + '</span>',
           d.nogOpen.rekeningen + ' rekening(en) · ' + K.euro(d.nogOpen.centen));
       $('mLet').textContent = d.let;
     });
@@ -52,8 +52,8 @@
       if (d.error) return K.meld(d.error);
       $('mSignaalTelling').textContent = d.aantal;
       $('mSignalen').innerHTML = (d.signalen || []).map(function (s) {
-        return K.rij('<span class="tag">' + esc(s.soort) + '</span> ' + esc(s.tekst), esc(s.tafel || ''));
-      }).join('') || '<p class="stil">Er vraagt op dit moment niets om aandacht.</p>';
+        return K.rij('<span class="tag ds-horeca-tag">' + esc(s.soort) + '</span> ' + esc(s.tekst), esc(s.tafel || ''));
+      }).join('') || '<p class="stil ds-horeca-meta">Er vraagt op dit moment niets om aandacht.</p>';
       $('mSignaalLet').textContent = d.let;
     });
   }

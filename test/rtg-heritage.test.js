@@ -126,8 +126,10 @@ test('Heritage blijft zelfstandig; basis laadt editorial v4 daarna als laatste l
   assert.doesNotMatch(TOKENS, /rtg-editorial-v4\.css/,
     'een CSS-import kan nooit na de rest van Heritage winnen');
   const basis = fs.readFileSync(path.join(ROOT,'public/shared/basis/basis-01.js'),'utf8');
-  assert.match(basis, /blad\.href = '\/shared\/rtg-editorial-v4\.css'/);
-  assert.match(basis, /laadEditorialBlad\(\)/);
+  assert.match(basis, /voegBasisStijlToe\('\/shared\/rtg-editorial-v4\.css', 'rtgEditorialV4Css'\)/);
+  const heritage = basis.slice(basis.indexOf('function laadHeritageBlad'), basis.indexOf('function pasWereldIdentiteitToe'));
+  assert.ok(heritage.indexOf("voegBasisStijlToe('/shared/rtg-heritage.css'") < heritage.indexOf('laadEditorialBlad()'),
+    'Heritage wordt eerst geplaatst en editorial v4 wint als laatste laag');
   assert.equal((TOKENS.match(/rtg-simple\.css/g) || []).length, 1);
   assert.match(WERELDSCHERMEN, /data-rtg-screen-root="content"/);
   assert.match(WERELDSCHERMEN, /data-rtg-screen-root="immersive"/);
@@ -236,13 +238,21 @@ test('routevarianten en canvaskeuzes zijn volledig herleidbaar tot het centrale 
     const body = (html.match(/<body\b[^>]*>/i) || [''])[0];
     const material = (body.match(/data-rtg-eigenvlak="([^"]+)"/) || [])[1];
     assert.equal(material, undefined, file + ' gebruikt nog een oude materiaalvariant');
-    /* Een scherm op het RTG Design System heeft zijn eigen schil: de layout en
-       de desktoploader van Heritage horen daar juist NIET (ONTWERPSYSTEEM.md
-       par. 5); zijn schil bewijst test/ontwerpsysteem.test.js en zijn eigen
-       browsertoets uit public/ds/contract.json "bewijs". */
+    /* DS vervangt de oude presentatie, niet de bestaande workspace-runtime.
+       Eén runtime mag blijven wanneer DS vooraf start en de route een eigen
+       browserbewijs heeft. AlleenDs bewijst daar de werkelijke centrale
+       presentatie, behouden domein-DOM en afwezigheid van legacy/extra Edge. */
     if (/class="[^"]*\bds-scherm\b/.test(body)) {
       assert.match(html, /href="\/ds\/rtg-ds\.css"/, file + ' draagt ds-scherm zonder het Design System');
-      assert.doesNotMatch(html, /rtg-world-desktop\.js|data-rtg-layout=/, file + ' mengt de oude schil met het Design System');
+      assert.doesNotMatch(html, /<link\b[^>]*href=["']\/shared\/[^"']+\.css/, file + ' laadt nog legacy-presentatie');
+      const loaders = html.match(/<script\b[^>]*src="\/shared\/rtg-world-desktop\.js"[^>]*>/g) || [];
+      assert.ok(loaders.length <= 1, file + ' start de gedeelde runtime meermaals');
+      if (loaders.length) {
+        assert.match(loaders[0], /\sdefer(?:\s|>)/, file + ' wacht niet op de DS-ingang');
+        assert.equal(require('../scripts/ontwerpsysteem').dsVoorScript(html, '/shared/rtg-world-desktop.js'), true, file + ': DS vóór runtime');
+        const bewijs = JSON.parse(lees('public/ds/contract.json')).bewijs['public/apps/' + file];
+        assert.ok(bewijs && fs.existsSync(path.join(ROOT, bewijs)), file + ': route heeft geen eigen browsercontract');
+      } else assert.doesNotMatch(body, /data-rtg-layout=/, file + ' claimt een workspace zonder runtime');
       continue;
     }
     if (identity.classify('/apps/'+file) !== 'redirect') {

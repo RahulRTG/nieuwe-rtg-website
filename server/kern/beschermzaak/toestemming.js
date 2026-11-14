@@ -57,6 +57,9 @@ module.exports = (ctx, eigen) => {
     /* ACHTERUIT, en meteen. Een lopende overdracht is geen reden om nog even
        door te gaan; juist dan is intrekken het signaal dat het moet stoppen. */
     if (z.stand === 'stabilisatie' || z.stand === 'overdracht') z.stand = 'toestemming';
+    if (typeof ctx.opvangStopVoorZaak === 'function') {
+      ctx.opvangStopVoorZaak(z.id, 'toestemming ingetrokken');
+    }
     z.bijgewerkt = nu();
     audit(wie(req).key, 'beschermzaak.toestemming-weg', z.codenaam, z.ingetrokken.reden || '');
     save();

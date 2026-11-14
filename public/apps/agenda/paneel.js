@@ -41,16 +41,16 @@
       $('#afHerhaalTot').value = open.herhaalTot || '';
       $('#afHerinner').value = open.herinner == null ? '' : String(open.herinner);
       $('#afNotitie').value = open.notitie || '';
-      $('#afWeg').style.display = open.id && !eco ? '' : 'none';
+      $('#afWeg').hidden = !(open.id && !eco);
       // een uitnodiging bewerkt u niet: u zegt ja of nee, en de organisator
       // houdt de afspraak zelf bij
-      $('#uitnodigingBlok').style.display = uitnodiging ? '' : 'none';
+      $('#uitnodigingBlok').hidden = !uitnodiging;
       if (uitnodiging) $('#uitnodigingTekst').textContent = 'Uitnodiging van ' + open.van +
         (open.status === 'ja' ? ' · u zei: ik kom.' : open.status === 'nee' ? ' · u zei: ik kom niet.' : ' · nog niet beantwoord.');
       zetVelden(!eco && !uitnodiging);
-      $('#deelBlok').style.display = open.id && !eco && !uitnodiging ? '' : 'none';
+      $('#deelBlok').hidden = !(open.id && !eco && !uitnodiging);
       // de Vergaderruimte (RTG Meet): voor de organisator en de genodigden
-      $('#afMeet').style.display = open.id && !eco ? '' : 'none';
+      $('#afMeet').hidden = !(open.id && !eco);
       tekenDeelnemers();
       $('#afScrim').classList.add('open');
       if (!eco && !uitnodiging) $('#afTitel').focus();
@@ -61,9 +61,9 @@
       var d = (open && open.deelnemers) || [];
       $('#afDeelnemers').innerHTML = d.length ? d.map(function (x) {
         var st = x.status === 'ja' ? 'komt' : x.status === 'nee' ? 'komt niet' : 'nog geen antwoord';
-        return '<div class="deeln"><span>' + esc(x.codenaam) + '</span><span class="st' +
-          (x.status === 'ja' ? ' ja' : '') + '">' + st + '</span></div>';
-      }).join('') : '<p class="stil h-mt40">Nog niemand uitgenodigd. De ander ziet alleen uw codenaam.</p>';
+        return '<div class="deeln ds-dag-deeln"><span>' + esc(x.codenaam) + '</span><span class="st' +
+          (x.status === 'ja' ? ' ja' : '') + ' ds-dag-st">' + st + '</span></div>';
+      }).join('') : '<p class="stil ds-dag-stil ds-dag-marge">Nog niemand uitgenodigd. De ander ziet alleen uw codenaam.</p>';
     }
 
     $('#afDicht').addEventListener('click', dicht);

@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-29T07:04:11.715Z",
-    "commit": "779eacacfb",
+    "op": "2026-11-10T14:28:37.259Z",
+    "commit": "aa79dabfa",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/edgekaart.js",
@@ -1144,7 +1144,7 @@
           "rol": "beslist",
           "etiket": null,
           "wat": "laadt controllers die ontbreken",
-          "citaat": "if (ds || window[bron[1]] || document.querySelector("
+          "citaat": "if (window[global] || document.querySelector('script[src=\"' + pad + '\"]')) return;"
         }
       ],
       "verantwoordelijkheden": [],
@@ -2916,7 +2916,7 @@
           "rol": "beslist",
           "etiket": "voortzetting:b",
           "wat": "geen vorige: de publieke ingang",
-          "citaat": "vorige = cfg ? cfg.huis || cfg.home : '/apps/app.html';"
+          "citaat": "vorige = intern(cfg && (cfg.huis || cfg.home)) || '/apps/app.html';"
         },
         {
           "rol": "leest",
@@ -2957,7 +2957,7 @@
       }
     },
     {
-      "pad": "public/shared/rtg-edge-smart-menu/rtg-edge-smart-menu-01.js",
+      "pad": "public/shared/rtg-edge-smart-menu/rtg-edge-smart-menu-02.js",
       "laag": "edge-casco",
       "rollen": [
         {
@@ -2983,9 +2983,7 @@
         "globals": [
           "RTGEdgeSmartMenu"
         ],
-        "zendt": [
-          "input"
-        ],
+        "zendt": [],
         "luistert": [],
         "attributen": [],
         "opslag": [],
@@ -3353,7 +3351,8 @@
         ],
         "zendt": [],
         "luistert": [
-          "rtg-public-state"
+          "rtg-public-state",
+          "rtg-website-truth"
         ],
         "attributen": [
           "data-rtg-desktop",
@@ -3386,7 +3385,8 @@
         ],
         "zendt": [],
         "luistert": [
-          "rtg-public-state"
+          "rtg-public-state",
+          "rtg-website-truth"
         ],
         "attributen": [
           "data-rtg-desktop",
@@ -3823,7 +3823,7 @@
         "public/shared/interface/world-desktop-home.js",
         "public/shared/randen.js",
         "public/shared/rtg-edge-library.js",
-        "public/shared/rtg-edge-smart-menu/rtg-edge-smart-menu-01.js"
+        "public/shared/rtg-edge-smart-menu/rtg-edge-smart-menu-02.js"
       ]
     },
     "zichtbaarheidsstand": {
@@ -3908,7 +3908,7 @@
       "public/shared/rtg-edge-library.js",
       "public/shared/rtg-edge-preferences.js",
       "public/shared/rtg-edge-smart-menu/rtg-edge-smart-menu-00.js",
-      "public/shared/rtg-edge-smart-menu/rtg-edge-smart-menu-01.js",
+      "public/shared/rtg-edge-smart-menu/rtg-edge-smart-menu-02.js",
       "public/shared/rtg-edge-system.js",
       "public/shared/rtg-edge-worlds.js"
     ],

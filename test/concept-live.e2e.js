@@ -85,13 +85,18 @@ test('het lid past het Rome-concept op het scherm aan; Rahul en de Edge werken m
       object: { soort: 'reisaanvraag', id: r, label: r } }), ref);
     assert.deepEqual((await page.evaluate(() => RTGEdgeBlikveld.voorRahul())).verwijzingen, [{ soort: 'reisaanvraag', id: ref }]);
 
-    const tab = page.locator('.rtg-rahul-tab').first();
-    await tab.waitFor({ timeout: 20000 });
-    await tab.click();
+    /* Op een DS-scherm is de zichtbare universele ingang de Edge. De oude
+       Rahul-tab blijft alleen de bestaande gespreks-/goedkeuringseigenaar en
+       wordt niet als tweede knop zichtbaar. */
+    const edgeRahul = page.locator('[data-ds-edge="rahul"]');
+    await edgeRahul.waitFor({ state: 'visible', timeout: 20000 });
+    await edgeRahul.click();
+    const edgeVeld = page.locator('.ds-edge__veld[aria-label="Vraag Rahul"]');
+    await edgeVeld.waitFor({ state: 'visible', timeout: 10000 });
+    await edgeVeld.fill('Ik wil met zes vrienden vier dagen naar Rome, maximaal 800 euro per persoon.');
+    await edgeVeld.press('Enter');
+
     const veld = page.locator('.rtg-rahul-page input[aria-label="Vraag Rahul"]');
-    await veld.waitFor({ state: 'visible', timeout: 10000 });
-    await veld.fill('Ik wil met zes vrienden vier dagen naar Rome, maximaal 800 euro per persoon.');
-    await veld.press('Enter');
 
     const kaart = page.locator('.rtg-rahul-page .rtg-conceptwerk');
     await kaart.waitFor({ timeout: 20000 });
@@ -104,16 +109,20 @@ test('het lid past het Rome-concept op het scherm aan; Rahul en de Edge werken m
     const maten = await page.evaluate(() => [...document.querySelectorAll('.rtg-conceptwerk label')].map((l) =>
       [l.querySelector('input').getBoundingClientRect().width, l.getBoundingClientRect().width]));
     for (const [veld, vak] of maten) assert.ok(veld <= vak + 0.5, 'een veld van ' + veld + ' px in een vak van ' + vak + ' px');
-    assert.ok(!(await page.evaluate(() => document.getElementById('rtgConceptwerkStijl').textContent)).includes('NaN'));
+    assert.equal(await page.locator('#rtgConceptwerkCss').count(), 0, 'DS gebruikt uitsluitend het canonieke componentblad');
+    assert.match(await kaart.getAttribute('class'), /\bds-conceptwerk\b/);
     assert.match(await kaart.locator('.afgeleid').textContent(), /Groepsbudget: maximaal € 5\.600/);
     const voorModel = model.verzoeken.length;
 
     // het lid past het concept op het scherm aan, zonder iets tegen Rahul te zeggen
     await kaart.locator('input[name="reizigers"]').fill('8');
-    await kaart.locator('input[name="reizigers"]').press('Tab');
+    /* De component bewaart op `change`. Expliciet vervagen is dezelfde
+       browserhandeling als uit het veld tabben, maar laat de uitkomst niet
+       afhangen van welk volgend element onder CI op dat moment focus krijgt. */
+    await kaart.locator('input[name="reizigers"]').blur();
     await page.waitForFunction(() => document.querySelector('.rtg-conceptwerk').getAttribute('data-versie') === '2', null, { timeout: 10000 });
     await kaart.locator('input[name="dagen"]').fill('5');
-    await kaart.locator('input[name="dagen"]').press('Tab');
+    await kaart.locator('input[name="dagen"]').blur();
     await page.waitForFunction(() => document.querySelector('.rtg-conceptwerk').getAttribute('data-versie') === '3', null, { timeout: 10000 });
     assert.match(await kaart.locator('.afgeleid').textContent(), /Groepsbudget: maximaal € 6\.400/);
     assert.equal(await kaart.locator('.rahul').textContent(),
@@ -131,7 +140,7 @@ test('het lid past het Rome-concept op het scherm aan; Rahul en de Edge werken m
 
     // een ongeldige waarde: geweigerd bij het veld, met de reden, en de versie blijft
     await kaart.locator('input[name="reizigers"]').fill('40');
-    await kaart.locator('input[name="reizigers"]').press('Tab');
+    await kaart.locator('input[name="reizigers"]').blur();
     await page.waitForFunction(() => document.querySelector('.rtg-conceptwerk input[name="reizigers"]').getAttribute('aria-invalid') === 'true', null, { timeout: 10000 });
     assert.match(await kaart.locator('#cw-' + obj[0].id + '-reizigers').textContent(), /van 1 tot en met 30/);
     assert.equal(await kaart.getAttribute('data-versie'), '3');

@@ -5,9 +5,8 @@
    rust is een uitkomst en geen leegte.
 
    Registreert GEEN stand en bindt geen knoppen; dat doet deel 3. De splitsing
-   bestaat om de 10 KB-maat te halen (scripts/check.js regel 13). De STIJL van dit
-   paneel staat sinds die maat weer knelde in deel 1a (overzicht-a.js) en komt
-   hier binnen als Deel.ovcss. */
+   bestaat om de 10 KB-maat te halen (scripts/check.js regel 13). De vorm van dit
+   paneel staat samen met de andere standen in geld-onderdelen.css. */
 (function (w, d) {
   'use strict';
   var $ = function (s) { return d.querySelector(s); };
@@ -25,28 +24,6 @@
 
   /* Alles gescopet op #ovWrap zodat een andere stand hier nooit iets van
      erft; de kaart, knop en lbl komen uit geld.html zelf. */
-
-  /* Via createElement en NIET als <style> in de html-string: de voordeur
-     stempelt alleen createElement-elementen met de CSP-nonce; een blok uit
-     innerHTML wordt door style-src geweigerd (zo ging RTG-code ooit
-     ongestyled de lucht in). Id-wacht: teken() draait bij elke standwissel. */
-  function stijl() {
-    if (d.getElementById('ovStijl')) return;
-    var css = (w.RTGGeldDeel || {}).ovcss;
-    /* GEEN STILLE TERUGVAL OP EEN LEGE STRING, en dat is geen theorie: hier stond
-       `|| ''` en deel 1a was nog niet in geld.html gezet. Het paneel tekende
-       ongestyled door en niemand merkte het -- behalve de raakvlakronde, die de
-       navigatielinks als te kleine knoppen meldde. Een symptoom dat op een heel
-       ander probleem wees. Een ontbrekend deel hoort te schreeuwen. */
-    if (!css) {
-      if (w.console && w.console.error) w.console.error('geld/overzicht: deel 1a (overzicht-a.js) is niet geladen -- dit paneel blijft ongestyled');
-      return;
-    }
-    var st = d.createElement('style');
-    st.id = 'ovStijl';
-    st.textContent = css;
-    d.head.appendChild(st);
-  }
 
   function groet() {
     /* Het uur van de KLANT, niet van de server: wie elders in de wereld zit,
@@ -107,7 +84,6 @@
   /* Tekent de cockpit in #ovVak. Ontbreekt dat vak, dan hoort dit luid stuk
      te gaan en niet stil over te slaan (LAT.md regel 5); daarom geen wacht. */
   function teken(c) {
-    stijl();
     var esc = w.Geld.esc, cf = c.cijfers || {}, uz = c.uitzonderingen || [];
     var staat = uz.length === 0 ? 'Alles in orde'
       : uz.length === 1 ? '1 zaak vraagt aandacht'
@@ -153,5 +129,5 @@
   }
 
   var Deel = w.RTGGeldDeel = w.RTGGeldDeel || {};
-  Deel.overzicht = { stijl: stijl, teken: teken, deelVooruit: deelVooruit };
+  Deel.overzicht = { teken: teken, deelVooruit: deelVooruit };
 })(window, document);

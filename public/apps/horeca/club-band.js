@@ -33,11 +33,11 @@
       var d = r.body;
       if (d.error) return K.meld(d.error);
       $('cTafels').innerHTML = (d.tafels || []).map(function (t) {
-        return K.rij('<b>' + esc(t.tafel) + '</b> <span class="stil">· ' + esc(t.gastnaam || 'zonder naam') +
-          ' · ' + t.personen + ' personen</span> <span class="tag' + (t.gehaald ? ' aan' : '') + '">' +
+        return K.rij('<b>' + esc(t.tafel) + '</b> <span class="stil ds-horeca-meta">· ' + esc(t.gastnaam || 'zonder naam') +
+          ' · ' + t.personen + ' personen</span> <span class="tag ds-horeca-tag' + (t.gehaald ? ' aan' : '') + '">' +
           (t.gehaald ? 'minimum gehaald' : K.euro(t.teGaan) + ' te gaan') + '</span>',
         K.euro(t.besteed) + ' van ' + K.euro(t.minimumCenten));
-      }).join('') || '<p class="stil">Er staat geen tafel met een minimum spend.</p>';
+      }).join('') || '<p class="stil ds-horeca-meta">Er staat geen tafel met een minimum spend.</p>';
       $('cTafelLet').textContent = d.let;
     });
   }

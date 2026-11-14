@@ -67,8 +67,9 @@ test('op een echte server: wie zich ziek meldt, staat vrij in het weekrooster en
     const mw = rooster.find(x => x.role === 'staff'), baas = rooster.find(x => x.role === 'manager');
     const tMw = (await api('supplier/login', { code: 'KIKUNOI', staffId: mw.id, pin: '5678' })).body.token;
     const tBaas = (await api('supplier/login', { code: 'KIKUNOI', staffId: baas.id, pin: '1234' })).body.token;
-    const vandaag = new Date().toISOString().slice(0, 10);
-    const voor = (await api('supplier/schedule', {}, tBaas)).body.days[0].staff.find(x => x.id === mw.id);
+    const voorDag = (await api('supplier/schedule', {}, tBaas)).body.days[0];
+    const vandaag = voorDag.date;
+    const voor = voorDag.staff.find(x => x.id === mw.id);
     assert.equal(voor.afwezig, undefined, 'voor de melding staat hij gewoon in het rooster');
 
     const z = await api('staff/leave/request', { soort: 'ziek', van: vandaag }, tMw);

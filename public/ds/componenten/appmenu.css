@@ -1,0 +1,98 @@
+/* Het bestaande RTGAppMenu blijft eigenaar van acties, ontdekking en focus.
+   Deze presentatie wordt uitsluitend op html[data-ds] aangesloten. */
+@layer rtg.component {
+  .ds-appmenu__knop, .ds-appmenu__sluit {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    min-inline-size: var(--ds-doel);
+    min-block-size: var(--ds-doel);
+    padding: var(--ds-ruimte-2);
+    border: 0;
+    border-radius: var(--ds-radius-knop);
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    cursor: pointer;
+  }
+  .ds-appmenu__knop svg {
+    inline-size: 1.5rem; block-size: 1.5rem;
+    stroke: currentColor; fill: none; stroke-width: 1.7; stroke-linecap: round;
+  }
+  .ds-appmenu__knop.amn-zweef {
+    position: fixed; z-index: 9970;
+    inset-block-start: calc(env(safe-area-inset-top, 0px) + var(--ds-ruimte-2));
+    inset-inline-start: max(var(--ds-ruimte-2), env(safe-area-inset-left, 0px), env(safe-area-inset-right, 0px));
+    background: var(--ds-oppervlak);
+    color: var(--ds-inkt);
+    box-shadow: var(--ds-schaduw-inhoud);
+  }
+  .ds-appmenu__links, .ds-appmenu__koprij {
+    display: flex; align-items: center; gap: var(--ds-ruimte-2);
+  }
+  .ds-appmenu__links { grid-column: 1; justify-self: start; flex-wrap: wrap; min-inline-size: 0; }
+  .ds-appmenu__links > * { max-inline-size: 100%; overflow-wrap: anywhere; }
+  .ds-appmenu__host.ds-kop { grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); }
+  .ds-appmenu {
+    position: fixed; inset: 0; z-index: 9994;
+    display: none; align-items: end; justify-content: center;
+    padding-block-start: max(var(--ds-ruimte-4), env(safe-area-inset-top, 0px));
+    padding-inline: max(var(--ds-ruimte-2), env(safe-area-inset-left, 0px), env(safe-area-inset-right, 0px));
+    background: var(--ds-glas);
+    font-family: var(--ds-letter-tekst);
+  }
+  .ds-appmenu.amn-open { display: flex; }
+  .ds-appmenu .ds-appmenu__blad {
+    inline-size: min(100%, 28rem); min-inline-size: 0;
+    max-block-size: min(86dvh, calc(100dvh - env(safe-area-inset-top, 0px) - var(--ds-ruimte-4)));
+    overflow-y: auto; overscroll-behavior: contain;
+    margin: 0;
+    padding: var(--ds-ruimte-4);
+    padding-block-end: calc(var(--ds-ruimte-4) + env(safe-area-inset-bottom, 0px));
+    background: var(--ds-cover-grond); color: var(--ds-cover-inkt);
+    border-color: var(--ds-glasrand);
+  }
+  .ds-appmenu__greep {
+    inline-size: var(--ds-ruimte-8); block-size: var(--ds-ruimte-1);
+    margin-block: 0 var(--ds-ruimte-3); margin-inline: auto;
+    background: var(--ds-cover-metaal); border-radius: var(--ds-radius-capsule);
+  }
+  .ds-appmenu__kop { display: flex; align-items: center; justify-content: space-between; gap: var(--ds-ruimte-3); }
+  .ds-appmenu__kop b {
+    min-inline-size: 0; overflow-wrap: anywhere;
+    font: 500 var(--ds-maat-kop)/1.2 var(--ds-letter-display);
+  }
+  .ds-appmenu__sluit { color: var(--ds-cover-inkt); }
+  .ds-appmenu__sectie {
+    margin-block: var(--ds-ruimte-6) var(--ds-ruimte-2);
+    color: var(--ds-cover-metaal); font-size: var(--ds-maat-meta);
+    letter-spacing: .12em; text-transform: uppercase;
+  }
+  .ds-appmenu__rooster { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 10rem), 1fr)); gap: var(--ds-ruimte-2); }
+  .ds-appmenu__tegel, .ds-appmenu__rij {
+    display: flex; align-items: center; gap: var(--ds-ruimte-3);
+    min-inline-size: 0; min-block-size: var(--ds-doel); inline-size: 100%;
+    padding-block: var(--ds-ruimte-3); padding-inline: var(--ds-ruimte-3);
+    border: 1px solid var(--ds-glasrand); border-radius: var(--ds-radius-inhoud);
+    background: transparent; color: var(--ds-cover-inkt);
+    font: 400 var(--ds-maat-klein)/1.5 var(--ds-letter-tekst); text-align: start;
+    cursor: pointer;
+  }
+  .ds-appmenu__tegel span, .ds-appmenu__rij span { min-inline-size: 0; overflow-wrap: anywhere; }
+  .ds-appmenu__tegel svg, .ds-appmenu__rij svg {
+    flex: 0 0 auto; inline-size: 1.25rem; block-size: 1.25rem;
+    stroke: var(--ds-cover-metaal); fill: none; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;
+  }
+  .ds-appmenu__lijst { display: flex; flex-direction: column; }
+  .ds-appmenu__rij { border: 0; border-block-start: 1px solid var(--ds-glasrand); }
+  .ds-appmenu__rij:first-child { border-block-start: 0; }
+  .ds-appmenu__rij em { margin-inline-start: auto; font-style: normal; font-size: var(--ds-maat-meta); font-variant-numeric: tabular-nums; }
+  .ds-appmenu__leeg { margin: 0; font-size: var(--ds-maat-klein); line-height: 1.5; }
+  .ds-appmenu__knop:focus-visible { outline: 2px solid var(--ds-focus); outline-offset: 2px; }
+  .ds-appmenu__tegel:focus-visible, .ds-appmenu__rij:focus-visible, .ds-appmenu__sluit:focus-visible { outline: 2px solid var(--ds-cover-metaal); outline-offset: 2px; }
+  .ds-appmenu__tegel:hover, .ds-appmenu__rij:hover, .ds-appmenu__sluit:hover { background: var(--ds-glasrand); }
+  @media (min-width: 40rem) {
+    .ds-appmenu { align-items: center; padding-block-end: max(var(--ds-ruimte-4), env(safe-area-inset-bottom, 0px)); }
+  }
+}

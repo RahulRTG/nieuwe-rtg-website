@@ -100,7 +100,7 @@
   }
   function renderKeuken(){
     const tabBtn = document.getElementById('tabKeuken');
-    if (tabBtn) tabBtn.style.display = (heeftKeuken() || heeftBar()) ? '' : 'none';
+    if (tabBtn) tabBtn.classList.toggle('h-weg', !(heeftKeuken() || heeftBar()));
     const wrap = $('#keukenWrap'); if (!wrap) return;
     if (!heeftKeuken() && !heeftBar()){ wrap.innerHTML = ''; return; }
     // een pure bar of club heeft alleen de barkant; stuur de keuze daarheen

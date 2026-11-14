@@ -2,7 +2,10 @@
    not ready and must not mutate. Signal ready(name) after rendering. */
 (function (g, factory) {
   'use strict';
-  var core = typeof module === 'object' && module.exports ? require('./rtg-route-memory-core.js') : g && g.RTGRouteMemoryCore;
+  /* De browser krijgt Core via basis.js; CommonJS gebruikt de gebruikelijke
+     extensieloze module-resolutie. Zo wordt de Node-import niet ten onrechte
+     als een documentscript of stylesheet in de browserlaadgraaf beschouwd. */
+  var core = typeof module === 'object' && module.exports ? require('./rtg-route-memory-core') : g && g.RTGRouteMemoryCore;
   if (!core) return;
   var library = factory(core);
   if (typeof module === 'object' && module.exports) module.exports = library;

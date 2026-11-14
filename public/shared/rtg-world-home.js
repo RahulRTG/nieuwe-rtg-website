@@ -21,7 +21,7 @@
       var when = d.createElement('span'); when.setAttribute('translate', 'no'); when.textContent = dates; detail.appendChild(when);
     }
     var action = d.getElementById('worldTravelAction');
-    action.href = state === 'guest' ? '/apps/app.html' : first ? '#reizen' : '/apps/reisbureau.html';
+    action.setAttribute('href', state === 'guest' ? '/apps/app.html' : first ? '#reizen' : '/apps/reisbureau.html');
     action.innerHTML = text(state === 'guest' ? 'signIn' : first ? 'openTrip' : 'planTrip') + '<span aria-hidden="true">↗</span>';
   }
   function work(data, state) {

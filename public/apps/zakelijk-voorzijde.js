@@ -1,3 +1,4 @@
+// Presenteert zakelijk vervoer binnen het centrale designsysteem.
 (() => {
   'use strict';
   /* Zakelijk vervoer op het RTG Design System (TRAVELOS-MIGRATIE.md, stroom

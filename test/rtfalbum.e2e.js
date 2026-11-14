@@ -8,6 +8,7 @@ const { startServer, letOpFouten, laadPlaywright, browserOpties, geenBrowser } =
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
+const tijdzone = require('../server/kern/tijdzone');
 
 const pw = laadPlaywright();
 const PNG = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==';
@@ -24,13 +25,13 @@ test('Gezinsalbum: maandgroepen, hartje + filter, kijker, terugblik en de jarige
     const sess = { code: g.code, token: g.token };
     await post('/api/rtf/baby/instellen', Object.assign({}, sess, { kindNaam: 'Fien', geboren: '2025-11-05' }));
     await post('/api/rtf/baby/entry-maak', Object.assign({}, sess, { tekst: 'Eerste stapjes', foto: PNG }));
-    const nu = new Date();
-    const oud = (nu.getFullYear() - 1) + '-' + String(nu.getMonth() + 1).padStart(2, '0') + '-' + String(nu.getDate()).padStart(2, '0');
+    const vandaag = tijdzone.datumIn();
+    const oud = tijdzone.plusDagen(vandaag, -365);
     await post('/api/rtf/baby/entry-maak', Object.assign({}, sess, { tekst: 'Toen nog zo klein', dag: oud }));
     // een verjaardag over tien dagen, voor de strook
-    const over10 = new Date(Date.now() + 10 * 86400000);
+    const over10 = tijdzone.plusDagen(vandaag, 10);
     await post('/api/foundation/gezin/verjaardag/persoon', Object.assign({}, sess,
-      { naam: 'Oma Riet', dag: over10.getDate(), maand: over10.getMonth() + 1, jaar: 1956 }));
+      { naam: 'Oma Riet', dag: Number(over10.slice(8, 10)), maand: Number(over10.slice(5, 7)), jaar: 1956 }));
 
     browser = await pw.chromium.launch(browserOpties(pw));
     const page = await browser.newPage();
@@ -51,7 +52,7 @@ test('Gezinsalbum: maandgroepen, hartje + filter, kijker, terugblik en de jarige
 
     /* maandgroepen: het album kent hoofdstukken, en de terugblik het verleden */
     const MAANDEN = ['januari','februari','maart','april','mei','juni','juli','augustus','september','oktober','november','december'];
-    const kop = MAANDEN[new Date().getMonth()];
+    const kop = MAANDEN[Number(vandaag.slice(5, 7)) - 1];
     assert.ok(await page.evaluate(k => new RegExp(k, 'i').test(document.querySelector('#boek').textContent), kop),
       'de huidige maand is een hoofdstuk');
     await page.waitForFunction(() => !document.querySelector('#terugblikSec').hidden &&

@@ -669,3 +669,25 @@ test('een zware toets draait nog steeds mee als je hem niet wegvraagt', () => {
       'staat, deze lijst over kosten. Twee redenen, twee lijsten.');
   }
 });
+
+test('de vijf schermdelen draaien, worden samengevoegd en reizen mee in het bewijs', () => {
+  /* Vier delen pasten met de actuele, volledige meting niet meer binnen de
+     45-minutengrens van de job. Alleen de matrix vergroten is gevaarlijk: dan
+     kan deel vijf groen draaien terwijl het schermjournaal en het latere
+     bewijs hem stil vergeten. Deze bewering bindt uitvoering, samenvoeging en
+     bewijsverzameling aan dezelfde vijf delen. */
+  const wortel = path.join(__dirname, '..');
+  const yml = fs.readFileSync(path.join(wortel, '.github', 'workflows', 'ci.yml'), 'utf8');
+  const verzamelaar = fs.readFileSync(path.join(wortel, 'scripts', 'outputcollect.js'), 'utf8');
+  const planner = fs.readFileSync(path.join(wortel, 'scripts', 'outputproof.js'), 'utf8');
+  const { requiredJournals } = require('../scripts/lib/outputartifact');
+  assert.match(yml, /name: Schermtoetsen deel \$\{\{ matrix\.deel \}\} van 5/);
+  assert.match(yml, /deel: \[1, 2, 3, 4, 5\]/);
+  assert.match(yml, /npm run e2e -- --deel=\$\{\{ matrix\.deel \}\}\/5/);
+  assert.match(yml, /for deel in 1 2 3 4 5; do/);
+  assert.match(verzamelaar, /requiredJournals: required/);
+  assert.match(planner, /verifyJournalSources\(provenance\.sources\)/);
+  assert.deepEqual(requiredJournals.filter(r => r.artifact.startsWith('schermjournaal-deel-'))
+    .map(r => [r.artifact, r.job]), [1, 2, 3, 4, 5].map(n =>
+      ['schermjournaal-deel-' + n, 'Schermtoetsen deel ' + n + ' van 5']));
+});

@@ -1,5 +1,5 @@
 {
-  "stempel": "2026-10-06",
+  "stempel": "2026-11-12",
   "uitleg": "Per lezer van db.data.rides: wat hij eruit haalt en of de opdrachtwereld dat kan leveren. Geschreven vóór de migratie, zodat die niet wordt geraden. Zie MAATSTAF.md par. 7.5.",
   "blokkade": {
     "stand": "opgeheven",
@@ -114,7 +114,7 @@
         "naOmzetting": "na het besluit. Fooi is geld van een mens: een rit die uit de telling valt, kost een chauffeur zijn deel"
       },
       {
-        "bestand": "server/opzet/kernlaag4.js",
+        "bestand": "server/opzet/kernlaag4-bedrijfsmaat.js",
         "treffers": 1,
         "wat": "afgeronde ritten als geslaagde uitkomst voor activatie en retentie (kern/bedrijfsmaat/stand.js, als lezer)",
         "naOmzetting": "na het besluit. Een rit die uit de telling valt, maakt een geactiveerd lid stil tot een niet-geactiveerd lid"

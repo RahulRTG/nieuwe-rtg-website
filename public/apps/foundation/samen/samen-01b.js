@@ -1,13 +1,20 @@
 /* De Samen-meldingen en de rustige poller voor pagina- en chatupdates. */
   var bannerEl = null;
+  function veiligSamenPad(waarde) {
+    var p = String(waarde || '');
+    if (!p || p.length > 200 || p !== p.trim() || /[?#\\\u0000-\u001f]/.test(p)) return '';
+    if (!/^\/(?:apps|site)\//.test(p) || /(?:^|\/)\.{1,2}(?:\/|$)/.test(p)) return '';
+    return p;
+  }
   function banner(tekst, pad) {
+    pad = veiligSamenPad(pad);
     if (bannerEl) bannerEl.remove();
     bannerEl = maakEl('<div class="rsm-banner"><span>' + esc(tekst) + '</span>' +
       (pad ? '<button class="rsm-go" type="button">Ga mee →</button>' : '') +
       '<button class="rsm-x" type="button" aria-label="Sluiten">✕</button></div>');
     document.body.appendChild(bannerEl);
     if (pad) bannerEl.querySelector('.rsm-go').addEventListener('click',
-      function () { location.href = pad; });
+      function () { window.location.assign(pad); });
     bannerEl.querySelector('.rsm-x').addEventListener('click', function () {
       bannerEl.remove(); bannerEl = null;
     });

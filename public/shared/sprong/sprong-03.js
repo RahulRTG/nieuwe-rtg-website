@@ -1,13 +1,6 @@
   /* --- deel 3: de lijst en wat een tik doet --- */
-  /* WAT KAN IK HIER DOEN. Dezelfde lijst die het app-menu toont
-     (RTGAppMenu.functies), en met opzet geen eigen lijst: die zou binnen een
-     week iets anders zeggen dan het menu drie centimeter verderop. Staat het
-     menu niet op deze pagina, dan is er geen kopje Hier -- en niet een leeg
-     kopje, want een kopje zonder inhoud belooft iets.
-
-     Een handeling die de pagina niet AANBIEDT komt hier dus ook niet in. Dat is
-     de grens die GRAMMATICA.md al trekt: de software stelt voor, hij verzint
-     niet. */
+  /* Alleen echte handelingen uit de bestaande appmenu-owner: geen eigen lijst
+     of leeg kopje dat mogelijkheden belooft die de pagina niet aanbiedt. */
   function handelingen() {
     if (!w.RTGAppMenu || typeof w.RTGAppMenu.functies !== 'function') return [];
     var uit = [];
@@ -104,22 +97,17 @@
   }
 
   function bouw() {
-    luik = d.createElement('div');
-    luik.className = 'rtgsprong'; luik.hidden = true;
+    luik = d.createElement('dialog');
+    luik.className = 'rtgsprong ds-sprong ds-dialoog'; luik.hidden = true;
     luik.setAttribute('role', 'dialog'); luik.setAttribute('aria-modal', 'true');
     luik.setAttribute('aria-label', 'Spring naar een functie');
+    luik.addEventListener('cancel', function (e) { e.preventDefault(); sluit(); });
     var kop = d.createElement('div'); kop.className = 'rtgsprong-kop';
     veld = d.createElement('input');
     veld.type = 'search'; veld.placeholder = 'Waar wilt u heen?';
     veld.setAttribute('aria-label', 'Zoek een functie');
     veld.addEventListener('input', function () { teken(veld.value); });
-    /* PIJLTJES EN ENTER, want op een bureau is dit een toetsenbordding. De
-       eerste rij staat al klaar: wie typt en meteen Enter drukt, opent de beste
-       treffer zonder de muis aan te raken -- dat is de hele reden dat zo'n lade
-       op een computer sneller voelt dan een menu.
-
-       Op een telefoon verandert er niets: daar is er geen toetsenbordfocus om
-       te verplaatsen en blijft tikken tikken. */
+    /* Enter opent de beste treffer; pijlen bewegen tussen veld en resultaten. */
     veld.addEventListener('keydown', function (e) {
       var rijen = lijst.querySelectorAll('.rtgsprong-rij');
       if (!rijen.length) return;
@@ -164,20 +152,26 @@
   function open() {
     var lade = ledenlade();
     if (lade) { lade.classList.add('open'); var i = d.getElementById('osZoekInput'); if (i) i.focus(); return; }
-    if (!luik) bouw();
+    if (!luik || !luik.isConnected) bouw();
+    if (!luik.hidden) { veld.focus(); return; }
     laadElders();
     terugNaar = d.activeElement;
     luik.hidden = false;
-    haal().then(function () { teken(veld.value); veld.focus(); });
+    if (luik.tagName === 'DIALOG') luik.showModal();
+    var eigenLuik = luik;
+    haal().then(function () {
+      if (luik !== eigenLuik || !luik.isConnected || luik.hidden) return;
+      teken(veld.value); veld.focus();
+    });
   }
   function sluit() {
-    if (luik) luik.hidden = true;
-    if (terugNaar && terugNaar.focus) terugNaar.focus();
+    if (luik) { luik.hidden = true; if (luik.tagName === 'DIALOG' && luik.open) luik.close(); }
+    if (terugNaar && terugNaar.isConnected && terugNaar.focus) terugNaar.focus();
   }
 
   function greepje() {
     greep = d.createElement('button');
-    greep.type = 'button'; greep.className = 'rtgsprong-greep';
+    greep.type = 'button'; greep.className = 'rtgsprong-greep ds-sprong-greep';
     greep.setAttribute('aria-label', 'Spring naar een functie');
     greep.innerHTML = '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" ' +
       'stroke-width="1.6" aria-hidden="true"><circle cx="11" cy="11" r="6"/><path d="M15.5 15.5 21 21"/></svg>';

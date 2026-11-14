@@ -1,0 +1,57 @@
+/* Presentatie van de bestaande RTGi18n-owner; geen tweede vertaalmotor.
+   De native dialoog regelt modaliteit, de bestaande hooks alle taalacties. */
+@layer rtg.component {
+  .ds-taalkeuze {
+    box-sizing: border-box; position: fixed; inset: 0; z-index: 99999;
+    inline-size: 100%; max-inline-size: none; block-size: 100%; max-block-size: none;
+    margin: 0; border: 0; display: none; align-items: end; justify-content: center;
+    padding-block: max(var(--ds-ruimte-3), env(safe-area-inset-top, 0px)) max(var(--ds-ruimte-3), env(safe-area-inset-bottom, 0px));
+    padding-inline: max(var(--ds-ruimte-3), env(safe-area-inset-left, 0px), env(safe-area-inset-right, 0px));
+    background: transparent; color: var(--ds-cover-inkt); font-family: var(--ds-letter-tekst);
+  }
+  .ds-taalkeuze.open { display: flex; }
+  .ds-taalkeuze::backdrop { background: var(--ds-glas); }
+  .ds-taalkeuze .rtg-lang-card {
+    box-sizing: border-box; inline-size: min(100%, 35rem); min-inline-size: 0;
+    max-block-size: calc(100dvh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px) - 2 * var(--ds-ruimte-3));
+    margin: 0; padding: var(--ds-ruimte-4); overflow: auto; overscroll-behavior: contain;
+    color: var(--ds-cover-inkt); background: var(--ds-cover-grond); border: 1px solid var(--ds-glasrand); border-radius: var(--ds-radius-systeem); text-align: start;
+  }
+  .ds-taalkeuze .rtg-lang-head { display: flex; align-items: center; justify-content: space-between; gap: var(--ds-ruimte-3); margin-block-end: var(--ds-ruimte-3); }
+  .ds-taalkeuze .rtg-lang-eyebrow, .ds-taalkeuze .rtg-lang-label, .ds-taalkeuze .rtg-lang-quick-wrap > span {
+    font-size: var(--ds-maat-meta); font-weight: 600; line-height: 1.5; letter-spacing: .12em; text-transform: uppercase; color: var(--ds-cover-metaal);
+  }
+  .ds-taalkeuze h2 { margin: 0; font: 500 var(--ds-maat-titel)/1.1 var(--ds-letter-display); overflow-wrap: anywhere; }
+  .ds-taalkeuze .rtg-lang-card > p { margin-block: var(--ds-ruimte-3) var(--ds-ruimte-6); font-size: var(--ds-maat-klein); line-height: 1.6; }
+  .ds-taalkeuze .rtg-lang-label { display: block; margin-block-end: var(--ds-ruimte-2); }
+  .ds-taalkeuze button, .ds-taalkeuze input {
+    min-inline-size: var(--ds-doel); min-block-size: var(--ds-doel); max-inline-size: 100%;
+    padding: var(--ds-ruimte-3); border: 1px solid var(--ds-glasrand); border-radius: var(--ds-radius-knop);
+    color: inherit; background: transparent; font: inherit; font-size: var(--ds-maat-klein); line-height: 1.5;
+  }
+  .ds-taalkeuze button { cursor: pointer; overflow-wrap: anywhere; }
+  .ds-taalkeuze button:hover, .ds-taalkeuze .rtg-lang-quick.is-active { background: var(--ds-glasrand); border-color: var(--ds-cover-metaal); }
+  .ds-taalkeuze button:focus-visible, .ds-taalkeuze input:focus-visible { outline: 2px solid var(--ds-cover-metaal); outline-offset: 2px; }
+  .ds-taalkeuze button:disabled { cursor: default; }
+  .ds-taalkeuze .rtg-lang-close { display: grid; place-items: center; flex: 0 0 auto; padding: var(--ds-ruimte-2); }
+  .ds-taalkeuze .rtg-lang-search { display: flex; flex-wrap: wrap; gap: var(--ds-ruimte-2); margin-block-end: var(--ds-ruimte-3); }
+  .ds-taalkeuze .rtg-lang-search input { flex: 1 1 10rem; min-inline-size: 0; inline-size: 100%; }
+  .ds-taalkeuze .rtg-lang-search input::placeholder { color: var(--ds-cover-inkt); opacity: .75; }
+  .ds-taalkeuze .rtg-lang-search button { flex: 0 0 auto; }
+  .ds-taalkeuze #rtg-lang-mic { display: grid; place-items: center; padding: var(--ds-ruimte-2); }
+  .ds-taalkeuze #rtg-lang-mic svg { inline-size: 1.5rem; block-size: 1.5rem; }
+  .ds-taalkeuze #rtg-lang-mic.luistert { background: var(--ds-cover-metaal); color: var(--ds-cover-grond); }
+  .ds-taalkeuze .rtg-lang-hint { display: flex; align-items: center; gap: var(--ds-ruimte-3); inline-size: 100%; text-align: start; margin-block-end: var(--ds-ruimte-4); }
+  .ds-taalkeuze .rtg-lang-hint[hidden] { display: none; }
+  .ds-taalkeuze .rtg-lang-sug { display: flex; flex-direction: column; min-inline-size: 0; gap: var(--ds-ruimte-1); }
+  .ds-taalkeuze .rtg-lang-go { font-size: var(--ds-maat-meta); color: var(--ds-cover-metaal); }
+  .ds-taalkeuze .rtg-lang-mis { line-height: 1.5; }
+  .ds-taalkeuze .rtg-lang-quick-wrap { border-block-start: 1px solid var(--ds-glasrand); padding-block-start: var(--ds-ruimte-4); }
+  .ds-taalkeuze .rtg-lang-quick-wrap > span { display: block; margin-block-end: var(--ds-ruimte-2); }
+  .ds-taalkeuze .rtg-lang-quick-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 11rem), 1fr)); gap: var(--ds-ruimte-2); }
+  .ds-taalkeuze .rtg-lang-quick { display: flex; align-items: center; gap: var(--ds-ruimte-3); min-inline-size: 0; text-align: start; }
+  .ds-taalkeuze .rtg-lang-quick > span:last-child { min-inline-size: 0; overflow-wrap: anywhere; }
+  .ds-taalkeuze .rtg-lang-code { display: inline-grid; place-items: center; flex: 0 0 auto; min-inline-size: 2rem; min-block-size: 2rem; color: var(--ds-cover-metaal); font-size: var(--ds-maat-meta); font-weight: 700; }
+  @media (min-width: 40rem) { .ds-taalkeuze { align-items: center; } }
+  @media print { .ds-taalkeuze { display: none; } }
+}

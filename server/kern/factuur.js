@@ -9,6 +9,8 @@
    Bedragen tonen we als "EUR 1.234,56": geen euroteken, zodat we niet afhankelijk
    zijn van de tekstcodering van de viewer. Alles blijft ASCII en dus robuust. */
 
+const csvcel = require('../lib/csvcel');
+
 const RTG = {
   naam: 'Rahul Travel Group',
   kvk: 'KvK 82273510',
@@ -187,9 +189,7 @@ function overzichtPdf(kop, rijen) {
 //  2) csv-escaping: quotes verdubbelen en het veld tussen quotes zetten zodra
 //     er een scheidingsteken, quote of regeleinde in staat.
 function csvCel(v) {
-  let s = String(v == null ? '' : v);
-  if (/^[=+\-@\t\r]/.test(s) && !/^[-+]?[\d.,]+%?$/.test(s)) s = "'" + s;
-  return /[",\n;]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+  return csvcel(v, { behoudGetallen: true });
 }
 
 function csv(rijen) {

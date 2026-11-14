@@ -65,8 +65,24 @@ test('de muisvrije balk werkt in een echte pagina', { skip: geenBrowser(pw) }, a
        is er geen vaste balk meer. Je roept Rahul, en dan is hij er. Beide
        kanten horen hier vast te liggen, anders sluipt de balk zo weer terug. */
     await page.waitForSelector('.hv-balk input', { state: 'attached', timeout: 15000 });
+    /* Iedere host gebruikt nu de canonieke component. De server mag centrale
+       bladen bundelen, daarom bewijst de CSSOM de werkelijke regel in plaats
+       van een letterlijke linknaam. Een oude payload blijft verboden. */
+    await page.waitForFunction(() => {
+      function bevat(regels) {
+        return Array.from(regels || []).some(regel => {
+          if (regel.selectorText && regel.selectorText.includes('.ds-handenvrij__balk')) return true;
+          try { return regel.cssRules && bevat(regel.cssRules); } catch (_) { return false; }
+        });
+      }
+      const legacy = Array.from(document.querySelectorAll('style'))
+        .some(stijl => stijl.textContent.includes('.hv-balk{position:fixed;'));
+      return Array.from(document.styleSheets).some(blad => { try { return bevat(blad.cssRules); } catch (_) { return false; } }) && !legacy;
+    }, null, { timeout: 15000 });
     assert.equal(await page.evaluate(() => document.querySelector('.hv-balk').classList.contains('hv-weg')),
       true, 'de balk hoort weg te staan tot je Rahul roept');
+    assert.equal(await page.evaluate(() => getComputedStyle(document.querySelector('.hv-balk')).display),
+      'none', 'de legacy hv-weg-hook moet in de werkelijke cascade verborgen blijven');
     await page.evaluate(() => window.RTGRahul.open());
     await page.waitForSelector('.hv-balk input', { state: 'visible', timeout: 15000 });
     /* EN DAN NOG WACHTEN TOT DE BALK STIL STAAT. `state: 'visible'` is al waar
@@ -229,6 +245,17 @@ test('de muisvrije balk werkt in een echte pagina', { skip: geenBrowser(pw) }, a
        gesprek klapte het weer dicht); dit is wat er daarna nog aan speling over
        is. */
     await page.waitForSelector('.hv-kaart', { state: 'visible', timeout: 15000 });
+    const geldPresentatie = await page.evaluate(() => {
+      const kaart = document.querySelector('.hv-kaart');
+      const ja = kaart.querySelector('button.ja');
+      const r = ja.getBoundingClientRect();
+      return { ds: kaart.classList.contains('ds-handenvrij__geldkaart'), role: kaart.getAttribute('role'),
+        breed: r.width, hoog: r.height, inBeeld: r.top >= 0 && r.bottom <= innerHeight && r.left >= 0 && r.right <= innerWidth };
+    });
+    assert.equal(geldPresentatie.ds, true, 'dezelfde bevestiging behoudt zijn DS-hook op beide hosts');
+    assert.equal(geldPresentatie.role, 'alertdialog');
+    assert.ok(geldPresentatie.breed >= 24 && geldPresentatie.hoog >= 24 && geldPresentatie.inBeeld,
+      'de menselijke bevestiging blijft bereikbaar in het zichtbare paneel');
     assert.equal(naarRahul2, 0, 'ook met de mond aan gaat er eerst niets uit');
     await page.click('.hv-kaart button.ja');
     /* WACHTEN OP HET ANTWOORD, niet op 800 ms.

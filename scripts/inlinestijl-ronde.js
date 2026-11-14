@@ -57,12 +57,22 @@ function draai(cmd, args) {
     { cwd: WORTEL, encoding: 'utf8' });
 }
 
-/* Hoeveel er in dit bestand te halen valt, zonder iets aan te raken. */
-function potentie(webpad) {
+/* De volledige markupnoemer en hoeveel daarvan automatisch samen te voegen is,
+   zonder iets aan te raken. De oude rapportage las alleen `winst` en kon
+   daardoor nul tonen terwijl unieke of toestanddragende attributen nog echt in
+   de pagina stonden. */
+function meting(webpad) {
   const r = draai('inlinestijl-omzet.js', ['public' + webpad, '--toon']);
-  const m = /attributen die dan verdwijnen : (\d+)/.exec(r.stdout || '');
-  return m ? Number(m[1]) : 0;
+  const lees = (naam) => Number(((new RegExp(naam + '\\s*: (\\d+)')).exec(r.stdout || '') || [])[1] || 0);
+  return {
+    alle: lees('werkelijke attributen'),
+    toestanden: lees('toestand \\(bewust overgeslagen\\)'),
+    presentatie: lees('presentatie-attributen'),
+    winst: lees('attributen die dan verdwijnen')
+  };
 }
+
+function potentie(webpad) { return meting(webpad).winst; }
 
 function rondeVoor(webpad) {
   const bestand = path.join(PUB, webpad.slice(1));
@@ -125,10 +135,23 @@ function rondeVoor(webpad) {
 const paginas = losse.length ? losse.map(p => (p.startsWith('/') ? p : '/' + p)) : allePaginas();
 
 if (TOON) {
-  let tot = 0; const rijen = [];
-  for (const p of paginas) { const w = potentie(p); if (w) { rijen.push([p, w]); tot += w; } }
+  let tot = 0, alle = 0, toestanden = 0, presentatie = 0, bestanden = 0; const rijen = [], schuld = [];
+  for (const p of paginas) {
+    const m = meting(p);
+    if (m.alle) { bestanden++; schuld.push([p, m.alle, m.presentatie, m.toestanden]); }
+    alle += m.alle; toestanden += m.toestanden; presentatie += m.presentatie;
+    if (m.winst) { rijen.push([p, m.winst]); tot += m.winst; }
+  }
   rijen.sort((a, b) => b[1] - a[1]);
-  console.log('\nTE HALEN uit de MARKUP van .html-bestanden: ' + tot + ' attributen over ' + rijen.length + ' bestanden\n');
+  console.log('\nWERKELIJKE MARKUP: ' + alle + ' style-attributen over ' + bestanden + ' bestanden' +
+    ' (' + presentatie + ' presentatie, ' + toestanden + ' toestand)');
+  console.log('AUTOMATISCH TE CONSOLIDEREN: ' + tot + ' attributen over ' + rijen.length + ' bestanden\n');
+  schuld.sort((a, b) => b[1] - a[1]);
+  for (const [p, a, pr, t] of schuld.slice(0, 20)) {
+    console.log(String(a).padStart(5) + '  ' + p + '  (' + pr + ' presentatie, ' + t + ' toestand)');
+  }
+  if (schuld.length > 20) console.log('  ... en nog ' + (schuld.length - 20) + ' bestanden met werkelijke markupschuld');
+  if (rijen.length) console.log('\nAUTOMATISCHE KANDIDATEN');
   for (const [p, w] of rijen.slice(0, 20)) console.log(String(w).padStart(5) + '  ' + p);
   if (rijen.length > 20) console.log('  ... en nog ' + (rijen.length - 20) + ' bestanden');
   process.exit(0);

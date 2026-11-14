@@ -44,6 +44,17 @@ const path = require('path');
 const { startServer, letOpFouten, laadPlaywright, browserOpties, geenBrowser, wachtOpWaarde, wachtOpNetstilte } = require('./helper');
 
 const pw = laadPlaywright();
+const VRIENDEN_BRON = fs.readFileSync(path.join(__dirname, '..', 'public', 'apps', 'foundation', 'vrienden.html'), 'utf8');
+
+test('Vrienden heeft geen vaste inline presentatie vóór zijn gedragsbron', () => {
+  const markup = VRIENDEN_BRON.slice(0, VRIENDEN_BRON.indexOf('<script src="/apps/util.js">'));
+  assert.doesNotMatch(markup, /\sstyle=/,
+    'vaste compositie en verborgen toestand horen bij de centrale presentatieowners');
+  assert.match(markup, /\/ds\/componenten\/presentatierol\.css/,
+    'de centrale presentatierol wordt rechtstreeks geladen');
+  assert.match(markup, /id="fotoIn" class="h-weg"/,
+    'de bestandsingang gebruikt de bestaande verborgen toestand');
+});
 
 /* De elementen die pas NA de kapotte regel worden opgezocht of gebonden. Wie
    deze lijst inkort, moet zich afvragen of hij het einde van het blok nog meet.

@@ -108,6 +108,7 @@
      belofte die vervult zodra de bron gezet is (of met { status } als dat niet
      lukte). */
   function kijk(el, pad, opts) {
+    if (!(el instanceof HTMLMediaElement)) return Promise.resolve({ status: 400 });
     var spec = { pad: pad, o: opts || {}, pogingen: 0 };
     el.__rtgKijk = spec;
     function zet(positie) {

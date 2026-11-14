@@ -23,12 +23,6 @@ test('Heritage context returns through real navigation without writes', async t 
       await page.goto(server.base + path);
       await page.waitForFunction(gereed, null, {timeout:geduld(12000)});
     }
-    /* Op mobiel staat de statusknop niet in de bovenbalk (www-stijl, #534); de Edge
-       bereikt hem met zijn actie 'status', en die doet precies deze klik op de knop
-       (legacy() in shared/rtg-adaptive-edge.js). De V4-kop draagt een proxy met
-       dezelfde klasse (rtg-v4-edge-state) die deze bron aanklikt; de toets kiest
-       daarom expliciet de bron in de Edge-root. */
-    async function openStatus() { await page.locator('.rtg-edge-chrome .rtg-edge-state').evaluate(e => e.click()); }
     async function returnTo(path) {
       await page.evaluate(() => window.RTGRouteMemory.save());
       await visit('/apps/bestanden.html');
@@ -89,36 +83,35 @@ test('Heritage context returns through real navigation without writes', async t 
       await visit('/apps/agenda.html');
       await page.evaluate(() => document.activeElement.blur());
       await page.mouse.move(200,350);
-      assert.equal(await page.evaluate(() => RTGEdge2.isBusy(document,false)),false);
-      const key = '.rtg-edge-action>[data-rtg-continue-key]';
-      await require('./helper').edgeActies(page);
-      await page.click(key); await page.waitForSelector('#afScrim.open');
+      assert.equal(await page.evaluate(() => !!window.RTGEdge2), false, 'een DS-scherm bouwt geen tweede Edge-controller');
+      await edgeBediening(page, 'Nieuwe afspraak');
+      await page.waitForSelector('#afScrim.open');
       await page.keyboard.press('Escape');
-      const returnKey = '.rtg-adaptive-bar [data-rtg-adaptive-action="context"]';
+      const returnKey = '.ds-edge__balk [data-ds-edge="acties"]';
       await page.waitForFunction(selector=>document.activeElement.matches(selector),returnKey);
       assert.equal(await page.locator(returnKey).isVisible(),true,'focus returns to the visible action entrance');
-      assert.equal(await page.locator('.rtg-adaptive-sheet').isVisible(),false,'the previous sheet stays closed');
+      assert.equal(await page.locator('#dsEdgeBlad').isVisible(),false,'the previous sheet stays closed');
       assert.equal(await page.getAttribute('#afScrim','aria-modal'),'false');
       /* Maand is op telefoon bewust verborgen; Week is de zichtbare route
          naar dezelfde dagsheet die deze toets nodig heeft. */
       await page.keyboard.press('Escape');
       await edgeBediening(page, 'Week');
-      await openStatus(); await page.click('[data-edge-2-mode="focus"]');
       await page.locator('#kal [data-dag]').first().click();
       await page.waitForSelector('#afScrim.open');
       await page.keyboard.press('Escape');
       await page.waitForFunction(()=>!document.querySelector('#afScrim').classList.contains('open'));
-      assert.equal(await page.getAttribute('body','data-rtg-edge-2-state'),'focus','Escape closes only the sheet, retaining Focus');
-      await page.click('.rtg-edge-2-reveal');
+      assert.equal(await page.getAttribute('.ds-edge__balk','data-ds-modus'),'navigatie','Escape closes only the app sheet and retains the DS Edge');
     });
     await t.test('Offline source status cannot retain a prior confirmation', async () => {
       await visit('/apps/agenda.html');
-      await openStatus();
       await context.setOffline(true);
-      await page.waitForFunction(() => document.querySelector('[data-edge-ready]').textContent.includes('Wacht op bron'));
-      assert.equal((await page.textContent('[data-edge-network]')).trim(),'Offline');
-      for (const field of ['ready','store','ai']) assert.match(await page.textContent('[data-edge-'+field+']'),/Wacht op bron/);
+      await page.waitForFunction(() => navigator.onLine === false && [...document.querySelectorAll('.ds-melding')]
+        .some(x => /geen internet|geen verbinding/i.test(x.textContent)));
+      const offline = await page.locator('.ds-melding').filter({ hasText: /geen internet|geen verbinding/i }).last().textContent();
+      assert.doesNotMatch(offline, /gereed|bewaard|bevestigd/i, 'offline status bevat geen oude succesbevestiging');
       await context.setOffline(false);
+      await page.waitForFunction(() => navigator.onLine === true && [...document.querySelectorAll('.ds-melding')]
+        .some(x => /verbinding is terug/i.test(x.textContent)));
     });
     await context.close();
   } finally { if (browser) await browser.close(); await stop(server.child); }

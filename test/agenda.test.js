@@ -7,6 +7,7 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const { startServer, stop, binnenEenDag } = require('./helper');
+const tijdzone = require('../server/kern/tijdzone');
 
 function api(base, pad, body, token) {
   const h = { 'Content-Type': 'application/json' };
@@ -15,13 +16,8 @@ function api(base, pad, body, token) {
     .then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
 }
 function morgen() {
-  // Meet dezelfde lokale kalenderdag als de agenda-parser. Rond middernacht
-  // kan `setDate()` gevolgd door een directe UTC-afdruk anders een dag
-  // terugvallen, terwijl het product bewust vanaf lokale middag rekent.
-  const d = new Date();
-  d.setHours(12, 0, 0, 0);
-  d.setDate(d.getDate() + 1);
-  return d.toISOString().slice(0, 10);
+  // Meet dezelfde huiskalender als de agenda-parser, ook op een UTC-runner.
+  return tijdzone.plusDagen(tijdzone.datumIn(), 1);
 }
 
 let srv, base, lid, sup;

@@ -1,0 +1,11 @@
+@layer rtg.component {
+  .ds-pinherstel { position: fixed; inset: 0; z-index: 9990; display: flex; align-items: center; justify-content: center; padding: var(--ds-ruimte-4); background: var(--ds-glas); }
+  .ds-pinherstel__doos { inline-size: min(22rem, 100%); padding: var(--ds-ruimte-6); border: 1px solid var(--ds-lijnkleur); border-radius: 0; background: var(--ds-cover-grond); color: var(--ds-cover-inkt); font-family: var(--ds-letter-tekst); }
+  .ds-pinherstel__kop { margin-block-end: var(--ds-ruimte-2); font: 500 1.15rem/1.3 var(--ds-letter-display); }
+  .ds-pinherstel__uitleg { margin: 0 0 var(--ds-ruimte-4); color: var(--ds-inkt-zacht); font-size: var(--ds-maat-klein); line-height: 1.55; }
+  .ds-pinherstel__veld { box-sizing: border-box; inline-size: 100%; margin: 0 0 var(--ds-ruimte-2); padding: var(--ds-ruimte-3); border: 1px solid var(--ds-lijnkleur); border-radius: 0; background: var(--ds-oppervlak); color: var(--ds-inkt); font: inherit; font-size: var(--ds-maat-tekst); letter-spacing: .4em; text-align: center; }
+  .ds-pinherstel__melding { min-block-size: 1.2rem; margin-block-end: var(--ds-ruimte-3); color: var(--ds-status-fout); font-size: var(--ds-maat-meta); }
+  .ds-pinherstel__melding--goed { color: var(--ds-metaal); }
+  .ds-pinherstel__doe { inline-size: 100%; min-block-size: var(--ds-doel); padding: var(--ds-ruimte-3); border: 0; border-radius: 0; background: var(--ds-metaal); color: var(--ds-cover-grond); font: inherit; font-size: var(--ds-maat-klein); font-weight: 600; cursor: pointer; }
+  .ds-pinherstel__vergeten { display: block; min-block-size: var(--ds-doel); margin: var(--ds-ruimte-3) auto 0; padding: var(--ds-ruimte-2); border: 0; background: transparent; color: var(--ds-inkt-zacht); font: inherit; font-size: var(--ds-maat-meta); text-decoration: underline; cursor: pointer; }
+}

@@ -1,0 +1,35 @@
+/* Het bestaande Magnaat-keurmerk blijft boven de trainingskopie leesbaar. */
+@layer rtg.component {
+  .ds-magnaatproef {
+    position: fixed;
+    z-index: 2147483647;
+    inset-block-start: max(var(--ds-ruimte-2), env(safe-area-inset-top, 0px));
+    inset-inline-end: max(var(--ds-ruimte-2), env(safe-area-inset-left, 0px), env(safe-area-inset-right, 0px));
+    display: flex;
+    align-items: center;
+    gap: var(--ds-ruimte-2);
+    max-inline-size: calc(100% - 2 * var(--ds-ruimte-2) - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px));
+    padding: var(--ds-ruimte-2) var(--ds-ruimte-3);
+    border: 1px solid var(--ds-cover-metaal);
+    border-radius: var(--ds-radius-inhoud);
+    background: var(--ds-cover-grond);
+    color: var(--ds-cover-inkt);
+    box-shadow: var(--ds-schaduw-systeem);
+    font-family: var(--ds-letter-tekst);
+    font-size: var(--ds-maat-meta);
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: var(--ds-spatie-label);
+    text-transform: uppercase;
+    overflow-wrap: anywhere;
+    pointer-events: none;
+  }
+  .ds-magnaatproef::before {
+    content: "";
+    flex: 0 0 var(--ds-ruimte-2);
+    inline-size: var(--ds-ruimte-2);
+    block-size: var(--ds-ruimte-2);
+    border-radius: var(--ds-radius-cirkel);
+    background: var(--ds-cover-metaal);
+  }
+}

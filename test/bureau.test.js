@@ -57,7 +57,8 @@ async function lidMet(tier) {
   if (tier === 'lifestyle' || tier === 'business') await elevateTier(BASE, r.token, tier, await officeTok());
   return r.token;
 }
-const overDagen = n => new Date(Date.now() + n * 86400000).toISOString().slice(0, 10);
+const tijdzone = require('../server/kern/tijdzone');
+const overDagen = n => tijdzone.plusDagen(tijdzone.datumIn(), n);
 
 /* Het kantoor rechtstreeks bouwen, voor de toetsen die geen server nodig hebben.
    De levensgraaf gaat er apart in: die is sinds deze ronde GEEN onderdeel meer
@@ -408,8 +409,7 @@ test('een verjaardag uit Attenties landt als datum in de Control Tower', async (
      Een verjaardag is 'MM-DD' en moet naar de eerstvolgende echte datum worden
      gerekend; die omrekening is het enige stukje eigen rekenwerk in de bronnen. */
   const tok = await lidMet('lifestyle');
-  const over = new Date(Date.now() + 5 * 86400000);
-  const mmdd = String(over.getMonth() + 1).padStart(2, '0') + '-' + String(over.getDate()).padStart(2, '0');
+  const mmdd = overDagen(5).slice(5);
   await raw('/member/rechterhand/attenties/relatie', { naam: 'Moeder', band: 'familie', verjaardag: mmdd }, tok);
 
   const nu = await json(await bu('nu', {}, tok));

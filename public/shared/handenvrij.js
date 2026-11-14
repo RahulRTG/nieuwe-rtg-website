@@ -162,11 +162,15 @@
   /* De browserkant staat apart, zodat dit bestand de zinsontleding blijft en
      niets anders. Alleen als er iemand is ingelogd halen we de balk erbij; een
      bezoeker zonder inlog krijgt geen extra script en geen extra verkeer. */
-  if (typeof document === 'undefined' || !root.addEventListener) return;
+  /* Alleen de echte browserwindow mag de presentatielaag laden. `root` blijft
+     hierboven bruikbaar voor de pure parser in Node of een worker, maar is
+     geen alternatieve DOM-eigenaar. Dat maakt de browsergrens ook statisch
+     bewijsbaar voor de Experience-laadgraaf. */
+  if (typeof window === 'undefined' || typeof document === 'undefined' || !window.addEventListener) return;
   var ingelogd = false;
   try { ingelogd = !!(localStorage.getItem('rtg_member_token') || localStorage.getItem('rtg_sup_token')); } catch (e) {}
-  if (!ingelogd || root.__handenvrijBalk) return;
-  var s = document.createElement('script');
-  s.src = '/shared/handenvrij-balk.js'; s.defer = true;
-  document.head.appendChild(s);
+  if (!ingelogd || window.__handenvrijBalk) return;
+  var handenvrijScriptNode = document.createElement('script');
+  handenvrijScriptNode.src = '/shared/handenvrij-balk.js'; handenvrijScriptNode.defer = true;
+  document.head.appendChild(handenvrijScriptNode);
 })(typeof self !== 'undefined' ? self : this);

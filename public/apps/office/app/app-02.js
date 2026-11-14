@@ -61,6 +61,12 @@
     return api('open', { id: id }).then(function (r) {
       if (volgorde !== openVolgorde) return false;
       if (r.status !== 200) return zeg(r.body.error || 'Kon niet openen.');
+      // Een hulpvenster hoort bij het document waarin het werd geopend. Laat
+      // zoeken, filteren of grafieken niet als vaste laag boven het volgende
+      // document liggen en daar de bediening onderscheppen.
+      Array.prototype.forEach.call(document.querySelectorAll('.bladpaneel'), function (paneel) {
+        paneel.remove();
+      });
       open = r.body; magBewerken = !!r.body.magBewerken; vuil = false;
       zetTab(open);
       $('#titel').value = r.body.titel; $('#titel').disabled = !r.body.eigenaar;
@@ -69,12 +75,12 @@
       $('#deelBtn').style.display = r.body.eigenaar ? '' : 'none';
       // Rahul leest tekst en dia's; op een formulier of schets heeft hij niets te zoeken
       $('#aiBtn').style.display = magBewerken && r.body.soort !== 'formulier' && r.body.soort !== 'schets' && r.body.soort !== 'bord' ? '' : 'none';
-      $('#presBtn').style.display = r.body.soort === 'presentatie' ? '' : 'none';
-      $('#formBalk').style.display = r.body.soort === 'blad' ? '' : 'none';
-      $('#tekstTools').style.display = 'none'; $('#bladTools').style.display = 'none';
-      $('#tekst').style.display = 'none'; $('#bladWrap').style.display = 'none'; $('#presWrap').style.display = 'none';
-      $('#formWrap').style.display = 'none'; $('#schetsWrap').style.display = 'none';
-      $('#bordWrap').style.display = 'none';
+      $('#presBtn').classList.toggle('h-weg', r.body.soort !== 'presentatie');
+      $('#formBalk').classList.toggle('h-weg', r.body.soort !== 'blad');
+      $('#tekstTools').classList.add('h-weg'); $('#bladTools').classList.add('h-weg');
+      $('#tekst').style.display = 'none'; $('#bladWrap').classList.add('h-weg'); $('#presWrap').classList.add('h-weg');
+      $('#formWrap').classList.add('h-weg'); $('#schetsWrap').classList.add('h-weg');
+      $('#bordWrap').classList.add('h-weg');
       if (r.body.soort === 'blad') toonBlad(r.body.inhoud);
       else if (r.body.soort === 'presentatie') toonPres(r.body.inhoud);
       else if (r.body.soort === 'formulier') toonFormulier(r.body.inhoud);

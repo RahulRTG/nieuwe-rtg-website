@@ -1,9 +1,10 @@
+// Edge in de applicatieschil.
 (function (w, d) {
   'use strict';
   if (!d.body || w.__RTGEdge2Loader) return;
   w.__RTGEdge2Loader = true;
 
-  var b = d.body, h = d.head || d.documentElement;
+  var b=d.body;
   b.setAttribute('data-rtg-edge-2', '');
   if (!b.hasAttribute('data-rtg-edge-2-context')) b.setAttribute('data-rtg-edge-2-context', 'none');
   if (!b.hasAttribute('data-rtg-edge-2-state')) b.setAttribute('data-rtg-edge-2-state', 'overview');
@@ -116,6 +117,7 @@
   function stemVensterAf() {
     var lijst = d.querySelectorAll('dialog[open],[role="dialog"][aria-modal="true"]');
     var open = false;
+// Edge bij vensters en werkruimtes.
     for (var i = 0; i < lijst.length; i++) if (zichtbaarVenster(lijst[i])) { open = true; break; }
     if (b.hasAttribute(VENSTER_ATTR) === open) return;
     if (open) b.setAttribute(VENSTER_ATTR, 'true'); else b.removeAttribute(VENSTER_ATTR);
@@ -184,16 +186,20 @@
   }
   function script(pad, naam, klaar) {
     if (w[naam]) { klaar(true); return; }
-    var s = bron('script', 'src', pad), nieuw = !s;
-    if (!s) { s = d.createElement('script'); s.src = pad; s.async = true; }
-    wacht(s, naam, klaar);
-    if (nieuw) h.appendChild(s);
+    var oud=bron('script','src',pad);
+    if (oud) { wacht(oud, naam, klaar); return; }
+    var el=d.createElement('script');
+    el.src = pad; el.async = true;
+    wacht(el, naam, klaar);
+    d.head.appendChild(el);
   }
   function blad(pad, klaar) {
-    var css = bron('link[rel~="stylesheet"]', 'href', pad), nieuw = !css;
-    if (!css) { css = d.createElement('link'); css.id = 'rtg-edge-2-css'; css.rel = 'stylesheet'; css.href = pad; }
-    wacht(css, '', klaar);
-    if (nieuw) h.appendChild(css);
+    var oud=bron('link[rel~="stylesheet"]','href',pad);
+    if (oud) { wacht(oud, '', klaar); return; }
+    var el=d.createElement('link');
+    el.id = 'rtg-edge-2-css'; el.rel = 'stylesheet'; el.href = pad;
+    wacht(el, '', klaar);
+    d.head.appendChild(el);
   }
   var over = 4, mislukt = false;
   function afhankelijk(ok) {
@@ -215,7 +221,6 @@
       } catch (fout) {}
     });
   }
-  /* Vorm en contextkern downloaden samen; de uitvoerder volgt pas na beide. */
   blad('/shared/rtg-edge-2.css', afhankelijk);
   script('/shared/rtg-edge-2-context.js', 'RTGEdge2Context', afhankelijk);
   script('/shared/rtg-edge-command.js', 'RTGEdgeCommand', afhankelijk);

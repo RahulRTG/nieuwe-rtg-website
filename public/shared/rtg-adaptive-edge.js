@@ -21,7 +21,7 @@
       Input.prepare(rt, action); setState('expanded'); return true;
     }
     setState('dock');
-    if (action === 'home') { if (w.dispatchEvent(new w.CustomEvent('rtg-edge-home', { cancelable: true }))) w.location.href = rt.edge.cfg.home; return true; }
+    if (action === 'home') { if (w.dispatchEvent(new w.CustomEvent('rtg-edge-home', { cancelable: true }))) return K.navigate(w, rt.edge.cfg.home); return true; }
     if (action === 'back') { w.history.back(); return true; }
     if (action === 'worlds') return legacy('.rtg-edge-worlds-trigger');
     if (action === 'menu') return legacy('.rtg-edge-menu');
@@ -34,7 +34,7 @@
     }
     if (action === 'presence') return rt.model.presence && rt.model.presence.action ? execute(rt.model.presence.action) : false;
     var destination=w.RTGAdaptiveEdgeVisual&&w.RTGAdaptiveEdgeVisual.destination(action);
-    if(destination){w.location.href=destination;return true;}
+    if(destination)return K.navigate(w,destination);
     if(action==='contact')return Services.open(rt,'connect',rt.serviceApi);
     if(action.indexOf('object')===0){setDeck('actions');setState('expanded');return true;}
     if (action === 'connect' || action === 'media' || action === 'account') return Services.open(rt, action, rt.serviceApi);

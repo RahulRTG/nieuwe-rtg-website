@@ -3,7 +3,7 @@
    en de prullenbak met herstel. Draait alleen waar een browser is. */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
+const { startServer, letOpFouten, laadPlaywright, browserOpties, geenBrowser, wachtOpSchil } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -39,7 +39,7 @@ test('Bestanden: uploaden, delen, een versie van de ander en de prullenbak',
         localStorage.setItem('rtg_lang', 'nl'); localStorage.setItem('rtg_cookieinfo_v1', '1');
       }, token);
       await page.goto(base + '/apps/bestanden.html', { waitUntil: 'domcontentloaded' });
-      await page.waitForSelector('#kies', { timeout: 15000 });
+      await wachtOpSchil(page, { timeout: 15000 });
     };
     // een bestand in de kiezer leggen zonder echt bestandssysteem: DataTransfer
     const legIn = (sel, naam, inhoud) => page.evaluate(function (a) {

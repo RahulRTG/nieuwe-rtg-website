@@ -38,6 +38,20 @@ function herzegeling(journaal, regels, k = A) {
   const waarde = crypto.sign(null, Buffer.from('rtg-herzegeling-v1\n' + kanoniek(kaal), 'utf8'), k.privateKey).toString('base64');
   return Object.assign({}, kaal, { handtekening: { alg: 'ed25519', publiek: k.publiek, waarde } });
 }
+const HERSTEL = sleutelpaar();
+const HERSTEL_ID = '0f5bf00a-3abc-49ba-97ca-9f6554f1780d';
+const hex = n => String(n).repeat(32).slice(0, 32);
+function herstelverklaring(k = HERSTEL) {
+  const kaal = { soort: 'ankerherstelverklaring', versie: 1, id: HERSTEL_ID, gemaaktAt: '2026-11-09T18:00:00.000Z',
+    journaal: 'api', redenCode: 'ONHERSTELBARE_AUDITBREUK',
+    van: { tijdvak: 1, nr: 7, hash: hex(7), at: '2026-10-21T11:14:51.152Z' },
+    gemeenschappelijk: { nr: 3, hash: hex(3), at: '2026-10-21T10:55:54.639Z' },
+    naar: { tijdvak: 2, nr: 4, hash: 'a'.repeat(32), at: '2026-10-21T11:14:49.313Z' },
+    verlies: { vanafNr: 4, totNr: 7, aantal: 4, status: 'inhoud-onherstelbaar' },
+    bewijs: [{ soort: 'extern-ankerbestand', sha256: 'b'.repeat(64) }] };
+  const waarde = crypto.sign(null, Buffer.from('rtg-ankerherstel-v1\n' + kanoniek(kaal)), k.privateKey).toString('base64');
+  return Object.assign({}, kaal, { handtekening: { alg: 'ed25519', publiek: k.publiek, waarde } });
+}
 
 test('zonder map geen ontvanger, en een lege map heeft geen laatste', () => {
   assert.throws(() => maakOntvanger(), /RTG_ANKER_MAP ontbreekt/);
@@ -113,6 +127,33 @@ test('een bestaand blok zonder handtekening pint niets vast', () => {
   fs.writeFileSync(path.join(map, 'ankers.jsonl'), JSON.stringify({ ontvangen: 'x', blok: { punten: {} } }) + '\n');
   const o = maakOntvanger({ map });
   assert.equal(o.neemAan({ blok: blok({ api: { nr: 1, hash: 'h' } }, B) }).status, 200);
+});
+
+test('een nieuw tijdvak vereist een aparte verklaring en bewaart de auditbreuk append-only', () => {
+  const o = maakOntvanger({ map: nieuweMap(), herstelPubliek: HERSTEL.publiek });
+  o.neemAan({ blok: blok({ api: { nr: 3, hash: hex(3), at: '2026-10-21T10:55:54.639Z' } }) });
+  o.neemAan({ blok: blok({ api: { nr: 7, hash: hex(7), at: '2026-10-21T11:14:51.152Z' } }) });
+  const nieuw = blok({ api: { nr: 4, hash: 'a'.repeat(32), at: '2026-10-21T11:14:49.313Z', tijdvak: 2, herstelId: HERSTEL_ID } });
+  assert.match(o.neemAan({ blok: nieuw }).error, /zonder geldige aparte herstelverklaring/);
+  assert.equal(o.neemAan({ blok: nieuw, herstelverklaringen: [herstelverklaring(B)] }).status, 409,
+    'de gewone of een willekeurige sleutel is geen herstelbevoegdheid');
+  const goed = o.neemAan({ blok: nieuw, herstelverklaringen: [herstelverklaring()] });
+  assert.equal(goed.status, 200);
+  const regels = fs.readFileSync(o.bestand, 'utf8').trim().split('\n').map(JSON.parse);
+  assert.equal(regels.length, 3);
+  assert.equal(regels[1].blok.punten.api.nr, 7, 'de oude externe kop blijft staan');
+  assert.equal(regels[2].herstelverklaringen[0].verlies.status, 'inhoud-onherstelbaar');
+  assert.equal(regels[2].blok.punten.api.tijdvak, 2);
+});
+
+test('een ontvanger zonder herstelbevoegdheid of voorgeschiedenis kan niet in tijdvak 2 beginnen', () => {
+  const nieuw = blok({ api: { nr: 4, hash: 'a'.repeat(32), at: '2026-10-21T11:14:49.313Z', tijdvak: 2, herstelId: HERSTEL_ID } });
+  const leeg = maakOntvanger({ map: nieuweMap(), herstelPubliek: HERSTEL.publiek });
+  assert.match(leeg.neemAan({ blok: nieuw, herstelverklaringen: [herstelverklaring()] }).error, /lege ontvanger/);
+  const geenSleutel = maakOntvanger({ map: nieuweMap() });
+  geenSleutel.neemAan({ blok: blok({ api: { nr: 3, hash: hex(3), at: '2026-10-21T10:55:54.639Z' } }) });
+  geenSleutel.neemAan({ blok: blok({ api: { nr: 7, hash: hex(7), at: '2026-10-21T11:14:51.152Z' } }) });
+  assert.equal(geenSleutel.neemAan({ blok: nieuw, herstelverklaringen: [herstelverklaring()] }).status, 409);
 });
 
 async function luister(o) {

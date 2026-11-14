@@ -37,8 +37,8 @@ function ronde(bewijzen) {
   for (const [id, opties] of Object.entries(bewijzen)) {
     const v = VEREIST.find((x) => x.id === id);
     if (!v) throw new Error('onbekend bewijs in de proef: ' + id);
-    const inhoud = { bron: { commit: opties.commit || COMMIT } };
-    if ('geslaagd' in opties) inhoud.geslaagd = opties.geslaagd;
+    const inhoud = { ...opties, [id === 'suite' ? 'stempel' : 'bron']:
+      { commit: opties.commit || COMMIT, boomVuil: opties.boomVuil ?? false } };
     fs.writeFileSync(path.join(map, v.bestand), JSON.stringify(inhoud) + '\n');
   }
   return map;
@@ -50,7 +50,14 @@ function draai(map, vlaggen) {
   return { code: r.status, uit: (r.stdout || '') + (r.stderr || '') };
 }
 
-const alleVier = () => Object.fromEntries(VEREIST.map((v) => [v.id, { geslaagd: true }]));
+const alleVier = () => ({
+  // Werkelijke schrijvers: SUITE gebruikt gemeten.groen, niet geslaagd.
+  suite: { gemeten: { volledig: true, groen: true, afsluitcode: 0,
+    tapVolledig: true, tests: 10, geslaagdeTests: 10, mislukt: 0,
+    geannuleerd: 0, overgeslagen: 0, todo: 0, bestanden: 2 } },
+  schermen: { geslaagd: true }, releasepoort: { geslaagd: true },
+  staging: { geslaagd: true }
+});
 
 test('alle vier geleverd op deze commit: BEWEZEN, en de poort gaat open', () => {
   const r = draai(ronde(alleVier()), ['--eis-bewezen']);
@@ -77,6 +84,50 @@ test('een gezakt bewijs sluit de poort OOK zonder --eis-bewezen', () => {
   const r = draai(ronde(metGezakt), []);
   assert.match(r.uit, /GEZAKT/);
   assert.equal(r.code, 1, 'tegenbewijs telt altijd, vlag of geen vlag');
+});
+
+test('een rode SUITE in het echte schrijversformaat sluit ook de vrijblijvende lezer', () => {
+  const rood = alleVier();
+  Object.assign(rood.suite.gemeten, { groen: false, afsluitcode: 1,
+    geslaagdeTests: 9, mislukt: 1 });
+  const r = draai(ronde(rood), []);
+  assert.match(r.uit, /GEZAKT/);
+  assert.equal(r.code, 1);
+});
+
+test('een groene SUITE-claim vereist volledige consistente TAP zonder skips of todo', () => {
+  for (const wijziging of [
+    { volledig: false }, { tapVolledig: false }, { afsluitcode: 1 },
+    { tests: 0, geslaagdeTests: 0 }, { bestanden: 0 }, { geslaagdeTests: 9 },
+    ...['mislukt', 'geannuleerd', 'overgeslagen', 'todo'].map(k => ({ [k]: 1, geslaagdeTests: 9 }))
+  ]) {
+    const ongeldig = alleVier();
+    Object.assign(ongeldig.suite.gemeten, wijziging);
+    const r = draai(ronde(ongeldig), ['--eis-bewezen']);
+    assert.match(r.uit, /GEZAKT/, JSON.stringify(wijziging));
+    assert.equal(r.code, 1);
+  }
+});
+
+test('ontbrekende of niet-booleaanse uitslagen zijn nooit geleverd bewijs', () => {
+  for (const v of VEREIST) for (const waarde of [undefined, null, 'true', 1]) {
+    const onbekend = alleVier();
+    if (v.id === 'suite') onbekend.suite.gemeten.groen = waarde;
+    else onbekend[v.id].geslaagd = waarde;
+    const r = draai(ronde(onbekend), ['--eis-bewezen']);
+    assert.match(r.uit, /ONBEWEZEN/, v.id + ': ' + waarde);
+    assert.equal(r.code, 1);
+  }
+});
+
+test('een groene meting op gewijzigde code hoort niet bij de gestempelde commit', () => {
+  for (const v of VEREIST) {
+    const vuil = alleVier();
+    vuil[v.id].boomVuil = true;
+    const r = draai(ronde(vuil), ['--eis-bewezen']);
+    assert.match(r.uit, /ONBEWEZEN/, v.id);
+    assert.equal(r.code, 1);
+  }
 });
 
 /* EEN BEWIJS VAN GISTEREN IS GEEN BEWIJS VAN VANDAAG. Dit is de stille variant:

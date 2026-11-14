@@ -15,6 +15,7 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');
 const path = require('path');
+const ontwerp = require('../scripts/ontwerpsysteem');
 
 const WORTEL = path.join(__dirname, '..');
 const lees = (p) => fs.readFileSync(path.join(WORTEL, p), 'utf8');
@@ -24,6 +25,23 @@ const JS = lees('public/shared/gebaar.js');
 // precies de dingen waar we hieronder op zoeken.
 const CSSKAAL = CSS.replace(/\/\*[\s\S]*?\*\//g, '');
 const JSKAAL = JS.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
+
+test('de gebarenlaag scheidt de centrale DS-presentatie van de begrensde legacy-laadweg', () => {
+  const ds = ontwerp.scriptLaadAnalyse(JS, { ds: true });
+  assert.deepEqual(ds.onzeker, []);
+  assert.deepEqual(ds.verwijzingen, [
+    { href: '/shared/adaptief/grammatica.js', soort: 'dom' }
+  ]);
+  const legacy = ontwerp.scriptLaadAnalyse(JS, { ds: false });
+  assert.deepEqual(legacy.onzeker, []);
+  assert.deepEqual(legacy.verwijzingen, [
+    { href: '/shared/gebaar.css', soort: 'dom' },
+    { href: '/shared/adaptief/grammatica.js', soort: 'dom' }
+  ]);
+  assert.match(JS, /document\.documentElement\.hasAttribute\('data-ds'\)/);
+  assert.match(JS, /function laadScript\(path\)/);
+  assert.doesNotMatch(JSKAAL, /location\.href\s*=/);
+});
 
 test('in rust raakt het blad alleen aan wat met naam is toegestaan', () => {
   /* DE MUTATIE: verander `:where(.rtg-knop,.knop,.gb-rij)` in `:where(button)`,

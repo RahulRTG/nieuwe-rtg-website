@@ -81,6 +81,23 @@ test('inkomende navigatie verwerkt animatieannulering maar verbergt geen onverwa
   assert.deepEqual(reported, [unexpected], 'echte fouten blijven zichtbaar');
 });
 
+test('geschiedenis zonder geldig doel slaat alleen de overgang over zonder paginafout', () => {
+  let swap, skipped = 0, domRead = 0;
+  const window = { matchMedia: () => ({ matches: false }),
+    addEventListener: (name, fn) => { if (name === 'pageswap') swap = fn; } };
+  const document = { documentElement: { classList: { contains: () => false } },
+    querySelectorAll: () => { domRead++; return []; } };
+  vm.runInNewContext(fs.readFileSync(path.join(__dirname, '../public/shared/rtg-heritage-transition.js'), 'utf8'),
+    { window, document, URL });
+  for (const activation of [null, {}, { entry: null }, { entry: {} },
+    { entry: { url: '' } }, { entry: { url: ' ' } }, { entry: { url: 'geen geldig doel' } }]) {
+    const viewTransition = { ready: Promise.resolve(), finished: Promise.resolve(), skipTransition: () => { skipped++; } };
+    assert.doesNotThrow(() => swap({ activation, viewTransition }));
+  }
+  assert.equal(skipped, 7);
+  assert.equal(domRead, 0, 'geen gegokte doelpagina of gedeelde elementnaam');
+});
+
 test('Berichten en Camera installeren de overgangsbediening voor de eerste weergave', () => {
   for (const route of ['comm', 'camera']) {
     const html = fs.readFileSync(path.join(__dirname, '../public/apps/' + route + '.html'), 'utf8');

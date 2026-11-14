@@ -1,0 +1,204 @@
+/* Eén presentatie voor de bestaande handenvrij-familie. hv-* blijft de
+   bedieningsstaat van de bestaande controllers; --hv-* draagt uitsluitend
+   de door de gebruiker bewaarde consoleplek en maat. Geen nieuwe controller. */
+@layer rtg.component {
+  .ds-handenvrij__balk,
+  .ds-handenvrij__chat,
+  .ds-handenvrij__werk {
+    box-sizing: border-box;
+    position: fixed;
+    display: flex;
+    font-family: var(--ds-letter-tekst);
+    color: var(--ds-cover-inkt);
+    color-scheme: dark;
+  }
+  .ds-handenvrij__balk *,
+  .ds-handenvrij__chat *,
+  .ds-handenvrij__werk * { box-sizing: border-box; }
+  .ds-handenvrij__balk {
+    inset-inline: var(--ds-ruimte-3);
+    inset-block-end: calc(var(--ds-ruimte-3) + env(safe-area-inset-bottom, 0px));
+    z-index: 38;
+    gap: .45rem;
+    align-items: center;
+    padding-block: .4rem;
+    padding-inline: .55rem .4rem;
+    border: 1px solid var(--ds-glasrand);
+    border-radius: var(--ds-radius-systeem);
+    background: var(--ds-glas);
+    backdrop-filter: blur(30px) saturate(1.08);
+    -webkit-backdrop-filter: blur(30px) saturate(1.08);
+    box-shadow: var(--ds-schaduw-systeem);
+  }
+  .ds-handenvrij__formulier {
+    display: flex;
+    flex: 1;
+    min-inline-size: 0;
+    gap: .45rem;
+    align-items: center;
+    margin: 0;
+  }
+  .ds-handenvrij__veld {
+    flex: 1;
+    min-inline-size: 0;
+    block-size: 38px;
+    padding-block: 0;
+    padding-inline: .85rem;
+    border: 1px solid var(--ds-glasrand);
+    border-radius: var(--ds-radius-capsule);
+    background: var(--ds-cover-grond);
+    color: var(--ds-cover-inkt);
+    font: 400 .84rem var(--ds-letter-tekst);
+    box-shadow: var(--ds-schaduw-inhoud);
+  }
+  .ds-handenvrij__veld::placeholder { color: color-mix(in srgb, var(--ds-cover-inkt) 65%, var(--ds-cover-grond)); }
+  .ds-handenvrij__knop,
+  .ds-handenvrij__schermknop,
+  .ds-handenvrij__geldknop,
+  .ds-handenvrij__werkknop {
+    flex: 0 0 auto;
+    min-block-size: 24px;
+    background: transparent;
+    border: 1px solid var(--ds-glasrand);
+    border-radius: var(--ds-radius-capsule);
+    color: var(--ds-cover-inkt);
+    font-family: var(--ds-letter-tekst);
+    line-height: 1.2;
+    cursor: pointer;
+  }
+  .ds-handenvrij__knop {
+    padding-block: .5rem;
+    padding-inline: .7rem;
+    font-size: .72rem;
+    font-weight: 500;
+    white-space: nowrap;
+    transition: color var(--ds-duur-kort), border-color var(--ds-duur-kort), background var(--ds-duur-kort);
+  }
+  .ds-handenvrij__knop:hover,
+  .ds-handenvrij__schermknop:hover,
+  .ds-handenvrij__werkknop:hover { border-color: var(--ds-cover-metaal); background: color-mix(in srgb, var(--ds-cover-inkt) 10%, var(--ds-cover-grond)); }
+  .ds-handenvrij__veld:focus-visible,
+  .ds-handenvrij__knop:focus-visible,
+  .ds-handenvrij__schermknop:focus-visible,
+  .ds-handenvrij__geldknop:focus-visible,
+  .ds-handenvrij__werkknop:focus-visible { outline: 2px solid var(--ds-cover-metaal); outline-offset: 2px; }
+  .ds-handenvrij__verstuur {
+    display: flex;
+    inline-size: 34px;
+    block-size: 34px;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: 0;
+    border-radius: var(--ds-radius-cirkel);
+    font-size: .95rem;
+    color: var(--ds-cover-grond);
+    background: var(--ds-cover-metaal);
+  }
+  .ds-handenvrij__verstuur:hover { color: var(--ds-cover-grond); background: var(--ds-cover-metaal); }
+  .ds-handenvrij__knop[aria-pressed="true"] { background: color-mix(in srgb, var(--ds-cover-metaal) 18%, var(--ds-cover-grond)); color: var(--ds-cover-metaal); border-color: var(--ds-cover-metaal); }
+  .ds-handenvrij__knop.hv-hoort { background: var(--ds-accent); color: var(--ds-accent-inkt); border-color: var(--ds-accent-inkt); }
+
+  .ds-handenvrij__chat {
+    inset-inline: 0;
+    inset-block-end: 3.4rem;
+    z-index: 37;
+    flex-direction: column;
+    gap: .5rem;
+    padding-block: .7rem;
+    padding-inline: .8rem;
+    background: var(--ds-cover-grond);
+    border-block-start: 1px solid var(--ds-glasrand);
+    max-block-size: 46vh;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    transition: max-block-size var(--ds-duur-kort) var(--ds-curve), inset-block-start var(--ds-duur-kort) var(--ds-curve);
+  }
+  .ds-handenvrij__beurt { display: flex; gap: .5rem; align-items: flex-end; max-inline-size: 100%; }
+  .ds-handenvrij__beurt.ik { flex-direction: row-reverse; }
+  .ds-handenvrij__bericht { max-inline-size: 76%; padding-block: .5rem; padding-inline: .7rem; border-radius: var(--ds-radius-inhoud); font-size: .86rem; line-height: 1.5; white-space: pre-wrap; overflow-wrap: anywhere; }
+  .ds-handenvrij__beurt.hij .ds-handenvrij__bericht { background: color-mix(in srgb, var(--ds-cover-inkt) 6%, var(--ds-cover-grond)); color: var(--ds-cover-inkt); border: 1px solid var(--ds-glasrand); }
+  .ds-handenvrij__beurt.ik .ds-handenvrij__bericht { background: var(--ds-accent); color: var(--ds-accent-inkt); }
+  .ds-handenvrij__beurt.mens .ds-handenvrij__bericht { border-color: var(--ds-cover-metaal); }
+  .ds-handenvrij__mond { display: flex; flex: 0 0 auto; inline-size: 2.5rem; block-size: 2.5rem; align-items: center; justify-content: center; border: 1px solid var(--ds-glasrand); border-radius: var(--ds-radius-cirkel); background: var(--ds-cover-grond); overflow: hidden; }
+  .ds-handenvrij__mond canvas { inline-size: 2.5rem; block-size: auto; display: block; }
+  .ds-handenvrij__afzender { font-size: .66rem; letter-spacing: .06em; text-transform: uppercase; color: color-mix(in srgb, var(--ds-cover-inkt) 70%, var(--ds-cover-grond)); margin-block-end: .15rem; }
+  .ds-handenvrij__tijd { font-size: .66rem; color: color-mix(in srgb, var(--ds-cover-inkt) 70%, var(--ds-cover-grond)); margin-block-start: .2rem; }
+  .ds-handenvrij__beurt.ik .ds-handenvrij__tijd { color: var(--ds-accent-inkt); }
+  .ds-handenvrij__tikt { display: inline-flex; gap: .25rem; padding-block: .1rem; padding-inline: 0; }
+  .ds-handenvrij__tikt i { inline-size: .34rem; block-size: .34rem; border-radius: var(--ds-radius-cirkel); background: var(--ds-cover-inkt); animation: ds-handenvrij-tikt 1.1s infinite; }
+  .ds-handenvrij__tikt i:nth-child(2) { animation-delay: .16s; }
+  .ds-handenvrij__tikt i:nth-child(3) { animation-delay: .32s; }
+  @keyframes ds-handenvrij-tikt {
+    0%, 60%, 100% { opacity: .25; transform: translateY(0); }
+    30% { opacity: 1; transform: translateY(-2px); }
+  }
+
+  .ds-handenvrij__geldregel { display: flex; gap: .5rem; align-items: center; justify-content: space-between; padding-block: .35rem .1rem; padding-inline: .1rem; font-size: .72rem; color: color-mix(in srgb, var(--ds-cover-inkt) 70%, var(--ds-cover-grond)); border-block-end: 1px solid var(--ds-glasrand); margin-block-end: .2rem; }
+  .ds-handenvrij__geldknop { font-size: .7rem; padding-block: .2rem; padding-inline: .55rem; }
+  .ds-handenvrij__geldregel .ds-handenvrij__geldknop { white-space: nowrap; }
+  .ds-handenvrij__geldknop[aria-pressed="true"],
+  .ds-handenvrij__geldknop.ja { background: var(--ds-accent); border-color: var(--ds-accent); color: var(--ds-accent-inkt); font-weight: 700; }
+  .ds-handenvrij__geldkaart { border: 1px solid var(--ds-cover-metaal); border-radius: var(--ds-radius-inhoud); padding-block: .7rem; padding-inline: .8rem; background: color-mix(in srgb, var(--ds-cover-inkt) 4%, var(--ds-cover-grond)); color: var(--ds-cover-inkt); font-size: .83rem; line-height: 1.55; }
+  .ds-handenvrij__geldkaart h4 { margin-block: 0 .35rem; margin-inline: 0; font-size: .8rem; letter-spacing: .04em; text-transform: uppercase; color: var(--ds-cover-metaal); }
+  .ds-handenvrij__geldkaart p { margin-block: 0 .55rem; margin-inline: 0; }
+  .ds-handenvrij__geldacties { display: flex; gap: .5rem; flex-wrap: wrap; }
+  .ds-handenvrij__geldkaart .ds-handenvrij__geldknop { font-size: .8rem; padding-block: .4rem; padding-inline: .8rem; }
+
+  .ds-handenvrij__chat[data-stand="half"] { max-block-size: 46vh; }
+  .ds-handenvrij__chat[data-stand="vol"] { max-block-size: calc(88vh - 3.4rem); }
+  .ds-handenvrij__chat[data-stand="scherm"] { inset-block: 0; max-block-size: none; padding-block-start: 0; }
+  .ds-handenvrij__greep { position: sticky; inset-block-start: -.7rem; margin-block: -.7rem .3rem; margin-inline: -.8rem; padding-block: .45rem .5rem; padding-inline: .8rem; background: var(--ds-cover-grond); border-block-end: 1px solid var(--ds-glasrand); display: flex; align-items: center; gap: .4rem; z-index: 2; touch-action: none; cursor: ns-resize; flex-wrap: wrap; }
+  .ds-handenvrij__greeplijn { inline-size: 2.2rem; block-size: .22rem; border-radius: var(--ds-radius-capsule); background: var(--ds-glasrand); margin-inline-end: auto; }
+  .ds-handenvrij__schermknop { font-size: .72rem; padding-block: .32rem; padding-inline: .45rem; }
+  .ds-handenvrij__schermknop[aria-pressed="true"] { background: var(--ds-cover-metaal); color: var(--ds-cover-grond); border-color: var(--ds-cover-metaal); }
+  .ds-handenvrij__fotoacties { display: flex; gap: .4rem; flex-wrap: wrap; margin-block: .2rem .4rem; margin-inline: 0; }
+  .ds-handenvrij__foto { max-inline-size: min(220px, 60%); border-radius: var(--ds-radius-beeld); border: 1px solid var(--ds-glasrand); display: block; margin-block: .2rem; margin-inline: 0; }
+
+  /* Beide delen boven Command: anders onderschept de werktafel de klik op
+     een betaalbevestiging. Mobiel blijft de schilbalk eronder vrij; desktop
+     heeft de eigen consoleankers, ook zonder een bewaarde sleepstand. */
+  .ds-handenvrij.rtg-command .ds-handenvrij__balk { z-index: 260; inset-block-end: calc(60px + env(safe-area-inset-bottom, 0px)); }
+  .ds-handenvrij.rtg-command .ds-handenvrij__chat { z-index: 259; inset-block-end: calc(108px + env(safe-area-inset-bottom, 0px)); }
+  .ds-handenvrij.rtg-command.hv-bureau .ds-handenvrij__balk { inset-block-end: 1rem; }
+  .ds-handenvrij.rtg-command.hv-bureau .ds-handenvrij__chat { inset-block-end: 4.6rem; }
+  .ds-handenvrij.hv-bureau .ds-handenvrij__balk { inset-inline-start: auto; inset-inline-end: 1rem; inset-block-end: 1rem; inline-size: var(--hv-breed, min(30rem, 42vw)); border-color: var(--ds-cover-metaal); }
+  .ds-handenvrij.hv-bureau .ds-handenvrij__chat { inset-inline-start: auto; inset-inline-end: 1rem; inset-block-end: 4.6rem; inline-size: var(--hv-breed, min(30rem, 42vw)); border: 1px solid var(--ds-glasrand); border-radius: var(--ds-radius-systeem); }
+  .ds-handenvrij.hv-bureau.hv-verzet .ds-handenvrij__balk { inset-inline-end: auto; inset-block-end: auto; inset-inline-start: var(--hv-x); inset-block-start: calc(var(--hv-y) + var(--hv-hoog)); }
+  .ds-handenvrij.hv-bureau.hv-verzet .ds-handenvrij__chat { inset-inline-end: auto; inset-block-end: auto; inset-inline-start: var(--hv-x); inset-block-start: var(--hv-y); max-block-size: var(--hv-hoog); block-size: var(--hv-hoog); }
+  /* De bestaande sleepcontroller bewaart fysieke viewportcoördinaten. Alleen
+     hun presentatie wordt bij RTL gespiegeld, niet de opgeslagen plek. */
+  .ds-handenvrij.hv-bureau.hv-verzet:dir(rtl) .ds-handenvrij__balk,
+  .ds-handenvrij.hv-bureau.hv-verzet:dir(rtl) .ds-handenvrij__chat { inset-inline-start: calc(100% - var(--hv-x) - var(--hv-breed)); }
+  .ds-handenvrij__maat { position: absolute; inset-inline-end: 0; inset-block-end: 0; inline-size: 1.1rem; block-size: 1.1rem; cursor: nwse-resize; background: linear-gradient(135deg, transparent 45%, var(--ds-glasrand) 45%, var(--ds-glasrand) 55%, transparent 55%); z-index: 3; }
+  .ds-handenvrij:not(.hv-bureau) .ds-handenvrij__maat { display: none; }
+  .ds-handenvrij.hv-bureau .ds-handenvrij__chat[data-stand="scherm"] { inset-inline-end: 0; inline-size: 100%; border-radius: var(--ds-radius-inhoud); }
+  .ds-handenvrij__werk { inset-inline: 0; inset-block-end: 3.4rem; z-index: 36; gap: .35rem; flex-wrap: wrap; align-items: center; padding-block: .35rem; padding-inline: .7rem; background: var(--ds-glas); border-block-start: 1px solid var(--ds-glasrand); }
+  .ds-handenvrij.hv-werkrij .ds-handenvrij__chat { inset-block-end: 6.1rem; }
+  .ds-handenvrij.hv-bureau .ds-handenvrij__werk { inset-inline-start: auto; inset-inline-end: 1rem; inset-block-end: 4.6rem; inline-size: min(30rem, 42vw); border: 1px solid var(--ds-glasrand); border-radius: var(--ds-radius-systeem); }
+  .ds-handenvrij.hv-bureau.hv-werkrij .ds-handenvrij__chat { inset-block-end: 7.3rem; }
+  .ds-handenvrij__werkknop { font-size: .74rem; padding-block: .3rem; padding-inline: .5rem; max-inline-size: 11rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .ds-handenvrij__werkkop { color: color-mix(in srgb, var(--ds-cover-inkt) 70%, var(--ds-cover-grond)); font-size: .66rem; letter-spacing: .08em; text-transform: uppercase; padding-block: .3rem; padding-inline: .2rem; cursor: default; }
+  .ds-handenvrij.hv-ruimte { padding-block-end: 3.6rem; }
+  .ds-handenvrij.hv-werkrij.hv-ruimte { padding-block-end: 6.3rem; }
+  .ds-handenvrij.hv-bureau.hv-ruimte,
+  .ds-handenvrij.hv-opgeruimd,
+  .ds-handenvrij.hv-weg { padding-block-end: 0; }
+  .ds-handenvrij__balk.hv-weg,
+  .ds-handenvrij__chat.hv-weg,
+  .ds-handenvrij__werk.hv-weg,
+  .ds-handenvrij__chat[hidden],
+  .ds-handenvrij__werk[hidden],
+  .ds-handenvrij__knop[hidden],
+  .ds-handenvrij.hv-weg .ds-handenvrij__chat,
+  .ds-handenvrij.hv-weg .ds-handenvrij__balk,
+  .ds-handenvrij.hv-os .rtg-scherm,
+  .ds-handenvrij.hv-os .mgz-rahul { display: none; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ds-handenvrij__balk { backdrop-filter: none; -webkit-backdrop-filter: none; }
+    .ds-handenvrij__chat,
+    .ds-handenvrij__knop { transition: none; }
+    .ds-handenvrij__tikt i { animation: none; opacity: .6; }
+  }
+}

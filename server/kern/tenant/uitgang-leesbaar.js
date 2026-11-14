@@ -86,8 +86,30 @@ function maak(uitvoer) {
   r.push(ledenTabel((u.inhoud || {}).leden));
   r.push('');
 
+  const archief = (u.inhoud || {}).reisarchief;
+  if (archief) {
+    r.push('## Documentair reisarchief');
+    r.push('');
+    r.push('Scope: ' + esc(archief.scope.rol) + ' voor zaak ' + esc(archief.scope.supplierCode) + '.');
+    r.push('Dit archief activeert geen reizen, toegang, leveranciersacceptaties of betalingen.');
+    r.push('');
+    r.push('| Reisreferentie | Versie | Bewaarde stand |');
+    r.push('|---|---:|---|');
+    for (const reis of archief.reizen) r.push('| ' + esc(reis.ref) + ' | ' + esc(reis.versie) + ' | ' + esc(reis.status) + ' |');
+    r.push('');
+    r.push('Volledig opgenomen binnen deze zaakscope: ' + archief.dekking.volledig.map(esc).join('; ') + '.');
+    r.push('Niet gedekt: ' + archief.dekking.nietGedekt.map(esc).join('; ') + '.');
+    r.push('');
+  }
+
   r.push('## Wat er NIET in zit');
   r.push('');
+  r.push('- Tenantbrede reiscontracten en leverancieropdrachten: deze werkruimtepoort');
+  r.push('  bewijst daarvoor geen inzagerecht. De uitvoer is gedeeltelijk, geen volledige');
+  r.push('  tenant- of reisexport. De beperking staat checksum-gedekt in `reisketenUitgang`.');
+  r.push('  Inlezen activeert geen reiscontract, leveranciersacceptatie of betaalbewijs.');
+  r.push('  De persoonlijke productie-exitbevoegdheid tijdens bewaring is nog niet gekwalificeerd.');
+  if (archief) r.push('  Het afzonderlijk begrensde zaakzelfarchief hierboven verleent geen tenantbrede inzage.');
   r.push('- De sleutels: het beheer-token, de lid-tokens en de koppeling naar RTG-accounts.');
   r.push('  Die zijn er bewust uit: een uitvoer is een archief en geen sleutelbos, en die');
   r.push('  laatste koppelt buiten de identiteitskluis om een werkruimtelid aan een');

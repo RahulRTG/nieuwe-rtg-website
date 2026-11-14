@@ -55,6 +55,8 @@ test('de reden van een mislukte tik: bekend, verstuurd-maar-niet-afgerond, of be
     'tik verstuurd maar niet afgerond binnen de limiet');
   assert.equal(klikReden('Timeout 2500ms exceeded.\n - attempting click action\n - waiting for element to be visible, enabled and stable'),
     'pagina antwoordde niet binnen de limiet');
+  assert.equal(klikReden('Timeout 10000ms exceeded.\n - waiting for locator(\'[data-appwerkt="1"]\')'),
+    'bediening werd opnieuw getekend voor activering');
   assert.equal(klikReden('Timeout 2500ms exceeded.\n - waiting for locator'), 'reden niet gemeld');
   assert.equal(klikReden(''), 'reden niet gemeld');
 });
@@ -62,7 +64,7 @@ test('de reden van een mislukte tik: bekend, verstuurd-maar-niet-afgerond, of be
 test('alleen een verdwenen of geblokkeerde knop krijgt eenmaal een schone tegenproef', () => {
   const { redenVoorSchoneTegenproef } = require('../scripts/appwerkt');
   for (const reden of ['intercepts pointer events', 'element is outside of the viewport', 'element is not visible',
-    'element is not stable', 'pagina antwoordde niet binnen de limiet']) {
+    'element is not stable', 'pagina antwoordde niet binnen de limiet', 'bediening werd opnieuw getekend voor activering']) {
     assert.equal(redenVoorSchoneTegenproef(reden), true, reden);
   }
   assert.equal(redenVoorSchoneTegenproef('element is not enabled'), false,
@@ -74,30 +76,36 @@ test('alleen een verdwenen of geblokkeerde knop krijgt eenmaal een schone tegenp
 test('een geometrisch bewegende bediening gebruikt uitsluitend de echte toetsenbordroute als terugval', () => {
   const bron = require('node:fs').readFileSync(require('node:path').join(__dirname, '../scripts/appwerkt.js'), 'utf8');
   assert.match(bron, /async function tikAlsGebruiker[\s\S]{0,1800}keyboard\.press\('Enter'\)/);
-  assert.match(bron, /async function tikAlsGebruiker[\s\S]{0,2600}element is not stable\|pagina antwoordde niet binnen de limiet/,
+  assert.match(bron, /async function tikAlsGebruiker[\s\S]{0,4200}element is not stable\|pagina antwoordde niet binnen de limiet/,
     'alleen een nog niet verstuurde geometrische muisactie mag naar het toetsenbord terugvallen');
   assert.doesNotMatch(bron, /async function tikAlsGebruiker[\s\S]{0,1800}dispatchEvent\(['"]click/,
     'de meter mag een klik niet rechtstreeks in het DOM veinzen');
   assert.match(bron, /page\.click\('\[data-appwerkt="1"\]', \{ timeout: 10000, noWaitAfter: true \}\)/,
     'de echte muisroute krijgt een begrensde stabiliteitswacht onder integrale belasting');
-  assert.match(bron, /tikAlsGebruiker\(page, k\.modaal \|\| k\.edgeApp\)/,
+  assert.match(bron, /scrollIntoView\(\{ block: 'center', inline: 'nearest', behavior: 'instant' \}\)/,
+    'de normale scrollroute houdt de gemarkeerde bediening buiten vaste Edge-lagen');
+  assert.match(bron, /gedeeldeLaagOpen[\s\S]{0,900}keyboard\.press\('Escape'\)[\s\S]{0,900}rtg-edge-status-panel\[aria-hidden=/,
+    'een reeds beproefde gedeelde Edge-laag sluit via haar gewone Escape-route voor de app verdergaat');
+  assert.match(bron, /tikAlsGebruiker\(page, k\.modaal \|\| k\.edgeApp, k\.merk, bereik\)/,
     'bewegende modale en Edge-bediening gebruikt de volwaardige focus- en Enter-route');
+  assert.match(bron, /bediening werd opnieuw getekend voor activering[\s\S]{0,500}markeerOpnieuwGetekendeBediening[\s\S]{0,500}page\.click\('\[data-appwerkt="1"\]'/,
+    'een vóór activering opnieuw gemonteerde bediening wordt op dezelfde stabiele identiteit opnieuw gemarkeerd en echt geklikt');
 });
 
 test('een expliciete bedieningsidentiteit blijft gelijk wanneer alleen de zichtbare status wijzigt', () => {
   const bron = require('node:fs').readFileSync(require('node:path').join(__dirname, '../scripts/appwerkt.js'), 'utf8');
   const stabieleMerken = bron.match(/return bron \? \[el\.tagName, bron\]\.join\('\|'\)/g) || [];
-  assert.equal(stabieleMerken.length, 4,
+  assert.equal(stabieleMerken.length, 5,
     'inventarisatie, replay en controle moeten dezelfde stabiele bronidentiteit gebruiken');
 });
 
 test('een Edge-kloon en haar bronbediening delen één toegankelijke identiteit', () => {
   const bron = require('node:fs').readFileSync(require('node:path').join(__dirname, '../scripts/appwerkt.js'), 'utf8');
-  assert.equal((bron.match(/label \|\| el\.title \|\| el\.innerText \|\| el\.value/g) || []).length, 4,
+  assert.equal((bron.match(/label \|\| el\.title \|\| el\.innerText \|\| el\.value/g) || []).length, 5,
     'bron en kloon moeten dezelfde naamvolgorde gebruiken');
-  assert.equal((bron.match(/if \(bron\.startsWith\('control:'\)\) bron = '';/g) || []).length, 4,
+  assert.equal((bron.match(/if \(bron\.startsWith\('control:'\)\) bron = '';/g) || []).length, 5,
     'de technische control-prefix mag geen tweede zakelijke handeling maken');
-  assert.equal((bron.match(/replace\(\/\^\(\[\^\\p\{L\}\\p\{N\}\]\+\)\\s\+\/u, '\$1'\)/g) || []).length, 4,
+  assert.equal((bron.match(/replace\(\/\^\(\[\^\\p\{L\}\\p\{N\}\]\+\)\\s\+\/u, '\$1'\)/g) || []).length, 5,
     'witruimte na een visueel pictogram mag bron en Edge-kloon niet verdubbelen');
 });
 
@@ -113,6 +121,9 @@ test('kortlevende bevestigingen, beleid en documentacties verklaren zichzelf aan
   assert.match(lees('public/shared/gebaar/gebaar-03.js'),
     /data-rtg-adaptive-source['"], ['"]gebaar-acties[\s\S]{0,160}data-hoofdactie/,
     'de kortlevende deur naar veegacties moet vóór een verversing bedienbaar zijn');
+  assert.match(lees('public/shared/uitvoer/uitvoer-02.js'),
+    /rtguitvoer-knop[\s\S]{0,520}data-hoofdactie/,
+    'Meenemen bestaat alleen bij uitvoerbare gegevens en moet vóór een hertekening worden bediend');
   assert.match(lees('public/shared/deelmenu/deelmenu-02.js'),
     /data-rtg-adaptive-source['"], ['"]deel-[\s\S]{0,120}data-stand/,
     'een herbouwde deeltab moet dezelfde appstand en control-identiteit houden');
@@ -122,6 +133,56 @@ test('kortlevende bevestigingen, beleid en documentacties verklaren zichzelf aan
   assert.match(lees('public/shared/rtg-docs-2026.css'),
     /\.rtd-nav\{[^}]*z-index:45/,
     'RTDocs-navigatie moet boven de iOS-kop en onder dialogen blijven');
+});
+
+test('Zorg laadt via haar eigen tab en niet via een uitgestelde achtergrondtaak', () => {
+  const fs = require('node:fs');
+  const path = require('node:path');
+  const tabbron = fs.readFileSync(path.join(__dirname, '../public/apps/app-main/app-main-12.js'), 'utf8');
+  const opbouwbron = fs.readFileSync(path.join(__dirname, '../public/apps/app-main/app-main-12a.js'), 'utf8');
+  const zorgbron = fs.readFileSync(path.join(__dirname, '../public/apps/app-main/app-main-13.js'), 'utf8');
+  const meterbron = fs.readFileSync(path.join(__dirname, '../scripts/appwerkt.js'), 'utf8');
+  assert.match(tabbron, /zorg:\s*\[\['laadCare',\s*\(\)\s*=>\s*laadCare\(\)\]\]/,
+    'de directe Zorg-ingang moet de echte zorglader activeren');
+  assert.doesNotMatch(opbouwbron, /\[\s*['"]laadCare['"]\s*,\s*laadCare\s*\]/,
+    'Home mag Zorg niet daarnaast nog eens als achtergrondtaak laden');
+  assert.match(zorgbron, /data-view=["']zorg["'][\s\S]{0,180}aria-busy[\s\S]{0,900}removeAttribute\(['"]aria-busy['"]\)/,
+    'Zorg moet zijn echte asynchrone laadvenster toegankelijk publiceren');
+  assert.match(meterbron, /\.view\.active\[aria-busy=\\?"true\\?"\]/,
+    'de bedieningsmeter moet het actieve drukke tabblad afwachten');
+});
+
+test('een intern appcontract kan de persona van zijn organisatorische wereld preciseren', () => {
+  const { rijen } = require('../scripts/appwerkt');
+  const zorg = rijen().find((rij) => rij.functie === 'tab:zorg');
+  assert.equal(zorg && zorg.wereld, 'FoundationOS');
+  assert.equal(zorg && zorg.persona, 'lid',
+    'de ledenapp-Zorgtab gebruikt het ledenaccount, ook al staat hij onder de gezinswereld');
+});
+
+test('een definitieve relatiebeëindiging blijft achter de veilige annuleringsroute', () => {
+  const fs = require('node:fs');
+  const path = require('node:path');
+  const bron = fs.readFileSync(path.join(__dirname, '../scripts/appwerkt.js'), 'utf8');
+  const scherm = fs.readFileSync(path.join(__dirname, '../public/apps/mijn-relaties.html'), 'utf8');
+  assert.match(bron, /\^ja,\\s\*sluit deze\\b/,
+    'de definitieve sluitactie moet als risicostap na Laat maar worden bediend');
+  assert.match(scherm, /Sluit deze relatie[\s\S]{0,180}data-stand["'], ['"]relatie-gevolgen/,
+    'de gevolgenopener moet na Laat maar via zijn bestaande schermstand herhaalbaar zijn');
+});
+
+test('Cercle declareert zijn terugroute als herstelbare schermstand', () => {
+  const bron = require('node:fs').readFileSync(require('node:path').join(__dirname, '../public/apps/cercle.html'), 'utf8');
+  const edge = require('node:fs').readFileSync(require('node:path').join(__dirname, '../public/shared/rtg-adaptive-edge-controls.js'), 'utf8');
+  assert.match(bron, /class="terug" data-stand="cercle-kantoor" href="\/apps\/lifestyle\.html"/,
+    'de kantoorroute moet na dynamische Cercle-acties opnieuw bedienbaar blijven');
+  assert.match(edge, /app:!!embed\|\|root\.matches\(APP\)/,
+    'bediening uit een embedded appheader moet app-eigendom houden in Adaptive Edge');
+  assert.match(edge, /if\(src\.frame\)b\.dataset\.rtgAdaptiveFrame='true'/,
+    'dezelfde bediening moet haar frameherkomst behouden zodat een bronapp geen bestemmingsbediening erft');
+  const meter = require('node:fs').readFileSync(require('node:path').join(__dirname, '../scripts/appwerkt.js'), 'utf8');
+  assert.match(meter, /frameBediening \|\| el\.getAttribute\('data-rtg-adaptive-frame'\) !== 'true'/,
+    'alleen een expliciete frame-adapter mag paneelbediening aan de gemeten app toeschrijven');
 });
 
 test('de replaygrens groeit begrensd mee met onafhankelijke resterende bediening', () => {

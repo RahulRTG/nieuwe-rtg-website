@@ -44,45 +44,10 @@
   var WERK = /\/apps\/(leverancier|personeel|kantoren|backoffice|office|meldkamer|techniek|boardroom|kantoorpda|overheidspda|gemeentepda)/;
   var opWerk = WERK.test(location.pathname);
 
-  var css =
-    /* het paneel rechtsonder; de rest van het scherm blijft van het werk */
-    'body.hv-bureau .hv-balk{left:auto;right:1rem;bottom:1rem;width:var(--hv-breed,min(30rem,42vw));' +
-    'border:1px solid var(--gold,#857007);border-radius:0;box-shadow:0 12px 34px rgba(0,0,0,.5);}' +
-    'body.hv-bureau .hv-chat{left:auto;right:1rem;bottom:4.6rem;width:var(--hv-breed,min(30rem,42vw));' +
-    'border:1px solid #2a2a28;border-radius:0;}' +
-    /* verplaatst: dan telt de eigen plek en niet meer de hoek rechtsonder */
-    'body.hv-bureau.hv-verzet .hv-balk{right:auto;bottom:auto;left:var(--hv-x);top:calc(var(--hv-y) + var(--hv-hoog));}' +
-    'body.hv-bureau.hv-verzet .hv-chat{right:auto;bottom:auto;left:var(--hv-x);top:var(--hv-y);' +
-    'max-height:var(--hv-hoog) !important;height:var(--hv-hoog);}' +
-    /* de greep om groter en kleiner te slepen, rechtsonder in het gesprek */
-    '.hv-maat{position:absolute;right:0;bottom:0;width:1.1rem;height:1.1rem;cursor:nwse-resize;' +
-    'background:linear-gradient(135deg,transparent 45%,#4a4744 45%,#4a4744 55%,transparent 55%);z-index:3;}' +
-    'body:not(.hv-bureau) .hv-maat{display:none;}' +
-    'body.hv-bureau .hv-chat[data-stand="scherm"]{right:0;width:100%;border-radius:0;}' +
-    /* op een bureaublad hoeft er onder de pagina geen strook vrij te blijven:
-       het paneel zweeft in de hoek en dekt geen inhoud af die je nodig hebt */
-    'body.hv-bureau.hv-ruimte{padding-bottom:0;}' +
-    /* De kliklaag: een smalle rij VLAK BOVEN de balk, alleen op werkpagina's.
-       Vast gepositioneerd, net als de balk zelf: in de normale stroom zou hij
-       ergens onder aan de pagina belanden in plaats van bij het veld. Staat de
-       rij er, dan schuiven het gesprek en de bodemruimte een rij op. */
-    '.hv-werk{position:fixed;left:0;right:0;bottom:3.4rem;z-index:36;display:flex;gap:.35rem;' +
-    'flex-wrap:wrap;align-items:center;padding:.35rem .7rem;background:rgba(12,12,11,.94);' +
-    'border-top:1px solid #201e1c;font-family:Inter,system-ui,sans-serif;}' +
-    '.hv-werk[hidden]{display:none;}' +
-    'body.hv-werkrij .hv-chat{bottom:6.1rem;}' +
-    'body.hv-werkrij.hv-ruimte{padding-bottom:6.3rem;}' +
-    'body.hv-bureau .hv-werk{left:auto;right:1rem;bottom:4.6rem;width:min(30rem,42vw);' +
-    'border:1px solid #2a2a28;border-radius:0;}' +
-    'body.hv-bureau.hv-werkrij .hv-chat{bottom:7.3rem;}' +
-    '.hv-werk button{background:transparent;border:1px solid #3a3733;border-radius:0;color:#d8d5d0;' +
-    'font:inherit;font-size:.74rem;padding:.3rem .5rem;cursor:pointer;max-width:11rem;overflow:hidden;' +
-    'text-overflow:ellipsis;white-space:nowrap;}' +
-    '.hv-werk button:hover{border-color:var(--gold,#857007);color:#fff;}' +
-    '.hv-werk button:focus-visible{outline:2px solid var(--gold,#857007);outline-offset:2px;}' +
-    '.hv-werk .hv-werk-kop{border:0;color:#8A8680;font-size:.66rem;letter-spacing:.08em;' +
-    'text-transform:uppercase;padding:.3rem .2rem;cursor:default;}';
-  var st = document.createElement('style'); st.textContent = css; document.head.appendChild(st);
+  // Presentatie komt op iedere host uit de centrale DS-component.
+  /* Presentatie: public/ds/componenten/handenvrij.css. */
+
+
 
   if (bureau) document.body.classList.add('hv-bureau');
 
@@ -152,4 +117,3 @@
     var los = function () { neer = null; };
     greep.addEventListener('pointerup', los);
     greep.addEventListener('pointercancel', los);
-

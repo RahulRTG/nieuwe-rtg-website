@@ -12,6 +12,11 @@
   var supTok = null;
   try { supTok = localStorage.getItem('rtg_sup_token'); } catch (e) {}
   if (!supTok) return;
+  if (!document.documentElement.hasAttribute('data-ds') && !document.getElementById('rtgDsRuntimeCss')) {
+    var link = document.createElement('link');
+    link.id = 'rtgDsRuntimeCss'; link.rel = 'stylesheet'; link.href = '/ds/rtg-ds.css';
+    document.head.appendChild(link);
+  }
 
   var esc = function (t) { return String(t == null ? '' : t).replace(/[&<>"']/g, function (c) { return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]; }); };
   function api(pad, body) {
@@ -19,50 +24,7 @@
       .then(function (r) { return r.json().then(function (d) { return { ok: r.ok, d: d }; }); });
   }
 
-  var CSS =
-    '.poort-band{position:fixed;left:50%;transform:translateX(-50%);' +
-    'top:calc(env(safe-area-inset-top,0px) + 3.4rem);z-index:36;max-width:min(30rem,92vw);' +
-    'display:flex;align-items:center;gap:.7rem;background:#0C0C0B;border:1px solid var(--burgundy-on-dark,#C23A5E);' +
-    'border-radius:0;padding:.5rem .55rem .5rem .95rem;box-shadow:0 10px 30px rgba(0,0,0,.5);' +
-    'font-family:Inter,system-ui,sans-serif;color:#F4F1EC;font-size:.84rem;}' +
-    '.poort-band[hidden]{display:none;}' +
-    '.poort-band b{color:var(--burgundy-on-dark,#C23A5E);font-weight:600;}' +
-    '.poort-band .p-open{flex:0 0 auto;border:none;cursor:pointer;background:var(--burgundy,#7F1634);color:#fff;' +
-    'font:inherit;font-weight:600;font-size:.8rem;border-radius:0;padding:.4rem .85rem;}' +
-    '.poort-band .p-open:hover{background:var(--burgundy-bright,#9E1C40);}' +
-    '.poort-waas{position:fixed;inset:0;z-index:60;background:rgba(6,6,6,.72);backdrop-filter:blur(4px);' +
-    'display:flex;align-items:center;justify-content:center;padding:1.2rem;}' +
-    '.poort-waas[hidden]{display:none;}' +
-    '.poort-kaart{width:min(34rem,100%);max-height:88vh;overflow-y:auto;background:#151312;' +
-    'border:1px solid rgba(255,255,255,.12);border-radius:0;padding:1.4rem 1.4rem 1.2rem;' +
-    'font-family:Inter,system-ui,sans-serif;color:#F4F1EC;box-shadow:0 24px 60px rgba(0,0,0,.6);}' +
-    '.poort-kaart h2{font-family:"Bodoni Moda",Georgia,serif;font-weight:600;font-size:1.4rem;margin:0 0 .2rem;}' +
-    '.poort-kaart .p-sub{color:var(--rtg-leeszacht,#A79F92);font-size:.86rem;line-height:1.5;margin:0 0 1.1rem;}' +
-    '.p-stap{display:flex;gap:.7rem;align-items:flex-start;padding:.55rem 0;border-top:1px solid rgba(255,255,255,.08);}' +
-    '.p-vink{flex:0 0 auto;width:1.4rem;height:1.4rem;border-radius:50%;display:flex;align-items:center;justify-content:center;' +
-    'font-size:.8rem;border:1px solid rgba(255,255,255,.25);color:#8A8680;margin-top:.1rem;}' +
-    '.p-stap.klaar .p-vink{background:var(--burgundy,#7F1634);border-color:var(--burgundy,#7F1634);color:#fff;}' +
-    '.p-stap .p-tk{flex:1;min-width:0;}' +
-    '.p-stap .p-tk b{display:block;font-weight:600;font-size:.92rem;}' +
-    '.p-stap .p-tk span{display:block;color:var(--rtg-leeszacht,#A79F92);font-size:.82rem;line-height:1.45;margin-top:.1rem;}' +
-    '.p-stap .p-doe{flex:0 0 auto;align-self:center;border:1px solid var(--burgundy-on-dark,#C23A5E);background:transparent;' +
-    'color:var(--burgundy-on-dark,#C23A5E);font:inherit;font-size:.78rem;font-weight:600;border-radius:0;padding:.3rem .7rem;cursor:pointer;}' +
-    '.p-stap .p-doe:hover{background:rgba(194,58,94,.12);}' +
-    '.p-rond{margin:.5rem 0 0;background:#0C0C0B;border:1px solid rgba(255,255,255,.1);border-radius:0;padding:.8rem 1rem;}' +
-    '.p-rond h3{margin:0 0 .5rem;font-size:.95rem;font-weight:600;}' +
-    '.p-rond ol{margin:0;padding-left:1.1rem;color:#CFC9BE;font-size:.85rem;line-height:1.6;}' +
-    '.poort-knoprij{display:flex;gap:.6rem;margin-top:1.2rem;}' +
-    '.poort-knoprij button{flex:1;border:none;cursor:pointer;font:inherit;font-weight:600;font-size:.9rem;border-radius:0;padding:.7rem;}' +
-    '.p-online{background:var(--burgundy,#7F1634);color:#fff;}' +
-    '.p-online:hover{background:var(--burgundy-bright,#9E1C40);}' +
-    '.p-online:disabled{background:#2a2724;color:#6b6862;cursor:not-allowed;}' +
-    '.p-sluit{background:transparent;color:#CFC9BE;border:1px solid rgba(255,255,255,.2) !important;}' +
-    '.p-melding{margin-top:.7rem;font-size:.82rem;color:#C23A5E;min-height:1rem;}' +
-    '@media print{.poort-band,.poort-waas{display:none;}}';
-
-  function stijl() { var s = document.createElement('style'); s.textContent = CSS; (document.head || document.documentElement).appendChild(s); }
-
-  var band, waas, kaart, laatste = null;
+  var band, waas, kaart, laatste = null, focusVoorOpen = null;
 
   function render(d) {
     laatste = d;
@@ -90,9 +52,21 @@
 
   function meld(t) { var m = kaart && kaart.querySelector('.p-melding'); if (m) m.textContent = t || ''; }
 
-  function open() { if (waas) { waas.hidden = false; verversDanRender(); } }
-  function sluit() { if (waas) waas.hidden = true; }
-  function verversDanRender() { api('', {}).then(function (r) { render(r.d); }); }
+  function open() {
+    if (!waas) return;
+    focusVoorOpen = document.activeElement;
+    waas.hidden = false;
+    verversDanRender().then(function () {
+      var eerste = kaart && kaart.querySelector('button:not([disabled]),input:not([disabled]),select:not([disabled])');
+      if (eerste) eerste.focus();
+    });
+  }
+  function sluit() {
+    if (waas) waas.hidden = true;
+    var terug = focusVoorOpen; focusVoorOpen = null;
+    if (terug && terug.isConnected && typeof terug.focus === 'function') terug.focus();
+  }
+  function verversDanRender() { return api('', {}).then(function (r) { render(r.d); }); }
 
   function klik(e) {
     var t = e.target;
@@ -111,21 +85,20 @@
   }
 
   function toast(tekst) {
-    var el = document.createElement('div'); el.className = 'poort-band'; el.style.top = 'auto';
-    el.style.bottom = 'calc(env(safe-area-inset-bottom,0px) + 5rem)';
+    var el = document.createElement('div'); el.className = 'poort-band poort-toast ds-ondernemerpoort';
     el.innerHTML = '<span><b>✓</b> ' + esc(tekst) + '</span>';
     document.body.appendChild(el); setTimeout(function () { el.remove(); }, 5000);
   }
 
   function bouw() {
-    stijl();
-    band = document.createElement('div'); band.className = 'poort-band'; band.hidden = true;
+    band = document.createElement('div'); band.className = 'poort-band ds-ondernemerpoort'; band.hidden = true;
     band.innerHTML = '<span>Je zaak staat nog <b>offline</b></span><button class="p-open" type="button">Open de poort</button>';
     band.querySelector('.p-open').addEventListener('click', open);
-    waas = document.createElement('div'); waas.className = 'poort-waas'; waas.hidden = true;
-    kaart = document.createElement('div'); kaart.className = 'poort-kaart'; kaart.setAttribute('role', 'dialog'); kaart.setAttribute('aria-label', 'Ondernemer-poort');
+    waas = document.createElement('div'); waas.className = 'poort-waas ds-ondernemerpoort'; waas.hidden = true;
+    kaart = document.createElement('div'); kaart.className = 'poort-kaart'; kaart.setAttribute('role', 'dialog'); kaart.setAttribute('aria-modal', 'true'); kaart.setAttribute('aria-label', 'Ondernemer-poort');
     waas.appendChild(kaart);
     waas.addEventListener('click', function (e) { if (e.target === waas) sluit(); });
+    waas.addEventListener('keydown', function (e) { if (e.key === 'Escape') sluit(); });
     kaart.addEventListener('click', klik);
     document.body.appendChild(band); document.body.appendChild(waas);
     // de eerste stand ophalen; bij offline meteen de poort tonen (eenmaal per sessie)

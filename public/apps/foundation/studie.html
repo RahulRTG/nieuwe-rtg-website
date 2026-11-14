@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="nl">
+<html lang="nl" data-ds="1">
 <head>
 <script src="/shared/id.js"></script>
 <meta charset="utf-8">
@@ -9,71 +9,45 @@
 <link rel="manifest" href="/manifests/foundation.webmanifest">
 <link rel="apple-touch-icon" href="/icons/foundation.svg">
 <link rel="icon" href="/icons/foundation.svg" type="image/svg+xml">
-<link rel="stylesheet" href="stijl.css">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<link href="/ds/rtg-ds.css" rel="stylesheet">
+<script src="/ds/shell.js"></script>
 <script src="palet.js"></script>
-<link href="/shared/rtg-ui.css" rel="stylesheet">
-<style>
-  .wrap{max-width:44rem;margin:0 auto;padding:1.1rem 1.1rem 3rem;}
-  h1{font-family:var(--serif);font-weight:500;font-size:1.7rem;margin:.4rem 0 .2rem;}
-  .intro{color:var(--zacht);line-height:1.5;margin-bottom:1.3rem;}
-  .blok{padding:1.2rem;margin-bottom:1.2rem;}
-  .blok h2{font-family:var(--serif);font-weight:500;font-size:1.15rem;margin-bottom:.2rem;}
-  .blok .h{color:var(--zacht);font-size:.85rem;margin-bottom:1rem;line-height:1.4;}
-  .wegen{display:flex;flex-direction:column;gap:.7rem;}
-  .weg{background:var(--paneel2);border:1px solid var(--lijn);border-radius:0;padding:.8rem 1rem;}
-  .weg b{color:var(--rtg-leesgoud,var(--goud));}
-  .weg p{color:var(--zacht);font-size:.88rem;line-height:1.45;margin-top:.2rem;}
-  .knoprij{display:flex;gap:.6rem;flex-wrap:wrap;margin-top:.4rem;}
-</style>
-<link href="/shared/rtg-uniform.css" rel="stylesheet">
-<link href="/shared/ios.css" rel="stylesheet">
-<link rel="stylesheet" href="premium.css">
-<style data-rtg-stijlattr>
-/* Wat hier staat, stond als style="..." op de elementen zelf (in de markup
-   of in de sjablonen van de scripts die deze pagina laadt). Een stijlattribuut
-   houdt style-src-attr 'unsafe-inline' open in de CSP; een klasse niet
-   (NORM.json inlineStijlAttributen). De declaraties zijn letterlijk wat er
-   stond. :not(#_#_#_) geeft de klasse de voorrang die het attribuut had: hij
-   wint van elke gewone regel in de bladen, verliest net als het attribuut van
-   !important, en een el.style-schrijfactie wint er nog steeds van. */
-.s-166nr9c:not(#_#_#_){color:var(--zacht);font-size:.82rem;padding:.3rem 0 0}
-</style>
 <script src="/shared/rtg-world-desktop.js" defer></script>
-<link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
 <script src="/shared/rtg-heritage-transition.js" blocking="render"></script>
 </head>
-<body class="rtg-stijl" data-rtg-world="foundation" data-rtg-skin="heritage" data-rtg-layout="standard">
-<div id="balk"></div>
-<div class="wrap" role="main">
-  <h1>Verder leren voor jou</h1>
+<body class="ds-scherm ds-foundation" data-ds-schermtype="taak" data-ds-nadruk="gereedschap" data-rtg-world="foundation" data-rtg-skin="heritage" data-rtg-layout="standard">
+<div id="balk" class="ds-foundation-balk" role="banner"></div>
+<main class="wrap ds-taak ds-foundation-inhoud" id="main">
+  <h1 class="ds-titel ds-titel--scherm">Verder leren voor jou</h1>
 
-  <div class="kaart blok">
-    <h2>Gratis en goedkope wegen</h2>
-    <div class="h">In Nederland kun je veel gratis of bijna gratis leren. Een paar plekken om te beginnen:</div>
-    <div class="wegen">
-      <div class="weg"><b>Het Taalhuis en de Bibliotheek</b><p>Gratis hulp met taal, rekenen, lezen en de computer of telefoon. Handig voor werk, post en formulieren. Vraag ernaar in je bibliotheek.</p></div>
-      <div class="weg"><b>Gratis online cursussen</b><p>Er zijn veel gratis lessen online over van alles: van typen tot boekhouden. Begin klein, een half uur per keer.</p></div>
-      <div class="weg"><b>Mbo in deeltijd of een certificaat</b><p>Je kunt vaak in deeltijd een opleiding of los certificaat halen, ook naast je gezin. Informeer bij een mbo of het UWV.</p></div>
-      <div class="weg"><b>Rijbewijs of vakdiploma via de gemeente</b><p>Soms betaalt de gemeente of het UWV mee aan een rijbewijs, een certificaat (zoals heftruck of VCA) of een omscholing als het je aan werk helpt. Vraag naar een klantmanager.</p></div>
-      <div class="weg"><b>Inburgering en NT2</b><p>Nog niet zo lang in Nederland? De gemeente helpt met inburgeringslessen en Nederlands leren, vaak kosteloos.</p></div>
+  <div class="kaart blok ds-kaart ds-foundation-blok">
+    <h2 class="ds-titel ds-titel--sectie">Gratis en goedkope wegen</h2>
+    <div class="h ds-meta">In Nederland kun je veel gratis of bijna gratis leren. Een paar plekken om te beginnen:</div>
+    <div class="wegen ds-foundation-lijst">
+      <div class="weg ds-foundation-regel"><b>Het Taalhuis en de Bibliotheek</b><p>Gratis hulp met taal, rekenen, lezen en de computer of telefoon. Handig voor werk, post en formulieren. Vraag ernaar in je bibliotheek.</p></div>
+      <div class="weg ds-foundation-regel"><b>Gratis online cursussen</b><p>Er zijn veel gratis lessen online over van alles: van typen tot boekhouden. Begin klein, een half uur per keer.</p></div>
+      <div class="weg ds-foundation-regel"><b>Mbo in deeltijd of een certificaat</b><p>Je kunt vaak in deeltijd een opleiding of los certificaat halen, ook naast je gezin. Informeer bij een mbo of het UWV.</p></div>
+      <div class="weg ds-foundation-regel"><b>Rijbewijs of vakdiploma via de gemeente</b><p>Soms betaalt de gemeente of het UWV mee aan een rijbewijs, een certificaat (zoals heftruck of VCA) of een omscholing als het je aan werk helpt. Vraag naar een klantmanager.</p></div>
+      <div class="weg ds-foundation-regel"><b>Inburgering en NT2</b><p>Nog niet zo lang in Nederland? De gemeente helpt met inburgeringslessen en Nederlands leren, vaak kosteloos.</p></div>
     </div>
   </div>
 
-  <div class="kaart blok">
-    <h2>Vraag het je studiecoach</h2>
-    <div class="h">Nora denkt met je mee: wat zou je willen kunnen of worden, en welke gratis stap past daarbij?</div>
-    <div class="chat" id="chat"><div class="b ai">Hoi, ik ben Nora. Wat zou je graag willen leren, of wat voor werk zou je willen doen? Dan zoeken we samen een haalbare, betaalbare weg. Klein beginnen mag altijd.</div></div>
-    <div class="rijveld rtg-duimeind">
-      <textarea class="veld" id="vraag" rows="1" placeholder="Ik zou graag..." maxlength="1000"></textarea>
-      <button class="knop" id="stuur" data-hoofdactie>Vraag</button>
+  <div class="kaart blok ds-kaart ds-foundation-blok">
+    <h2 class="ds-titel ds-titel--sectie">Vraag het je studiecoach</h2>
+    <div class="h ds-meta">Nora denkt met je mee: wat zou je willen kunnen of worden, en welke gratis stap past daarbij?</div>
+    <div role="log" aria-live="polite" aria-label="Gesprek met de coach" class="chat ds-gesprek__stroom ds-foundation-chat" id="chat"><div class="b ai ds-gesprek__bericht">Hoi, ik ben Nora. Wat zou je graag willen leren, of wat voor werk zou je willen doen? Dan zoeken we samen een haalbare, betaalbare weg. Klein beginnen mag altijd.</div></div>
+    <div class="rijveld rtg-duimeind ds-vraagrij ds-foundation-vraag">
+      <textarea aria-label="Je vraag" class="veld ds-invoer ds-invoer--tekst" id="vraag" rows="1" placeholder="Ik zou graag..." maxlength="1000"></textarea>
+      <button class="knop ds-knop ds-knop--primair" id="stuur" data-hoofdactie>Vraag</button>
     </div>
-    <div class="s-166nr9c">Wat je hier typt wordt niet bewaard.</div>
-    <div class="knoprij h-mt90">
-      <a class="knop grijs klein" href="cv.html">Werk aan je cv</a>
-      <a class="knop grijs klein" href="dromen.html">Zet het als doel</a>
+    <div class="s-166nr9c ds-meta">Wat je hier typt wordt niet bewaard.</div>
+    <div class="knoprij ds-foundation-afstand ds-foundation-acties ds-foundation-afstand">
+      <a class="knop grijs klein ds-knop ds-knop--stil ds-knop--klein" href="cv.html">Werk aan je cv</a>
+      <a class="knop grijs klein ds-knop ds-knop--stil ds-knop--klein" href="dromen.html">Zet het als doel</a>
     </div>
   </div>
-</div>
+</main>
 
 <script src="sessie.js"></script>
 <script>
@@ -91,7 +65,6 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')) navigat
 <script src="/shared/bediening.js" defer></script>
 <script src="/shared/randen.js" defer></script>
 <script src="/shared/volscherm.js" defer></script>
-<script src="/shared/levendekleur.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
 <script src="/shared/ios.js" defer></script>

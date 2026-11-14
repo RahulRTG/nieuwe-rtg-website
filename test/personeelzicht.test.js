@@ -16,6 +16,7 @@ const fs = require('fs'); const os = require('os'); const path = require('path')
 const { startServer } = require('./helper');
 const { registreerGratis } = require('../scripts/lib/gratisaccount');
 const { maakLuister } = require('./stroombaken');
+const tijdzone = require('../server/kern/tijdzone');
 
 let H, child, TMP, tokM, zora, abel;
 const api = (pad, body, token) => fetch(H + pad, {
@@ -92,7 +93,7 @@ test('B1. een ziekmelding: de manager DAT en sinds wanneer, de zieke zichzelf, e
   assert.ok(!t.includes('2027-01-04') && !t.includes(mz.at), 'geen datum of tijdstip van Zora');
 
   // de verzuimplanning: de manager wat Zora nog kan, een collega alleen DAT ze afwezig is
-  const dag = new Date().toISOString().slice(0, 10);
+  const dag = tijdzone.datumIn();
   const pm = await api('/api/supplier/verzuim/planning', { van: dag, tot: dag }, tokM);
   assert.ok((pm.body.afwezig.find(x => String(x.staffId) === String(zora.id)) || {}).regels, 'de manager krijgt de regels');
   const pa = await api('/api/supplier/verzuim/planning', { van: dag, tot: dag }, abel.tok);

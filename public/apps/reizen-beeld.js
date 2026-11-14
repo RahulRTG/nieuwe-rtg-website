@@ -42,7 +42,7 @@
   /* De eigen maat van een foto, nodig om cover na te rekenen. */
   function maat(url) {
     if (!maten.has(url)) maten.set(url, new Promise(function (ok, mis) {
-      var i = new w.Image(); i.onload = function () { ok({ b: i.naturalWidth || 1, h: i.naturalHeight || 1 }); }; i.onerror = mis; i.src = url;
+      var reisBeeldMeter = new Image(); reisBeeldMeter.onload = function () { ok({ b: reisBeeldMeter.naturalWidth || 1, h: reisBeeldMeter.naturalHeight || 1 }); }; reisBeeldMeter.onerror = mis; reisBeeldMeter.setAttribute('src', url);
     }));
     return maten.get(url);
   }

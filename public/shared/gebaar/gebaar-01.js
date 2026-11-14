@@ -45,13 +45,24 @@
     return en() ? eng : nl;
   }
 
+  /* Twee begrensde laadwegen, uitsluitend voor de bestaande gebaarbron en de
+     gedeelde grammaticatabel. De letterlijke callsites blijven de bron van
+     waarheid; dit is geen algemeen moduleregister. */
+  function laadScript(path) {
+    var script = document.createElement('script');
+    script.src = path; script.async = true;
+    document.head.appendChild(script);
+  }
+
   /* Het blad hoort bij de laag en niet bij de pagina: een scherm dat gebaren
      wil, hoeft geen <link> te onthouden. Een keer, en alleen als hij er nog
      niet staat. */
-  if (!d.querySelector('link[href="/shared/gebaar.css"]')) {
-    var l = d.createElement('link');
-    l.rel = 'stylesheet'; l.href = '/shared/gebaar.css';
-    (d.head || d.documentElement).appendChild(l);
+  if (!document.documentElement.hasAttribute('data-ds') && !document.getElementById('rtg-gebaar-styles')) {
+    var gebaarBlad = document.createElement('link');
+    gebaarBlad.id = 'rtg-gebaar-styles';
+    gebaarBlad.rel = 'stylesheet';
+    gebaarBlad.href = '/shared/gebaar.css';
+    document.head.appendChild(gebaarBlad);
   }
 
   /* DE GRAMMATICA KOMT OOK MEE, maar pas als er iets te vegen valt. Lang drukken
@@ -64,9 +75,7 @@
      laden, en een tweede lading maakt een tweede tabel. */
   function grammaticaZacht() {
     if (window.RTGGrammatica || d.querySelector('script[src*="shared/adaptief/grammatica.js"]')) return;
-    var s = d.createElement('script');
-    s.src = '/shared/adaptief/grammatica.js'; s.async = true;
-    (d.head || d.documentElement).appendChild(s);
+    laadScript('/shared/adaptief/grammatica.js');
   }
   /* De tabel wordt GELEZEN op het moment dat een gebaar begint, nooit bewaard:
      wie hem bij het laden kopieert, heeft de kopie waar ronde 1 er zes van opruimde. */

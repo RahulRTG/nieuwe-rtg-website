@@ -51,8 +51,9 @@ async function main() {
           if (route.startsWith('/apps/') && !row.ds) await page.waitForFunction(() =>
             document.body.dataset.rtgEditorialV4 === 'true' || document.body.hasAttribute('data-rtg-projectie'), null, { timeout:12000 });
           row.contentReadyMs = Date.now() - started;
-          row.access = await page.evaluate(() => [...document.querySelectorAll('[data-rtg-access]')].some(e =>
+          row.access = await page.evaluate(() => [...document.querySelectorAll('[data-rtg-access],.ds-foundation-toegang,.wd-access')].some(e =>
             e.getClientRects().length && getComputedStyle(e).visibility !== 'hidden'));
+          row.public = await page.evaluate(() => !!document.body.dataset.publicPlatform);
           row.projection = await page.evaluate(() => document.body.hasAttribute('data-rtg-projectie'));
           if (route === '/apps/reisuitnodiging.html') {
             await require('./lib/desktop-guest')(page, row, errors);
@@ -85,7 +86,7 @@ async function main() {
             if (!row.state.content || row.state.content.w < 300 || row.state.content.h < 300) row.failures.push('missing-projection-content');
             if (row.state.overflow) row.failures.push('horizontal-overflow');
           } else {
-          if (!row.access) await page.waitForSelector('.rtg-adaptive-bar', { timeout: 12000 });
+          if (!row.access && !row.public) await page.waitForSelector('.rtg-adaptive-bar', { timeout: 12000 });
           row.edgeReadyMs = Date.now() - started;
           // Verify media the screen actually promises. A public pass uses a
           // gradient and Explore is a product index; neither invents a photo.
@@ -108,7 +109,7 @@ async function main() {
           }, row.media.selector, { timeout:12000 });
           // Edge can append styles after DOMContentLoaded; wait for the shared
           // desktop stylesheet to finish applying before measuring its grid.
-          if (!row.access) await page.waitForFunction(() => {
+          if (!row.access && !row.public) await page.waitForFunction(() => {
             const body = document.body;
             if (body.dataset.rtgShell === 'mobile') return true;
             if (body.dataset.rtgEditorialV4 === 'true') {
@@ -157,8 +158,11 @@ async function main() {
             const shown = e => !!(e && e.getClientRects().length && getComputedStyle(e).visibility !== 'hidden' && getComputedStyle(e).display !== 'none');
             return { url: location.pathname, world:b.dataset.rtgWorld, worldHome:b.dataset.worldHome || '', palette:b.dataset.rtgPalette, desktop:b.dataset.rtgDesktop, shellMode:b.dataset.rtgShell, layout:b.dataset.rtgLayout, public:b.dataset.publicPlatform,
               editorialV4:b.dataset.rtgEditorialV4 === 'true', v4Kind:b.dataset.rtgV4Kind || '',
+              publicBeleving:b.matches('.ds-beleving[data-ds-beleving="publiek"]') ||
+                !!document.querySelector('.wd-shell.ds-beleving[data-ds-beleving="publiek"]'),
               cinematic:b.dataset.rtgCinematic === 'true', viewport:innerWidth,
-              access:[...document.querySelectorAll('[data-rtg-access]')].some(e => e.getClientRects().length && getComputedStyle(e).visibility !== 'hidden'),
+              access:[...document.querySelectorAll('[data-rtg-access],.ds-foundation-toegang,.wd-access')].some(e => e.getClientRects().length && getComputedStyle(e).visibility !== 'hidden'),
+              accessDialog:visible('.ds-foundation-toegang,.wd-access'),
               mobileDecoration:visible('.wd-shell>.wd-greeting,.wd-shell>.wp-tabs,.wd-shell>.wd-people,.wd-shell>.wd-favorites,.wd-shell>.wd-library,.wd-home>.wp-scene,.wp-domain'),
               nativeContent:visible('.wd-home:not([hidden]) main,.wd-home:not([hidden])>*,.wd-access,.wd-focus:not([hidden])'),
               publicDecoration:visible('.wd-shell>.wd-greeting,.wd-shell>.wp-tabs,.wp-edit-images'),
@@ -170,9 +174,10 @@ async function main() {
                  Counting it as a second shell header made the audit reject the
                  one-screen composition it is meant to protect. */
               visibleLegacyHeaders:[...document.querySelectorAll('body>header:not(.rtg-v4-header):not([data-rtg-v4-canvas-toolbar]):not(.ritkop):not([data-rtg-v4-content-header]),.wd-page>header:not(.rtg-v4-header):not([data-rtg-v4-canvas-toolbar]):not(.ritkop):not([data-rtg-v4-content-header]),.rtg-edge-top,.rtg-edge-side,.rtg-edge-bottom')].filter(shown).length,
-              accessRect:rect('[data-rtg-access]'),
+              accessRect:rect('[data-rtg-access],.ds-foundation-toegang,.wd-access'),
               background:css.backgroundColor, editorialVersion:css.getPropertyValue('--rtg-editorial-version').trim(), headingFont:heading&&getComputedStyle(heading).fontFamily, edgeState:b.getAttribute('data-rtg-edge-2-state'), padding:css.padding, pageScroll:scrollY, scheme:css.colorScheme, shells:document.querySelectorAll('.wd-shell').length,
-              edges:[...document.querySelectorAll('.rtg-adaptive-bar')].filter(e => e.getClientRects().length && getComputedStyle(e).visibility !== 'hidden').length,
+              edges:visible('.ds-foundation-toegang,.wd-access') ? 1 : (b.dataset.publicPlatform ? Number(visible('.pp-header')) :
+                [...document.querySelectorAll('.rtg-adaptive-bar')].filter(e => e.getClientRects().length && getComputedStyle(e).visibility !== 'hidden').length),
               paletteRegions:['.rtg-adaptive-bar','.wk-shell','.hq-shell','.pn-shell','.reisapp'].flatMap(selector => {
                 const el = document.querySelector(selector); if (!el || !el.getBoundingClientRect().height) return [];
                 return [{selector,background:getComputedStyle(el).backgroundColor,material:getComputedStyle(el).getPropertyValue('--edge-bar-bg').trim()}];
@@ -191,7 +196,12 @@ async function main() {
              eigen marge (24). Hier stond 24: dat legde vast dat de inhoud onder
              de kop doorliep, zodat het logo over "Uw mensen" lag (18 oktober 2026). */
           const v4Top = s.worldHome && !mobile ? 96 : s.v4Kind === 'cover' ? 0 : (mobile ? 58 : 72);
-          const expectedTop = s.access ? 0 : s.editorialV4 ? v4Top : s.public ? (mobile ? 76 : 88) :
+          /* De publieke Beleving heeft twee bewust verschillende composities.
+             De voordeur is een gecentreerde, redactionele index met 48px lucht
+             (12px op mobiel); een verhaalpagina laat zijn foto direct onder de
+             vaste kop doorlopen. Dit is geen oude wereldhome met drie rails. */
+          const belevingTop = s.public === 'detail' ? 64 : (mobile ? 76 : 112);
+          const expectedTop = s.access ? 0 : s.editorialV4 ? v4Top : s.public ? (s.publicBeleving ? belevingTop : (mobile ? 76 : 88)) :
             s.cinematic ? (/^(compact|focus)$/.test(s.edgeState || '') ? 0 : (mobile ? 82 : 88)) :
             (mobile ? 136 : 88) - (/^(compact|focus)$/.test(s.edgeState || '') ? 64 : 0);
           if (!s.access && s.v4Kind !== 'canvas' && (!mobile || s.public) && Math.abs(s.shell?.y+s.pageScroll-expectedTop) > 2) row.failures.push('nonstandard-top-inset');
@@ -207,7 +217,9 @@ async function main() {
             } else if (!s.v4Header || Math.abs(s.v4Header.h-expectedHeader) > 2 || Math.abs(s.v4Header.y) > 2) row.failures.push('nonstandard-v4-header');
             if (s.visibleLegacyHeaders) row.failures.push('visible-legacy-header');
           }
-          if (s.access && (!s.accessRect || s.accessRect.y > 64 || s.accessRect.w < 300 || s.accessRect.h < 600)) row.failures.push('access-portal-not-viewport');
+          if (s.access && (!s.accessRect || (s.accessDialog
+            ? s.accessRect.w < 300 || s.accessRect.h < 180 || s.accessRect.x < 0 || s.accessRect.right > s.viewport + 1
+            : s.accessRect.y > 64 || s.accessRect.w < 300 || s.accessRect.h < 600))) row.failures.push('access-portal-not-viewport');
           if (mobile && !s.public) {
             if (s.shellMode !== 'mobile' || s.desktop) row.failures.push('desktop-shell-on-mobile');
             /* Cinematic v2 intentionally promotes the native world scene to
@@ -235,6 +247,18 @@ async function main() {
                kolommen verboden en worden ze door Editorial V4 verborgen. */
             if (!s.worldHome && ((s.left && s.left.w > 1) || (s.right && s.right.w > 1) || (s.library && s.library.w > 1))) row.failures.push('visible-legacy-column');
             if (s.content.x < s.shell.x-1 || s.content.right > s.shell.right+1) row.failures.push('content-outside-v4-frame');
+          } else if (!s.access && !mobile && s.publicBeleving) {
+            /* Publieke fotografie is een pagina en geen dashboard. Bewaak de
+               nieuwe geometrie even streng: verhalen zijn werkelijk full-bleed,
+               de voordeur is maximaal 1280px en exact gecentreerd, en geen
+               verborgen legacyrail mag opnieuw ruimte innemen. */
+            const detail = s.public === 'detail';
+            const expectedWidth = Math.min(1280, s.viewport - 80);
+            const expectedX = (s.viewport - expectedWidth) / 2;
+            if (detail ? (Math.abs(s.shell.x) > 2 || Math.abs(s.shell.w-s.viewport) > 2)
+              : (Math.abs(s.shell.x-expectedX) > 2 || Math.abs(s.shell.w-expectedWidth) > 2)) row.failures.push('nonstandard-public-beleving-frame');
+            if ((s.left && s.left.w > 1) || (s.right && s.right.w > 1)) row.failures.push('visible-public-legacy-column');
+            if (s.content.x < s.shell.x-1 || s.content.right > s.shell.right+1) row.failures.push('public-content-outside-frame');
           } else if (!s.access && !mobile && (!s.left || !s.right || s.left.w < 100 || s.right.w < 100)) row.failures.push('missing-column');
           else if (!s.access && !mobile) {
             if (s.cinematic) {

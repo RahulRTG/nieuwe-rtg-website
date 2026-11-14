@@ -2,11 +2,11 @@
   var bannerEl = null;
   function banner(tekst, pad) {
     if (bannerEl) bannerEl.remove();
-    bannerEl = maakEl('<div class="mgz-banner"><span>' + esc(tekst) + '</span>' +
-      (pad ? '<button class="mgz-go" type="button">Ga mee →</button>' : '') +
-      '<button class="mgz-x" type="button" aria-label="Sluiten">✕</button></div>');
+    bannerEl = maakEl('<div class="mgz-banner' + (metgezelDs ? ' ds-samen-banner' : '') + '"><span>' + esc(tekst) + '</span>' +
+      (pad ? '<button class="mgz-go' + (metgezelDs ? ' ds-samen-doe' : '') + '" type="button">Ga mee →</button>' : '') +
+      '<button class="mgz-x' + (metgezelDs ? ' ds-samen-sluit' : '') + '" type="button" aria-label="Sluiten">✕</button></div>');
     document.body.appendChild(bannerEl);
-    if (pad) bannerEl.querySelector('.mgz-go').addEventListener('click', function () { location.href = pad; });
+    if (pad) bannerEl.querySelector('.mgz-go').addEventListener('click', function () { location.assign(pad); });
     bannerEl.querySelector('.mgz-x').addEventListener('click', function () { bannerEl.remove(); bannerEl = null; });
     setTimeout(function () { if (bannerEl) { bannerEl.remove(); bannerEl = null; } }, 15000);
   }

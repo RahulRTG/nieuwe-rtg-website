@@ -89,18 +89,51 @@ const BRONSOORTEN = {
   voltooiproef: ['voltooibaar', 'persistent', 'herstelbaar', 'menselijk']
 };
 
-/* Een onderdeel met een scenario in scripts/lib/voltooi/ krijgt zijn drie
-   bewijzen uit VOLTOOIPROEF.json. Het instrument is het SCENARIObestand en niet
+/* Een onderdeel met een scenario in scripts/lib/voltooi/ krijgt zijn taak- en herstelbewijzen uit VOLTOOIPROEF.json. Het instrument is het SCENARIObestand en niet
    scripts/voltooiproef.js: daarop meet de bewijsbron de koppeling, en het
    gedeelde instrument noemt de routes van geen enkel scherm. */
-function voltooi(scenario, waarom) {
+function voltooi(scenario, waarom, scherm) {
   const bron = { soort: 'voltooiproef', register: 'VOLTOOIPROEF.json', instrument: 'scripts/lib/voltooi/' + scenario + '.js', waarom };
+  if (scherm) { bron.kanaal = 'browser'; bron.scherm = scherm; }
   return { voltooibaar: bron, persistent: bron, herstelbaar: bron, menselijk: bron };
 }
 
 /* Sleutel: de functie-id uit MAPPEN (zoals APPWERKT.json hem als `functie`
    schrijft), zodat een hernoemde app het contract niet stil laat vallen. */
 const CONTRACT = {
+  /* Foto en videobeeld blijven in het toestel. Alleen een uitgesproken vrije
+     vraag gaat naar de sessiegebonden Rahul-route; de bevoegdronde meet zowel
+     het lokale beeldpad als de scheiding van dat persoonlijke gesprek. */
+  'link:camera': Object.assign({
+    belofte: 'een lid maakt op zijn eigen toestel een foto zonder dat beeld naar RTG te sturen en gebruikt Rahul uitsluitend binnen zijn eigen ledensessie',
+    bevoegdContext: 'lokale-media-met-sessieassistent',
+    bestanden: ['public/apps/camera.html']
+  }, voltooi('camera', 'lokale opname, export en heropenen zonder opslag van camerabeeld bij RTG; weigering en herstel afzonderlijk beproefd', {
+    ingang: '/apps/camera.html', toestand: '#beeld', bestemmingen: []
+  })),
+  /* Juridisch is openbare, statische uitleg. Het scherm bevat geen account- of
+     domeingegevens en roept geen API aan. BEVOEGD meet dat laatste opnieuw via
+     SCHERMROUTES; zodra hier toch een route verschijnt vervalt dit contract. */
+  'link:juridisch': Object.assign({
+    belofte: 'iedere bezoeker kan de juridische uitleg lezen zonder dat het scherm persoonlijke gegevens of een bevoegde handeling ontsluit',
+    bevoegdContext: 'publieke-inhoud',
+    bestanden: ['public/apps/juridisch.html'],
+    // Een documentkeuze gebruikt echte links, geen kunstmatige knoppen. Deze
+    // verklaring begrenst de bestemmingen; APPWERKT inventariseert daarnaast
+    // ALLE eigen links in main en laat onbekende of ontbrekende links open.
+    navigatielinks: [
+      // Deze rij wordt als RTG-lid gemeten: de bestaande app neemt de sessiepas
+      // aan en opent Command boven de oude shell. Meet de zichtbare hoofdtaak,
+      // niet de bewust bedekte host of de statische HTML-titel/inlogdeur.
+      { bestemming: '/apps/app.html', inhoud: '#rtgCommand[data-stand="open"] .cmd-leeg .cmd-belofte', titel: 'RTG Pass' },
+      { bestemming: '/apps/juridisch/voorwaarden.html', inhoud: 'main h1', titel: 'Algemene voorwaarden, Rahul Travel Group' },
+      { bestemming: '/apps/juridisch/privacy.html', inhoud: 'main h1', titel: 'Privacybeleid, Rahul Travel Group' },
+      { bestemming: '/apps/juridisch/partnervoorwaarden.html', inhoud: 'main h1', titel: 'Partnervoorwaarden, Rahul Travel Group' }
+    ]
+  }, voltooi('juridisch', 'zichtbare documenttaak; publicatiecontinuïteit zonder kunstmatige API- of persoonsgegevensopslag', {
+    ingang: '/apps/juridisch.html', toestand: '#hoofd .intro h1',
+    bestemmingen: ['/apps/juridisch/voorwaarden.html', '/apps/juridisch/privacy.html', '/apps/juridisch/partnervoorwaarden.html']
+  })),
   'link:sessies': Object.assign({
     belofte: 'een lid ziet waar het is ingelogd en sluit een ander toestel op afstand -- en dat toestel blijft buiten, ook na een herstart of een crash'
   }, voltooi('sessies', 'het scenario loopt /api/mijn/sessies, /sluit en de toestelbinding, de routes die /apps/mijn-sessies.html zelf aanroept, met een echte sleutel voor het bezitsbewijs')),
@@ -236,6 +269,7 @@ const CONTRACT = {
      stoppen), -14 (intake delen, boeken) en -15 (pakketten). */
   'tab:zorg': Object.assign({
     belofte: 'het lid ziet het zorgaanbod, boekt en betaalt een behandeling of pakket, deelt medische context apart met een kliniek en stopt dat zelf, en annuleert wat hij niet meer wil',
+    persona: 'lid',
     ingang: '/apps/app.html',
     via: '#tab=zorg',
     bereik: '[data-view="zorg"]',
@@ -402,14 +436,29 @@ const CONTRACT = {
      de leeftijdsgroepen; pas daarna ontstaat een Foundation-adres. APPWERKT
      liep deze zichtbare ingang eerder helemaal niet en noemde de hele app
      daardoor ongemeten, hoewel de kiezer al door app-main-26 wordt bediend. */
-  'os:rtf': {
+  'os:rtf': Object.assign({
     belofte: 'een lid opent de RTFoundation en kiest de passende leeftijdswereld voordat de Foundation-jas wordt geopend',
-    ingang: '/apps/app.html',
+    ingang: '/apps/app.html?pas=rtg',
     via: 'de rand: "Praat met Rahul" -> "open RTFoundation", dat de leeftijdskeuze van de RTFoundation opent',
     adapter: { type: 'rahul-opdracht', opdracht: 'open RTFoundation', verwacht: '#osBelScrim.open',
       bereik: '#osBelScrim.open', titel: 'RTFoundation' },
-    bestanden: ['public/apps/app-main/app-main-26.js']
-  },
+    bestanden: ['public/apps/app-main/app-main-26.js'],
+    /* Deze kiezer leest of wijzigt geen domeingegevens. Hij bewaart alleen de
+       gekozen leeftijdsgroep op het toestel en navigeert naar een van deze
+       vijf lokale Foundation-ingangen. De ingangen zelf houden hun eigen
+       bevoegdheidscontract; de kiezer mag daar niet op meeliften. */
+    bevoegdContext: 'lokale-navigatie',
+    bevoegdBestemmingen: [
+      '/apps/foundation/index.html?groep=mini',
+      '/apps/foundation/index.html?groep=kind',
+      '/apps/foundation/index.html?groep=tiener',
+      '/apps/foundation/index.html?groep=jong',
+      '/apps/foundation/index.html?groep=volw'
+    ]
+  }, voltooi('rtfoundation-keuze', 'zichtbare keuze en terugkeer met oorspronkelijke browseropslag', {
+    ingang: '/apps/app.html?pas=rtg', toestand: '#osBelScrim.open',
+    bestemmingen: ['mini', 'kind', 'tiener', 'jong', 'volw'].map(g => '/apps/foundation/index.html?groep=' + g)
+  })),
   'link:browser': Object.assign({
     belofte: 'een lid vindt en opent de site van een ander lid en stuurt via het formulier een bericht dat precies een keer als gesprek aankomt, alleen tussen verbonden leden'
   }, voltooi('browser', 'het scenario loopt /api/browser/gids, /zoek, /open en /bericht, de routes die /apps/browser.html zelf aanroept, met de maker die het gesprek leest, een zaak die de klus in haar werklijst ziet en een vreemde die er niet door komt')),
@@ -502,17 +551,24 @@ const CONTRACT = {
   }, voltooi('bellen', 'het scenario loopt /api/member/call met een echte live-verbinding (/api/stroom/ticket, /api/stream) per lid, de signalering die RTGSocial.bel in app-main-10 en de doorgifte in app-main-11 gebruiken, met een onverbonden, een geblokkeerd en een gratis lid')),
   /* Videobellen gebruikt dezelfde sociale kiezer, maar is een afzonderlijke
      OS-app en krijgt daarom zijn eigen zichtbare contractingang. De bestaande
-     echte WebRTC-proef blijft de media bewijzen; deze adapter levert op zichzelf
-     geen voltooi-, opslag- of herstelbewijs. */
-  'os:videobellen': {
+     echte WebRTC-proef deelt de taakimplementatie met VOLTOOIPROEF; de adapter
+     alleen blijft onvoldoende voor voltooi-, continuïteits- of herstelbewijs. */
+  'os:videobellen': Object.assign({
     belofte: 'een lid opent videobellen, kiest een verbonden contact en start uitsluitend met expliciete camera- en microfoontoestemming',
-    ingang: '/apps/app.html',
+    ingang: '/apps/app.html?pas=rtg',
     via: 'de rand: "Praat met Rahul" -> "open videobellen", dat de kiezer met verbonden Salon-contacten opent',
     adapter: { type: 'rahul-opdracht', opdracht: 'open videobellen', verwacht: '#osBelScrim.open',
       bereik: '#osBelScrim.open', titel: 'Videobellen' },
+    /* Audio- en videogesprekken gebruiken exact dezelfde servergrens voor
+       contactkeuze, signalering, blokkades en de live-stroom. Het WebRTC-beeld
+       wordt apart echt in de browser gemeten; voor BEVOEGD mag daarom alleen
+       het reeds gekruiste belscenario worden hergebruikt. */
+    bevoegdVia: 'os:bellen',
     bestanden: ['public/apps/app-main/app-main-10.js', 'public/apps/app-main/app-main-10a.js',
       'public/apps/app-main/app-main-11.js', 'public/apps/app-main/app-main-26.js']
-  },
+  }, voltooi('videobellen', 'werkelijke tweezijdige media, continuïteit en beëindiging zonder opnamepersistentie te verzinnen', {
+    ingang: '/apps/app.html?pas=rtg', toestand: '#osBelScrim.open', bestemmingen: []
+  })),
 
   /* De lusproef stond tot 24 september 2026 in ZONDER_APP: hij schreef geen
      register, en Ontdekken leek /apps/rtg.html te zijn. Beide klopten niet meer:
@@ -669,9 +725,9 @@ const ALGEMEEN = {
    als ontbrekend noemt staat hier -- geen gok per app. */
 /* Alleen werkelijk ontbrekende testwereldvoorzieningen horen hier. De
    headless WebRTC-identiteiten en nepmedia voor Videobellen bestaan inmiddels
-   in test/videobellen-echt.e2e.js; wat nog ontbreekt is een passende bronsoort
-   die dat browserbewijs eerlijk aan APPWERKT kan koppelen. Dat is geen
-   ontbrekende adapter in de testwereld. */
+   in test/videobellen-echt.e2e.js en delen nu het browser-scenario met
+   VOLTOOIPROEF. De browserbinding controleert de fysieke ingang en waargenomen
+   schermtoestanden. De adapter zelf blijft geen bewijs. */
 const TESTWERELD_ONTBREEKT = {};
 
 module.exports = { BEWIJZEN, BRONSOORTEN, CONTRACT, ZONDER_APP, WERELD, ALGEMEEN, TESTWERELD_ONTBREEKT };

@@ -68,12 +68,12 @@
        argument het woord "undefined" achter de tekst, en dat stond in een echt
        scherm (de pols). Een helper hoort niet te lekken wat hij niet kreeg. */
     rij: function (links, rechts) {
-      return '<div class="item"><span>' + links + '</span><span class="stil">' + (rechts == null ? '' : rechts) + '</span></div>';
+      return '<div class="item ds-horeca-item"><span>' + links + '</span><span class="stil ds-horeca-meta">' + (rechts == null ? '' : rechts) + '</span></div>';
     },
     // een knop met gegevens eraan; het binden gebeurt per scherm
     knop: function (tekst, data, primair) {
       var attr = Object.keys(data || {}).map(function (k) { return ' data-' + k + '="' + esc(data[k]) + '"'; }).join('');
-      return '<button class="knop' + (primair ? ' p' : '') + '" type="button"' + attr + '>' + esc(tekst) + '</button>';
+      return '<button class="knop ds-knop ds-knop--klein' + (primair ? ' p' : '') + '" type="button"' + attr + '>' + esc(tekst) + '</button>';
     },
     // alle knoppen met een bepaald data-attribuut binden
     bind: function (wortel, attr, doen) {

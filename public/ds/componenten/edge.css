@@ -3,11 +3,25 @@
    wisselt de modi, en de bevoegdheid blijft bij de server (EDGE.md: "de Edge
    presenteert bevoegdheid; hij verleent haar nooit"). */
 @layer rtg.component {
+  /* Alleen de documentvloer met een aanwezige Edge reserveert focusruimte.
+     Dialogen en interne scrollers houden hun eigen scrollcontract. */
+  .ds-edge-aan:has(.ds-edge:not([hidden])) {
+    scroll-padding-block-end: calc(var(--ds-edge-hoogte) + max(var(--ds-ruimte-3), env(safe-area-inset-bottom)) + var(--ds-ruimte-3));
+  }
+  /* Op DS-schermen is de Edge de ene zichtbare systeemdeur. Appmenu blijft
+     als actie-eigenaar bestaan, maar zijn tweede hamburger neemt geen ruimte
+     of focus meer in zodra de Edge werkelijk is gemonteerd. */
+  .ds-edge-aan:has(.ds-edge__balk) #osMenuBtn,
+  .ds-edge-aan:has(.ds-edge__balk) .rtg-duimbalk,
+  .ds-edge-aan:has(.ds-edge__balk) .ios-thuis { display: none; }
   .ds-edge {
     position: fixed;
     inset-inline: var(--ds-ruimte-3);
     inset-block-end: max(var(--ds-ruimte-3), env(safe-area-inset-bottom));
-    z-index: 20;
+    /* De Edge blijft de universele bediening, ook boven een niet-modale
+       detailwerkruimte. Echte modale veiligheids- en toestemmingslagen mogen
+       daar in hun eigen hogere systeemlaag nog steeds boven staan. */
+    z-index: 9000;
     max-inline-size: 40rem;
     margin-inline: auto;
     color: var(--ds-cover-inkt);

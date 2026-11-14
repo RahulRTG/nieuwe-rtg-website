@@ -1,7 +1,7 @@
 /* RTG Continue Key verrijkt de bestaande Edge-hoofdactie zonder haar uit te voeren. */
 (function (g, fabriek) {
   'use strict';
-  var kern = typeof module === 'object' && module.exports ? require('./rtg-continue-key-core.js') : g && g.RTGContinueKeyCore;
+  var kern = typeof module === 'object' && module.exports ? require('./rtg-continue-key-core') : g && g.RTGContinueKeyCore;
   if (!kern) return;
   var api = fabriek(kern);
   if (typeof module === 'object' && module.exports) module.exports = api;

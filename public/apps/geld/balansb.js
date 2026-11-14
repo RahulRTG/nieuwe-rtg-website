@@ -79,7 +79,6 @@
   }
 
   function start() {
-    B.stijl();
     DATA = null;
     $('#blWrap').addEventListener('click', klik);
     if (w.RTGUitvoer) w.RTGUitvoer.bron(model);

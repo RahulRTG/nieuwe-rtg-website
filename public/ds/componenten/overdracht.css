@@ -1,0 +1,40 @@
+/* De bestaande commerce-overdrachtowner toont uitsluitend serverinformatie. */
+@layer rtg.component {
+  .ds-overdracht {
+    position: relative; z-index: 40; margin: 0;
+    padding-block: var(--ds-ruimte-4); padding-inline: var(--ds-ruimte-4);
+    border-block-end: 1px solid var(--ds-lijnkleur);
+    background: var(--ds-oppervlak); color: var(--ds-inkt);
+    font: 400 var(--ds-maat-tekst)/1.5 var(--ds-letter-tekst);
+  }
+  .ds-overdracht-in {
+    max-inline-size: 60rem; margin-inline: auto; display: flex; flex-wrap: wrap;
+    gap: var(--ds-ruimte-3) var(--ds-ruimte-6); align-items: start;
+  }
+  .ds-overdracht-kop {
+    inline-size: 100%; display: flex; flex-wrap: wrap; align-items: center;
+    justify-content: space-between; gap: var(--ds-ruimte-3); color: var(--ds-metaal);
+    font-size: var(--ds-maat-klein); letter-spacing: .1em; text-transform: uppercase;
+  }
+  .ds-overdracht-x {
+    min-inline-size: var(--ds-doel); min-block-size: var(--ds-doel);
+    padding-block: var(--ds-ruimte-2); padding-inline: var(--ds-ruimte-3);
+    border: 1px solid var(--ds-lijnkleur); border-radius: var(--ds-radius-knop);
+    background: transparent; color: var(--ds-inkt); font: inherit;
+    letter-spacing: normal; text-transform: none; cursor: pointer;
+  }
+  .ds-overdracht-x:hover { background: var(--ds-oppervlak-zacht); }
+  .ds-overdracht-x:focus-visible, .ds-overdracht-terug:focus-visible {
+    outline: 2px solid var(--ds-focus); outline-offset: 2px;
+  }
+  .ds-overdracht-lijst { flex: 1 1 22rem; min-inline-size: 0; margin: 0; padding: 0; list-style: none; }
+  .ds-overdracht-lijst li { display: flex; justify-content: space-between; gap: var(--ds-ruimte-3); padding-block: var(--ds-ruimte-1); }
+  .ds-overdracht-lijst li > span:first-child { min-inline-size: 0; overflow-wrap: anywhere; }
+  .ds-overdracht-aantal { color: var(--ds-inkt-zacht); font-variant-numeric: tabular-nums; }
+  .ds-overdracht-bedrag { font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .ds-overdracht-som { flex: 0 1 auto; min-inline-size: min(11rem, 100%); text-align: end; overflow-wrap: anywhere; }
+  .ds-overdracht-som b { display: block; font-size: var(--ds-maat-kop); font-weight: 600; }
+  .ds-overdracht-meta, .ds-overdracht-uitleg { inline-size: 100%; margin-block: var(--ds-ruimte-1) 0; font-size: var(--ds-maat-klein); color: var(--ds-inkt-zacht); overflow-wrap: anywhere; }
+  .ds-overdracht-uitleg { border-block-start: 1px solid var(--ds-lijnkleur); padding-block-start: var(--ds-ruimte-3); margin-block-start: var(--ds-ruimte-2); }
+  .ds-overdracht-terug { display: inline-flex; align-items: center; min-block-size: var(--ds-doel); min-inline-size: var(--ds-doel); color: var(--ds-accent); text-decoration: underline; text-underline-offset: 2px; }
+}

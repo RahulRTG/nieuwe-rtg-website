@@ -231,12 +231,11 @@ test('de eigenaarsbootstrap verdraagt een verloren race, en alleen die', () => {
      sleutel betekent dat een ander proces sneller was: opnieuw kijken en
      doorlopen.
 
-     Waarom dit een BRONtoets is en geen race-toets: de bootstrap draait bij het
-     laden van server.js, dus reproduceren kost drie echte servers en dat is
-     precies de flakiness die we kwijt wilden. test/vloot.test.js is het
-     end-to-end-bewijs; deze bewering houdt de reparatie vast. */
-  const bron = fs.readFileSync(path.join(WORTEL, 'server', 'server.js'), 'utf8');
-  assert.match(bron, /function zetEigenaarsAccountEens\(\)/,
+     De productcode staat inmiddels op zijn eigen opstartnaad en
+     test/eigenaar-wedloop.test.js lokt de echte drie-processenrace rechtstreeks
+     uit. Deze brontoets houdt daarnaast de fail-closed catch vast. */
+  const bron = fs.readFileSync(path.join(WORTEL, 'server', 'opzet', 'demo-eigenaar.js'), 'utf8');
+  assert.match(bron, /function zetEens\(\)/,
     'de bootstrap is niet meer opgesplitst; dan is er niets om opnieuw te proberen');
   assert.match(bron, /UNIQUE constraint failed: users\\\./,
     'de botsing op de unieke sleutel wordt niet meer herkend als een verloren race');
@@ -249,7 +248,7 @@ test('de eigenaarsbootstrap verdraagt een verloren race, en alleen die', () => {
      steeds, en valt hij er alsnog op om. De mutatieproef liet hem daarop
      AFSLAAN. */
   const wachter = bron.indexOf('if (!/UNIQUE constraint failed: users');
-  const opnieuw = bron.indexOf('return zetEigenaarsAccountEens();', wachter);
+  const opnieuw = bron.indexOf('return zetEens();', wachter);
   assert.ok(wachter > 0 && opnieuw > wachter && opnieuw - wachter < 200,
     'na het herkennen van de race wordt er niet opnieuw gekeken; herkennen alleen ' +
     'lost niets op');

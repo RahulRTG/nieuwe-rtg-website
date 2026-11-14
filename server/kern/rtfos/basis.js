@@ -74,6 +74,9 @@ module.exports = ({ db, save, bewerkCollectie, crypto, boardroomWie, magBoardroo
     // de verantwoording achteraf en de dingen die mis kunnen gaan
     vergaderingen: [], beleid: [], jaarverslagen: [], risicos: [], meldcodes: [],
     beschermzaken: [],   // eigen KLASSE, gedeelde poort; zie kern/beschermzaak/klasse.js
+    // CIVILIS-opvang: geen tweede casus, alleen voorziening en uitvoering rond
+    // een beschermzaak. Naam, adres en diagnose bestaan hier met opzet niet.
+    opvangvoorzieningen: [], opvangreserveringen: [],
     // Persoonscodes hebben verval, gebruik, intrekking en eigen opslag.
     codelevenscycli: [],
     audit: [] };

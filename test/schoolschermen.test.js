@@ -62,7 +62,9 @@ test('directie, personeel, leraar en gezin krijgen elk een eigen professioneel d
 
 test('schoolsleutels blijven tijdelijk en verlopen na dertig minuten', () => {
   assert.match(partner, /\/shared\/rtg-school-session\.js/);
+  assert.match(partner, /\/ds\/componenten\/accountdeur\.css/);
   assert.match(school, /\/shared\/rtg-school-session\.js/);
+  assert.match(school, /\/ds\/componenten\/accountdeur\.css/);
   assert.match(partnerApp, /RTGSchoolSession/);
   assert.match(school, /RTGSchoolSession/);
   assert.doesNotMatch(partnerApp, /localStorage\.(?:setItem|getItem)\s*\(/);
@@ -74,6 +76,8 @@ test('schoolsleutels blijven tijdelijk en verlopen na dertig minuten', () => {
   assert.match(sessie, /\['pointerdown', 'keydown', 'focus'\]/);
   assert.ok(offline.includes("'/shared/rtg-school-session.js'"),
     'de veiligere sessielaag moet ook in de offline-schil zitten');
+  assert.ok(offline.includes("'/ds/tokens.css'") && offline.includes("'/ds/componenten/accountdeur.css'"),
+    'de canonieke fail-closed Schoolpasdeur moet offline dezelfde presentatie houden');
   for (const pad of ["'/apps/foundation/leerpaspoort.html'", "'/apps/rtgschool/leer.js'", "'/apps/rtgschool/examen.js'", "'/apps/rtgschool/bijles.js'"])
     assert.ok(offline.includes(pad), 'het leerlingpaspoort mist offline onderdeel ' + pad);
 });

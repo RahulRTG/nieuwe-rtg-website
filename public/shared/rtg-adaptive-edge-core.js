@@ -50,6 +50,18 @@
   }
   function detail(action) { return DETAILS[action] || 'RTG'; }
   function normDeck(value, fallback) { return norm(DECKS, value, fallback || 'home'); }
+  /* Edge-configuratie en visuele bestemmingen zijn invoer. De gedeelde kern
+     laat uitsluitend een lokale RTG-app-route door; protocolwissels,
+     padtraversal en witruimte krijgen geen navigatierecht. */
+  function internalRoute(value) {
+    return typeof value === 'string' &&
+      /^\/apps\/(?!\.{1,2}(?:\/|[?#]|$))(?!.*\/\.{1,2}(?:\/|[?#]|$))[A-Za-z0-9_.\/-]+(?:[?#][^\s]*)?$/.test(value) ? value : null;
+  }
+  function navigate(win, value) {
+    var route = internalRoute(value);
+    if (!route || !win || !win.location || typeof win.location.assign !== 'function') return false;
+    win.location.assign(route); return true;
+  }
   function nextDeck(value, delta) {
     var index = DECKS.indexOf(normDeck(value));
     return DECKS[(index + (delta < 0 ? -1 : 1) + DECKS.length) % DECKS.length];
@@ -75,5 +87,6 @@
      zijn decks. register, setProjection en voer bestaan met opzet niet, en
      test/edgeregister-leeg.test.js zakt zodra ze terugkomen. */
   return Object.freeze({ STATES: STATES, DECKS: DECKS, SPECS: SPECS, normState: normState, presence: presence, view: view, detail: detail,
-    normDeck: normDeck, nextDeck: nextDeck, model: model, momentopname: momentopname });
+    normDeck: normDeck, nextDeck: nextDeck, internalRoute: internalRoute, navigate: navigate,
+    model: model, momentopname: momentopname });
 }));

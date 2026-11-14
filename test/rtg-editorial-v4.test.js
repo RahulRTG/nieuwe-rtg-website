@@ -6,6 +6,7 @@ const path = require('node:path');
 const ROOT = path.resolve(__dirname, '..');
 const read = relative => fs.readFileSync(path.join(ROOT, relative), 'utf8');
 const runtime = require('../public/shared/rtg-editorial-v4');
+const ontwerp = require('../scripts/ontwerpsysteem');
 const emptyBody = { getAttribute(){ return null; }, querySelector(){ return null; }, matches(){ return false; } };
 
 test('editorial v4 classificeert de zeven schermfamilies deterministisch', () => {
@@ -41,17 +42,17 @@ test('basis laadt editorial v4 als een werkelijk laatste presentatielaag', () =>
   const basis = read('public/shared/basis/basis-01.js');
   assert.doesNotMatch(heritage, /rtg-editorial-v4\.css/);
   assert.match(heritage, /--rtg-editorial-version:20261001/);
-  assert.match(basis, /blad\.href = '\/shared\/rtg-editorial-v4\.css'/);
+  assert.match(basis, /voegBasisStijlToe\('\/shared\/rtg-editorial-v4\.css', 'rtgEditorialV4Css'\)/);
   assert.match(basis, /laadEditorialBlad\(\)/);
   assert.match(read('public/shared/rtg-editorial-v4.css'), /--rtg-editorial-version:20261016/);
 });
 
 test('de werkelijke browserbundel laadt één nieuwe runtime en de service workers bewaren hem offline', () => {
   const basis = read('public/shared/basis.js');
-  assert.match(basis, /\['rtg-editorial-v4-model', 'RTGEditorialV4Model'\]/);
-  assert.match(basis, /\['rtg-editorial-v4-header', 'RTGEditorialV4Header'\]/);
-  assert.match(basis, /\['rtg-editorial-v4', 'RTGEditorialV4'\]/);
-  assert.doesNotMatch(basis, /\['rtg-cinematic-system', 'RTGCinematicSystem'\]/);
+  assert.match(basis, /laadBasisController\('\/shared\/rtg-editorial-v4-model\.js', 'RTGEditorialV4Model'\)/);
+  assert.match(basis, /laadBasisController\('\/shared\/rtg-editorial-v4-header\.js', 'RTGEditorialV4Header'\)/);
+  assert.match(basis, /laadBasisController\('\/shared\/rtg-editorial-v4\.js', 'RTGEditorialV4'\)/);
+  assert.doesNotMatch(basis, /laadBasisController\('\/shared\/rtg-cinematic-system/);
   for (const file of ['public/sw.js','public/apps/foundation/sw.js']) {
     const source = read(file);
     assert.match(source, /rtg-editorial-v4\.css/);
@@ -75,6 +76,16 @@ test('de nieuwe laag definieert header, Edge en alle apparaatbreekpunten', () =>
     'de compacte Edge-labels blijven op lichte en donkere beelden leesbaar');
   assert.match(css, /prefers-reduced-motion:reduce\)[^{]*\{[\s\S]*transition-duration:0s!important/,
     'reduced motion schakelt overgangen werkelijk uit');
+});
+
+test('basisacties houden toestandsfilters uit hun cascade-specificiteit', () => {
+  const css = read('public/shared/rtg-editorial-v4.css');
+  assert.match(css,
+    /:is\(\.knop,\.btn,button\[type="submit"\],a\.button,\.primary,\.primair,\.hoofd,\.rtg-dashboard-hero-cta,\.daily-action\):where\(:not\(\[hidden\],\.h-weg,\.rtg-command-form button\)\)\{/,
+    'de generieke actie-eigenaar mag latere primaire en secundaire varianten niet overstemmen');
+  assert.doesNotMatch(css,
+    /:is\(\.knop,\.btn,button\[type="submit"\],a\.button,\.primary,\.primair,\.hoofd,\.rtg-dashboard-hero-cta,\.daily-action\):not\(\[hidden\]\):not\(\.h-weg\):not\(\.rtg-command-form button\)/,
+    'drie afzonderlijke :not-filters verhogen de specificiteit en veroorzaken contrastregressies');
 });
 
 test('de ene schil sluit oude koppen, uitrekkende randen en Edge-overlap af', () => {
@@ -122,4 +133,13 @@ test('de schermkeuring erkent de ene native canvas-toolbar als de V4-kop', () =>
 test('de schermkeuring verwacht voor V4 dezelfde ivoren grond in native productschillen', () => {
   const audit = read('scripts/desktop-audit.js');
   assert.match(audit, /region\.selector === '\.wk-shell' \? v4Canvas/);
+});
+
+test('editorial v4 begrenst fragmentnavigatie tot bestaande DOM-doelen', () => {
+  const source = read('public/shared/rtg-editorial-v4.js');
+  const analyse = ontwerp.scriptLaadAnalyse(source, { ds: false });
+  assert.deepEqual(analyse.onzeker, [], analyse.onzeker.join('\n'));
+  assert.match(source, /function spring\(anchor, target\)/);
+  assert.match(source, /anchor\.setAttribute\('href', '#' \+ target\.id\)/);
+  assert.doesNotMatch(source, /\.href\s*=\s*['"]#['"]\s*\+/);
 });

@@ -21,7 +21,16 @@ function maakRotatie({ map, pad, klok, huidig, grensBytes, grensBestanden, meld 
      toetsen in test/journaalbestand.test.js vielen er meteen over. */
   function oudeBestanden() {
     try {
-      return fs.readdirSync(map).filter(n => /^\d{13}\.log$/.test(n)).sort().reverse();
+      const namen = fs.readdirSync(map);
+      const gedraaid = namen.filter(n => /^\d{13}\.log$/.test(n)).sort().reverse();
+      /* Een oude databasecollectie verhuist via een eigen, atomisch geplaatst
+         bestand (journaalbestand.js). Dat bestand is het OUDSTE deel van het
+         journaal: lezen neemt het mee, en de gewone bestandsgrens laat het na
+         verloop van tijd ook weer verdwijnen. De verborgen .complete-marker
+         blijft staan, zodat een achterlopende server de collectie daarna niet
+         opnieuw kan invoeren. */
+      const verhuisd = namen.filter(n => /^migratie-v1-[0-9a-f]{32}\.log$/.test(n)).sort();
+      return gedraaid.concat(verhuisd);
     } catch (e) { return []; }
   }
 

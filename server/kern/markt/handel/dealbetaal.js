@@ -20,9 +20,14 @@ const stand = require('../../pay/oplaadstand');
 module.exports = (ctx, { chatMet, isDeelnemer, rolIn, chatPub }) => {
   const { save, nu, pk, vind, sein, betaalWaarheid } = ctx;
 
-  /* Precies een keer, en alleen als de deal er nog is en nog niet betaald. */
+  /* De mutatie precies een keer. Een herhaling bevestigt de eigen opslag:
+     betaald in RAM kan het resultaat zijn van een eerdere mislukte save. */
   function zetBetaald(chat, methode) {
-    if (!chat || !chat.deal || chat.deal.betaald) return false;
+    if (!chat || !chat.deal) return false;
+    if (chat.deal.betaald) {
+      save();
+      return false;
+    }
     const m = methode || 'apple-pay';
     chat.deal.betaald = true; chat.deal.status = 'betaald'; chat.deal.methode = m; chat.deal.betaaldAt = nu();
     const ad = vind(chat.adId); if (ad) ad.status = 'verkocht';

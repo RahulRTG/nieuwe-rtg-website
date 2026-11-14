@@ -101,7 +101,9 @@ test('de centrale bedieningslaag houdt een handmatige route zichtbaar', () => {
   assert.match(twin, /!command\|\|!w\.RTGRahulTabHelpers/, 'Live Twin stopt veilig als de contextmodule ontbreekt');
   assert.match(kompas, /MENS BESLIST/);
   assert.match(kompas, /RTGKompas/);
-  assert.match(twin, /RTG LIVE TWIN · VERIFIED PRE-FLIGHT/);
+  assert.match(twin, /CONTROLE NOG NODIG/);
+  assert.doesNotMatch(twin, /VERIFIED PRE-FLIGHT|2 SERVERBRONNEN/,
+    'de beginweergave is geen reeds ontvangen serverbewijs');
   assert.match(twin, /PROOF RAIL/);
   assert.match(twin, /RTGLiveTwin/);
   assert.match(twin, /PREFLIGHT GESTART/);

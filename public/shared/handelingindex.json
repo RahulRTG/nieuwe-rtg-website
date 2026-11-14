@@ -3500,6 +3500,24 @@
       "url": "/apps/mijn-relaties.html"
     },
     {
+      "label": "Bedien apparaten",
+      "app": "Wonen",
+      "wereld": "LivingOS",
+      "url": "/apps/wonen.html"
+    },
+    {
+      "label": "Bekijk vandaag",
+      "app": "Wonen",
+      "wereld": "LivingOS",
+      "url": "/apps/wonen.html"
+    },
+    {
+      "label": "Onderhoud regelen",
+      "app": "Wonen",
+      "wereld": "LivingOS",
+      "url": "/apps/wonen.html"
+    },
+    {
       "label": "Begeleider",
       "app": "Zorg",
       "wereld": "FoundationOS",

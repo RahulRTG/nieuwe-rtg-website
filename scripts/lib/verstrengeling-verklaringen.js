@@ -4,6 +4,8 @@
    alleen een melding onderdrukken is onvoldoende. LEGACY betekent: bekend,
    fout en nog niet opgelost. Noem zo'n relatie geen DOMEINRELATIE. */
 module.exports = [
+  { van: 'domein:personalos', naar: 'domein:toegankelijk', soort: 'GEDEELDE_PRIMITIEF',
+    reden: 'PersonalOS projecteert het bestaande toegankelijkheidsprofiel in de persoonlijke compositie; kern/toegankelijk blijft eigenaar en PersonalOS maakt geen tweede profiel of bevoegdheid' },
   /* HET REISAANBOD EN HET REISBUREAU DELEN EEN DEUR. kern/reisaanbod.js schrijft
      het aanbod en telt de open aanvragen erbij, kern/reisbureau.js schrijft de
      aanvragen en leest het aanbod: een domein (RTG Reizen) met twee collecties,
@@ -238,6 +240,8 @@ module.exports = [
     reden: 'journaalbestand.js r.77 maakt de rotatie; een journaal en zijn rotatie zijn een onderwerp, geknipt op de 10 KB van keuringsregel 13' },
   { van: 'domein:journaalbestand', naar: 'domein:journaallezen', soort: 'EIGEN_DATA',
     reden: 'r.135: de leeskant van datzelfde journaal' },
+  { van: 'domein:journaalbestand', naar: 'domein:journaalmigratie', soort: 'EIGEN_DATA',
+    reden: 'journaalbestand.js laat de migratie van datzelfde append-only journaal per inhoudsdigest atomair voltooien voordat de schrijver opent; migratie bezit geen ander domein of opslagcontract' },
   { van: 'domein:journaalbestand', naar: 'domein:doorgeefjournaal', soort: 'EIGEN_DATA',
     reden: 'r.165: het doorgeven van datzelfde journaal naar een volgende bestemming' },
   { van: 'domein:doorgeefjournaal', naar: 'domein:journaalvorm', soort: 'EIGEN_DATA',

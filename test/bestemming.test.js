@@ -58,3 +58,31 @@ test('5. persona-afwijking: beide bronnen, en alleen als de doelgroep niet gedek
   assert.equal(a.bronVerwacht, 'SCHERMEIGENAAR.json');
   assert.equal(B.personaAfwijking('lid', '/apps/a-oud.html', REG), null, 'een alias zonder doelgroep is geen afwijking');
 });
+
+
+test('expliciete querycontext mag niet stilzwijgend verdwijnen of wijzigen', () => {
+  const ingang = '/apps/a.html?pas=rtg';
+  for (const landing of ['/apps/a.html', '/apps/a.html?pas=lifestyle', '/apps/a.html?pas=rtg&extra=1',
+    '/apps/a-oud.html?pas=lifestyle', 'https://vreemd.example/apps/a.html?pas=rtg', '//vreemd.example/apps/a.html?pas=rtg']) {
+    const o = B.beoordeel({ ingang, landing, register: REG, persona: 'lid',
+      anderen: [{ persona: 'zaak', landing: ingang }] });
+    assert.equal(o.status, 'NIET_GETEST', landing);
+    assert.equal(o.bestemming.uitkomst, 'andere-context', landing);
+  }
+});
+
+test('exacte querycontext werkt ook via een bestaande alias; ongespecificeerde fragmenten blijven vrij', () => {
+  for (const landing of ['/apps/a.html?pas=rtg', '/apps/a.html?pas=rtg#tab=foundation']) {
+    const o = B.beoordeel({ ingang: '/apps/a-oud.html?pas=rtg', landing, register: REG, persona: 'lid' });
+    assert.equal(o.status, 'BEWEZEN');
+    assert.equal(o.bestemming.uitkomst, 'zelfde-capability');
+  }
+  assert.equal(B.beoordeel({ ingang: '/apps/a.html', landing: '/apps/a.html?pas=rtg#tab=foundation',
+    register: REG, persona: 'lid' }).status, 'BEWEZEN');
+});
+
+test('ook zonder querycontract kan een vreemde origin geen bereikbaarheid bewijzen', () => {
+  for (const landing of ['https://vreemd.example/apps/a.html', '//vreemd.example/apps/a.html', 'http://[ongeldig']) {
+    assert.equal(B.beoordeel({ ingang: '/apps/a.html', landing, register: REG, persona: 'lid' }).status, 'NIET_GETEST');
+  }
+});

@@ -44,6 +44,21 @@
     });
   }
 
+  /* Een lege toestand mag alleen naar een bestemming in hetzelfde RTG-huis
+     wijzen. Een serverzin of configuratiefout mag nooit ongemerkt een
+     javascript:-URL, protocol-relative host of ander extern vertrekpunt in
+     de universele lege-staatcomponent plaatsen. Fragmenten blijven bruikbaar
+     voor een vervolgstap binnen hetzelfde scherm. */
+  function veiligPad(waarde) {
+    if (typeof waarde !== 'string' || !waarde || waarde !== waarde.trim() || /[\s\\\u0000-\u001f\u007f]/.test(waarde)) return null;
+    if (/^#[A-Za-z][A-Za-z0-9:_.-]*$/.test(waarde)) return waarde;
+    if (waarde[0] !== '/' || waarde.slice(0, 2) === '//') return null;
+    try {
+      var url = new URL(waarde, 'https://rtg.invalid');
+      return url.origin === 'https://rtg.invalid' ? waarde : null;
+    } catch (e) { return null; }
+  }
+
   /* De stand rond "u bent niet aangemeld", zodat elke aanroeper hem op
      dezelfde manier stelt in plaats van hem per scherm te formuleren. */
   function inlogStand(o) {
@@ -74,14 +89,19 @@
   }
 
   function actieVan(o) {
-    if (o.actie && o.actie.tekst && (o.actie.pad || o.actie.doel || typeof o.actie.doe === 'function')) return o.actie;
+    if (o.actie && o.actie.tekst) {
+      var actiePad = veiligPad(o.actie.pad);
+      if (actiePad) return { tekst: o.actie.tekst, pad: actiePad };
+      if (o.actie.doel || typeof o.actie.doe === 'function') return o.actie;
+    }
     var stappen = o.stappen || [], stap = stappen.length === 1 ? stappen[0] : null;
-    return stap && stap.tekst && stap.pad ? stap : null;
+    var stapPad = stap && veiligPad(stap.pad);
+    return stap && stap.tekst && stapPad ? { tekst: stap.tekst, pad: stapPad } : null;
   }
 
   function maakVlak(o, actie) {
     var el;
-    if (actie && actie.pad) { el = d.createElement('a'); el.href = actie.pad; }
+    if (actie && actie.pad) { el = d.createElement('a'); el.setAttribute('href', actie.pad); }
     else if (actie && (actie.doel || typeof actie.doe === 'function')) {
       el = d.createElement('div'); el.setAttribute('role', 'button'); el.tabIndex = 0;
       /* Een lege toestand met één interne vervolgstap is de primaire actie van
@@ -107,9 +127,10 @@
       el.appendChild(s); return;
     }
     (o.stappen || []).forEach(function (st) {
-      if (!st || !st.pad || !st.tekst) return;
+      var pad = st && veiligPad(st.pad);
+      if (!st || !pad || !st.tekst) return;
       var a = d.createElement('a');
-      a.className = 'rtg-leeg-actie'; a.href = st.pad; a.textContent = st.tekst;
+      a.className = 'rtg-leeg-actie'; a.setAttribute('href', pad); a.textContent = st.tekst;
       el.appendChild(a);
     });
   }
@@ -140,8 +161,9 @@
     if (o.waarom) uit += '<p>' + esc(o.waarom) + '</p>';
     if (actie) uit += '<span class="rtg-leeg-actie">' + esc(actie.tekst) + '</span>';
     else (o.stappen || []).forEach(function (st) {
-      if (!st || !st.pad || !st.tekst) return;
-      uit += '<a class="rtg-leeg-actie" href="' + esc(st.pad) + '">' + esc(st.tekst) + '</a>';
+      var pad = st && veiligPad(st.pad);
+      if (!st || !pad || !st.tekst) return;
+      uit += '<a class="rtg-leeg-actie" href="' + esc(pad) + '">' + esc(st.tekst) + '</a>';
     });
     return uit + '</' + tag + '>';
   }

@@ -23,20 +23,25 @@
     }).catch(function (e) { bytes.delete(id); throw e; }));
     return bytes.get(id);
   }
+  function beeldbron(img, source) {
+    if (!img || img.tagName !== 'IMG') return false;
+    img.setAttribute('src', String(source || '')); return true;
+  }
   function paint(record, source, crop) {
     record.nodes.forEach(function (img) {
-      img.src = source; img.style.objectPosition = crop.x + '% ' + crop.y + '%';
+      beeldbron(img, source); img.style.objectPosition = crop.x + '% ' + crop.y + '%';
       img.style.transform = 'scale(' + crop.zoom + ')'; img.style.transformOrigin = crop.x + '% ' + crop.y + '%';
     });
   }
   function apply(record) {
     var choice = preferences[record.id], version = epoch;
-    if (!choice) { record.nodes.forEach(function (img) { img.src = record.original; img.style.objectPosition = ''; img.style.transform = ''; img.style.transformOrigin = ''; }); return; }
+    if (!choice) { record.nodes.forEach(function (img) { beeldbron(img, record.original); img.style.objectPosition = ''; img.style.transform = ''; img.style.transformOrigin = ''; }); return; }
     file(choice.file).then(function (url) { if (version === epoch && preferences[record.id] === choice) paint(record, url, choice[w.innerWidth < 1000 ? 'mobile' : 'desktop']); }).catch(function () {
-      record.nodes.forEach(function (img) { img.src = record.original; img.style.objectPosition = ''; img.style.transform = ''; img.style.transformOrigin = ''; });
+      record.nodes.forEach(function (img) { beeldbron(img, record.original); img.style.objectPosition = ''; img.style.transform = ''; img.style.transformOrigin = ''; });
     });
   }
   function register(img, id, label) {
+    if (!img || img.tagName !== 'IMG') return false;
     if (img.dataset.personalImageRegistered) return;
     img.dataset.personalImageRegistered = 'true';
     var full = world + '/' + id, record = slots.get(full);
@@ -85,7 +90,7 @@
       if (record && new URL(record.original, d.baseURI).href === url) { apply(record); return; }
       if (record) record.nodes = record.nodes.filter(function (n) { return n !== img; });
       var box = img.closest('.wp-photo,.wd-app-photo'), oldButton = box && box.querySelector('.pi-change'); if (oldButton) oldButton.remove();
-      delete img.dataset.personalImageRegistered; img.src = url; img.style.objectPosition = ''; img.style.transform = ''; img.style.transformOrigin = '';
+      delete img.dataset.personalImageRegistered; beeldbron(img, url); img.style.objectPosition = ''; img.style.transform = ''; img.style.transformOrigin = '';
       register(img, 'beeld-' + hash(url), label);
     },
     list: function () { return Array.from(slots.values()).filter(function (r) { return r.nodes.some(function (n) { return n.isConnected; }); }); },

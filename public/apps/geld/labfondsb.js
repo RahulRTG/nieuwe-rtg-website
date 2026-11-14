@@ -130,7 +130,6 @@
 
   function start() {
     var D = Deel();
-    D.stijl();
     $('#lfWrap').addEventListener('click', klik);
     if (w.RTGUitvoer) w.RTGUitvoer.bron(D.model);
     laad();

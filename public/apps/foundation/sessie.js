@@ -3,7 +3,17 @@
    toestel; elk profiel weet wie hij is. Bewaard in localStorage, zodat de
    tools (leren, cv) je naam al kennen en de balk bovenin laat zien wie je bent. */
 (function (w) {
+  const dsBijStart = document.documentElement.hasAttribute('data-ds');
   var KEY = 'rtf_sessie';
+  function laadSessiePresentatie(pad) {
+    if (document.documentElement.hasAttribute('data-ds')) return;
+    if (document.getElementById('rtgDsRuntimeCss')) return;
+    var presentatie = document.createElement('link');
+    presentatie.id = 'rtgDsRuntimeCss';
+    presentatie.rel = 'stylesheet';
+    presentatie.href = pad;
+    document.head.appendChild(presentatie);
+  }
   // de gedeelde verbindingslaag (offline-banner + satellietmodus) laadt op
   // elke RTF-pagina mee; sessie.js zit overal, dus dit is de ene plek
   try {
@@ -60,35 +70,6 @@
     var m = /\/([^/?#]+)\.html$/.exec(location.pathname);
     return m ? m[1].toLowerCase() : '';
   }
-  function toegangSlot(reden, laden) {
-    var id = 'rtf-toegang-slot', el = document.getElementById(id);
-    document.documentElement.classList.add('rtf-toegang-dicht');
-    if (!document.getElementById('rtf-toegang-stijl')) {
-      var stijl = document.createElement('style'); stijl.id = 'rtf-toegang-stijl';
-      stijl.textContent = 'html.rtf-toegang-dicht body>*:not(#rtf-toegang-slot):not(.wd-shell):not(.rtg-edge-chrome){visibility:hidden!important}html.rtf-toegang-dicht .wd-shell>.wd-home{visibility:hidden!important;pointer-events:none!important}html.rtf-toegang-dicht #rtf-toegang-slot{visibility:visible!important}#rtf-toegang-slot [data-rtf-uitweg]{padding:.65rem .85rem;border:1px solid #4a463d;border-radius:0;color:#f6f1e7;text-decoration:none}';
-      (document.head || document.documentElement).appendChild(stijl);
-    }
-    if (!el) {
-      el = document.createElement('dialog'); el.id = id; el.setAttribute('role', 'alertdialog'); el.setAttribute('aria-modal', 'true');
-      el.style.cssText = 'position:fixed;inset:0;z-index:2147483000;width:100%;height:100%;max-width:none;max-height:none;margin:0;border:0;display:grid;place-items:center;padding:1rem;background:radial-gradient(circle at 50% 38%,#101d31,#08090c 62%);color:#f4f0e7;font-family:Inter,system-ui,sans-serif';
-      (document.body || document.documentElement).appendChild(el);
-    }
-    var s = lees(), beheer = !!(s && s.profiel && s.profiel.beheerder);
-    el.innerHTML = '<div style="width:min(92vw,34rem);padding:1.5rem;border:1px solid rgba(195,155,74,.38);border-radius:0;background:linear-gradient(145deg,#121923,#0b0e14);box-shadow:0 24px 80px rgba(0,0,0,.55)">' +
-      '<div style="font:800 .68rem/1 Inter;letter-spacing:.17em;text-transform:uppercase;color:#e0c487">RTF · veilige toegang</div>' +
-      '<h1 style="font:900 1.75rem/1.08 Inter,sans-serif;letter-spacing:-.035em;text-transform:uppercase;margin:.65rem 0">' + (laden ? 'Jouw veilige wereld wacht op je' : 'Deze ruimte blijft nog dicht') + '</h1>' +
-      '<p style="color:#bdb8ad;line-height:1.55;margin:0 0 1rem">' + esc(reden || 'De server controleert je leeftijd en passen voordat dit scherm opengaat.') + '</p>' +
-      (laden ? '<div style="height:3px;border-radius:0;background:linear-gradient(90deg,#2874d0,#c39b4a,#63d587)"></div>' :
-        '<div style="display:flex;gap:.5rem;flex-wrap:wrap"><a data-rtf-wissel href="index.html#profielen" style="padding:.65rem .85rem;border-radius:0;background:#a6002f;color:#fff;text-decoration:none;font-weight:800">Kies een profiel →</a>' +
-        '<a data-rtf-uitweg href="/apps/app.html">Naar RTG OS</a>' +
-        (beheer ? '<a href="beheer.html" style="padding:.65rem .85rem;border:1px solid #4a463d;border-radius:0;color:#f6f1e7;text-decoration:none">Leeftijd instellen</a>' : '') + '</div>') + '</div>';
-    var wissel = el.querySelector('[data-rtf-wissel]');
-    if (wissel) wissel.onclick = function () {
-      var ss = lees(); if (ss) { wissel(ss); localStorage.setItem(KEY, JSON.stringify(ss)); }
-    };
-    try { if (!el.open) el.showModal(); } catch (e) {}
-    return el;
-  }
   function controleerToegang(gedwongen) {
     var sleutel = typeof gedwongen === 'string' && gedwongen ? gedwongen : paginaSleutel();
     var campus = sleutel === 'campus';
@@ -102,7 +83,8 @@
       .then(function (d) {
         if (!d.httpOk || !d.toegestaan) { toegangSlot(d.reden || 'Deze ruimte hoort niet bij jouw leeftijd of pas.', false); return d; }
         var el = document.getElementById('rtf-toegang-slot'); if (el) { try { el.close(); } catch (e) {} el.remove(); }
-        document.documentElement.classList.remove('rtf-toegang-dicht');
+        herstelToegangAchtergrond();
+        document.documentElement.classList.remove('rtf-toegang-dicht', 'ds-foundation-dicht');
         document.documentElement.setAttribute('data-rtf-groep', d.groep || 'kind');
         try { window.dispatchEvent(new CustomEvent('rtf-toegang', { detail: d })); } catch (e) {}
         return d;
@@ -128,6 +110,88 @@
       });
     };
   }
+/* Presentatie van dezelfde serverdeur. Tokens, profielwissel en de beslissing
+   blijven in sessie-00; deze functie blijft in dezelfde bestaande bundel-IIFE. */
+  var toegangAchtergrond = [];
+  function verbergToegangAchtergrond(slot) {
+    if (toegangAchtergrond.length || !document.body) return;
+    Array.prototype.forEach.call(document.body.children, function (node) {
+      if (node === slot) return;
+      toegangAchtergrond.push({ node: node, hidden: node.hasAttribute('hidden'),
+        inert: node.hasAttribute('inert'), aria: node.getAttribute('aria-hidden') });
+      node.hidden = true; node.setAttribute('inert', ''); node.setAttribute('aria-hidden', 'true');
+    });
+  }
+  function herstelToegangAchtergrond() {
+    toegangAchtergrond.splice(0).forEach(function (staat) {
+      if (!staat.node || !staat.node.isConnected) return;
+      staat.node.hidden = staat.hidden;
+      if (!staat.inert) staat.node.removeAttribute('inert');
+      if (staat.aria == null) staat.node.removeAttribute('aria-hidden'); else staat.node.setAttribute('aria-hidden', staat.aria);
+    });
+  }
+  function toegangBeeld(reden, laden, beheer) {
+    return '<div class="ds-foundation-slot"><div class="ds-label">RTF · veilige toegang</div>' +
+      '<h1 class="ds-titel ds-titel--scherm">' + (laden ? 'Jouw veilige wereld wacht op je' : 'Deze ruimte blijft nog dicht') + '</h1>' +
+      '<div role="status">' + esc(reden || 'De server controleert je leeftijd en passen voordat dit scherm opengaat.') + '</div>' +
+      (laden ? '<progress class="ds-foundation-laden" aria-label="Toegang controleren"></progress>' :
+        '<div class="ds-foundation-acties"><a class="ds-knop ds-knop--primair" data-rtf-wissel href="index.html#profielen">Kies een profiel →</a>' +
+        '<a class="ds-knop" data-rtf-uitweg href="/apps/app.html">Naar RTG OS</a>' +
+        (beheer ? '<a class="ds-knop" href="beheer.html">Leeftijd instellen</a>' : '') + '</div>') + '</div>';
+  }
+  function toegangSlot(reden, laden) {
+    var id = 'rtf-toegang-slot', el = document.getElementById(id);
+    document.documentElement.classList.add('rtf-toegang-dicht', 'ds-foundation-dicht');
+    laadSessiePresentatie('/ds/rtg-ds.css');
+    if (!el) {
+      el = document.createElement('dialog'); el.id = id; el.setAttribute('role', 'alertdialog'); el.setAttribute('aria-modal', 'true');
+      el.className = 'ds-dialoog ds-foundation-toegang';
+      (document.body || document.documentElement).appendChild(el);
+    }
+    verbergToegangAchtergrond(el);
+    var s = lees(), beheer = !!(s && s.profiel && s.profiel.beheerder);
+    el.innerHTML = toegangBeeld(reden, laden, beheer);
+    var wisselKnop = el.querySelector('[data-rtf-wissel]');
+    if (wisselKnop) wisselKnop.onclick = function () {
+      var ss = lees(); if (ss) { wissel(ss); localStorage.setItem(KEY, JSON.stringify(ss)); }
+    };
+    try { if (!el.open) el.showModal(); } catch (e) {}
+    return el;
+  }
+/* Dezelfde coach-owner, in dezelfde sessiebundel. Geen eigen sessie of transport. */
+  function coach(opts) {
+      var s = lees(); if (!s) return;
+      var gesprek = [], bezig = false;
+      function zelfdeProfiel() { var nu = lees(); return !!(nu && nu.code === s.code && nu.token === s.token &&
+        (nu.profiel && nu.profiel.id) === (s.profiel && s.profiel.id)); }
+      var NM = { vrouw: 'Rahul', man: 'Rahul', nonbinair: 'Rahul' };
+      function buddyKeuze() { try { return localStorage.getItem('rtf_buddy') || 'vrouw'; } catch (e) { return 'vrouw'; } }
+      // de leeftijdsgroep stuurt taal en niveau van de AI; van het profiel, anders de app-ingang
+      function groepVan() { try { return (s.profiel && s.profiel.groep) || document.documentElement.getAttribute('data-rtf-groep') || ''; } catch (e) { return ''; } }
+      function esc2(t) { return String(t == null ? '' : t).replace(/[&<>"]/g, function (c) { return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]; }); }
+      function verstuur() {
+        var t = (opts.input.value || '').trim(); if (!t || (dsBijStart && (bezig || !zelfdeProfiel()))) return;
+        if (dsBijStart) { bezig = true; opts.knop.disabled = true; }
+        opts.input.value = '';
+        opts.chat.insertAdjacentHTML('beforeend', '<div class="b ik' + (dsBijStart ? ' ds-gesprek__bericht ds-gesprek__bericht--eigen' : '') + '">' + esc2(t) + '</div>');
+        gesprek.push({ role: 'user', content: t });
+        var w = document.createElement('div'); w.className = 'b ai' + (dsBijStart ? ' ds-gesprek__bericht' : ''); w.textContent = opts.wacht || ((NM[buddyKeuze()] || 'Rahul') + ' denkt mee...');
+        opts.chat.appendChild(w); opts.chat.scrollTop = opts.chat.scrollHeight;
+        api('/hulp/ai', { code: s.code, token: s.token, kind: opts.kind, messages: gesprek, buddy: buddyKeuze(), groep: groepVan() })
+          .then(function (d) {
+            if (dsBijStart && !zelfdeProfiel()) { w.textContent = 'Je profiel is gewijzigd. Open deze ruimte opnieuw.'; return; }
+            if (dsBijStart && (!d || d.error || d.ok === false || typeof d.text !== 'string' || !d.text.trim())) throw new Error('Geen coachantwoord');
+            w.textContent = d.text; gesprek.push({ role: 'assistant', content: d.text }); opts.chat.scrollTop = opts.chat.scrollHeight;
+          })
+          .catch(function () {
+            if (dsBijStart && !zelfdeProfiel()) { w.textContent = 'Je profiel is gewijzigd. Open deze ruimte opnieuw.'; return; }
+            w.textContent = 'Sorry, dat lukte even niet. Probeer het zo nog eens.';
+            if (dsBijStart) { gesprek.pop(); if (!opts.input.value) opts.input.value = t; }
+          }).finally(function () { if (dsBijStart) { bezig = false; opts.knop.disabled = false; } });
+      }
+      opts.knop.addEventListener('click', verstuur);
+      opts.input.addEventListener('keydown', function (e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); verstuur(); } });
+    }
 /* WELKE LETTER PAST OP DEZE CIRKEL. De avatar krijgt de kleur die het lid
    zelf koos, en de letter stond vast op de tekstkleur van het huis -- wit.
    Wit op het standaardgoud #C9A24B haalt 2,2:1, en dat is geen initiaal maar
@@ -145,6 +209,14 @@ function opKleur(hex) {
           0.7152 * k(parseInt(h.slice(2, 4), 16)) +
           0.0722 * k(parseInt(h.slice(4, 6), 16));
   return (1.05 / (L + 0.05)) >= ((L + 0.05) / 0.05) ? '#FFFFFF' : '#0C0C0B';
+}
+
+/* De deur blijft lazy, maar de loader heeft één vaste browserverantwoordelijkheid
+   en alleen lokale letterlijke callsites. */
+function laadFoundationDeur(pad, klaar, fout) {
+  var script = document.createElement('script');
+  script.onload = klaar; script.onerror = fout; script.src = pad;
+  document.head.appendChild(script);
 }
 
 /* de sessie van de hulppas: lezen, actief en bewaren */
@@ -185,11 +257,7 @@ function opKleur(hex) {
       }
       if (window.RTGDeur) return toon();
       // de deur wordt zelden gebruikt, dus pas laden als hij nodig is
-      var s = document.createElement('script');
-      s.src = '/shared/deur.js';
-      s.onload = toon;
-      s.onerror = function () { location.href = 'index.html'; };
-      document.head.appendChild(s);
+      laadFoundationDeur('/shared/deur.js', toon, function () { location.href = 'index.html'; });
     },
     // gebruik boven aan een tool-pagina: geen sessie -> de deur, met de weg erin
     eisProfiel: function () {
@@ -215,28 +283,7 @@ function opKleur(hex) {
     api: api,
     toegang: controleerToegang,
     // herbruikbare AI-coach-chat. opts: { kind, chat, input, knop, wacht }
-    coach: function (opts) {
-      var s = lees(); if (!s) return;
-      var gesprek = [];
-      var NM = { vrouw: 'Rahul', man: 'Rahul', nonbinair: 'Rahul' };
-      function buddyKeuze() { try { return localStorage.getItem('rtf_buddy') || 'vrouw'; } catch (e) { return 'vrouw'; } }
-      // de leeftijdsgroep stuurt taal en niveau van de AI; van het profiel, anders de app-ingang
-      function groepVan() { try { return (s.profiel && s.profiel.groep) || document.documentElement.getAttribute('data-rtf-groep') || ''; } catch (e) { return ''; } }
-      function esc2(t) { return String(t == null ? '' : t).replace(/[&<>"]/g, function (c) { return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]; }); }
-      function verstuur() {
-        var t = (opts.input.value || '').trim(); if (!t) return;
-        opts.input.value = '';
-        opts.chat.insertAdjacentHTML('beforeend', '<div class="b ik">' + esc2(t) + '</div>');
-        gesprek.push({ role: 'user', content: t });
-        var w = document.createElement('div'); w.className = 'b ai'; w.textContent = opts.wacht || ((NM[buddyKeuze()] || 'Rahul') + ' denkt mee...');
-        opts.chat.appendChild(w); opts.chat.scrollTop = opts.chat.scrollHeight;
-        api('/hulp/ai', { code: s.code, token: s.token, kind: opts.kind, messages: gesprek, buddy: buddyKeuze(), groep: groepVan() })
-          .then(function (d) { w.textContent = d.text; gesprek.push({ role: 'assistant', content: d.text }); opts.chat.scrollTop = opts.chat.scrollHeight; })
-          .catch(function () { w.textContent = 'Sorry, dat lukte even niet. Probeer het zo nog eens.'; });
-      }
-      opts.knop.addEventListener('click', verstuur);
-      opts.input.addEventListener('keydown', function (e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); verstuur(); } });
-    },
+    coach: coach,
     // Balk bovenin met "ingelezen als", een belletje voor berichten en (voor de
     // beheerder) een knop naar Gezin beheren. plaats: een element om in te vullen.
     balk: function (el, opties) {
@@ -257,6 +304,7 @@ function opKleur(hex) {
         '<a href="#" id="sbUit">Gezin uitloggen</a>' +
         '</div>' +
         '<div class="sb-berichten" id="sbBerichten" hidden></div>';
+      sessieVorm(el);
       injectCss();
       /* De balk wordt NA het laden getekend, dus de vuller van glyf.js is al
          langsgeweest. Hier nog een keer, alleen over dit stukje DOM. */
@@ -296,42 +344,37 @@ function opKleur(hex) {
         api('/gezin/bericht/gelezen', { code: s.code, token: s.token }).then(function () { var t = el.querySelector('#sbTel'); if (t) t.hidden = true; }).catch(function () {});
       }).catch(function () { box.innerHTML = '<div class="sb-leeg">Kon berichten niet laden.</div>'; });
   }
-  var cssGedaan = false;
+  /* Dezelfde balk met DS-vorm; oorspronkelijke ids blijven gedragshaken. */
+  function sessieVorm(el) {
+    el.classList.add('ds-foundation-balk');
+    var klassen = { 'sb-balk': 'ds-foundation-sessierij', 'sb-brand': 'ds-foundation-merk',
+      'sb-terug': 'ds-knop ds-knop--klein', 'sb-safe': 'ds-meta',
+      'sb-bel': 'ds-knop ds-knop--klein', 'sb-prof': 'ds-knop ds-knop--klein',
+      'sb-tel': 'ds-foundation-teller', 'sb-av': 'ds-foundation-avatar',
+      'sb-menu': 'ds-foundation-menu', 'sb-berichten': 'ds-foundation-berichten' };
+    Object.keys(klassen).forEach(function (naam) {
+      el.querySelectorAll('.' + naam).forEach(function (node) { klassen[naam].split(' ').forEach(function (k) { node.classList.add(k); }); });
+    });
+    el.querySelectorAll('.sb-menu a').forEach(function (a) { a.classList.add('ds-knop', 'ds-knop--stil'); });
+    var prof = el.querySelector('#sbProf'), bel = el.querySelector('#sbBel');
+    prof.setAttribute('aria-controls', 'sbMenu'); bel.setAttribute('aria-controls', 'sbBerichten');
+    prof.setAttribute('aria-expanded', 'false'); bel.setAttribute('aria-expanded', 'false');
+    el.addEventListener('click', function () {
+      prof.setAttribute('aria-expanded', String(!el.querySelector('#sbMenu').hidden));
+      bel.setAttribute('aria-expanded', String(!el.querySelector('#sbBerichten').hidden));
+    });
+    el.addEventListener('keydown', function (e) {
+      if (e.key !== 'Escape') return;
+      var menu = el.querySelector('#sbMenu'), berichten = el.querySelector('#sbBerichten');
+      var bron = !menu.hidden ? prof : !berichten.hidden ? bel : null;
+      if (!bron) return;
+      e.preventDefault(); e.stopPropagation(); menu.hidden = true; berichten.hidden = true;
+      prof.setAttribute('aria-expanded', 'false'); bel.setAttribute('aria-expanded', 'false');
+      bron.focus();
+    });
+  }
   function injectCss() {
-    if (cssGedaan) return; cssGedaan = true;
-    var css = '.sb-balk{display:flex;align-items:center;gap:.6rem;padding:.6rem 1rem;border-bottom:1px solid var(--lijn);position:relative;}' +
-      '.sb-brand{font-family:var(--serif);font-weight:600;background:transparent;color:#C39B4A;padding:0;white-space:nowrap;}.sb-brand b{color:#F4F0E7;font-weight:500;}' +
-      '.sb-terug{color:var(--zacht);text-decoration:none;font-size:.85rem;}' +
-      '.sb-safe{margin-left:auto;display:inline-flex;align-items:center;gap:.35rem;color:var(--zacht);font-size:.62rem;font-weight:800;letter-spacing:.09em;text-transform:uppercase;white-space:nowrap;}.sb-safe i{width:.42rem;height:.42rem;border-radius:50%;background:#63D587;box-shadow:0 0 0 3px rgba(99,213,135,.12);}' +
-      /* min-* erbij, zodat de knop de 24x24 van WCAG 2.5.8 haalt ook als de
-         envelop ooit weer uit de markup zou vallen. Een ondergrens hoort bij de
-         component en niet bij het toeval van zijn inhoud. */
-      '.sb-bel{background:transparent;color:var(--txt);font-size:1.15rem;position:relative;line-height:1;padding:.2rem;' +
-        'min-width:24px;min-height:24px;display:inline-flex;align-items:center;justify-content:center;}' +
-      '.sb-bel .rtg-glyf{width:1.15rem;height:1.15rem;display:block;}' +
-      '.sb-tel{position:absolute;top:-4px;right:-6px;background:var(--rood);color:#fff;font-size:.62rem;font-weight:700;border-radius:0;min-width:1.1rem;height:1.1rem;display:inline-flex;align-items:center;justify-content:center;padding:0 3px;}' +
-      '.sb-tel[hidden]{display:none;}' +
-      '.sb-prof{display:flex;align-items:center;gap:.45rem;background:transparent;color:var(--txt);}' +
-      '.sb-av{width:1.8rem;height:1.8rem;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:1rem;}' +
-      '.sb-nm{font-size:.9rem;font-weight:600;max-width:7rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}' +
-      /* Op een telefoon is je eigen naam naast je eigen avatar geen informatie
-         maar breedte: hij kostte 62 punten in een balk die er 390 heeft, en
-         duwde daarmee een andere actie naar de tweede rij. De avatar zegt
-         hetzelfde. Vanaf een tablet is er ruimte en staat hij er weer. */
-      '@media (max-width:640px){.sb-nm{display:none;}.sb-brand{font-size:.82rem}.sb-safe{font-size:0}.sb-safe i{display:block}}' +
-      '.sb-menu{position:absolute;top:100%;right:1rem;z-index:40;background:var(--paneel);border:1px solid var(--lijn);border-radius:0;padding:.4rem;display:flex;flex-direction:column;min-width:12rem;box-shadow:0 12px 30px rgba(0,0,0,.5);}' +
-      '.sb-menu[hidden],.sb-berichten[hidden]{display:none;}' +
-      '.sb-menu a{color:var(--txt);text-decoration:none;padding:.6rem .7rem;border-radius:0;font-size:.9rem;}.sb-menu a:hover{background:var(--paneel2);color:var(--rtg-leesgoud,var(--goud));}' +
-      '.sb-berichten{position:absolute;top:100%;right:1rem;z-index:40;background:var(--paneel);border:1px solid var(--lijn);border-radius:0;padding:.5rem;width:min(92vw,22rem);max-height:70vh;overflow:auto;box-shadow:0 12px 30px rgba(0,0,0,.5);}' +
-      '.sb-leeg{color:var(--zacht);font-size:.85rem;padding:.8rem;text-align:center;}' +
-      '.sb-b{padding:.6rem .7rem;border-radius:0;background:var(--paneel2);margin-bottom:.4rem;}' +
-      '.sb-b.reis{border:1px solid var(--goud);}' +
-      '.sb-b.hulp{border:1px solid var(--rood);background:#2a1512;}' +
-      '.sb-hulplabel{color:#e88;font-weight:700;font-size:.78rem;margin-bottom:.25rem;}' +
-      '.sb-bkop{font-size:.78rem;color:var(--zacht);margin-bottom:.2rem;}.sb-bkop b{color:var(--txt);}' +
-      '.sb-btxt{font-size:.92rem;line-height:1.4;white-space:pre-wrap;}' +
-      '.sb-reisknop{display:inline-block;margin-top:.5rem;background:#A6002F;color:#fff;font-weight:800;font-size:.82rem;text-decoration:none;padding:.4rem .75rem;border-radius:0;}';
-    var st = document.createElement('style'); st.textContent = css; document.head.appendChild(st);
+    laadSessiePresentatie('/ds/rtg-ds.css');
   }
   w.Sessie = Sessie;
   /* Draait meteen wanneer sessie.js wordt gelezen, dus nog voordat de pagina
@@ -427,16 +470,16 @@ function opKleur(hex) {
      een script dat hier wordt ingehangen draait pas nadat deze bundel klaar is,
      en dan staat RTGWereld er dus al. */
   try {
-    if (!d.querySelector('link[href="/shared/wereldschil.css"]')) {
+    if (!document.documentElement.hasAttribute('data-ds') && !d.querySelector('link[href="/shared/wereldschil.css"]')) {
       var blad = d.createElement('link');
       blad.rel = 'stylesheet';
       blad.href = '/shared/wereldschil.css';
       (d.head || d.documentElement).appendChild(blad);
     }
     if (!d.querySelector('script[src="/shared/wereldschil.js"]')) {
-      var s = d.createElement('script');
-      s.src = '/shared/wereldschil.js';
-      (d.head || d.documentElement).appendChild(s);
+      var foundationWereldschilScriptNode = document.createElement('script');
+      foundationWereldschilScriptNode.src = '/shared/wereldschil.js';
+      document.head.appendChild(foundationWereldschilScriptNode);
     }
   } catch (e) {}
 })(window, document);

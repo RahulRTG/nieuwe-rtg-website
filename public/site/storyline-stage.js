@@ -34,7 +34,7 @@
     var img = query('.story-photo img'), meta = d.querySelector('meta[name="rtg-asset-base"]');
     var base = new URL(((meta && meta.content) || '/').replace(/\/?$/, '/'), d.baseURI);
     var src = new URL('images/' + scene.photo, base).href;
-    if (img.src !== src) img.src = src;
+    if (img.getAttribute('src') !== src) img.setAttribute('src', src);
     var select = query('select'), label = query('.demo-choice span'); label.textContent = spec.label;
     if (select.dataset.scenario !== state.scenario) {
       select.replaceChildren(); spec.options.forEach(function (item) { var o = node('option', item[1]); o.value = item[0]; select.appendChild(o); });

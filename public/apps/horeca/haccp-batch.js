@@ -23,12 +23,12 @@
       $('bOver').textContent = d.over;
       $('bBijna').textContent = d.bijnaOver;
       $('bBatches').innerHTML = (d.batches || []).map(function (b) {
-        return K.rij('<b>' + esc(b.naam) + '</b> <span class="stil">· ' + esc(b.batch || 'zonder batchnummer') +
+        return K.rij('<b>' + esc(b.naam) + '</b> <span class="stil ds-horeca-meta">· ' + esc(b.batch || 'zonder batchnummer') +
           (b.leverancier ? ' · ' + esc(b.leverancier) : '') + (b.hoeveelheid ? ' · ' + esc(b.hoeveelheid) : '') + '</span>',
-        '<span class="tag' + (b.over ? ' laat' : (b.dagenTeGaan <= 2 ? ' laat' : ' aan')) + '">' + esc(b.tht) + ' · ' +
+        '<span class="tag ds-horeca-tag' + (b.over ? ' laat' : (b.dagenTeGaan <= 2 ? ' laat' : ' aan')) + '">' + esc(b.tht) + ' · ' +
           (b.over ? Math.abs(b.dagenTeGaan) + ' dagen over de datum' : b.dagenTeGaan + ' dagen') + '</span>' +
           K.knop('Eraf', { weg: b.id }));
-      }).join('') || '<p class="stil">Er staan geen batches open.</p>';
+      }).join('') || '<p class="stil ds-horeca-meta">Er staan geen batches open.</p>';
       $('bBatchLet').textContent = d.let;
       K.bind($('bBatches'), 'weg', function (btn) {
         var reden = $('bWegReden').value.trim();
@@ -59,9 +59,9 @@
   function vragen() {
     var l = gekozen();
     $('bVragen').innerHTML = l ? l.vragen.map(function (v, i) {
-      return '<div class="item"><span><label><input type="checkbox" data-akkoord="' + i + '"> ' + esc(v) + '</label></span>' +
-        '<input class="veld" data-opmerking="' + i + '" maxlength="160" placeholder="Opmerking (verplicht als niet akkoord)" aria-label="Opmerking bij ' + esc(v) + '"></div>';
-    }).join('') : '<p class="stil">Er is nog geen controlelijst. Maak er hierboven een.</p>';
+      return '<div class="item ds-horeca-item"><span><label><input type="checkbox" data-akkoord="' + i + '"> ' + esc(v) + '</label></span>' +
+        '<input class="veld ds-invoer" data-opmerking="' + i + '" maxlength="160" placeholder="Opmerking (verplicht als niet akkoord)" aria-label="Opmerking bij ' + esc(v) + '"></div>';
+    }).join('') : '<p class="stil ds-horeca-meta">Er is nog geen controlelijst. Maak er hierboven een.</p>';
   }
 
   if (!K.poort()) return;

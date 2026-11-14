@@ -1,6 +1,7 @@
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert/strict');
+const fs = require('node:fs');
 const operation = require('../public/shared/rtg-operation');
 const edge = require('../public/shared/rtg-edge-2-context');
 
@@ -65,4 +66,11 @@ test('three pinned actions retain explicit slots across catalog and source chang
   assert.equal(model.pin(2,'a'), true);
   assert.deepEqual(model.slots(), ['b',null,'a']);
   assert.deepEqual(dock.model(entries.slice().reverse(), model.slots()).slots(), model.slots());
+});
+
+test('the pinned action URL remains bounded navigation, never a document loader', () => {
+  const source = fs.readFileSync('public/shared/rtg-action-dock.js', 'utf8');
+  assert.match(source, /setAttribute\('href', item\[3\]\)/);
+  assert.doesNotMatch(source, /\.href\s*=\s*item\[3\]/);
+  assert.deepEqual(require('../scripts/ontwerpsysteem').scriptLaadAnalyse(source, { ds: true }).onzeker, []);
 });

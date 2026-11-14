@@ -346,6 +346,26 @@ async function paarKlaar() {
   return { a, b, stad, idVoorA: rij.id, idVoorB: (await json(await rv('matches', {}, b))).matches[0].id };
 }
 
+// twee gematchte leden met alleen een gedeelde voorkeurslocatie; dit voorstel
+// is bewust ongedateerd en leunt dus niet op de private presence graph
+async function locatiePaarKlaar() {
+  const a = await lidMet('lifestyle');
+  const b = await lidMet('lifestyle');
+  const stad = 'Luzern-' + (teller++);
+  await rv('profiel/zet', { aan: true, over: 'Locatie-A-' + stad,
+    beschikbaar: dagdeelBeide, locaties: stad }, a);
+  await rv('profiel/zet', { aan: true, over: 'Locatie-B-' + stad,
+    beschikbaar: dagdeelBeide, locaties: stad }, b);
+  const kand = await json(await rv('kandidaten', {}, a));
+  const zB = kand.kandidaten.find(k => k.over === 'Locatie-B-' + stad);
+  await rv('like', { id: zB.id }, a);
+  const kandB = await json(await rv('kandidaten', {}, b));
+  await rv('like', { id: kandB.kandidaten.find(k => k.likteMij && k.over === 'Locatie-A-' + stad).id }, b);
+  const mA = (await json(await rv('matches', {}, a))).matches.find(x => x.codenaam === zB.codenaam);
+  const mB = (await json(await rv('matches', {}, b))).matches[0];
+  return { a, b, stad, idVoorA: mA.id, idVoorB: mB.id };
+}
+
 test('arrange it: het voorstel komt uit aanwezigheid en beschikbaarheid, zonder zaaknaam', async () => {
   const { a, stad, idVoorA } = await paarKlaar();
   const r = await json(await rv('arrange', { id: idVoorA }, a));
@@ -381,6 +401,18 @@ test('arrange it: een akkoord is niet genoeg; twee akkoorden gaan naar De Rechte
     assert.ok(!/bevestigd|gereserveerd\b/.test(e.notitie.replace('bevestigt', '')),
       'er wordt niet geclaimd dat er al iets vaststaat');
   }
+});
+
+test('arrange it: een ongedateerd voorstel op een gedeelde locatie blijft geldig', async () => {
+  const { a, b, stad, idVoorA, idVoorB } = await locatiePaarKlaar();
+  const gemaakt = await json(await rv('arrange', { id: idVoorA }, a));
+  assert.equal(gemaakt.voorstel.stad, stad);
+  assert.equal(gemaakt.voorstel.van, null, 'een voorkeurslocatie verzint geen aanwezigheid');
+  assert.equal(gemaakt.voorstel.tot, null, 'een voorkeurslocatie verzint geen einddatum');
+  assert.equal((await rv('akkoord', { id: idVoorA, ja: true }, a)).status, 200,
+    'de maker kan het zojuist ontvangen voorstel aanvaarden');
+  assert.equal((await rv('akkoord', { id: idVoorB, ja: true }, b)).status, 200,
+    'ook de ander kan het ongedateerde voorstel aanvaarden');
 });
 
 test('arrange it: van setting wisselen zet de akkoorden terug', async () => {

@@ -280,6 +280,18 @@ een werkend mechanisme.
   vernietigd moest worden.
 - Uit `bewaring` en `vernietigd` komt niemand terug. Dat zijn eindstanden.
 
+**Federatieve reisgrens (lokale afbouw, 11 november 2026):** bovenstaande
+levensloop bezit de werkruimtes, niet alle gedeelde reiscontracten. Zolang een
+tenant als verkoper of aanbieder voorkomt in `reisAanvragen.keten`, weigert
+vernietiging vóór enige verwijdering of statuswijziging. Een onleesbare bron
+wordt eveneens geweigerd. Het systeem zegt dus niet `vernietigd` terwijl
+betrokken reishistorie nog aanwezig is. Dit voegt geen exportrecht of
+bewaartermijn toe: volledige tenantbrede reisafwikkeling en bewaring vragen
+nog een bevoegd contract. De bestaande zaakzelfexport is slechts een
+documentair archief van de huidige persoonlijke zaakbevoegdheid, geen
+tenantbrede exit. De implementatiegrens staat in `TRAVELOS-UITVOERING.md` en
+de concrete bewijsstand in `AFBOUWPROGRAMMA.md`.
+
 ### De veger komt hier niet langs
 
 `werkruimtes` en `tenants` stonden nergens in het bewaarbeleid en dus in de

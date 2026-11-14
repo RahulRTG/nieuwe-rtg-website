@@ -60,50 +60,10 @@
   'use strict';
   if (w.RTGPoort) return;
 
-  var CSS =
-    ".rp{display:flex;flex-direction:column;width:100%;}" +
-    ".rp-mond{display:block;margin:0.2rem auto 0.1rem;width:200px;height:91px;}" +
-    ".rp-zin{font-family:'Bodoni Moda',Georgia,serif;font-weight:400;font-size:1.12rem;line-height:1.65;" +
-      "color:var(--txt,#F4F1EC);text-align:center;min-height:4.4rem;display:flex;align-items:center;" +
-      "justify-content:center;padding:0.8rem 0.4rem 1rem;text-wrap:balance;animation:rpZin .5s ease;}" +
-    "@keyframes rpZin{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:none;}}" +
-    ".rp-rij{display:flex;align-items:center;border-bottom:1px solid var(--line,rgba(255,255,255,.1));" +
-      "margin:0 .6rem;transition:border-color .2s;}" +
-    ".rp-rij:focus-within{border-color:var(--burgundy,#C23A5E);}" +
-    /* De lange staart van :not()'s is geen sierwerk. De UI-kit geeft ELK
-       invoerveld een kaartje met rand en ronde hoeken, en doet dat met precies
-       deze drie uitzonderingen erbij -- dus zo zwaar weegt die regel. Deze ene
-       regel moet juist een kale lijn zijn: geen doosje, alleen een streep
-       eronder. Met dezelfde staart plus onze eigen twee klassen wint hij, en
-       hoeft er nergens !important aan te pas te komen. */
-    ".rp .rp-rij input:not([type=range]):not([type=checkbox]):not([type=radio])" +
-      "{flex:1;min-width:0;background:none;border:none;border-radius:0;outline:none;box-shadow:none;" +
-      "color:var(--txt,#F4F1EC);" +
-      "font-family:'Inter',system-ui,sans-serif;font-size:.95rem;text-align:center;padding:.75rem .4rem;}" +
-    ".rp .rp-rij input:not([type=range]):not([type=checkbox]):not([type=radio]):focus" +
-      "{border:none;box-shadow:none;}" +
-    ".rp-rij input::placeholder{color:var(--soft,rgba(244,241,236,.6));}" +
-    ".rp .rp-rij select{flex:1;min-width:0;background:none;border:none;border-radius:0;outline:none;box-shadow:none;" +
-      "color:var(--txt,#F4F1EC);font-family:'Inter',system-ui,sans-serif;font-size:.95rem;" +
-      "text-align:center;text-align-last:center;padding:.75rem .4rem;}" +
-    ".rp .rp-rij select[hidden],.rp .rp-rij input[hidden]{display:none;}" +
-    /* min-width, want de pijl is 22 BREED en 35 hoog: bij een pictogramknop is
-       de breedte het gat (WCAG 2.5.8 vraagt 24 in beide richtingen). */
-    ".rp-rij button{background:none;border:none;cursor:pointer;color:var(--gold,#A98F1C);font-size:1.15rem;" +
-      "padding:.4rem .2rem;min-width:24px;opacity:0;transition:opacity .2s;font-family:inherit;}" +
-    ".rp-rij:focus-within button,.rp-rij.vol button{opacity:.85;}" +
-    ".rp-paden{margin-top:1.6rem;display:flex;flex-direction:column;gap:.7rem;align-items:center;}" +
-    /* padding en niet min-height: deze drie staan onder elkaar in een kolom, en
-       met padding blijft de tekst in het midden van zijn raakvlak staan. 19px
-       tekst plus tweemaal 3 is 25 -- net over de 24 van WCAG 2.5.8. */
-    ".rp-pad{background:none;border:none;color:var(--muted,rgba(244,241,236,.7));font:inherit;font-size:.8rem;" +
-      "cursor:pointer;text-decoration:underline;text-underline-offset:3px;padding:3px 0;}" +
-    ".rp-pad:hover{color:var(--gold,#A98F1C);}";
-
-  function stijl() {
-    if (d.getElementById('rpStijl')) return;
-    var s = d.createElement('style'); s.id = 'rpStijl'; s.textContent = CSS;
-    (d.head || d.documentElement).appendChild(s);
+  if (!d.documentElement.hasAttribute('data-ds') && !d.getElementById('rtgDsRuntimeCss')) {
+    var link = d.createElement('link');
+    link.id = 'rtgDsRuntimeCss'; link.rel = 'stylesheet'; link.href = '/ds/rtg-ds.css';
+    d.head.appendChild(link);
   }
 
   function esc(t) {
@@ -111,4 +71,3 @@
       return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c];
     });
   }
-

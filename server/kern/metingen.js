@@ -25,8 +25,8 @@
 
 const { magHerkomst, rangVan } = require('./herkomst');
 const klok = require('../lib/klok');
+const { datumIn: dagVan, plusDagen } = require('./tijdzone');
 
-const DAG = 86400000;
 const VENSTER = 7;          // waarover we een gemiddelde tonen
 const MAX_DAGEN = 400;      // per onderwerp per lid
 
@@ -46,14 +46,12 @@ const ONDERWERPEN = {
     vraag: 'Hoeveel weegt u?', per: 'dag' }
 };
 
-const dagVan = d => new Date(d).toISOString().slice(0, 10);
-
 /* Het beeld over het venster. Het aantal dagen dat ECHT is ingevuld gaat mee
    naar buiten: een gemiddelde over een enkele nacht is geen weekbeeld, en een
    scherm dat dat verschil niet krijgt, kan het ook niet tonen. */
 function beeldVan(rijen, onderwerp, nu = klok.datum()) {
-  const vanaf = dagVan(new Date(nu.getTime() - (VENSTER - 1) * DAG));
   const vandaag = dagVan(nu);
+  const vanaf = plusDagen(vandaag, -(VENSTER - 1));
   const inVenster = rijen.filter(r => r.op >= vanaf && r.op <= vandaag);
   if (!inVenster.length) return { gemeten: false, dagen: 0, vandaag: null, herkomsten: [], naast: [] };
 

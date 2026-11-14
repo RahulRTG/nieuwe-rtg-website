@@ -1,0 +1,47 @@
+/* Presentatie van de bestaande RTGiOS-gebaren en blad-API. De eigenaar van
+   pointer-, geschiedenis- en sluitgedrag blijft shared/ios; geen tweede schil. */
+@layer rtg.component {
+  .ds-ios-thuis {
+    position: fixed;
+    inset-inline-start: 50%;
+    inset-block-end: 0;
+    transform: translateX(-50%);
+    z-index: 60;
+    inline-size: 150px;
+    /* Alleen de strook ONDER de Edge; nooit boven zijn knoppen. De
+       toegankelijke Home-bediening van 44px blijft de bestaande Edge-link. */
+    block-size: max(var(--ds-ruimte-3), env(safe-area-inset-bottom, 0px));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 0;
+    padding: 0;
+    background: transparent;
+    color: var(--ds-inkt-zacht);
+    cursor: pointer;
+    touch-action: none;
+  }
+  .ds-ios-thuis::after { content: ''; inline-size: 134px; block-size: 5px; border-radius: var(--ds-radius-capsule); background: currentColor; }
+  .ds-ios-thuis:focus-visible { outline: 2px solid var(--ds-focus); outline-offset: 2px; }
+  .ds-ios-host.ios-veert { transition: transform var(--ds-duur) var(--ds-curve), opacity var(--ds-duur) var(--ds-curve); }
+  .ds-ios-host.ios-weg { transform: scale(.84) translateY(-10vh); opacity: 0; transition: transform var(--ds-duur) var(--ds-curve), opacity var(--ds-duur) var(--ds-curve); }
+  .ds-ios-waas { position: fixed; inset: 0; z-index: 70; background: var(--ds-glas); opacity: 0; transition: opacity var(--ds-duur) var(--ds-curve); }
+  .ds-ios-waas.ios-aan { opacity: 1; }
+  .ds-ios-blad {
+    position: fixed;
+    inset-inline: 0;
+    inset-block-end: 0;
+    z-index: 71;
+    inline-size: 100%;
+    max-block-size: 92dvh;
+    overflow-y: auto;
+    padding: 0 var(--ds-ruimte-4) calc(env(safe-area-inset-bottom, 0px) + var(--ds-ruimte-6));
+    border-end-start-radius: 0;
+    border-end-end-radius: 0;
+    transform: translateY(100%);
+    transition: transform var(--ds-duur) var(--ds-curve);
+  }
+  .ds-ios-blad.ios-aan { transform: none; }
+  .ds-ios-greep { position: sticky; inset-block-start: 0; display: flex; align-items: center; justify-content: center; min-block-size: var(--ds-doel); background: inherit; cursor: grab; touch-action: none; }
+  .ds-ios-greep::after { content: ''; inline-size: 36px; block-size: 5px; border-radius: var(--ds-radius-capsule); background: var(--ds-inkt-zacht); }
+}

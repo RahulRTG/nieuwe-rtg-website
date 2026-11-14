@@ -38,29 +38,22 @@
      heritage-blad komt bewust LAAT in <head>, na de stijl van het scherm. */
   if (document.body && !ds) document.body.setAttribute('data-rtg-skin', 'heritage');
 
+  function voegBasisStijlToe(pad, id) {
+    if (document.documentElement.hasAttribute('data-ds')) return;
+    var bestaandBlad = document.getElementById(id) || document.querySelector('link[href^="' + pad + '"]');
+    if (bestaandBlad) { if (!bestaandBlad.id) bestaandBlad.id = id; return bestaandBlad; }
+    var basisStyleNode = document.createElement('link');
+    basisStyleNode.id = id; basisStyleNode.rel = 'stylesheet'; basisStyleNode.href = pad;
+    document.head.appendChild(basisStyleNode);
+    return basisStyleNode;
+  }
+
   function laadEditorialBlad() {
-    if (document.getElementById('rtgEditorialV4Css') ||
-        document.querySelector('link[href^="/shared/rtg-editorial-v4.css"]')) return;
-    var blad = document.createElement('link');
-    blad.id = 'rtgEditorialV4Css';
-    blad.rel = 'stylesheet';
-    blad.href = '/shared/rtg-editorial-v4.css';
-    (document.head || document.documentElement).appendChild(blad);
+    voegBasisStijlToe('/shared/rtg-editorial-v4.css', 'rtgEditorialV4Css');
   }
 
   function laadHeritageBlad() {
-    var bestaand = document.getElementById('rtgHeritageCss') ||
-      document.querySelector('link[href^="/shared/rtg-heritage.css"]');
-    if (bestaand) {
-      if (!bestaand.id) bestaand.id = 'rtgHeritageCss';
-      laadEditorialBlad();
-      return;
-    }
-    var blad = document.createElement('link');
-    blad.id = 'rtgHeritageCss';
-    blad.rel = 'stylesheet';
-    blad.href = '/shared/rtg-heritage.css';
-    (document.head || document.documentElement).appendChild(blad);
+    voegBasisStijlToe('/shared/rtg-heritage.css', 'rtgHeritageCss');
     /* Een @import staat volgens CSS altijd vóór de regels van zijn eigenaar.
        V4 moet juist ná alle Heritage-regels komen om werkelijk de ene schil
        te zijn; daarom is dit bewust een volgend stylesheet in de DOM. */
@@ -80,10 +73,11 @@
     var identiteitScript = document.getElementById('rtgWorldIdentityJs') ||
       document.querySelector('script[src^="/shared/rtg-world-identity.js"]');
     if (!identiteitScript) {
-      identiteitScript = document.createElement('script');
-      identiteitScript.id = 'rtgWorldIdentityJs';
-      identiteitScript.src = '/shared/rtg-world-identity.js';
-      identiteitScript.async = false;
+      var nieuwIdentiteitScript = document.createElement('script');
+      nieuwIdentiteitScript.id = 'rtgWorldIdentityJs';
+      nieuwIdentiteitScript.src = '/shared/rtg-world-identity.js';
+      nieuwIdentiteitScript.async = false;
+      identiteitScript = nieuwIdentiteitScript;
     }
     identiteitScript.addEventListener('load', pasWereldIdentiteitToe, { once: true });
     identiteitScript.addEventListener('error', function () { if (!ds) laadHeritageBlad(); }, { once: true });
@@ -91,6 +85,8 @@
       (document.head || document.documentElement).appendChild(identiteitScript);
     }
   }
+
+  if (!ds) voegBasisStijlToe('/ds/componenten/basis.css', 'rtgBasisComponentCss');
 
   /* ---- taal: elk echt appscherm krijgt dezelfde 114-talige laag ---------
      Vijf grote shells namen i18n.js zelf al op; alle andere schermen hadden
@@ -162,25 +158,3 @@
     if (tg.nadruk === 'rustig') el.classList.add('rtg-rustig');
     if (tg.eenDing === 'altijd') el.classList.add('rtg-eending');
   } catch (e) {}
-
-  /* ---- 0. het thema, VOOR al het andere ---------------------------------
-     De vier thema's (champagne, onyx, bordeaux, royal) hingen aan een script
-     dat maar op één pagina stond. Een themakeuze die niet meereist is geen
-     thema maar een instelling van dat ene scherm, dus hij hoort in de laag die
-     overal ligt -- net als de bladen die hij aanstuurt (die komen mee via de
-     @import bovenaan shared/rtg-ui.css).
-
-     ZO VROEG MOGELIJK. Dit script zet een attribuut op <html> en daar hangt de
-     grondkleur aan; gebeurt dat pas na het tekenen, dan zie je de oude grond
-     even staan. Vandaar hier, boven de service worker, en niet in de opstart
-     onderaan.
-
-     De sleutel is rtg_thema_v2 en die staat los van de oude donker/licht-keuze
-     in shared/thema.js. Een pagina die nog niet om is, merkt niets: zonder
-     attribuut geldt gewoon wat de UI-kit al zei. */
-  if (!ds && !document.documentElement.hasAttribute('data-rtg-thema') && !document.getElementById('rtgThemasJs')) {
-    var th = document.createElement('script');
-    th.id = 'rtgThemasJs';
-    th.src = '/shared/rtg-themas.js';
-    (document.head || document.documentElement).appendChild(th);
-  }

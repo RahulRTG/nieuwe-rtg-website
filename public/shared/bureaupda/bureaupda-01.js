@@ -73,22 +73,5 @@
     });
   };
 
-  /* De stijl die de studio al had en de andere twee misten: de disciplinerij
-     als rustige balk met een gouden streep onder de actieve, in plaats van
-     pillen. De `.chips >`-voorvoegsels zijn nodig omdat de gedeelde pilrij in
-     rtg-ui.css als `body.rtg-stijl .chips > button` staat en dus zwaarder
-     weegt dan een kale `.chip` -- zonder dat voorvoegsel stond deze regel er
-     wel maar deed hij niets. Gemeten in de browser, niet gehoopt. */
-  var CSS =
-    'body.rtg-stijl .chips{display:flex;gap:.15rem;overflow-x:auto;margin:0 0 .2rem;padding:0 0 .1rem;' +
-      'border-bottom:1px solid var(--line);scrollbar-width:none;}' +
-    'body.rtg-stijl .chips::-webkit-scrollbar{display:none;}' +
-    'body.rtg-stijl .chips > .chip{white-space:nowrap;background:none;border:0;border-bottom:2px solid transparent;' +
-      'border-radius:0;margin-bottom:-1px;padding:.55rem .8rem .6rem;font-family:\'Inter\',system-ui,sans-serif;' +
-      'font-size:.72rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);cursor:pointer;}' +
-    'body.rtg-stijl .chips > .chip:hover{color:var(--txt);border-bottom-color:transparent;}' +
-    'body.rtg-stijl .chips > .chip.aan{background:none;color:var(--txt);border-bottom-color:var(--gold);}' +
-    '.bp-swatch{width:1rem;height:1rem;border-radius:50%;border:1px solid var(--line);display:inline-block;}';
-
-  w.RTGBureauPDA = { BUREAUS: BUREAUS, esc: esc, CSS: CSS };
+  w.RTGBureauPDA = { BUREAUS: BUREAUS, esc: esc };
 })(window);

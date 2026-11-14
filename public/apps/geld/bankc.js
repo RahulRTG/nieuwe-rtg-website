@@ -120,7 +120,6 @@
   }
 
   function start() {
-    B.stijl();
     B.ov = null; B.hart = null; B.stil = false;
     /* Meenemen (shared/uitvoer.js): het financiele hart als CSV/JSON, met de
        velden los. De datum komt als getal (ms) uit het grootboek; dus via

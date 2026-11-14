@@ -48,9 +48,12 @@ RTG Core → Design System → Wereldthema → Component → Schermtype → Sche
             tokens.css      thema/*.css   componenten/  schermen/
 ```
 
-Alles staat in `public/ds/`, en een scherm laadt precies één blad:
-`/ds/rtg-ds.css`. De eerste regel daarvan legt de volgorde van de **CSS-
-cascadelagen** vast:
+Alles staat in `public/ds/`, en een volledig gemigreerd scherm laadt precies
+één blad: `/ds/rtg-ds.css`. Tijdelijke minimale ingangen voor centrale
+componenten op nog niet gemigreerde hosts staan expliciet in
+`public/ds/contract.json`; zij zijn geen tweede componentowner en verdwijnen
+met hun laatste legacyhost. De eerste regel van de hoofdroot legt de volgorde
+van de **CSS-cascadelagen** vast:
 
 ```css
 @layer rtg.reset, rtg.tokens, rtg.thema, rtg.component, rtg.scherm;
@@ -76,6 +79,13 @@ laadvolgorde.
   dialoog en edge. Elke selector begint bij een eigen `.ds-`-klasse. Een
   verbetering aan `.ds-knop` werkt door in elk aangesloten scherm van elke
   wereld.
+- **Beleving** (`componenten/beleving.css`) is het gedeelde contract voor de
+  nieuwe publieke voordeuren en de appwerelden. `data-ds-beleving="publiek"`
+  geeft fotografie de brede cover, sluier en redactionele lucht;
+  `data-ds-beleving="werktafel"` bewaart hetzelfde ritme maar laat de handeling
+  vooropstaan. De beeldreeks `.ds-belevingsverhalen` gebruikt één groot moment
+  en twee rustige hoofdstukken. Zo kunnen LivingOS en volgende wereldpagina's
+  fotografisch worden zonder een routegebonden kaartstijl of nieuwe kleuren.
 - **Schermtypen** (`schermen/`): de zeven uit de goedgekeurde mockups,
   namelijk **Cover, Collectie, Taak, Detail, Gesprek, Canvas en Status**. Elk
   scherm van RTG is een van deze zeven of een samenstelling ervan.
@@ -166,6 +176,16 @@ Een regel buiten een cascadelaag wint van elke laag. Een scherm dat het nieuwe
 systeem laadt maar de oude bladen ook houdt, krijgt dus nog steeds de oude
 vorm. De migratie haalt per scherm de oude bladen weg en zet niets nieuws
 eroverheen.
+
+De bestaande Workspace Runtime en haar desktoploader zijn gedrag, geen
+stijlbron. Bij consolidatie blijven domein-DOM, sessies, widgets en panelen
+bij die eigenaar. Een DS-route mag die runtime eenmaal na de synchrone
+DS-ingang starten, met uitsluitend centrale werkruimte-CSS. Native canvassen
+houden een begrensd werkvlak; gewone schermen houden hun documentstroom.
+Een routegebonden browserproef moet de actieve bladen, één schileigenaar en
+het behoud van bediening en toestand bewijzen. Alleen het verwijderen van
+de runtime is geen geldige consolidatie. Onbekende transitieve laadpaden
+blijven blokkeren; deze gedragsgrens is geen vrijstelling van de stijlpoort.
 
 ## 6. De fasen, en waar ze staan
 
@@ -261,5 +281,11 @@ niet gemeten, en dat staat er dan ook zo.
 - een tijdelijke uitzondering zonder eigenaar, reden, vervaldatum en
   verwijderplan.
 
-De drie overgangsscripts in `contract.json` worden vóór 31 januari 2027
-beoordeeld.
+De lijst `contract.json.overgangsscripts` is leeg. I18n, Cookie, Uitvoer,
+Sprong, Poortgesprek, Basis, Plek, Plaatsnadering en de Magnaat-sandbox hebben
+hun uitzondering verloren: hun actuele DS-pad injecteert geen legacy-stijl
+meer. Een gerichte bronproef bewaakt dit zonder uitzondering. Plek en
+Plaatsnadering delen de niet-modale locatiekaart, zodat zoeken bruikbaar
+blijft. De legacy-presentatie voor werkelijke niet-DS-consumenten blijft
+apart bestaan totdat die consumenten bewezen zijn gemigreerd. Een lege
+uitzonderingslijst is geen bewijs dat alle schermen of laadpaden zijn afgesloten.

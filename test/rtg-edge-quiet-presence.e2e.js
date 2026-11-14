@@ -165,7 +165,7 @@ test('de ds-Edge op TravelOS blijft in rust bedienbaar en wordt bij herstel een 
     await page.goBack({ waitUntil: 'domcontentloaded' });
     await dsGereed(page);
     assert.equal(await page.locator('.ds-edge').count(), 1, 'routeherstel tekent precies één Edge');
-    assert.equal(await page.locator('.ds-edge__balk a[href="/apps/app.html"]').count(), 1, 'Home blijft bereikbaar');
+    assert.equal(await page.locator('.ds-edge__balk [data-ds-edge="home"]').count(), 1, 'Home blijft bereikbaar');
     await page.goForward({ waitUntil: 'domcontentloaded' });
     assert.equal(new URL(page.url()).pathname, '/apps/reisboek.html');
   } finally {

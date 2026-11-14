@@ -12,6 +12,7 @@
 
 const { compileer } = require('./plan');
 const { voorspelMet } = require('./gevolgcontract/voorspelling');
+const { bouw: bouwPlanTwin } = require('./plantweeling');
 
 module.exports = function planStap(t, { wereld, acties, spoor }) {
   /* HET PLAN EN DE VOORSPELLING REIZEN SAMEN TERUG MAAR ZIJN TWEE DINGEN:
@@ -44,6 +45,7 @@ module.exports = function planStap(t, { wereld, acties, spoor }) {
          WAAROM er niets kan, en dat is nu juist het antwoord. */
       eersteBezwaar: (gewogen.bezwaren || [])[0] ? (gewogen.bezwaren[0].reden || '').slice(0, 120) : undefined });
   const gevolg = voorspelMet(gewogen);
+  const tweeling = bouwPlanTwin(gewogen, { gevolg });
   /* WAT HIER STAAT, IS WAT ./gevolg.js WERKELIJK TERUGGEEFT. Hier stond
      `{ graad: gevolg.graad }`, en voorspel() heeft geen `graad` -- die woont
      per STAP, niet over het plan. Het merk droeg dus sinds de bouw een leeg
@@ -65,7 +67,13 @@ module.exports = function planStap(t, { wereld, acties, spoor }) {
          is de schaduwregel die vandaag niets weigert. */
       verklaardVolledig: (gevolg && gevolg.verklaring || {}).volledig,
       zouAfwijzen: (gevolg && gevolg.verklaring || {}).zouAfwijzen });
-  const uit = Object.assign({}, gewogen, { gevolg });
+  spoor && spoor.mark('PLAN_TWIN_EVALUATED', 'PASS', {
+    scenarios: tweeling.scenarios.length,
+    benaderend: tweeling.telling.benaderend,
+    nietBeschikbaar: tweeling.telling['niet-beschikbaar'],
+    verandertWerkelijkheid: tweeling.verandertWerkelijkheid
+  });
+  const uit = Object.assign({}, gewogen, { gevolg, tweeling });
   /* Het gewogen plan reist mee, zodat de Edge het kan tonen (./taakbeeld.js).
      Het is een OORDEEL en geen uitvoering: taakbeeld telt `pad: 'plan'` nooit
      als gedaan. */

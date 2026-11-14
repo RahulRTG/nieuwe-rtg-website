@@ -20,6 +20,8 @@
    dat omhoog moet en geen streak. Wie zich een week niet meldt, mist niets. */
 
 const { niveauVan, aanhoudendZwaar } = require('./zorgniveau');
+const klok = require('../lib/klok');
+const { datumIn: dagVan } = require('./tijdzone');
 
 const STEMMINGEN = [
   { id: 'goed', label: 'Goed' },
@@ -41,7 +43,6 @@ const DOEN = [
 ];
 
 const MAX_DAGEN = 400;
-const dagVan = d => new Date(d).toISOString().slice(0, 10);
 
 module.exports = ({ db, save, schoon }) => {
   const eigen = require('./eigencollectie')({ db, domein: 'kern/gemoed', bezit: { gemoed: 'kaart' } });
@@ -54,7 +55,7 @@ module.exports = ({ db, save, schoon }) => {
      volgorde waarin een scherm het toont. */
   const recent = (key, n) => rijenKijk(key).slice(-n).reverse();
 
-  function gemoedVan(key, nu = new Date()) {
+  function gemoedVan(key, nu = klok.datum()) {
     const vandaag = dagVan(nu);
     const lijst = recent(key, 14);
     const vanVandaag = lijst.find(c => c.op === vandaag) || null;
@@ -68,7 +69,7 @@ module.exports = ({ db, save, schoon }) => {
     };
   }
 
-  function gemoedZet(key, body, nu = new Date()) {
+  function gemoedZet(key, body, nu = klok.datum()) {
     const stemming = String(body.stemming || '');
     if (!STEMMINGEN.some(s => s.id === stemming)) return { status: 400, error: 'Kies hoe u erbij zit.' };
     const notitie = schoon(body.notitie, 1000);
@@ -99,7 +100,7 @@ module.exports = ({ db, save, schoon }) => {
   }
 
   /* Weghalen hoort erbij: wat u opschreef is van u, en van u alleen. */
-  function gemoedWeg(key, body, nu = new Date()) {
+  function gemoedWeg(key, body, nu = klok.datum()) {
     const op = /^\d{4}-\d{2}-\d{2}$/.test(String(body.op || '')) ? String(body.op) : dagVan(nu);
     const rijen = rijenKijk(key);
     const i = rijen.findIndex(c => c.op === op);

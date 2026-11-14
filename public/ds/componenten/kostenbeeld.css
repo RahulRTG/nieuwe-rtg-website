@@ -1,0 +1,20 @@
+/* Gedeelde kostenlezers. De kostenkern en herkomstketen blijven eigenaar
+   van bedragen en waarheid; DS draagt alleen de rustige presentatie. */
+@layer rtg.component {
+  .ds-kostenbeeld .ks-hoofd { padding-block: var(--ds-ruimte-4) var(--ds-ruimte-6); }
+  .ds-kostenbeeld .ks-zin { margin-block: var(--ds-ruimte-2) var(--ds-ruimte-1); font-size: var(--ds-maat-tekst); line-height: 1.5; }
+  .ds-kostenbeeld .ks-kpi { margin-block: var(--ds-ruimte-2) var(--ds-ruimte-1); }
+  .ds-kostenbeeld .ks-onder { color: var(--ds-inkt-zacht); font-size: var(--ds-maat-klein); line-height: 1.6; }
+  .ds-kostenbeeld .ks-reden { margin-block-start: var(--ds-ruimte-2); color: var(--ds-inkt-zacht); font-size: var(--ds-maat-klein); line-height: 1.6; }
+  .ds-kostenbeeld .ks-rij { display: flex; align-items: baseline; gap: var(--ds-ruimte-3); flex-wrap: wrap; }
+  .ds-kostenbeeld .ks-rij .rek { margin-inline-start: auto; text-align: end; }
+  .ds-kostenbeeld .ks-wat { min-inline-size: 8rem; }
+  .ds-kostenbeeld .ks-hoeveel { color: var(--ds-inkt-zacht); font-size: var(--ds-maat-klein); }
+  .ds-kostenbeeld .ks-waarom { min-block-size: var(--ds-doel); background: transparent; border: 0; padding-block: var(--ds-ruimte-2); color: var(--ds-inkt-zacht); font: 600 var(--ds-maat-klein)/1.3 var(--ds-letter-tekst); letter-spacing: .06em; text-transform: uppercase; cursor: pointer; }
+  .ds-kostenbeeld .ks-waarom:is(:hover,:focus-visible) { color: var(--ds-metaal); }
+  .ds-kostenbeeld .ks-waarom:focus-visible { outline: 2px solid var(--ds-focus); outline-offset: 3px; }
+  .ds-kostenbeeld .ks-keten { margin-block: var(--ds-ruimte-1) var(--ds-ruimte-3); padding-block: var(--ds-ruimte-3) var(--ds-ruimte-1); font-size: var(--ds-maat-klein); line-height: 1.6; }
+  .ds-kostenbeeld .ks-stap { padding-block: var(--ds-ruimte-2); padding-inline-start: var(--ds-ruimte-3); border-inline-start: 2px solid var(--ds-lijnkleur); }
+  .ds-kostenbeeld .ks-stap b { font-weight: 600; }
+  .ds-kostenbeeld .ks-stap small { display: block; color: var(--ds-inkt-zacht); font-size: var(--ds-maat-klein); }
+}

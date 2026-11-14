@@ -147,8 +147,7 @@ test('zwakke legacykamers worden hash-only gemigreerd en hard gesloten', async (
 
 test('Foundation-browser bewaart alleen kamer-id en deelt nooit querycredentials', () => {
   const root = path.join(__dirname, '..');
-  const bron = fs.readFileSync(path.join(root,
-    'public/apps/foundation/samen/samen-01.js'), 'utf8');
+  const bron = require('../scripts/bundel').bundel('apps/foundation/samen.js').toString('utf8');
   assert.match(bron, /localStorage\.setItem\(KAMERKEY, id\)/);
   assert.doesNotMatch(bron, /localStorage\.setItem\([^\n]*(?:deel)?[cC]ode/);
   assert.doesNotMatch(bron, /kamer\.code|k\.code|kamercode/);

@@ -1,0 +1,30 @@
+/* De bestaande kalender blijft maand, week, dag en lijst ondersteunen. */
+@layer rtg.component {
+ .ds-dag-kal { overflow: auto; }
+ .ds-dag-stuur, .ds-dag-rahulbalk { display: flex; flex-wrap: wrap; gap: var(--ds-ruimte-3); align-items: center; margin-block: var(--ds-ruimte-4); }
+ .ds-dag-rek { flex: 1; }
+ .ds-dag-rahulbalk input { flex: 1 1 12rem; min-inline-size: 0; }
+ .ds-dag-mgrid, .ds-dag-wgrid, .ds-dag-daily-week { display: grid; grid-template-columns: repeat(7,minmax(0,1fr)); gap: 1px; inline-size: 100%; min-inline-size: 0; border: 1px solid var(--ds-lijnkleur); }
+ .ds-dag-mkop { padding-block: var(--ds-ruimte-2); text-align: center; color: var(--ds-inkt-zacht); font-size: var(--ds-maat-meta); overflow-wrap: anywhere; }
+ .ds-dag-mdag, .ds-dag-wdag { min-block-size: 6rem; min-inline-size: 0; padding: var(--ds-ruimte-1); text-align: start; background: var(--ds-oppervlak); color: var(--ds-inkt); border: 0; font: inherit; overflow-wrap: anywhere; }
+ .ds-dag-mdag { cursor: pointer; inline-size: 100%; }
+ .ds-dag-mdag.buiten { color: var(--ds-inkt-zacht); }
+ .ds-dag-dnr { display: inline-block; padding: var(--ds-ruimte-1); font-variant-numeric: tabular-nums; }
+ .ds-dag-mdag.vandaag .ds-dag-dnr { outline: 2px solid var(--ds-accent); }
+ .ds-dag-chip { display: block; border-inline-start: 2px solid var(--ds-accent); padding: var(--ds-ruimte-1); margin-block: var(--ds-ruimte-1); font-size: var(--ds-maat-meta); background: var(--ds-oppervlak-sterk); overflow-wrap: anywhere; }
+ .ds-dag-chip.uit { border-inline-start-style: dashed; }
+ .ds-dag-chip.nee { text-decoration: line-through; }
+ /* Zeven dagen behouden: de interne kalender scrolt als doel plus celpadding niet past. */
+ .ds-dag-wgrid { min-inline-size: calc(7 * (var(--ds-doel) + 2 * var(--ds-ruimte-1)) + 8px); grid-template-columns: repeat(7,minmax(calc(var(--ds-doel) + 2 * var(--ds-ruimte-1)),1fr)); }
+ .ds-dag-week-toevoegen { min-inline-size: var(--ds-doel); min-block-size: var(--ds-doel); background: transparent; }
+ .ds-dag-wdag .ds-dag-chip { min-block-size: var(--ds-doel); cursor: pointer; }
+ .ds-dag-meer { color: var(--ds-inkt-zacht); }
+ .ds-dag-litem { display: flex; flex-wrap: wrap; gap: var(--ds-ruimte-3); padding: var(--ds-ruimte-4); margin-block: var(--ds-ruimte-3); border: 1px solid var(--ds-lijnkleur); border-inline-start: 3px solid var(--ds-accent); background: var(--ds-oppervlak); cursor: pointer; min-block-size: var(--ds-doel); }
+ .ds-dag-litem .ds-dag-tijd { flex: 0 1 5rem; }
+ .ds-dag-bron { color: var(--ds-metaal); overflow-wrap: anywhere; }
+ .ds-dag-deeln { display: flex; flex-wrap: wrap; justify-content: space-between; gap: var(--ds-ruimte-3); padding-block: var(--ds-ruimte-3); border-block-start: 1px solid var(--ds-lijnkleur); }
+ .ds-dag-daily-week button { min-inline-size: 0; min-block-size: var(--ds-doel); padding: var(--ds-ruimte-1); background: var(--ds-oppervlak); color: var(--ds-inkt); border: 0; font: inherit; overflow-wrap: anywhere; }
+ .ds-dag-daily-week button b { display: block; }
+ .ds-dag-daily-week button[aria-pressed="true"] { outline: 2px solid var(--ds-accent); outline-offset: -2px; }
+ .ds-dag-daily-planner { border-block: 1px solid var(--ds-lijnkleur); padding-block: var(--ds-ruimte-4); margin-block: var(--ds-ruimte-4); }
+}

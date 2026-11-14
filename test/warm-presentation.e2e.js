@@ -134,7 +134,7 @@ test('Connection actions preserve the shared navigation on desktop and mobile',a
   try {
     for(const product of ['vonk','rendezvous']) {
       await page.goto(srv.base+'/apps/notities.html');
-      await page.waitForSelector('.rtg-adaptive-bar');
+      await page.waitForSelector('.ds-edge__balk');
       await page.addStyleTag({url:srv.base+'/shared/connection-edge.css'});
       for(const file of ['connection-edge-core','connection-edge-input','connection-edge'])await page.addScriptTag({url:srv.base+'/shared/'+file+'.js'});
       await page.evaluate(async product=>{
@@ -144,19 +144,20 @@ test('Connection actions preserve the shared navigation on desktop and mobile',a
       },product);
       for(const width of [1440,390]) {
         await page.setViewportSize({width,height:1000});
-        const action=page.locator('.wd-page .connection-edge [data-connection-action="discover"]');
+        const action=page.locator('.connection-edge [data-connection-action="discover"]');
         await action.waitFor();
-        assert.equal(await page.locator('.rtg-adaptive-bar:visible').count(),1);
+        assert.equal(await page.locator('.ds-edge__balk:visible').count(),1);
         assert.equal(await page.locator('.connection-edge').evaluate(e=>getComputedStyle(e).position),'relative');
+        const label=await action.innerText();
         await action.click();
-        await page.locator('.rtg-adaptive-bar [data-rtg-adaptive-action="context"]').click();
-        const projected=page.locator('.rtg-adaptive-controls').getByRole('button',{name:await action.innerText(),exact:true});
+        await page.locator('.ds-edge__balk [data-ds-edge="acties"]').click();
+        const projected=page.locator('#dsEdgeBlad').getByRole('button',{name:label,exact:true});
         await projected.click();
         assert.equal(await page.evaluate(()=>window.connectionCalls),width===1440?2:4);
         assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),true);
       }
       await page.evaluate(()=>window.connectionTest.destroy());
-      assert.equal(await page.locator('.rtg-adaptive-bar').isVisible(),true);
+      assert.equal(await page.locator('.ds-edge__balk').isVisible(),true);
     }
   }finally{await ctx.close();}
 });

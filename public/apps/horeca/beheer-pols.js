@@ -17,37 +17,37 @@
   var esc = K.esc;
   var INVULBAAR = [];
 
-  function bron(x) { return '<span class="stil">· ' + esc(x.label) + '</span>'; }
+  function bron(x) { return '<span class="stil ds-horeca-meta">· ' + esc(x.label) + '</span>'; }
 
   function toon(d) {
     INVULBAAR = d.invulbaar || [];
 
     $('poGemeten').innerHTML = (d.gemeten || []).map(function (m) {
       return K.rij('<b>' + esc(m.naam) + '</b> ' + esc(m.tekst) + ' ' + bron(m) +
-        '<br><span class="stil">' + esc(m.rekensom) + '</span>');
-    }).join('') || '<p class="stil">Er valt op dit moment niets te meten.</p>';
+        '<br><span class="stil ds-horeca-meta">' + esc(m.rekensom) + '</span>');
+    }).join('') || '<p class="stil ds-horeca-meta">Er valt op dit moment niets te meten.</p>';
 
     /* Wat we NIET weten staat er met de reden bij. Een leeg vak zou als "rustig"
        worden gelezen, en dat merkt de gast pas voor de deur. */
     $('poNiet').innerHTML = (d.nietGemeten || []).map(function (g) {
-      return K.rij('<b>' + esc(g.onderwerp) + '</b> <span class="stil">' + esc(g.waarom) + '</span>');
+      return K.rij('<b>' + esc(g.onderwerp) + '</b> <span class="stil ds-horeca-meta">' + esc(g.waarom) + '</span>');
     }).join('');
 
     $('poZaak').innerHTML = INVULBAAR.map(function (o) {
       var nu = (d.zaakZegt || []).filter(function (z) { return z.onderwerp === o.sleutel; })[0];
-      return '<div class="rij h-mt40"><label for="po_' + esc(o.sleutel) + '" class="s-1trhhui">' +
-        esc(o.naam) + '</label><select class="veld" id="po_' + esc(o.sleutel) + '" aria-label="' + esc(o.naam) + '">' +
+      return '<div class="rij ds-horeca-rij ds-horeca-afstand"><label for="po_' + esc(o.sleutel) + '" class="s-1trhhui">' +
+        esc(o.naam) + '</label><select class="veld ds-invoer" id="po_' + esc(o.sleutel) + '" aria-label="' + esc(o.naam) + '">' +
         '<option value="">(niets zeggen)</option>' +
         o.standen.map(function (s) {
           return '<option value="' + esc(s) + '"' + (nu && nu.stand === s ? ' selected' : '') + '>' + esc(s) + '</option>';
-        }).join('') + '</select><span class="stil">' + (nu ? esc(nu.label) : 'nog niet ingevuld') + '</span></div>';
+        }).join('') + '</select><span class="stil ds-horeca-meta">' + (nu ? esc(nu.label) : 'nog niet ingevuld') + '</span></div>';
     }).join('');
 
     $('poGasten').innerHTML = (d.gastenZeggen || []).map(function (g) {
       var verdeling = Object.keys(g.verdeling).map(function (s) { return esc(s) + ': ' + g.verdeling[s]; }).join(', ');
       return K.rij('<b>' + esc(g.naam) + '</b> ' + esc(g.stand) + ' ' + bron(g) +
-        '<br><span class="stil">' + esc(verdeling) + '</span>');
-    }).join('') || '<p class="stil">Nog geen meldingen van gasten in de afgelopen uren.</p>';
+        '<br><span class="stil ds-horeca-meta">' + esc(verdeling) + '</span>');
+    }).join('') || '<p class="stil ds-horeca-meta">Nog geen meldingen van gasten in de afgelopen uren.</p>';
 
     $('poLet').textContent = d.let + ' ' + (d.versMinuten
       ? 'Wat je invult vervalt na ' + Math.round(d.versMinuten.zaak / 60) + ' uur.' : '');

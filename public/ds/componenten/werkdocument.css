@@ -1,0 +1,53 @@
+/* Project Room en Decision Room: dezelfde dossier-, bron- en beslisstructuur.
+   De bestaande controllers, huizen en data-attributen blijven eigenaar. */
+@layer rtg.component {
+  .ds-werkdocument { color: var(--ds-inkt); background: var(--ds-grond); }
+  .ds-werkdocument-app { max-inline-size: 80rem; margin-inline: auto; padding-block-end: calc(var(--ds-edge-hoogte) + env(safe-area-inset-bottom) + var(--ds-ruimte-8)); }
+  .ds-werkdocument-kop, .ds-werkdocument-huizen, .ds-werkdocument-focusmeta, .ds-werkdocument-focusvoet, .ds-werkdocument-sectiekop, .ds-werkdocument-eigenaar, .ds-werkdocument-bewijskop, .ds-werkdocument-dialoogacties, .ds-werkdocument-doorgaan { display: flex; flex-wrap: wrap; align-items: center; gap: var(--ds-ruimte-3); }
+  .ds-werkdocument-kop { padding-block: calc(env(safe-area-inset-top) + var(--ds-ruimte-4)) var(--ds-ruimte-4); padding-inline: var(--ds-goot); border-block-end: 1px solid var(--ds-lijnkleur); }
+  .ds-werkdocument-merk { display: grid; text-decoration: none; color: var(--ds-inkt); min-block-size: var(--ds-doel); }
+  .ds-werkdocument-merk b { font-family: var(--ds-letter-display); font-size: var(--ds-maat-kop); font-weight: 400; }
+  .ds-werkdocument-kopruimte { flex: 1 1 auto; }
+  .ds-werkdocument-profiel, .ds-werkdocument-bronknop { display: inline-flex; align-items: center; min-block-size: var(--ds-doel); min-inline-size: var(--ds-doel); color: var(--ds-accent); overflow-wrap: anywhere; }
+  .ds-werkdocument-huizen [aria-pressed="true"], .ds-werkdocument-nav [aria-current="page"] { border-color: var(--ds-accent); background: var(--ds-accent); color: var(--ds-accent-inkt); }
+  .ds-werkdocument-scherm { padding-block: var(--ds-ruimte-8); padding-inline: var(--ds-goot); }
+  .ds-werkdocument-scherm[hidden], .ds-werkdocument-laag[hidden], .ds-werkdocument-melding[hidden] { display: none; }
+  .ds-werkdocument-scherm h1 { font-family: var(--ds-letter-display); font-size: var(--ds-maat-display); font-weight: 400; line-height: 1.15; max-inline-size: 24ch; margin-block: var(--ds-ruimte-3); overflow-wrap: anywhere; }
+  .ds-werkdocument-scherm h2, .ds-werkdocument-dialoog h2 { font-family: var(--ds-letter-display); font-size: var(--ds-maat-kop); font-weight: 400; margin-block: var(--ds-ruimte-2); overflow-wrap: anywhere; }
+  .ds-werkdocument-ey, .ds-werkdocument-label, .ds-werkdocument-nummer { font-size: var(--ds-maat-meta); color: var(--ds-metaal); }
+  .ds-werkdocument-intro { max-inline-size: 65ch; color: var(--ds-inkt-zacht); margin-block: var(--ds-ruimte-3) var(--ds-ruimte-6); }
+  .ds-werkdocument-focus, .ds-werkdocument-dossierkop, .ds-werkdocument-resultaat { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 1fr); gap: var(--ds-ruimte-4); border: 1px solid var(--ds-lijnkleur); border-radius: var(--ds-radius-inhoud); background: var(--ds-oppervlak-sterk); padding: var(--ds-ruimte-6); }
+  .ds-werkdocument-focusbody, .ds-werkdocument-focusstats { min-inline-size: 0; }
+  .ds-werkdocument-focusstats, .ds-werkdocument-bronnen, .ds-werkdocument-lijst, .ds-werkdocument-tijdlijn, .ds-werkdocument-bewijslijst, .ds-werkdocument-borging, .ds-werkdocument-archief { display: grid; gap: var(--ds-ruimte-3); }
+  .ds-werkdocument-focusstat, .ds-werkdocument-feit, .ds-werkdocument-dossierstatus, .ds-werkdocument-dossierroute { display: grid; align-content: start; gap: var(--ds-ruimte-2); overflow-wrap: anywhere; }
+  .ds-werkdocument-focusstat b { font-size: var(--ds-maat-kop); font-variant-numeric: tabular-nums; }
+  .ds-werkdocument-focusvoet, .ds-werkdocument-sectiekop, .ds-werkdocument-bewijskop { justify-content: space-between; margin-block: var(--ds-ruimte-4); }
+  .ds-werkdocument small, .ds-werkdocument-intro, .ds-werkdocument-metaregel { color: var(--ds-inkt-zacht); font-size: var(--ds-maat-klein); overflow-wrap: anywhere; }
+  .ds-werkdocument-avatar { display: grid; place-items: center; min-inline-size: var(--ds-doel); min-block-size: var(--ds-doel); border: 1px solid var(--ds-lijnkleur); border-radius: var(--ds-radius-capsule); }
+  .ds-werkdocument-eigenaar { margin-block: var(--ds-ruimte-4); }
+  .ds-werkdocument-eigenaar small, .ds-werkdocument-rij small, .ds-werkdocument-bron small, .ds-werkdocument-moment small { display: block; }
+  .ds-werkdocument-voortgang { block-size: .5rem; overflow: hidden; border-radius: var(--ds-radius-capsule); background: var(--ds-lijnkleur); }
+  .ds-werkdocument-voortgang i { display: block; block-size: 100%; background: var(--ds-accent); }
+  .ds-werkdocument-metertekst { display: flex; justify-content: space-between; flex-wrap: wrap; gap: var(--ds-ruimte-2); margin-block-start: var(--ds-ruimte-2); font-size: var(--ds-maat-klein); }
+  .ds-werkdocument-rij { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: var(--ds-ruimte-3); inline-size: 100%; min-block-size: var(--ds-doel); padding: var(--ds-ruimte-4); text-align: start; color: var(--ds-inkt); background: var(--ds-oppervlak-sterk); border: 1px solid var(--ds-lijnkleur); border-radius: var(--ds-radius-inhoud); }
+  .ds-werkdocument-vertrouwen, .ds-werkdocument-rahul, .ds-werkdocument-grens { display: flex; gap: var(--ds-ruimte-3); padding-block: var(--ds-ruimte-4); color: var(--ds-inkt-zacht); }
+  .ds-werkdocument-feiten, .ds-werkdocument-dossiergrid, .ds-werkdocument-afweggrid, .ds-werkdocument-velden, .ds-werkdocument-veldgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr)); gap: var(--ds-ruimte-4); margin-block: var(--ds-ruimte-4); }
+  .ds-werkdocument-bron, .ds-werkdocument-moment, .ds-werkdocument-afwegvlak, .ds-werkdocument-bewijs, .ds-werkdocument-archiefkaart, .ds-werkdocument-borgstap { padding: var(--ds-ruimte-4); border: 1px solid var(--ds-lijnkleur); border-radius: var(--ds-radius-inhoud); overflow-wrap: anywhere; }
+  .ds-werkdocument-bron a { display: inline-flex; align-items: center; min-block-size: var(--ds-doel); color: var(--ds-accent); }
+  .ds-werkdocument-afwegvlak.wijd, .ds-werkdocument-breed { grid-column: 1 / -1; }
+  .ds-werkdocument-leeg, .ds-werkdocument-geen { padding: var(--ds-ruimte-6); border: 1px dashed var(--ds-lijnkleur); border-radius: var(--ds-radius-inhoud); color: var(--ds-inkt-zacht); }
+  .ds-werkdocument-nav { display: flex; flex-wrap: wrap; gap: var(--ds-ruimte-2); padding-inline: var(--ds-goot); }
+  .ds-werkdocument-nav .ds-knop { flex: 1 1 9rem; }
+  .ds-werkdocument-primair { background: var(--ds-accent); color: var(--ds-accent-inkt); }
+  .ds-werkdocument-primair:not(button), .ds-werkdocument-secundair:not(button) { display: inline-flex; align-items: center; min-block-size: var(--ds-doel); padding-inline: var(--ds-ruimte-4); border: 1px solid var(--ds-lijnkleur); border-radius: var(--ds-radius-knop); text-decoration: none; }
+  .ds-werkdocument-laag { inline-size: min(calc(100% - 2 * var(--ds-goot)), 42rem); max-block-size: calc(100dvh - 2 * var(--ds-goot)); padding: 0; overflow-y: auto; }
+  .ds-werkdocument-dialoog { position: relative; padding: var(--ds-ruimte-6); }
+  .ds-werkdocument-dialoog label, .ds-werkdocument-invoer { display: grid; gap: var(--ds-ruimte-2); margin-block: var(--ds-ruimte-3); }
+  .ds-werkdocument-sluit { float: inline-end; }
+  .ds-werkdocument-keuze, .ds-werkdocument-radio, .ds-werkdocument-vink { display: flex; align-items: center; gap: var(--ds-ruimte-3); min-block-size: var(--ds-doel); }
+  .ds-werkdocument-keuzes, .ds-werkdocument-radios { display: grid; gap: var(--ds-ruimte-2); }
+  .ds-werkdocument-beslis, .ds-werkdocument-opleverform { display: grid; gap: var(--ds-ruimte-3); margin-block: var(--ds-ruimte-4); }
+  .ds-werkdocument-melding { position: fixed; inset-inline: var(--ds-goot); inset-block-end: calc(var(--ds-edge-hoogte) + var(--ds-ruimte-4)); z-index: 2100; max-inline-size: 48rem; margin-inline: auto; padding: var(--ds-ruimte-4); color: var(--ds-inkt); background: var(--ds-oppervlak-sterk); border: 1px solid var(--ds-lijnkleur); box-shadow: var(--ds-schaduw-systeem); }
+  @media (max-width: 48rem) { .ds-werkdocument-focus, .ds-werkdocument-dossierkop, .ds-werkdocument-resultaat { grid-template-columns: minmax(0, 1fr); padding: var(--ds-ruimte-4); } .ds-werkdocument-rij { grid-template-columns: auto minmax(0, 1fr); } .ds-werkdocument-rijstatus { grid-column: 2; } }
+  @media (prefers-reduced-motion: reduce) { .ds-werkdocument .ds-knop { transition: none; } }
+}

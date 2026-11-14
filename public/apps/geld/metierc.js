@@ -173,7 +173,6 @@
   }
 
   function start() {
-    M.stijl();
     M.tab = 'ik'; M.ik = null; M.bekeken = null; M.register = null; M.loon = null;
     M.oefen = { rol: '', vraag: '' };
     // Meenemen: de bron volgt het scherm waar je staat (metierb.js)

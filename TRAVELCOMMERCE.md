@@ -16,6 +16,23 @@ hebben we alles om onze klanten te helpen"*. Het antwoord uit de meting was:
 de BESLISLUS is af en netjes bewaakt, de UITVOERLUS bestaat niet. Par. 9 is die
 meting; de rest van dit document is wat eruit volgt.
 
+**Leesstatus, 12 november 2026:** de historische meting hieronder is geen
+actuele verkoopvrijgave. Het definitieve interne commerciële reisbeleid staat
+in `PRIJZEN.md` §9.3, inclusief versie en inwerkingtredingsvoorwaarden.
+RTG draagt verantwoordelijkheid voor zijn eigen aangeboden
+en samengestelde reizen, inclusief de toepasselijke organisator- en
+nazorgplichten. Zelfstandig bij andere reisbureaus gekochte reizen vallen buiten
+die RTG-verkoop en afrekening; een account of documentimport maakt RTG niet de
+verkoper. TravelOS mag de toegestane reisinformatie blijven tonen. Dienstverlening
+aan een extern reisbureau als platformklant is evenmin automatisch RTG-reisverkoop.
+De partnercommissie is geen fictieve commissie aan RTG zelf. Reisrol,
+reisprijs, fiscale reismarge en leveranciersafrekening afzonderlijk onderbouwen.
+Inmiddels bestaan `server/kern/reisbureau-samenstelling.js` en
+`server/kern/reisbureau-betaling.js`; hun bestaan bewijst nog geen gekwalificeerde
+providerketen, pakketreisdekking of kloppende publieke voorwaarden. §9.3.5 benoemt
+die aansluitingen. De algemene bemiddelaarsclaim uit de huidige publieke
+voorwaarden mag niet als dekking voor eigen RTG-pakketten worden gebruikt.
+
 ---
 
 ## 0. De kern, in twee zinnen
@@ -117,8 +134,8 @@ scherm van iemands schoonmoeder.
 
 ## 4. Vier namen die al bezet zijn
 
-`SEMANTIEK.json` telt <!--getal:semantiek.namen-->134<!--/getal--> namen in meer
-dan één domein, waarvan er <!--getal:semantiek.betekenissen-->116<!--/getal-->
+`SEMANTIEK.json` telt <!--getal:semantiek.namen-->136<!--/getal--> namen in meer
+dan één domein, waarvan er <!--getal:semantiek.betekenissen-->118<!--/getal-->
 meer dan één betekenis dragen. Deze vier raakt deze laag rechtstreeks:
 
 - **`SOORTEN`** -- 47 betekenissen over 49 domeinen, het ergste woord van het
@@ -404,3 +421,39 @@ de leveranciers- en partnerkant is niets gemeten. `APPWERKT.json` kent vier
 reisrijen, waarvan er drie `bereikbaar: BEWEZEN` dragen en de overige bewijzen
 `NIET_GETEST` of `GEEN_FIXTURE` zijn -- niet gemeten mag nooit als "in orde"
 langskomen.
+
+---
+
+## 10. Federatieve reisarchitectuur en vier lussen (besluit 11 november 2026)
+
+De brede richting is vastgelegd zonder een nieuwe reisbackend, PartnerOS of
+completion-register te maken. TravelOS wordt de federatieve contract- en
+uitvoeringslaag waarop RTG Travel, een zelfstandig reisbureau en een leverancier
+dezelfde bestaande RTG-vermogens gebruiken, met behoud van hun eigen klanten,
+leveranciers, contracten, tarieven, betaalprovider, boekingskanalen en uitgang.
+
+Drie eisen staan vanaf nu naast TC-1 tot en met TC-7:
+
+1. **De rol is transactioneel.** Reisagent, organisator, bemiddelaar,
+   leverancier, platform, verkoper, factuurpartij en betaler worden per
+   overeenkomst en levering vastgelegd. Een genre of organisatie bepaalt die
+   juridische rol niet stil voor alle transacties.
+2. **De lus is economisch gesloten.** Verkoop, levering, facturatie,
+   aansprakelijkheid, allocatie, gedeeltelijke levering, annulering, uitval,
+   settlement en reconciliatie blijven aantoonbaar verbonden.
+3. **Breedte is geen boekbaarheidsclaim.** Een reisvorm draagt voortaan één van
+   drie kwalificatieniveaus: `ondersteund`, `operationeel bewezen` of `direct
+   boekbaar bewezen`. De laatste twee vereisen echte uitvoering; geen generieke
+   claim geldt automatisch voor zestien disciplines.
+
+Naast de reizigerslus, partnerlus en bewijslus staat de **economische
+verbeterlus**: nulmeting, uitvoering via bestaande RTG-vermogens, werkelijke
+resultaten, gecontroleerde verbetering en nameting -- per tenant, zonder
+centrale ranglijst en zonder vrijgekomen tijd automatisch als bespaarde euro's
+te verkopen.
+
+`TRAVELOS-UITVOERING.md` is het repositorygebonden implementatiecontract bij
+dit besluit. Het koppelt iedere verantwoordelijkheid aan de bestaande eigenaar,
+het aanwezige contract, de ontbrekende overgang, de vereiste proef en het bewijs
+dat een blokkade mag opheffen. Het document verandert geen APPWERKT-stand en de
+productiestatus blijft NO-GO.

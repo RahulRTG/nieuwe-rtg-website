@@ -1,0 +1,74 @@
+/* Centrale, tijdelijke presentatierollen voor legacyhosts die statische
+   style-attributen afbouwen. De rollen bevatten uitsluitend compositie; de
+   volledige schermmigratie vervangt ze door de vaste DS-schermtypen. */
+@layer rtg.component {
+  .ds-presentatie-uitleg-na:not(#_#_#_) { padding-block-start: .3rem; }
+  .ds-presentatie-actie-compact:not(#_#_#_) { flex: 0 1 auto; }
+  .ds-presentatie-gecentreerd:not(#_#_#_) { text-align: center; }
+  .ds-presentatie-bord-smal:not(#_#_#_) { max-inline-size: 16rem; margin: 0 auto; }
+  .ds-presentatie-keuze-midden:not(#_#_#_) { justify-content: center; margin-block-start: .5rem; }
+  .ds-presentatie-uitleg-onder:not(#_#_#_) { padding-block-end: .4rem; }
+  .ds-presentatie-veldlabel:not(#_#_#_) { display: block; font-size: .72rem; color: var(--soft, var(--ds-inkt-zacht)); margin-block-end: .25rem; }
+  .ds-presentatie-velden:not(#_#_#_) { display: flex; gap: .5rem; flex-wrap: wrap; align-items: flex-end; margin-block-start: .75rem; }
+  .ds-presentatie-keuzerij:not(#_#_#_) { display: flex; flex-wrap: wrap; gap: .5rem; align-items: center; }
+  .ds-presentatie-actierij:not(#_#_#_) { display: flex; gap: .6rem; flex-wrap: wrap; align-items: center; margin-block-start: .75rem; }
+  .ds-presentatie-velden-compact:not(#_#_#_) { display: flex; gap: .6rem; flex-wrap: wrap; align-items: flex-end; margin-block-start: .5rem; }
+  .ds-presentatie-veldlabel-ruim:not(#_#_#_) { display: block; font-size: .72rem; color: var(--soft, var(--ds-inkt-zacht)); margin-block: .7rem .3rem; }
+  .ds-presentatie-velden-zonder-marge:not(#_#_#_) { display: flex; gap: .6rem; flex-wrap: wrap; align-items: flex-end; }
+  .ds-presentatie-velden-ruim:not(#_#_#_) { display: flex; gap: .6rem; flex-wrap: wrap; align-items: flex-end; margin-block-start: .75rem; }
+  .ds-presentatie-rijveld:not(#_#_#_) { display: flex; gap: .5rem; flex-wrap: wrap; margin-block: .75rem; }
+  .ds-presentatie-actierij-na:not(#_#_#_) { display: flex; gap: .6rem; align-items: center; margin-block-start: .7rem; flex-wrap: wrap; }
+  .ds-presentatie-vinklabel:not(#_#_#_) { font-size: .78rem; display: flex; align-items: center; gap: .3rem; }
+  .ds-presentatie-inline-acties:not(#_#_#_) { display: flex; gap: .6rem; align-items: center; flex-wrap: wrap; }
+  .ds-presentatie-inline-gap:not(#_#_#_) { display: flex; gap: .6rem; }
+  .ds-presentatie-fases:not(#_#_#_) { display: flex; gap: .6rem; align-items: flex-start; flex-wrap: wrap; }
+  .ds-presentatie-verdeelrij:not(#_#_#_) { display: flex; gap: .6rem; align-items: center; flex-wrap: wrap; justify-content: space-between; }
+  .ds-presentatie-mini-acties:not(#_#_#_) { display: flex; gap: .4rem; align-items: center; flex-wrap: wrap; }
+  .ds-presentatie-atelier-canvas:not(#_#_#_) { display: block; inline-size: 100%; margin-block-start: .5rem; border-radius: 0; touch-action: none; cursor: grab; }
+  .ds-presentatie-accentlink:not(#_#_#_) { color: var(--burgundy-on-dark, var(--ds-accent)); }
+  .ds-presentatie-notificatie-acties:not(#_#_#_) { display: flex; flex-direction: column; gap: .5rem; margin: .6rem 1.25rem calc(env(safe-area-inset-bottom, 0px) + .9rem); }
+  .ds-presentatie-relatief:not(#_#_#_) { position: relative; }
+  .ds-presentatie-notificatiepunt:not(#_#_#_) { position: absolute; inset-block-start: 4px; inset-inline-end: 18px; inline-size: 8px; block-size: 8px; border-radius: var(--ds-radius-cirkel); background: var(--burgundy, var(--ds-accent)); display: block; }
+  .ds-presentatie-tabrij:not(#_#_#_) { display: flex; gap: .4rem; padding: .6rem 1.1rem 0; }
+  .ds-presentatie-paneelkolom:not(#_#_#_) { flex: 1; overflow-y: auto; padding: 1rem 1.1rem; display: flex; flex-direction: column; gap: .7rem; }
+  .ds-presentatie-qr:not(#_#_#_) { display: inline-block; background: var(--ds-oppervlak-sterk); padding: 12px; border-radius: 0; margin: .9rem auto .4rem; }
+  .ds-presentatie-beschermd-uitleg:not(#_#_#_) { padding: .9rem 1.1rem; line-height: 1.5; font-size: .9rem; }
+  .ds-presentatie-snap-noot:not(#_#_#_) { color: var(--zacht, var(--ds-inkt-zacht)); font-size: .75rem; margin-block-start: .5rem; }
+  .ds-presentatie-story-opdracht:not(#_#_#_) { color: var(--goud2); font-size: .8rem; margin-block-start: .5rem; }
+  .ds-presentatie-inkomend:not(#_#_#_) { max-inline-size: 22rem; text-align: center; padding: 1.4rem; }
+  .ds-presentatie-belavatar:not(#_#_#_) { margin: 0 auto 1.25rem; }
+  .ds-presentatie-belsoort:not(#_#_#_) { margin: .25rem 0 1.25rem; }
+  .ds-presentatie-belacties:not(#_#_#_) { display: flex; gap: 1rem; justify-content: center; }
+  .ds-presentatie-studio:not(#_#_#_) { background: var(--ds-cover-grond); max-inline-size: 30rem; }
+  .ds-presentatie-studio-inhoud:not(#_#_#_) { padding: .7rem; overflow-y: auto; }
+  .ds-presentatie-studio-label:not(#_#_#_) { color: var(--zacht); font-size: .8rem; }
+  .ds-presentatie-studio-kleuren:not(#_#_#_) { display: flex; gap: .4rem; }
+  .ds-presentatie-studio-stuur:not(#_#_#_) { inline-size: 100%; margin-block-start: .5rem; }
+  .ds-presentatie-paginering:not(#_#_#_) { display: flex; align-items: center; justify-content: center; gap: .9rem; padding: .7rem; border-block-start: 1px solid var(--line, var(--ds-glasrand)); }
+  .ds-presentatie-noodlaag:not(#_#_#_) { display: flex; position: fixed; inset: 0; background: color-mix(in srgb, var(--ds-cover-grond) 85%, transparent); z-index: 60; align-items: center; justify-content: center; }
+  .ds-presentatie-media-vol:not(#_#_#_) { inline-size: 100%; border-radius: 0; background: var(--ds-cover-grond); }
+  .ds-presentatie-schooluitleg:not(#_#_#_) { color: var(--rtg-leesgoud, var(--ds-accent)); font-size: .85rem; }
+  .ds-presentatie-koppelkaart:not(#_#_#_) { margin-block-start: .5rem; border-block-start: 1px solid var(--line, var(--ds-glasrand)); padding-block-start: .6rem; }
+  .ds-presentatie-keuzekolom:not(#_#_#_) { display: flex; flex-direction: column; gap: .4rem; }
+  .ds-presentatie-accentkaart:not(#_#_#_) { border-color: var(--goud, var(--ds-accent)); }
+  .ds-presentatie-bronnoot:not(#_#_#_) { color: var(--zacht, var(--ds-inkt-zacht)); font-size: .78rem; margin-block: .25rem; }
+  .ds-presentatie-goudgetal:not(#_#_#_) { color: var(--gold, var(--ds-accent)); font-variant-numeric: tabular-nums; }
+  .ds-presentatie-meter-leeg:not(#_#_#_) { inline-size: 0; }
+  .ds-presentatie-marge-nul:not(#_#_#_) { margin: 0; }
+  .ds-presentatie-tekst-compact:not(#_#_#_) { font-size: .82rem; }
+  .ds-presentatie-status-opzij:not(#_#_#_) { margin-inline-start: .5rem; }
+  .ds-presentatie-gespreksrij:not(#_#_#_) { display: flex; align-items: center; gap: .9rem; }
+  .ds-presentatie-noot-op:not(#_#_#_) { margin-block-start: -.3rem; }
+  .ds-presentatie-linkknop:not(#_#_#_) { text-decoration: none; }
+  .ds-presentatie-regelaars:not(#_#_#_) { display: flex; gap: .35rem; flex-wrap: wrap; margin-block-start: .5rem; }
+  .ds-presentatie-rechts:not(#_#_#_) { margin-inline-start: auto; }
+  .ds-presentatie-canvas-vol:not(#_#_#_) { display: block; inline-size: 100%; border-radius: 0; touch-action: none; cursor: grab; }
+  .ds-presentatie-veld-middel:not(#_#_#_) { flex: 0 1 16rem; }
+  .ds-presentatie-waarschuwing:not(#_#_#_) { color: var(--zacht, var(--ds-inkt-zacht)); font-size: .88rem; margin-block-end: 1.25rem; line-height: 1.45; }
+  .ds-presentatie-gezinsnaam:not(#_#_#_) { font-size: 1.9rem; margin-block-start: .4rem; }
+  .ds-presentatie-kop-klein:not(#_#_#_) { font-size: 1.1rem; }
+  .ds-presentatie-toestand[hidden]:not(#_#_#_) { display: none; }
+  .ds-presentatie-veld-smal:not(#_#_#_) { flex: 0 1 11rem; }
+  .ds-presentatie-boven-half:not(#_#_#_) { margin-block-start: .5rem; }
+  .ds-presentatie-boven-drie-kwart:not(#_#_#_) { margin-block-start: .75rem; }
+}

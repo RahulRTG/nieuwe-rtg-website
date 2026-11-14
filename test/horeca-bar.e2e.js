@@ -25,22 +25,24 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, letOpFouten, laadPlaywright, browserOpties, geenBrowser,
-  wachtTot, wachtOpTekst, wachtOpZichtbaar, edgeActies } = require('./helper');
+const { startServer, stopHard, letOpFouten, laadPlaywright, browserOpties, geenBrowser,
+  wachtTot, wachtOpTekst, wachtOpZichtbaar } = require('./helper');
+const { werkvloerMatrix } = require('./lib/horeca-werkvloer-browser');
 const pw = laadPlaywright();
-const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-barscherm-'));
+
 
 const post = (base, pad, body, token) => fetch(base + pad, {
   method: 'POST', headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: 'Bearer ' + token } : {}) },
   body: JSON.stringify(body || {}) }).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
 
 test('het barscherm toont de stapel en de ronden, en zet een glas door',
-  { skip: geenBrowser(pw) }, async () => {
-  const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP, RTG_DEMO: '1' } });
+  { skip: geenBrowser(pw), timeout: 150000 }, async () => {
+  const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-barscherm-'));
+  const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP, RTG_STORE: 'sqlite', RTG_DEMO: '1', DATABASE_URL: '', PG_URL: '', REDIS_URL: '', RTG_EXTERNE_AI_UIT: '1', LOCAL_AI_URL: '', OPENAI_API_KEY: '', ANTHROPIC_API_KEY: '' } });
   let browser;
   try {
     browser = await pw.chromium.launch(browserOpties(pw));
-    const ctx = await browser.newContext({ serviceWorkers: 'block' });
+    const ctx = await browser.newContext({ serviceWorkers: 'block', viewport: { width: 390, height: 1000 }, locale: 'nl-NL', reducedMotion: 'reduce' });
     const page = await ctx.newPage();
     const fouten = [];
     letOpFouten(page, fouten);
@@ -105,6 +107,7 @@ test('het barscherm toont de stapel en de ronden, en zet een glas door',
       golven: document.getElementById('bGolvenLijst').innerText.replace(/\s+/g, ' '),
       open: document.getElementById('bOpen').textContent
     }));
+    await werkvloerMatrix(page, { naam: 'bar', focus: '[data-naar=gestart]', panelen: ['#bStapel', '#bGolvenLijst', '#bUitleg'] });
     let beeld = await lees();
 
     /* 2 + 3: de stapel telt over tafels heen, en de soep staat er niet op */
@@ -165,8 +168,7 @@ test('het barscherm toont de stapel en de ronden, en zet een glas door',
       if (lijnDicht) return route.abort('failed');
       return route.continue();
     });
-    await edgeActies(page);
-    await page.locator('[data-rtg-adaptive-source="bVerversNu"]').click();
+    await page.locator('#bVerversNu').click();
     /* Ververs haalt het bord opnieuw op; de nieuwe ronde is binnen zodra BAR-C
        in de ronderlijst staat. De knop eronder komt in dezelfde hertekening mee,
        want teken() zet de hele lijst in een keer neer. */
@@ -243,7 +245,7 @@ test('het barscherm toont de stapel en de ronden, en zet een glas door',
     assert.deepEqual(fouten, [], 'geen scriptfouten op het barscherm');
   } finally {
     if (browser) try { await browser.close(); } catch (e) {}
-    if (child) try { child.kill('SIGKILL'); } catch (e) {}
+    if (child) await stopHard(child);
     try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
   }
 });

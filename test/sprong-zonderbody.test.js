@@ -28,16 +28,20 @@ function element() {
     appendChild: k => { kinderen.push(k); return k; } };
 }
 
-function laad(body) {
+function laad(body, { dsBijStart = false, dsBijKlaar = dsBijStart } = {}) {
+  let ds = dsBijStart, klaar;
   const document = {
-    readyState: 'interactive', body, head: element(),
-    createElement: element, getElementById: () => null, addEventListener() {}
+    readyState: 'loading', body, head: element(),
+    documentElement: { hasAttribute: naam => naam === 'data-ds' && ds },
+    createElement: element, getElementById: () => null,
+    addEventListener(naam, fn) { if (naam === 'DOMContentLoaded') klaar = fn; }
   };
   const window = { localStorage: { getItem: () => 'tok' } };
   window.top = window; window.self = window;
   const ctx = { window, document, localStorage: window.localStorage, location: { pathname: '/apps/logboek.html' },
     fetch: () => Promise.resolve({ ok: false }), setTimeout: () => 0, console };
   vm.runInNewContext(BRON, ctx);
+  ds = dsBijKlaar; klaar();
   return { window, document };
 }
 
@@ -50,4 +54,11 @@ test('met een body zet hij zijn greep er gewoon in', () => {
   const body = element();
   laad(body);
   assert.equal(body.kinderen.length, 1, 'de greep hangt in de body');
+});
+
+test('dezelfde Sprong-owner injecteert legacy uitsluitend buiten de vroege én actuele DS-grens', () => {
+  for (const [dsBijStart, dsBijKlaar, aantal] of [[false,false,1],[true,true,0],[false,true,0],[true,false,0]]) {
+    const { document } = laad(element(), { dsBijStart, dsBijKlaar });
+    assert.equal(document.head.kinderen.length, aantal, JSON.stringify({ dsBijStart, dsBijKlaar }));
+  }
 });

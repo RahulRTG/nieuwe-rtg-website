@@ -33,22 +33,22 @@
       $('rVandaag').textContent = d.vandaag.aantal;
       $('rLopend').textContent = (d.lopend || []).length;
       $('rRitten').innerHTML = (d.lopend || []).map(function (o) {
-        return '<div class="bon"><b>' + esc(o.ref) + '</b>' +
-          ' <span class="tag">' + esc(o.levering) + '</span>' +
-          ' <span class="tag">' + esc(o.status) + '</span>' +
-          ' <span class="tag' + (o.status === 'onderweg' ? ' aan' : '') + '">' + esc(stap(o)) + '</span>' +
-          (o.allergyNote ? '<div><span class="allergie">Allergie: ' + esc(o.allergyNote) + '</span></div>' : '') +
-          '<div class="stil">' + esc(o.adres || 'ophalen aan de zaak') + ' · ' + esc(o.customerCodename || 'gast') +
+        return '<div class="bon ds-horeca-bon"><b>' + esc(o.ref) + '</b>' +
+          ' <span class="tag ds-horeca-tag">' + esc(o.levering) + '</span>' +
+          ' <span class="tag ds-horeca-tag">' + esc(o.status) + '</span>' +
+          ' <span class="tag ds-horeca-tag' + (o.status === 'onderweg' ? ' aan' : '') + '">' + esc(stap(o)) + '</span>' +
+          (o.allergyNote ? '<div><span class="allergie ds-horeca-allergie">Allergie: ' + esc(o.allergyNote) + '</span></div>' : '') +
+          '<div class="stil ds-horeca-meta">' + esc(o.adres || 'ophalen aan de zaak') + ' · ' + esc(o.customerCodename || 'gast') +
           ' · ' + (o.items || []).map(function (i) { return i.qty + '× ' + esc(i.name); }).join(', ') + '</div>' +
-          (o.bezorger ? '<div class="stil">Rit van ' + esc(o.bezorger.name) + '</div>' : '') +
-          '<div class="rij">' +
+          (o.bezorger ? '<div class="stil ds-horeca-meta">Rit van ' + esc(o.bezorger.name) + '</div>' : '') +
+          '<div class="rij ds-horeca-rij">' +
           K.knop('Inpakken', { pak: o.ref, items: (o.items || []).map(function (i) { return i.id; }).join('|') }) +
           K.knop('Aannemen', { neem: o.ref }) +
           K.knop('Alles gepakt', { check: o.ref }) +
           K.knop('Onderweg', { weg: o.ref }, true) +
           K.knop('Bezorgd', { klaar: o.ref }) +
           '</div></div>';
-      }).join('') || '<p class="stil">Er loopt op dit moment geen levering.</p>';
+      }).join('') || '<p class="stil ds-horeca-meta">Er loopt op dit moment geen levering.</p>';
 
       K.bind($('rRitten'), 'pak', function (b) {
         var tas = $('rTas').value.trim();

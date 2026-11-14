@@ -51,6 +51,9 @@
 <link href="/shared/rtg-uniform.css" rel="stylesheet">
 <link href="/shared/ios.css" rel="stylesheet">
 <link rel="stylesheet" href="premium.css">
+<link href="/ds/tokens.css" rel="stylesheet">
+<link href="/ds/componenten/samen.css" rel="stylesheet">
+<link href="/ds/componenten/handenvrij.css" rel="stylesheet">
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
 <script src="/shared/rtg-heritage-transition.js" blocking="render"></script>
@@ -230,7 +233,8 @@
     $('#fout2').textContent = ''; $('#standuit').textContent = '';
     api('stand', { code: $('#mijncode').value }).then(function (r) {
       if (!r.ok) { $('#fout2').textContent = r.d.error || 'Er ging iets mis.'; return; }
-      $('#standuit').innerHTML = '<b>' + esc(r.d.uitleg) + '</b><br>' + esc(r.d.nietsKlaar || '');
+      var route = r.d.route ? '<br><br><b>Uw route</b><br>' + esc(r.d.route.uitleg || '') : '';
+      $('#standuit').innerHTML = '<b>' + esc(r.d.uitleg) + '</b>' + route + '<br><br>' + esc(r.d.nietsKlaar || '');
     });
   });
 

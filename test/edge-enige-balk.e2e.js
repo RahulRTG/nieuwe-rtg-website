@@ -63,11 +63,9 @@ const SCHERMEN = [
      chips in het scherm zelf. Wat deze regel bewaakte (een balk naast de
      Edge, en geen bestemming kwijt) staat voor die schermen in DS_OPERATIE
      hieronder. */
-  /* De tabbalk van de twee kamers is smaller dan 60% van het scherm en werd
-     daarom niet als balk herkend; hij bleef staan, precies onder de onderbalk
-     van de Edge (27 september 2026: alle tabs volledig bedekt). */
-  { pad: '/apps/decision-room.html', balk: '.dr-nav', knop: 'Afweging' },
-  { pad: '/apps/project-room.html', balk: '.pr-nav', knop: 'Dossier' }
+  /* De twee kamers staan inmiddels volledig op het DS. Hun documenttabs zijn
+     inhoudsnavigatie en blijven naast precies één DS-Edge bereikbaar; dat
+     contract staat in DS_WERKDOCUMENTEN hieronder. */
 ];
 
 /* De operatieschermen op het Design System: de Edge is daar de enige balk,
@@ -75,13 +73,17 @@ const SCHERMEN = [
    bereikbaar in het scherm (de chips met data-ds-opsnav). */
 const DS_OPERATIE = ['/apps/luchthaven.html', '/apps/ovcontrol.html'];
 const OPS_BESTEMMINGEN = ['/apps/ov.html', '/apps/chauffeur.html', '/apps/luchthaven.html', '/apps/ovcontrol.html'];
+const DS_WERKDOCUMENTEN = [
+  { pad: '/apps/decision-room.html', nav: '.dr-nav', knop: 'Afweging' },
+  { pad: '/apps/project-room.html', nav: '.pr-nav', knop: 'Dossier' }
+];
 
 /* Wat de Edge NIET overneemt, hoort ook niet onder hem te liggen. In de
    compacte stand legt de Edge een onzichtbare herstelstrook over de bovenrand;
    de werkbalk van browser.html (met adresveld, dus niet over te nemen) lag er
    volledig onder. Hij schuift nu uit met --edge-randboven. */
 const VRIJ = [
-  { pad: '/apps/browser.html', knop: 'header.ios-nav button.ga', compact: true },
+  { pad: '/apps/browser.html', knop: 'header.ds-browser-balk button.ga' },
   /* De kaartlagen zijn bediening OP de kaart, geen balk: die blijven bij het
      scherm. Het oude navigatie-premium.css zette ze op 1280 breed rechtsonder,
      en de eerste laag (bank) lag volledig onder de onderbalk van de Edge. Op
@@ -205,6 +207,18 @@ test('de Edge neemt de eigen balk van een scherm over, met knoppen en ruimte',
       });
     }
 
+    for (const scherm of DS_WERKDOCUMENTEN) {
+      await t.test(scherm.pad + ': één DS-Edge en bereikbare documentnavigatie', async () => {
+        await page.goto(base + scherm.pad, { waitUntil: 'domcontentloaded' });
+        await wachtTot(page, (g) => !!document.querySelector('.ds-edge__balk') &&
+          [...document.querySelectorAll(g.nav + ' button')].some(b => b.textContent.includes(g.knop)), scherm,
+        { wat: scherm.pad + ': DS-Edge en documenttab ' + scherm.knop });
+        assert.equal(await page.locator('.ds-edge__balk').count(), 1);
+        assert.equal(await page.locator('.rtg-adaptive-bar,.rtg-edge-chrome').count(), 0);
+        await page.locator(scherm.nav).getByRole('button', { name: scherm.knop, exact: true }).click();
+      });
+    }
+
     for (const scherm of VRIJ) {
       await t.test(scherm.pad + ': de eigen bediening ligt niet onder de Edge', async () => {
         await page.goto(base + scherm.pad, { waitUntil: 'domcontentloaded' });
@@ -236,12 +250,12 @@ test('de Edge neemt de eigen balk van een scherm over, met knoppen en ruimte',
     await t.test('een balk met een invoerveld blijft bij het scherm', async () => {
       await page.goto(base + '/apps/browser.html', { waitUntil: 'domcontentloaded' });
       await wachtTot(page, () => document.body &&
-        document.body.getAttribute('data-rtg-adaptive-ready') === 'true' &&
-        !!document.querySelector('header.ios-nav #adres'), null,
+        document.body.getAttribute('data-rtg-desktop-state') === 'ready' &&
+        !!document.querySelector('header.ds-browser-balk #adres'), null,
         { wat: 'de adresbalk van browser.html' });
       const balk = await page.evaluate(() => {
-        const kop = document.querySelector('header.ios-nav');
-        const veld = document.querySelector('header.ios-nav #adres');
+        const kop = document.querySelector('header.ds-browser-balk');
+        const veld = document.querySelector('header.ds-browser-balk #adres');
         const s = getComputedStyle(kop), r = veld.getBoundingClientRect();
         return { geclaimd: kop.classList.contains('rtg-edge-owned-bar'),
           kopZichtbaar: s.display !== 'none',
@@ -260,7 +274,7 @@ test('de Edge neemt de eigen balk van een scherm over, met knoppen en ruimte',
        draait. Zonder deze proef zou een grovere claimregel onopgemerkt inhoud
        wegnemen. */
     await t.test('een hero die alleen de naam draagt, blijft staan', async () => {
-      await page.goto(base + '/apps/browser.html', { waitUntil: 'domcontentloaded' });
+      await page.goto(base + '/apps/comm.html', { waitUntil: 'domcontentloaded' });
       await wachtTot(page, () => document.body &&
         document.body.getAttribute('data-rtg-adaptive-ready') === 'true' && !!window.RTGAdaptiveEdgeClaim, null,
         { wat: 'een scherm waarop de claim draait' });
@@ -284,4 +298,81 @@ test('de Edge neemt de eigen balk van een scherm over, met knoppen en ruimte',
     if (browser) await browser.close();
     await stop(child);
   }
+});
+
+test('leverancier houdt één schil met echte tab-, meldings- en actorbediening',
+  { skip: geenBrowser(pw), timeout: 90000 }, async () => {
+  const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_AI_UIT: '1' } });
+  let browser;
+  try {
+    const post = async (pad, body) => {
+      const r = await fetch(base + pad, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+      const data = await r.json(); assert.equal(r.status, 200, pad + ': ' + JSON.stringify(data)); return data;
+    };
+    const rooster = await post('/api/supplier/roster', { code: 'KIKUNOI' });
+    const manager = rooster.staff.find(p => p.role === 'manager'); assert.ok(manager);
+    const sessie = await post('/api/supplier/login', { code: 'KIKUNOI', staffId: manager.id, pin: '1234' });
+    assert.ok(sessie.token);
+    browser = await pw.chromium.launch(browserOpties(pw));
+    for (const width of [390, 1440]) {
+      const ctx = await browser.newContext({ viewport: { width, height: 900 }, serviceWorkers: 'block', reducedMotion: 'reduce', locale: 'nl-NL' });
+      try {
+        await ctx.addInitScript(token => {
+          localStorage.setItem('rtg_sup_token', token);
+          localStorage.setItem('rtg_lang', 'nl'); localStorage.setItem('rtg_cookieinfo_v1', '1');
+        }, sessie.token);
+        const page = await ctx.newPage();
+        await page.goto(base + '/apps/leverancier.html?sector=restaurant', { waitUntil: 'domcontentloaded' });
+        await page.locator('#app.active').waitFor({ state: 'visible' });
+        await page.waitForFunction(() => document.body.dataset.rtgAdaptiveReady === 'true' && document.body.dataset.rtgEditorialV4 === 'true');
+        assert.equal(await page.locator('.rtg-v4-header:visible').count(), 1, width + ': één globale kop');
+        assert.equal(await page.locator('.rtg-adaptive-bar:visible').count(), 1, width + ': één Edge');
+        assert.equal(await page.locator('#app > .topbar').isVisible(), false, width + ': geen oude merkbalk');
+        assert.equal(await page.locator('#tabbar').isVisible(), false, width + ': het tabmodel is geen tweede onderbalk');
+        assert.equal(await page.locator('#actorName').textContent(), sessie.state.actor.name, 'de echte actor blijft herkenbaar');
+        assert.equal(await page.locator('#actorName').isVisible(), true);
+        assert.equal(await page.locator('#supName').textContent(), sessie.state.supplier.name, 'de volledige zaaknaam blijft zichtbaar, niet alleen het eerste woord uit de begroeting');
+        assert.equal(await page.locator('#supName').isVisible(), true);
+        assert.equal(await page.locator('#supType').isVisible(), true);
+        assert.ok((await page.locator('#supType').textContent()).includes(sessie.state.supplier.city));
+        assert.equal(await page.locator('#supIcon').isVisible(), false, 'de ruwe decoratieve sectorsleutel vervangt geen leesbaar label');
+        const identiteit = await page.evaluate(() => {
+          const naam = document.getElementById('supName').getBoundingClientRect();
+          const soort = document.getElementById('supType').getBoundingClientRect();
+          return { gescheiden: soort.top >= naam.bottom, binnenScherm: naam.left > 0 && naam.right <= innerWidth && soort.right <= innerWidth,
+            naam: naam.toJSON(), soort: soort.toJSON(), breedte: innerWidth };
+        });
+        assert.ok(identiteit.gescheiden, 'zaaknaam en type/plaats staan op eigen regels');
+        assert.ok(identiteit.binnenScherm, 'de identiteit heeft zijruimte en blijft binnen het scherm: ' + JSON.stringify(identiteit));
+        assert.equal(await page.locator('#actorChip').count(), 1); assert.equal(await page.locator('#bell').count(), 1);
+        await page.locator('#bellBadge[hidden]').waitFor({ state: 'attached' });
+        assert.equal(await page.locator('#bellBadge').isVisible(), false, 'nul meldingen geeft geen zichtbaar meldingssignaal');
+        await page.evaluate(() => { window.__partnerActor = document.getElementById('actorChip'); window.__partnerBell = document.getElementById('bell'); });
+
+        /* Meer is het bestaande WerkOS-register, geen tweede onderbalk. De
+           echte menukaart daaruit blijft naast de vier directe tabs werken. */
+        for (const tab of ['kassa', 'ai', 'gchat', 'menu', 'home']) {
+          await page.locator('[data-rtg-adaptive-action="context"]').click();
+          const knop = page.locator('.rtg-adaptive-controls [data-rtg-adaptive-tab="' + tab + '"]').first();
+          await knop.waitFor({ state: 'visible' }); await knop.click();
+          await page.locator('.view.active[data-view="' + tab + '"]').waitFor({ state: 'visible' });
+          assert.equal(await page.locator('#tabbar button.active').getAttribute('data-tab'), tab === 'menu' ? 'meer' : tab);
+        }
+        assert.equal(await page.evaluate(() => document.getElementById('actorChip') === window.__partnerActor && document.getElementById('bell') === window.__partnerBell), true, 'geen gekloonde actor- of meldingsknoppen');
+        await page.locator('#bell').click();
+        await page.locator('#notifPanel.open').waitFor({ state: 'visible' });
+        await page.locator('#notifClose').click();
+        await page.locator('#notifPanel.open').waitFor({ state: 'detached' });
+        await page.locator('#notifScrim').waitFor({ state: 'hidden' });
+        await page.locator('#actorChip').click();
+        await page.locator('#gate').waitFor({ state: 'visible' });
+        assert.equal(await page.evaluate(() => localStorage.getItem('rtg_sup_token')), null, 'de oorspronkelijke gebruikerswissel wist de sessie');
+        assert.equal(await page.locator('#app').isVisible(), false);
+        assert.equal(await page.locator('#actorChip').isVisible(), false, 'actorbediening blijft binnen de gesloten sessiepoort');
+        assert.equal(await page.locator('#bell').isVisible(), false);
+        assert.equal(await page.locator('#supName').isVisible(), false, 'de zaakidentiteit blijft eveneens binnen de gesloten sessiepoort');
+        assert.equal(await page.locator('#supType').isVisible(), false);
+      } finally { await ctx.close(); }
+    }
+  } finally { if (browser) await browser.close(); await stop(child); }
 });

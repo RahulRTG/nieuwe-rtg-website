@@ -21,22 +21,24 @@ function tekenKlaarLijst(){
   }));
 }
 async function laadKlaargezet(){
+  const vak = $('#kKlaarStaat'); if (!vak) return;
   try {
     const d = await api('reisbureau/uitnodigingen');
+    if (!vak.isConnected) return;
     const rij = (d.uitnodigingen || []).filter(x => x.soort === 'klaargezet'&&!x.programmaReis);
-    $('#kKlaarStaat').innerHTML = rij.length ? rij.map(x =>
+    vak.innerHTML = rij.length ? rij.map(x =>
       '<div class="rp-saved"><span>'+esc(x.bestemming||'Reis')+' · '+esc(x.venster.van)+' · '+
       (x.opgeeist?'Overgenomen':x.ingetrokken?'Ingetrokken':'Geldig tot '+esc(x.toegang&&x.toegang.expires_at))+'</span>'+
       (x.opgeeist||x.ingetrokken?'':'<button type="button" data-roteer="'+esc(x.id)+'">Nieuwe link</button><button type="button" data-introk="'+esc(x.id)+'">Trek in</button>')+'</div>').join(''):'<p>Er staat niets klaar.</p>';
-    $('#kKlaarStaat').querySelectorAll('[data-roteer]').forEach(b=>b.addEventListener('click',async()=>{
+    vak.querySelectorAll('[data-roteer]').forEach(b=>b.addEventListener('click',async()=>{
       b.disabled=true;try{const r=await api('reisbureau/uitnodiging-roteer',{id:b.dataset.roteer,idem:RTGIdem('reis-roteer')});toonLink(r.link);await laadKlaargezet();}catch(e){meld(e.message);b.disabled=false;}
     }));
-    $('#kKlaarStaat').querySelectorAll('[data-introk]').forEach(b => b.addEventListener('click', async () => {
+    vak.querySelectorAll('[data-introk]').forEach(b => b.addEventListener('click', async () => {
       b.disabled = true;
       try { await api('reisbureau/uitnodiging-weg', { id: b.dataset.introk }); laadKlaargezet(); }
       catch (e) { meld(e.message); b.disabled = false; }
     }));
-  } catch (e) { $('#kKlaarStaat').innerHTML = '<div class="leeg">' + esc(e.message) + '</div>'; }
+  } catch (e) { if (vak.isConnected) vak.innerHTML = '<div class="leeg">' + esc(e.message) + '</div>'; }
 }
 function toonLink(link){
   const vak=$('#kKlaarUit');vak.replaceChildren();const p=document.createElement('p');p.textContent='De reis staat klaar. Kopieer deze eenmalig getoonde link:';

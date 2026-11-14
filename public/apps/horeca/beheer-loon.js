@@ -35,9 +35,9 @@
       var d = r.body;
       if (d.error) return K.meld(d.error);
       $('pPotten').innerHTML = (d.potten || []).map(function (p) {
-        return K.rij('<b>' + esc(p.datum) + '</b> <span class="stil">· ' + p.verdeling.length + ' persoon/personen</span>',
+        return K.rij('<b>' + esc(p.datum) + '</b> <span class="stil ds-horeca-meta">· ' + p.verdeling.length + ' persoon/personen</span>',
           K.euro(p.potCenten));
-      }).join('') || '<p class="stil">Er is nog geen pot verdeeld.</p>';
+      }).join('') || '<p class="stil ds-horeca-meta">Er is nog geen pot verdeeld.</p>';
     });
   }
 
@@ -53,7 +53,7 @@
       if (d.error) return K.meld(d.error);
       var som = d.verdeling.reduce(function (t, v) { return t + v.centen; }, 0);
       $('pVerdeling').innerHTML = d.verdeling.map(function (v) {
-        return K.rij(esc(v.naam) + ' <span class="stil">· ' + v.uren + ' uur · weging ' + v.weging + '</span>', K.euro(v.centen));
+        return K.rij(esc(v.naam) + ' <span class="stil ds-horeca-meta">· ' + v.uren + ' uur · weging ' + v.weging + '</span>', K.euro(v.centen));
       }).join('') +
         K.rij('<b>Samen</b>', '<b>' + K.euro(som) + ' van een pot van ' + K.euro(d.potCenten) + '</b>');
       $('pPotLet').textContent = d.let;
@@ -71,9 +71,9 @@
       var d = r.body;
       if (d.error) return K.meld(d.error);
       $('lUit').innerHTML =
-        K.rij('Omzet <span class="stil">· ' + d.bonnen + ' bon(nen), zonder fooi</span>', K.euro(d.omzetCenten)) +
-        K.rij('Fooi <span class="stil">· niet in de noemer</span>', K.euro(d.fooiCenten)) +
-        K.rij('Loon <span class="stil">· ' + d.uren + ' uur, ' + Object.keys(d.perAfdeling).map(function (a) {
+        K.rij('Omzet <span class="stil ds-horeca-meta">· ' + d.bonnen + ' bon(nen), zonder fooi</span>', K.euro(d.omzetCenten)) +
+        K.rij('Fooi <span class="stil ds-horeca-meta">· niet in de noemer</span>', K.euro(d.fooiCenten)) +
+        K.rij('Loon <span class="stil ds-horeca-meta">· ' + d.uren + ' uur, ' + Object.keys(d.perAfdeling).map(function (a) {
           return a + ' ' + K.euro(d.perAfdeling[a]);
         }).join(', ') + '</span>', K.euro(d.loonCenten)) +
         K.rij('<b>Loonpercentage</b>', '<b>' + (d.loonpercentage == null ? 'geen omzet, dus geen percentage' : d.loonpercentage + '%') + '</b>') +
@@ -90,10 +90,10 @@
       $('gAllergie').textContent = d.metAllergie;
       $('gLijst').innerHTML = (d.gasten || []).map(function (g) {
         return K.rij('<b>' + esc(g.naam) + '</b>' +
-          (g.allergie ? ' <span class="allergie">' + esc(g.allergie) + '</span>' : '') +
-          (g.voorkeur ? ' <span class="stil">· ' + esc(g.voorkeur) + '</span>' : ''),
+          (g.allergie ? ' <span class="allergie ds-horeca-allergie">' + esc(g.allergie) + '</span>' : '') +
+          (g.voorkeur ? ' <span class="stil ds-horeca-meta">· ' + esc(g.voorkeur) + '</span>' : ''),
         g.bezoeken + ' bezoek(en) · ' + g.punten + ' punten');
-      }).join('') || '<p class="stil">Er staat nog geen gastprofiel.</p>';
+      }).join('') || '<p class="stil ds-horeca-meta">Er staat nog geen gastprofiel.</p>';
     });
   });
 

@@ -66,6 +66,9 @@
   }
 
   function bindKantoor(el){
+    const reisApi = maakReisApi(el);
+    if (window.RTGReisketenWerktafel) window.RTGReisketenWerktafel.mount(el.querySelector('#zaakReisContracten'), reisApi);
+    if (window.RTGReisketenLeverancier) window.RTGReisketenLeverancier.mount(el.querySelector('#zaakReisOpdrachten'), reisApi);
     el.querySelectorAll('[data-ksec]').forEach(b => b.addEventListener('click', () => { kantoorSec = b.dataset.ksec; kantoorMsg=''; histData = null; histPage = 1; boData = null; finData = null; finMsg = ''; mktData = null; mktMsg = ''; invData = null; vakData = null; vakAiMsg = ''; vakUren = null; thuisData = null; wvData = null; tresData = null; tresGraaf = null; tresMsg = ''; renderStation(); }));
     // Salon-bedrijfsaccount: bio, aanbiedingen (plaatsen en verzilveren) en polls
     const mkB = el.querySelector('#mkBioSave'); if (mkB) mkB.addEventListener('click', async () => {

@@ -1617,8 +1617,8 @@ dat RTG vandaag klopt (`MAGNAATLAB.md`) maar of hij kan voorspellen dat RTG
 mórgen nog klopt. Lees die vóór je een begrip introduceert, een register aanlegt
 of een scorecard bouwt. De opzet vraagt een semantisch register naar aanleiding
 van de twee `VERMOGENS`; de vraag ervóór is gemeten (`scripts/semantiek.js`,
-`SEMANTIEK.json`) en het was **geen incident**: van de <!--getal:semantiek.namen-->134<!--/getal--> namen die in meer dan
-één domein staan, dragen er **<!--getal:semantiek.betekenissen-->116<!--/getal--> meer dan één betekenis** — samen <!--getal:semantiek.betekenissenTotaal-->434<!--/getal-->
+`SEMANTIEK.json`) en het was **geen incident**: van de <!--getal:semantiek.namen-->136<!--/getal--> namen die in meer dan
+één domein staan, dragen er **<!--getal:semantiek.betekenissen-->118<!--/getal--> meer dan één betekenis** — samen <!--getal:semantiek.betekenissenTotaal-->441<!--/getal-->
 betekenissen, met `SOORTEN` op **39**. Daarnaast **29** betekenissen die op meer
 dan één plek wonen én **106** paren die dezelfde waarheid onder een ándere naam
 dragen — die tweede ronde bestaat omdat de eerste ze miste, en de duurste
@@ -2543,14 +2543,14 @@ het meten: de sluiting van het stuur is klein en precies één module leest van
 schijf -- `VERTROUWEN.json`, een REGISTER. Een register lezen mag, een `.js`
 lezen niet; dát onderscheid is de invariant. De vraag of de 77 registers samen
 één Codewereld vormen is eerst GEMETEN (`npm run codewereld`, `CODEWERELD.json`)
-in plaats van aangenomen -- zelfde reden als bij `Asset`: <!--getal:codewereld.ruggengraat-->6374<!--/getal--> van
-<!--getal:codewereld.paden-->6791<!--/getal--> paden staan in meer dan één register, dus er IS een ruggengraat, maar hij
+in plaats van aangenomen -- zelfde reden als bij `Asset`: <!--getal:codewereld.ruggengraat-->6471<!--/getal--> van
+<!--getal:codewereld.paden-->6959<!--/getal--> paden staan in meer dan één register, dus er IS een ruggengraat, maar hij
 loopt over de as ROUTE. De as SYMBOOL is **nul** -- geen register kent een
 functienaam met een plaats, dus het objectvoorbeeld `pay.boeken` met een
 `symbol`-veld belooft iets wat geen enkele meter vult. Die as is
-inmiddels GEBOUWD (`npm run symbolen`, `SYMBOLEN.json`): <!--getal:symbolen.totaal-->27991<!--/getal--> benoemde symbolen
-met een regelnummer en <!--getal:symbolen.kanten-->7959<!--/getal--> require-kanten heen en terug, met de eigen parser
-en <!--getal:symbolen.parsefout-->0<!--/getal--> parsefouten. De <!--getal:symbolen.nietGelezen-->316<!--/getal--> niet-gelezen bestanden staan er MET reden in
+inmiddels GEBOUWD (`npm run symbolen`, `SYMBOLEN.json`): <!--getal:symbolen.totaal-->29018<!--/getal--> benoemde symbolen
+met een regelnummer en <!--getal:symbolen.kanten-->8348<!--/getal--> require-kanten heen en terug, met de eigen parser
+en <!--getal:symbolen.parsefout-->0<!--/getal--> parsefouten. De <!--getal:symbolen.nietGelezen-->340<!--/getal--> niet-gelezen bestanden staan er MET reden in
 (bundeldelen die pas samengevoegd een programma vormen) -- weglaten zou ze
 onzichtbaar maken. Wat hij met opzet niet doet: aanroepers raden (een naam in
 aanroeppositie is geen verwijzing), en iets beweren over welk symbool een route
@@ -2558,14 +2558,14 @@ afhandelt. Twee dingen daar niet wegpoetsen: de brug route -> bestand rustte
 op ÉÉN register, dus de nul tegenspraken erin was `niet vast te stellen` en geen
 groen -- er ligt sinds 3 september een tweede bron naast (`ROUTEBRON.json`, uit de
 ROUTER in plaats van uit de bronboom), de dekking staat op
-<!--getal:codewereld.brugDekkingPct-->94.7<!--/getal-->% en er zijn <!--getal:routebron.tegenspraak-->0<!--/getal--> echte tegenspraken. Let daarbij op het onderscheid
+<!--getal:codewereld.brugDekkingPct-->96.6<!--/getal-->% en er zijn <!--getal:routebron.tegenspraak-->0<!--/getal--> echte tegenspraken. Let daarbij op het onderscheid
 dat die meting afdwong: een verschil tussen twee registers van VERSCHILLENDE
 leeftijd is een leeftijdsverschil en geen tegenspraak, en die twee worden nooit
 opgeteld. Verder is het bronbereik voor gedrag
-<!--getal:codewereld.bronGedragPct-->78.9<!--/getal-->% -- over de meerderheid van de bronbestanden zegt geen enkel
+<!--getal:codewereld.bronGedragPct-->78.7<!--/getal-->% -- over de meerderheid van de bronbestanden zegt geen enkel
 register iets over gedrag, dus een "80-95% zonder bron te beantwoorden" haalt die
 grens vandaag niet -- en dat ene getal verbergt nog iets, want `server/` haalt
-<!--getal:codewereld.bronServerPct-->90<!--/getal-->% en `public/` <!--getal:codewereld.bronPublicPct-->41.3<!--/getal-->%: over de schermen wisten de registers
+<!--getal:codewereld.bronServerPct-->89.5<!--/getal-->% en `public/` <!--getal:codewereld.bronPublicPct-->42.3<!--/getal-->%: over de schermen wisten de registers
 vrijwel niets (6,6%) tot `SCHERMROUTES.json` erbij kwam, dat per bestand in
 public/ leest welke API-paden het noemt en daarmee de keten scherm -> route legt.
 De aanroepgraaf ligt er sinds dezelfde dag naast (`AANROEPGRAAF.json`,
@@ -2596,12 +2596,12 @@ het register aanwijst leveren zaknamen. Ten tweede telt CODEWERELD.json sinds
 die dag DRIE dingen apart (structuur, relatie, gedrag), omdat een index die elk
 bestand noemt elke dekkingsvraag triviaal waar maakt: dat gebeurde twee keer op
 rij, en het zag er beide keren uit als vooruitgang. Alleen de gedragsteller
-(<!--getal:codewereld.bronGedragPct-->78.9<!--/getal-->%) is de bovengrens voor een vraag als "klopt het" -- en die kwam
+(<!--getal:codewereld.bronGedragPct-->78.7<!--/getal-->%) is de bovengrens voor een vraag als "klopt het" -- en die kwam
 voor de schermen pas op gang met `SCHERMGEDRAG.json`, dat per scherm SAMENSTELT
 wat de routes eronder al gemeten hadden (schrijft het, welke rol, wat is het
 bewijs waard). Twee dingen daar niet wegpoetsen: het is AFGELEID gedrag, dus
 `schrijft: nee` betekent "verandert niets aan de SERVERKANT" en niet "verandert
-niets"; en de <!--getal:schermgedrag.zonderGrond-->153<!--/getal--> schermen waarover het niets kan zeggen staan er MET reden
+niets"; en de <!--getal:schermgedrag.zonderGrond-->77<!--/getal--> schermen waarover het niets kan zeggen staan er MET reden
 in maar tellen niet als dekking (`zonderUitspraak`) -- anders stijgt een
 dekkingsgetal doordat er een meter bij komt die zwijgt. Die meter begon
 op 118 "dode paden" en eindigde op <!--getal:schermroutes.dood-->0<!--/getal-->; de aanroepgraaf begon op 587 onbekende
@@ -2870,3 +2870,58 @@ bewezen, falend* is een leestabel op bestaande standen), en elke nieuwe keten
 krijgt een proef met schakels en storingen. De eerste staat: `voorraad-ontvangst`
 (`scripts/voorraadproef.js`), een restaurant dat inkoopt bij een groothandel. Die
 vond meteen een stil defect: geleverd zonder dat er iets in de keuken landde.
+
+**`CIVILIS-UITVOERING.md` is de maatschappelijke uitvoeringsbijlage van 10
+november 2026** — tien herhaalbare fasen, twaalf domeinen, zes gedeelde lagen en
+vijftien motorverantwoordelijkheden, met repository-audit, capability-matrix,
+afhankelijkheidsgraaf, ketencontract, juridische beslispunten, bouwvolgorde,
+bewijsregister en testmatrix. Het is geen tweede completion-register:
+`APPWERKT.json` en de bestaande ketenproeven blijven beslissend. De eerste
+verticale keten is geen veilige slaapplek; de software voor capaciteit,
+aanbiederacceptatie, aankomst en vervolg is geïmplementeerd en gesimuleerd,
+maar nog niet extern geaccepteerd of operationeel bewezen. Het gedeelde
+contract is alleen een envelop en woordenlijst; domeinen behouden hun eigen
+bevoegdheden en toestandmachines.
+
+**`PERSONALOS.md` is de persoonlijke compositielaag** — niet een vijfde wereld,
+nieuwe app of tweede autorisatiemotor, maar de deterministische laag die de
+bestaande catalogus, actuele Authority-uitkomst, vrijwillige doelen,
+accountvoorkeuren en toegankelijkheid tot één versiebeheerbare werktafel
+samenstelt. Lees dit vóór je onboarding, persoonlijke navigatie, appaanbevelingen
+of contextwisseling bouwt. De harde grens: Authority bepaalt wat mag,
+PersonalOS ordent alleen wat daarbinnen relevant is, de gebruiker kan altijd
+zelf vastzetten en Heel RTG blijft volledig bereikbaar. Het document bevat ook
+de repository-audit, werkelijk geïmplementeerde API-contracten, dreigingsmodel,
+lokale prestatiemeting, migratie/rollback en het actuele NO-GO.
+
+**`TRAVELOS-UITVOERING.md` is het federatieve uitvoeringscontract van 11
+november 2026** — geen nieuwe reisbackend, PartnerOS of bewijsregister, maar de
+repositorygebonden vertaling van REIZEN.md en TRAVELCOMMERCE.md. Het legt vier
+harde richtingen vast: een partner houdt eigen klanten, leveranciers,
+contracten, tarieven, betaalprovider en uitgang; de juridische en economische
+rol staat per transactie en niet alleen per organisatie; de operationele én
+financiële lus moeten sluiten; en brede reisdekking wordt niet als directe
+boekbaarheid verkocht. Daarom onderscheidt het `ondersteund`, `operationeel
+bewezen` en `direct boekbaar bewezen`, steeds provider-, product-, markt- en
+broncommitgebonden. De repositorymatrix wijst per verantwoordelijkheid de
+bestaande module, het aanwezige contract, de ontbrekende overgang, de vereiste
+proef en de blokkade-eigenaar aan. De eerste kwalificatie is een spiegelproef:
+dezelfde beperkte reis voor RTG Travel en een onafhankelijke tenant, met drie
+zelfstandige leveranciers. `APPWERKT.json`, EXPERIENCEWERKT en Deep Green
+blijven beslissend; de actuele conclusie in de bijlage is NO-GO. Paragraaf 15
+beschrijft de inmiddels lokaal aangesloten keten in de bestaande
+reisAanvragen-opslag: persoonlijke actoren, offerteversies, leveranciers-
+acceptatie, inning en leveringsverklaringen. De bestaande reiskern bewaart nu
+haar prijsgrond en herstelt betalingen op dezelfde economische identiteit.
+Nieuwe inning vraagt de bestaande identiteitspoort en huisvrijgave; read-only
+herstel verplaatst geen nieuw geld. Nazorgvragen en verkopersantwoorden zijn
+aangesloten zonder uitvoerings- of financieel mandaat. De bestaande tenant-
+uitgang draagt een zaakgebonden documentair reisarchief zonder actieve rechten;
+geopende schermen herstellen na netwerkuitval zonder gevoelig lokaal dossier.
+Settlement, gedeeltelijke refund, volledige tenantuitgang en externe acceptatie
+zijn daarmee niet stilzwijgend opgelost. Het meetverslag staat uitsluitend in
+het bestaande AFBOUWPROGRAMMA.md. Paragraaf 9 van TRAVELCOMMERCE.md blijft een
+historische meting van 10 september: de later gebouwde
+`reisbureau-betaling.js`, samenstelling, geldherkomst en teruggave sluiten
+softwarestappen, maar maken de federatieve partnerketen en de integrale
+productiekwalificatie niet achteraf groen.

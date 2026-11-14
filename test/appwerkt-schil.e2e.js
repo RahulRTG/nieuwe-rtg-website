@@ -159,6 +159,17 @@ const NAVIGEERT = '<!doctype html><html><body><main>' +
   '<button type="button" onclick="location.href=\'/apps/bestemming.html\'">Terug</button>' +
   '<button type="button" onclick="window.lokaal=true">Lokale actie</button>' +
   '</main></body></html>';
+
+/* De RTG-browser vervangt Home door een interne Contact-stand. Daar staat een
+   verzendactie, maar de vaste Home-route komt in DOM-volgorde eerst en maakt
+   haar weer onzichtbaar. Alleen het publieke data-stand-contract geeft de
+   meter een controleerbare route terug naar de nog onaangeraakte actie. */
+const PAGINA_ROUTE = '<!doctype html><html><body><main id="vlak"></main><script>' +
+  'function teken(pad){document.getElementById("vlak").innerHTML=' +
+  '`<button type="button" data-stand="home" ${pad?"":"disabled"} onclick="teken(\\\'\\\')">Home</button>`+' +
+  '`<button type="button" data-stand="contact" ${pad?"disabled":""} onclick="teken(\\\'contact\\\')">Contact</button>`+' +
+  '(pad?`<button type="button" onclick="window.verstuurd=true">Verstuur</button>`:"")}' +
+  'teken("")</script></body></html>';
 const BESTEMMING = '<!doctype html><html><body><main>' +
   Array.from({ length: 12 }, (_, i) => '<button type="button">Vreemde actie ' + i + '</button>').join('') +
   '</main></body></html>';
@@ -329,6 +340,30 @@ test('bedienbaar telt de eigen knoppen, een keer elk, en laat de schil liggen', 
   }
 });
 
+test('een interne browserpagina blijft herstelbaar tot haar laatste actie is geraakt',
+  { skip: geenBrowser(pw), timeout: 30000 }, async () => {
+  const { bedien } = require('../scripts/appwerkt');
+  const srv = http.createServer((req, res) => {
+    res.setHeader('Content-Type', 'text/html');
+    res.end(PAGINA_ROUTE);
+  });
+  await new Promise((k) => srv.listen(0, '127.0.0.1', k));
+  const base = 'http://127.0.0.1:' + srv.address().port;
+  const browser = await pw.chromium.launch(browserOpties(pw));
+  try {
+    const ctx = await browser.newContext({ viewport: { width: 1280, height: 900 } });
+    const pagina = await bedien(ctx, base, '/apps/paginaroute.html');
+    assert.equal(pagina.gevonden, 3, 'Home, Contact en de toestandsgebonden verzendactie staan in de noemer');
+    assert.equal(pagina.geklikt, pagina.gevonden, 'de interne Contact-route wordt herhaald tot Verstuur werkelijk is geraakt');
+    assert.deepEqual(pagina.onaangeraakt, [], 'geen bediening achter een interne sitepagina blijft achter');
+    assert.ok(pagina.aangeraakt.includes('Verstuur'), 'de vervolgactie is echt bediend en niet administratief afgevinkt');
+    await ctx.close();
+  } finally {
+    await browser.close();
+    srv.close();
+  }
+});
+
 /* OS-apps hebben geen eigen URL. De meter moet daarom dezelfde zichtbare route
    als een lid lopen (Edge -> Rahul -> opdracht), en daarna uitsluitend de
    geopende kiezer tellen. Bellen en Snaps krijgen een echt verbonden
@@ -402,6 +437,112 @@ test('APPWERKT opent Bord en Schrift met hun echte tabgebonden Schoolpas',
       assert.deepEqual(bediening.crash.concat(bediening.serverfout), [], functie + ': de bediening veroorzaakte fouten');
       await ctx.close();
     }
+  } finally {
+    if (browser) await browser.close();
+    await stop(child);
+    try { fs.rmSync(data, { recursive: true, force: true }); } catch (e) {}
+  }
+});
+
+test('APPWERKT opent Gezin met een echt uitgenodigd en gekoppeld proeflid',
+  { skip: geenBrowser(pw), timeout: 120000 }, async () => {
+  const { startServer, stop } = require('./helper');
+  const { haalSessies, opslagVoor, verbindGezinProeflid } = require('../scripts/lib/proefsessies');
+  const { rijen, meetIngang, maakContext, bezoek, bedien } = require('../scripts/appwerkt');
+  const data = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-appwerkt-gezin-'));
+  const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: data } });
+  let browser;
+  try {
+    const { sessies, overgeslagen } = await haalSessies(base, ['lid']);
+    assert.deepEqual(overgeslagen, []);
+    const gekoppeld = await verbindGezinProeflid(base);
+    assert.equal(gekoppeld.ok, true, gekoppeld.reden);
+    browser = await pw.chromium.launch(browserOpties(pw));
+    const ctx = await maakContext(browser, opslagVoor({
+      lid: { ...sessies.lid, waarde: gekoppeld.token }
+    }));
+    const rij = rijen().find((r) => r.functie === 'tab:gezin');
+    const meet = meetIngang(rij);
+    const gezien = await bezoek(ctx, base, meet);
+    assert.deepEqual(gezien.crash, [], 'de gekoppelde gezinsstand opent niet');
+    assert.equal(gezien.poort, false, 'het gekoppelde lid bleef achter een poort');
+    const bediening = await bedien(ctx, base, meet);
+    assert.ok(bediening.gevonden >= 1, 'de gekoppelde gezinsstand heeft geen eigen bediening');
+    assert.equal(bediening.geklikt, bediening.gevonden,
+      'niet alle gezinsbediening is aangeraakt (' + bediening.geklikt + '/' + bediening.gevonden + ')');
+    assert.deepEqual(bediening.crash.concat(bediening.serverfout), [],
+      'de gezinsbediening veroorzaakte fouten');
+    await ctx.close();
+  } finally {
+    if (browser) await browser.close();
+    await stop(child);
+    try { fs.rmSync(data, { recursive: true, force: true }); } catch (e) {}
+  }
+});
+
+test('APPWERKT wacht op het echte Zorg-aanbod voordat het de tab bedient',
+  { skip: geenBrowser(pw), timeout: 120000 }, async () => {
+  const { startServer, stop } = require('./helper');
+  const { haalSessies, opslagVoor } = require('../scripts/lib/proefsessies');
+  const { rijen, meetIngang, maakContext, bezoek, bedien } = require('../scripts/appwerkt');
+  const data = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-appwerkt-zorg-'));
+  const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: data } });
+  let browser;
+  try {
+    const { sessies, overgeslagen } = await haalSessies(base, ['lid']);
+    assert.deepEqual(overgeslagen, []);
+    browser = await pw.chromium.launch(browserOpties(pw));
+    const ctx = await maakContext(browser, opslagVoor({ lid: sessies.lid }));
+    const rij = rijen().find((r) => r.functie === 'tab:zorg');
+    const meet = meetIngang(rij);
+    const gezien = await bezoek(ctx, base, meet);
+    assert.deepEqual(gezien.crash, [], 'de zorgstand opent niet');
+    assert.equal(gezien.poort, false, 'de zorgstand bleef achter een poort');
+    const bediening = await bedien(ctx, base, meet);
+    assert.ok(bediening.gevonden >= 1, 'het echte zorgaanbod leverde geen eigen bediening');
+    assert.equal(bediening.geklikt, bediening.gevonden,
+      'niet alle zorgbediening is aangeraakt (' + bediening.geklikt + '/' + bediening.gevonden + ')');
+    assert.deepEqual(bediening.crash.concat(bediening.serverfout), [],
+      'de zorgbediening veroorzaakte fouten');
+    await ctx.close();
+  } finally {
+    if (browser) await browser.close();
+    await stop(child);
+    try { fs.rmSync(data, { recursive: true, force: true }); } catch (e) {}
+  }
+});
+
+test('APPWERKT kwalificeert Navigatie met het echte lokale kaartpakket',
+  /* Navigatie heeft meer dan twintig toestandsafhankelijke acties en opent bij
+     iedere replay opnieuw het echte SQLite-net. Geef de volledige klikroute
+     ruimte; de meter zelf behoudt al zijn begrensde wachttijden. */
+  { skip: geenBrowser(pw), timeout: 300000 }, async () => {
+  const { startServer, stop } = require('./helper');
+  const { haalSessies, opslagVoor } = require('../scripts/lib/proefsessies');
+  const { rijen, meetIngang, maakContext, bezoek, bedien,
+    bereidAppwerktDatamapVoor } = require('../scripts/appwerkt');
+  const data = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-appwerkt-navigatie-'));
+  bereidAppwerktDatamapVoor(data);
+  const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: data } });
+  let browser;
+  try {
+    const { sessies, overgeslagen } = await haalSessies(base, ['lid']);
+    assert.deepEqual(overgeslagen, []);
+    browser = await pw.chromium.launch(browserOpties(pw));
+    const ctx = await maakContext(browser, opslagVoor({ lid: sessies.lid }));
+    const rij = rijen().find((r) => r.functie === 'link:navigatie');
+    const meet = meetIngang(rij);
+    const gezien = await bezoek(ctx, base, meet);
+    assert.deepEqual(gezien.crash, [], 'Navigatie opent niet met het kaartpakket');
+    assert.deepEqual(gezien.config, [], 'Navigatie meldt nog ontbrekende kaartconfiguratie');
+    const bediening = await bedien(ctx, base, meet);
+    assert.ok(bediening.gevonden >= 1, 'Navigatie heeft geen eigen bediening');
+    assert.equal(bediening.geklikt, bediening.gevonden,
+      'niet alle navigatiebediening is aangeraakt (' + bediening.geklikt + '/' + bediening.gevonden + ')');
+    assert.deepEqual(bediening.config, [], 'bediening raakte ontbrekende kaartconfiguratie');
+    assert.deepEqual(bediening.crash.concat(bediening.serverfout), [],
+      'Navigatie veroorzaakte fouten');
+    await ctx.close();
   } finally {
     if (browser) await browser.close();
     await stop(child);

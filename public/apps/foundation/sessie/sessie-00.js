@@ -3,7 +3,17 @@
    toestel; elk profiel weet wie hij is. Bewaard in localStorage, zodat de
    tools (leren, cv) je naam al kennen en de balk bovenin laat zien wie je bent. */
 (function (w) {
+  const dsBijStart = document.documentElement.hasAttribute('data-ds');
   var KEY = 'rtf_sessie';
+  function laadSessiePresentatie(pad) {
+    if (document.documentElement.hasAttribute('data-ds')) return;
+    if (document.getElementById('rtgDsRuntimeCss')) return;
+    var presentatie = document.createElement('link');
+    presentatie.id = 'rtgDsRuntimeCss';
+    presentatie.rel = 'stylesheet';
+    presentatie.href = pad;
+    document.head.appendChild(presentatie);
+  }
   // de gedeelde verbindingslaag (offline-banner + satellietmodus) laadt op
   // elke RTF-pagina mee; sessie.js zit overal, dus dit is de ene plek
   try {
@@ -60,35 +70,6 @@
     var m = /\/([^/?#]+)\.html$/.exec(location.pathname);
     return m ? m[1].toLowerCase() : '';
   }
-  function toegangSlot(reden, laden) {
-    var id = 'rtf-toegang-slot', el = document.getElementById(id);
-    document.documentElement.classList.add('rtf-toegang-dicht');
-    if (!document.getElementById('rtf-toegang-stijl')) {
-      var stijl = document.createElement('style'); stijl.id = 'rtf-toegang-stijl';
-      stijl.textContent = 'html.rtf-toegang-dicht body>*:not(#rtf-toegang-slot):not(.wd-shell):not(.rtg-edge-chrome){visibility:hidden!important}html.rtf-toegang-dicht .wd-shell>.wd-home{visibility:hidden!important;pointer-events:none!important}html.rtf-toegang-dicht #rtf-toegang-slot{visibility:visible!important}#rtf-toegang-slot [data-rtf-uitweg]{padding:.65rem .85rem;border:1px solid #4a463d;border-radius:0;color:#f6f1e7;text-decoration:none}';
-      (document.head || document.documentElement).appendChild(stijl);
-    }
-    if (!el) {
-      el = document.createElement('dialog'); el.id = id; el.setAttribute('role', 'alertdialog'); el.setAttribute('aria-modal', 'true');
-      el.style.cssText = 'position:fixed;inset:0;z-index:2147483000;width:100%;height:100%;max-width:none;max-height:none;margin:0;border:0;display:grid;place-items:center;padding:1rem;background:radial-gradient(circle at 50% 38%,#101d31,#08090c 62%);color:#f4f0e7;font-family:Inter,system-ui,sans-serif';
-      (document.body || document.documentElement).appendChild(el);
-    }
-    var s = lees(), beheer = !!(s && s.profiel && s.profiel.beheerder);
-    el.innerHTML = '<div style="width:min(92vw,34rem);padding:1.5rem;border:1px solid rgba(195,155,74,.38);border-radius:0;background:linear-gradient(145deg,#121923,#0b0e14);box-shadow:0 24px 80px rgba(0,0,0,.55)">' +
-      '<div style="font:800 .68rem/1 Inter;letter-spacing:.17em;text-transform:uppercase;color:#e0c487">RTF · veilige toegang</div>' +
-      '<h1 style="font:900 1.75rem/1.08 Inter,sans-serif;letter-spacing:-.035em;text-transform:uppercase;margin:.65rem 0">' + (laden ? 'Jouw veilige wereld wacht op je' : 'Deze ruimte blijft nog dicht') + '</h1>' +
-      '<p style="color:#bdb8ad;line-height:1.55;margin:0 0 1rem">' + esc(reden || 'De server controleert je leeftijd en passen voordat dit scherm opengaat.') + '</p>' +
-      (laden ? '<div style="height:3px;border-radius:0;background:linear-gradient(90deg,#2874d0,#c39b4a,#63d587)"></div>' :
-        '<div style="display:flex;gap:.5rem;flex-wrap:wrap"><a data-rtf-wissel href="index.html#profielen" style="padding:.65rem .85rem;border-radius:0;background:#a6002f;color:#fff;text-decoration:none;font-weight:800">Kies een profiel →</a>' +
-        '<a data-rtf-uitweg href="/apps/app.html">Naar RTG OS</a>' +
-        (beheer ? '<a href="beheer.html" style="padding:.65rem .85rem;border:1px solid #4a463d;border-radius:0;color:#f6f1e7;text-decoration:none">Leeftijd instellen</a>' : '') + '</div>') + '</div>';
-    var wissel = el.querySelector('[data-rtf-wissel]');
-    if (wissel) wissel.onclick = function () {
-      var ss = lees(); if (ss) { wissel(ss); localStorage.setItem(KEY, JSON.stringify(ss)); }
-    };
-    try { if (!el.open) el.showModal(); } catch (e) {}
-    return el;
-  }
   function controleerToegang(gedwongen) {
     var sleutel = typeof gedwongen === 'string' && gedwongen ? gedwongen : paginaSleutel();
     var campus = sleutel === 'campus';
@@ -102,7 +83,8 @@
       .then(function (d) {
         if (!d.httpOk || !d.toegestaan) { toegangSlot(d.reden || 'Deze ruimte hoort niet bij jouw leeftijd of pas.', false); return d; }
         var el = document.getElementById('rtf-toegang-slot'); if (el) { try { el.close(); } catch (e) {} el.remove(); }
-        document.documentElement.classList.remove('rtf-toegang-dicht');
+        herstelToegangAchtergrond();
+        document.documentElement.classList.remove('rtf-toegang-dicht', 'ds-foundation-dicht');
         document.documentElement.setAttribute('data-rtf-groep', d.groep || 'kind');
         try { window.dispatchEvent(new CustomEvent('rtf-toegang', { detail: d })); } catch (e) {}
         return d;

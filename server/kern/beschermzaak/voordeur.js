@@ -127,12 +127,22 @@ module.exports = (ctx, eigen) => {
   function stand(code) {
     const z = opCode(code);
     if (!z) return { status: 404, error: 'Deze code kennen wij niet. Kijk hem na, of begin opnieuw.' };
+    const routeUitleg = {
+      plek_aangevraagd: 'Een opvangplek is aangevraagd. Die is nog niet bevestigd.',
+      plek_bevestigd: 'De opvangaanbieder heeft een plek bevestigd.',
+      aangekomen: 'De aankomst bij de opvang is bevestigd.',
+      vervolg_gepland: 'De volgende stap na de opvang is gepland.',
+      alternatief_nodig: 'Deze plek lukte niet. De begeleider zoekt een alternatief.'
+    };
     return { ok: true, nietsKlaar: NIETS_KLAAR,
       stand: z.stand,
       ingetrokken: !!z.deurIngetrokken,
       /* "Er is iets klaargezet" en niet WAT. Wie de code vindt, hoort er niets
          uit te kunnen aflezen (LIFE.md: klaarzetten, bevestigen doet de mens). */
       klaargezet: (z.stappen || []).length > 0 || (z.overdrachten || []).length > 0,
+      route: z.civilisRoute ? { fase: z.civilisRoute.fase,
+        uitleg: routeUitleg[z.civilisRoute.fase] || 'Er wordt aan uw route gewerkt.',
+        bijgewerkt: z.civilisRoute.bijgewerkt } : null,
       uitleg: z.deurIngetrokken
         ? 'U heeft dit ingetrokken. Er gebeurt niets meer.'
         : (z.stand === 'veiligheid'
@@ -156,6 +166,9 @@ module.exports = (ctx, eigen) => {
     z.deurIngetrokken = { at: nu(), reden: schoon(reden, 200) || null };
     z.ingetrokken = z.deurIngetrokken;
     if (z.stand !== 'gesloten') z.stand = 'veiligheid';
+    if (typeof ctx.opvangStopVoorZaak === 'function') {
+      ctx.opvangStopVoorZaak(z.id, 'door de mens ingetrokken');
+    }
     z.bijgewerkt = nu();
     audit('voordeur', 'beschermzaak.voordeur-ingetrokken', z.codenaam, z.deurIngetrokken.reden || '');
     save();

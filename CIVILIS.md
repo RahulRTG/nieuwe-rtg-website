@@ -97,3 +97,27 @@ In volgorde, elk als kleinste verticale uitbreiding met een eigen proef:
 4. **Een tweede sector met een andere grammatica**: hotel (`kamer-uitchecken`), omdat die al in de lanceerbare kern valt.
 5. **De vijf zorggenres zonder gereedschap** terug naar `binnenkort`, of een eigen werkruimte per genre — een besluit van de eigenaar.
 6. **Zaakdoos als knooppuntennetwerk**, pas na de voorwaarden van bouwstroom E.
+
+## 8. Maatschappelijke infrastructuur voor bestaanszekerheid (10 november 2026)
+
+CIVILIS verbindt vanaf deze aanvulling ook de volledige maatschappelijke route:
+van noodhulp naar stabiliteit, van stabiliteit naar zelfstandigheid waar dat
+haalbaar is, van zelfstandigheid naar kansen en deelname, en van deelname naar
+duurzame bestaanszekerheid. Langdurige ondersteuning, terugkeer of blijvende
+afhankelijkheid is een geldige route en geen mislukking.
+
+De uitvoerbare architectuur, repository-audit, capability-matrix,
+afhankelijkheidsgraaf, het ketencontract, de juridische beslispunten, de
+testmatrix en het bewijsregister staan in `CIVILIS-UITVOERING.md`. De canonieke
+tien fasen, twaalf domeinen, zes lagen en vijftien motorverantwoordelijkheden
+staan als controleerbaar vormcontract in `server/kern/civilis/contract.js`.
+
+De eerste maatschappelijke verticale keten is **geen veilige slaapplek**. Zij
+hergebruikt de bestaande publieke beschermzaak, stads- en partnerbevoegdheden,
+audit en burgerweergave. Alleen de ontbrekende naad is toegevoegd: actuele
+opvangcapaciteit, idempotente aanvraag, expliciete aanbiederacceptatie,
+aankomst, zaakverantwoordelijkheid, noodfinancieringsstand en vervolgplan
+(`server/kern/rtfos/opvang.js`). De gerichte integratietest is groen, maar dat
+is ontwikkelbewijs op een wegwerpserver. Er is nog geen echte opvangaanbieder
+of gemeente aangesloten en er wordt geen operationele of Deep Green-vrijgave
+geclaimd.

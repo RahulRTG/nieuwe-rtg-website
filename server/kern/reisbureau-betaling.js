@@ -21,13 +21,14 @@
 
 const { geldrijenVoor } = require('./reisbureau-geldrijen');
 const { maakSleutel } = require('../db/economische-identiteit');
+const betaaltoestemming = require('./reisbureau-betaaltoestemming');
 
 /* De positie waar RTG de reissom int. Een eigen naam en niet `rtg:reserve`:
    die bak is van de fondsafdracht (opzet/kern-geldnaden.js), en twee
    geldstromen op een positie maken elk saldo onverklaarbaar. */
 const KAS = 'rtg:reisbureau';
 
-function maakReisbetaling({ db, save, crypto, payVan, reisbureauVan, nu }) {
+function maakReisbetaling({ db, save, crypto, payVan, reisbureauVan, nu, bewerkCollectie }) {
   const klok = nu || (() => new Date().toISOString());
   /* Een bewaarde rij heeft een eigen identiteit: zonder id kan een uitkering
      alleen naar de REIS wijzen en niet naar de cent die hij afwikkelt. */
@@ -42,84 +43,83 @@ function maakReisbetaling({ db, save, crypto, payVan, reisbureauVan, nu }) {
      gemount, en zonder pay hoort dit te weigeren en niet te doen alsof. */
   const pay = () => (payVan && payVan()) || null;
   const bureau = () => (reisbureauVan && reisbureauVan()) || null;
+  const bewaarRijen = require('./reisbureau-betalingsrijen')({ eigen, bewerkCollectie, save });
+  const lopend = new Map();
 
-  async function betaal(sess, codenaam, ref) {
+  async function betaal(sess, codenaam, ref, nieuweInningMag) {
     const rb = bureau();
     if (!rb) return { status: 503, error: 'Het reisbureau is niet beschikbaar.' };
     const a = rb.aanvraagVan(ref);
-    if (!a) return { status: 404, error: 'Aanvraag niet gevonden.' };
+    if (!a || a.keten) return { status: 404, error: 'Aanvraag niet gevonden.' };
     if (a.customerKey !== sess.key) return { status: 404, error: 'Aanvraag niet gevonden.' };
-    /* Alleen een BEVESTIGDE reis: tot een mens hem bevestigt staat er niets
-       vast en hoort er niets betaald te worden. */
-    if (a.status !== 'bevestigd') {
-      return { status: 409, error: 'Deze reis is nog niet bevestigd door een reisadviseur.' };
-    }
     if (a.betaald) return { ok: true, alBetaald: true, betaling: a.betaald };
+    if (lopend.has(ref)) return lopend.get(ref);
+    const taak = voerUit(rb, sess, codenaam, ref, nieuweInningMag);
+    lopend.set(ref, taak);
+    try { return await taak; } finally { lopend.delete(ref); }
+  }
 
-    const trip = rb.tripVan(a.tripId);
-    const opbouw = geldrijenVoor({ trip, personen: a.personen, valuta: 'EUR' });
-    if (!opbouw.ok) {
-      /* Een grens en geen gat: een betaling die niet weet wat aan wie toekomt,
-         is later niet te verantwoorden. */
-      return { status: 409, error: 'Deze reis is nog niet uitgesplitst; RTG kan hem daarom niet innen.',
-        hoe: opbouw.waarom };
-    }
-
+  async function voerUit(rb, sess, codenaam, ref, nieuweInningMag) {
     const p = pay();
     if (!p) return { status: 503, error: 'De betaallaag is niet beschikbaar.' };
+    const oud = rb.aanvraagVan(ref), adres = oud.inning ? oud.inning.van : codenaam;
+    if (!oud.inning) {
+      const mag = betaaltoestemming(nieuweInningMag, p);
+      if (mag.error) return mag;
+    }
+    const start = await rb.reserveerInning(ref, { key: sess.key, codenaam: adres });
+    if (!start.ok || start.alBetaald) return start;
+    const { trip, personen } = start.grond;
+    const opbouw = geldrijenVoor({ trip, personen, valuta: 'EUR' });
+    if (!opbouw.ok) return { status: 409, error: 'De vastgelegde geldbasis is ongeldig.', hoe: opbouw.waarom };
 
-    const b = await p.boekAsync({
-      van: 'lid:' + codenaam, naar: KAS, centen: opbouw.totaalCenten,
-      soort: 'reis', oms: 'Reis ' + (a.titel || a.tripId), ref: a.ref,
+    const beweging = {
+      van: 'lid:' + adres, naar: KAS, centen: opbouw.totaalCenten,
+      soort: 'reis', oms: 'Reis ' + (start.titel || trip.id), ref,
       // een reis wordt een keer betaald, ook over een crash of een tweede instantie heen
-      economischeSleutel: maakSleutel('pay-handeling', ['reis', a.ref])
-    });
-    if (!b || b.error) return { status: (b && b.status) || 502, error: (b && b.error) || 'Betaling mislukt.' };
+      economischeSleutel: maakSleutel('pay-handeling', ['reis', ref])
+    };
+    let b = null;
+    if (start.herstel) {
+      if (typeof p.boekBekend !== 'function') return { status: 503, error: 'De eerdere betaaluitkomst kan niet veilig worden nagekeken.' };
+      try { b = await p.boekBekend(beweging); }
+      catch (_) { return { status: 503, error: 'De eerdere betaaluitkomst is onbereikbaar; er wordt niets nieuws geïnd.' }; }
+      if (!b || b.ok !== true) {
+        if (!b || b.status !== 404 || b.onbekend !== true || b.code !== 'PAY_BOEKING_ONBEKEND')
+          return { status: 503, error: 'De eerdere betaaluitkomst wijkt af of is onbekend; er wordt niets nieuws geïnd.' };
+        b = null;
+      }
+    }
+    if (!b) {
+      const mag = betaaltoestemming(nieuweInningMag, p);
+      if (mag.error) return mag;
+      if (adres !== codenaam) return { status: 409, error: 'Het betaaladres is gewijzigd; een nieuwe inning vraagt menselijke beoordeling.' };
+      b = await p.boekAsync(beweging);
+    }
+    if (!b || b.error) {
+      // Alleen een zekere weigering geeft wijzigen weer vrij. Bij onbereikbare
+      // motor of onbekende afloop herhaalt men dezelfde duurzame geldidentiteit.
+      if (b && [400, 402, 403].includes(b.status)) await rb.stopInning(ref);
+      return { status: (b && b.status) || 502, error: (b && b.error) || 'De betaaluitkomst is onbekend; herhaal deze betaling om haar veilig te herstellen.' };
+    }
+    const bon = b.boeking;
+    if (!bon || !bon.id || bon.van !== 'lid:' + adres || bon.naar !== KAS ||
+        bon.centen !== opbouw.totaalCenten || bon.ref !== ref || bon.soort !== 'reis')
+      return { status: 502, error: 'De betaallaag bevestigde niet de aangevraagde geldbeweging. Herstel is vereist.' };
 
     /* Nu pas, MET het boekingsnummer: een rij die naar een niet-bestaande
        boeking wijst, is een bewering zonder bewijs. */
-    const metBoeking = geldrijenVoor({ trip, personen: a.personen, boekingId: b.boeking.id, valuta: 'EUR' });
-    const stempel = klok();
-    /* VELD VOOR VELD EN NIET MET EEN SPREAD: scripts/doorbelasting.js leest
-       bewaarde vormen statisch en kijkt niet door `...r` heen. Zelfde richting
-       als AI-CONTEXT-01. */
-    for (const r of metBoeking.rijen) {
-      const rijId = nieuwId('RGH');
-      eigen.bak('reisGeldrijen').push({
-        id: rijId, ref: a.ref, at: stempel,
-        bedragCenten: r.bedragCenten, valuta: r.valuta,
-        /* De PRECIEZE namen: kort `herkomst` botst met het gelijknamige veld in
-           reisbureau-samenstelling.js, dat iets anders betekent. */
-        economischeHerkomst: r.economischeHerkomst,
-        economischeEigenaar: r.economischeEigenaar, naarWie: r.naarWie,
-        grond: r.grond, bronObject: r.bronObject, relatie: r.relatie,
-        land: r.land, bewijs: r.bewijs
-      });
-    }
-
-    /* Klaargezet en niet uitgevoerd; elke uitkering wijst naar de HERKOMSTRIJ
-       die hij afwikkelt en niet alleen naar de reis. */
-    for (const g of eigen.kijk('reisGeldrijen')) {
-      if (g.ref !== a.ref || g.at !== stempel || g.economischeEigenaar === 'rtg') continue;
-      eigen.bak('reisUitkeringen').push({
-        id: nieuwId('RUK'), geldrij: g.id, ref: a.ref, at: stempel,
-        centen: g.bedragCenten, valuta: g.valuta,
-        /* Op de rij ZELF en niet alleen in `geldrij`: dat is een verwijzing, en
-           een keten die je niet in EEN rij ziet, kun je bij een geschil ook niet
-           in een rij tonen. */
-        economischeHerkomst: g.economischeHerkomst,
-        aan: g.economischeEigenaar, relatie: g.relatie, grond: g.grond,
-        uitgevoerd: false,
-        hoe: 'klaargezet; een mens van het kantoor voert hem uit langs kern/pay (GELD.md)'
-      });
-    }
+    const metBoeking = geldrijenVoor({ trip, personen, boekingId: bon.id, valuta: 'EUR' });
+    const stempel = bon.at || start.inning.at;
+    const projectie = await bewaarRijen(ref, bon, metBoeking.rijen, stempel);
+    if (!projectie.ok) return projectie;
 
     /* De EIGENAAR schrijft de betaling op zijn eigen rij; mislukt dat, dan
        verzint deze laag geen succes. */
     /* `van` is het BETAALADRES op de bon: een teruggave gaat daarheen terug en
        zoekt het niet opnieuw op (zie ./reisbureau-teruggave.js). */
-    const gezet = rb.markeerBetaald(a.ref, {
-      at: stempel, boeking: b.boeking.id, centen: opbouw.totaalCenten, valuta: 'EUR', van: codenaam });
+    const gezet = await rb.markeerBetaald(ref, {
+      at: stempel, boeking: bon.id, centen: opbouw.totaalCenten, valuta: 'EUR', van: adres });
     if (gezet.error) return { status: gezet.status || 409, error: gezet.error };
     return { ok: true, betaling: gezet.betaald, rijen: metBoeking.rijen.length };
   }

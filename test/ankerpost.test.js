@@ -57,6 +57,16 @@ test('4. de post stuurt het blok vooruit, en alleen bijschrijven', async () => {
   assert.ok(uit.blok && uit.blok.zegel, 'het weggebrachte blok komt niet terug in het antwoord');
 });
 
+test('4b. een herstelverklaring wordt samen met het nieuwe blok append-only aangeboden', async () => {
+  let lijf = null;
+  const p = post({ RTG_ANKERPOST_URL: 'https://anker.rtg.intern/' }, async (url, opties) => {
+    lijf = JSON.parse(opties.body); return { ok: true, status: 200, text: async () => JSON.stringify({ ok: true }) };
+  });
+  await p.post({ herstelverklaringen: [{ id: 'h-1' }] });
+  assert.deepEqual(lijf.herstelverklaringen, [{ id: 'h-1' }]);
+  assert.ok(lijf.blok && lijf.blok.zegel);
+});
+
 test('5. wat terugkomt is invoer en geen waarheid', async () => {
   /* Iets dat niet op een blok lijkt, is een BEVINDING over de tweede machine --
      geen aanleiding om hier iets te repareren. */

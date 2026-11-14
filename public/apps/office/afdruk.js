@@ -23,7 +23,7 @@
   var knop = document.getElementById('printBtn');
   if (!knop) return;
   var q = function (s) { return document.querySelector(s); };
-  var zichtbaar = function (s) { var e = q(s); return !!e && e.style.display !== 'none'; };
+  var zichtbaar = function (s) { var e = q(s); return !!e && getComputedStyle(e).display !== 'none'; };
 
   function soortNu() {
     if (zichtbaar('#bladWrap')) return 'blad';

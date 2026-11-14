@@ -14,10 +14,15 @@
   } catch (e) {
     d.documentElement.setAttribute('data-rtf-groep', 'volw');
   }
-  var l = d.createElement('link');
-  l.rel = 'stylesheet';
-  l.href = '/shared/dagkleur.css';
-  d.head.appendChild(l);
+  /* De DS-schermen krijgen hun wereldkleur uit de centrale tokens. Houd deze
+     grens rechtstreeks leesbaar voor de laadgraaf: seizoen.js blijft gedrag,
+     dagkleur.css is uitsluitend de presentatie van de oude Foundation-laag. */
+  if (!document.documentElement.hasAttribute('data-ds')) {
+    var l = d.createElement('link');
+    l.rel = 'stylesheet';
+    l.href = '/shared/dagkleur.css';
+    d.head.appendChild(l);
+  }
   var s = d.createElement('script');
   s.src = '/shared/seizoen.js';
   s.defer = true;

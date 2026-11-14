@@ -105,7 +105,7 @@ async function betaalOrderVoor(session, body) {
   o.betaaldMet = 'app';
   if (o.status === 'wacht-op-betaling') o.status = 'nieuw';
   verdienPunten(session.key, o.total - korting - voordeel, o.supplierName);
-  save();
+  save(['orders', 'punten']);
   /* Betaald = definitief, dus ook: een factuur voor beide partijen. Zie de kop
      van ./factuur.js -- deze transactie had er geen, en dat was de oorzaak
      achter "omzet zonder factuur" in de btw-aangifte. */

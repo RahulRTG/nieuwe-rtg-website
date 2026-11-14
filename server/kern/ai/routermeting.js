@@ -84,8 +84,17 @@ function meet(vraag, opties) {
     catch (e) { gedekt = null; }
   }
 
+  /* Een onafhankelijke oracle is OPTIONEEL en moet expliciet worden
+     aangeleverd. Geen oracle wordt nooit als een fout of als een nulscore
+     gelezen: de substitutiepoort blijft dan NIET_BEPROEFD. Alleen gesloten
+     test- of domeinuitkomsten horen deze velden te zetten; de vraag zelf wordt
+     nog steeds nergens bewaard. */
+  const vergelijking = ['juist', 'onjuist', 'afgezien'].includes(o.vergelijking)
+    ? o.vergelijking : null;
   tellers.tel(o.ingang, { spoor: !!keuze.goedkoperMogelijk, gedekt,
-    modelAntwoordde: o.modelAntwoordde });
+    modelAntwoordde: o.modelAntwoordde, vergelijking,
+    oracleOnafhankelijk: o.oracleOnafhankelijk === true,
+    veiligheidsfout: o.veiligheidsfout === true });
 
   return { techniek: keuze.techniek, gevraagd: keuze.gevraagd, reden: keuze.reden,
     spoor: !!keuze.goedkoperMogelijk, bewezenGedekt: gedekt };
@@ -95,4 +104,5 @@ module.exports = { meet, RAAKT_NIETS,
   /* Doorgegeven zodat een aanroeper EEN ingang heeft en niet hoeft te weten dat
      de tellers een eigen bestand zijn. */
   stand: tellers.stand, onthoud: tellers.onthoud, nulstel: tellers.nulstel,
-  INGANGEN: tellers.INGANGEN };
+  INGANGEN: tellers.INGANGEN,
+  substitutie: require('./substitutie') };

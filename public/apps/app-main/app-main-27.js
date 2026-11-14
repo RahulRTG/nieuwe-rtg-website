@@ -6,7 +6,7 @@
   if (hernoemIn) hernoemIn.addEventListener('keydown', e => { if (e.key === 'Enter' && hernoemOk) hernoemOk.click(); });
 
   /* ---------- overlays: gedeeld sluiten ---------- */
-  const scrims = ['#osMapScrim', '#osZoekScrim', '#osCcScrim', '#osHernoemScrim', '#osBelScrim', '#osWinkelScrim']
+  const scrims = ['#osMapScrim', '#osZoekScrim', '#osCcScrim', '#osPersonalScrim', '#osHernoemScrim', '#osBelScrim', '#osWinkelScrim']
     .map(s => $(s)).filter(Boolean);
   function sluitScrims() { scrims.forEach(s => s.classList.remove('open')); }
   scrims.forEach(s => s.addEventListener('click', e => { if (e.target === s) sluitScrims(); }));
@@ -27,7 +27,7 @@
   // acties zijn ook gewoon vindbaar in Spotlight: instellingen als resultaten
   function osActies() {
     const uit = [
-      { naam: 'Licht of donker', glyf: 'thema', doe: () => { const b = $('#rtg-thema-knop'); if (b) b.click(); } },
+      { naam: 'Licht of donker', glyf: 'thema', doe: () => { if (window.RTGOSThema) RTGOSThema.wissel(); } },
       { naam: 'Meldingen', glyf: 'meldingen', doe: () => { const b = $('#bell'); if (b) b.click(); } },
       { naam: 'Bedieningspaneel', glyf: 'paneel', doe: () => { ccSync(); if (ccScrim) ccScrim.classList.add('open'); } },
       { naam: 'Taal kiezen', glyf: 'taal', doe: () => { if (window.RTGi18n) RTGi18n.openModal(); } },

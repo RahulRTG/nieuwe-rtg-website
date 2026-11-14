@@ -94,5 +94,13 @@ module.exports = ({ cache, projectie, view, publiceerResultaat }) => {
     doos.auditBeelden.delete(op.naam);
     return op.resultaat;
   }
-  return stage;
+  return (doos, op) => {
+    const uit = stage(doos, op);
+    // Ook een pure auditbundel heeft verklaarde collecties. De duurzame
+    // afsluiting krijgt die namen; een werkelijk lege scope blijft ongeldig.
+    // De rijeigenaar schrijft de inhoud, niet de gewone KV-planner.
+    if (!doos.sleutels) doos.sleutels = new Set();
+    doos.sleutels.add(op.naam);
+    return uit;
+  };
 };

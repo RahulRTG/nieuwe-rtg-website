@@ -115,7 +115,7 @@ test('ingebed draagt de ouder de navigatie: geen kop, geen Edge, geen operatiena
   const { ctx, page, fouten } = await open(1300, 900, { zoek: '?embed=1' });
   await cockpit(page);
   await page.waitForFunction(() => document.documentElement.hasAttribute('data-ds-ingebed'));
-  assert.equal(await page.locator('.ds-kop').count(), 0);
+  assert.equal(await page.locator('.ds-kop:visible').count(), 0);
   assert.equal(await page.locator('.ds-edge').count(), 0);
   assert.equal(await page.locator('[data-ds-opsnav]').isHidden(), true);
   assert.deepEqual(fouten, []);

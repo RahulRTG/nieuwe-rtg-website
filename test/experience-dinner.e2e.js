@@ -67,8 +67,13 @@ for(const width of [390,1440])test(width+'px: context, verloren antwoord, bronco
   await app.locator('#rAgenda').click();
   await app.waitForURL('**/apps/agenda.html?datum='+date,{waitUntil:'domcontentloaded'});
   await app.waitForFunction(()=>document.body.innerText.includes('Tafel bij')&&document.body.innerText.includes('bevestigd'));
-  await page.waitForSelector('body[data-rtg-adaptive-ready="true"]');
-  assert.equal(await page.locator('.rtg-adaptive-bar').count(),1,'de agenda houdt dezelfde enkele Edge');
+  /* Agenda is inmiddels een volledig DS-scherm. Wacht op het gedeelde
+     schilcontract: gemigreerde schermen hebben de centrale DS Edge, terwijl
+     nog niet gemigreerde schermen de Adaptive Edge houden. De pilot mag geen
+     legacy-runtime terugvragen op een scherm waar die bewust is verwijderd. */
+  await h.wachtOpSchil(page);
+  assert.equal(await page.locator('.rtg-adaptive-bar, html[data-ds] .ds-edge__balk').count(),1,
+    'de agenda houdt precies één centrale Edge');
   assert.ok(await app.locator('.litem .wat').first().evaluate(el=>el.getBoundingClientRect().width)>=120,'afspraaktitel houdt leesruimte');
   assert.ok(!(await app.evaluate(()=>document.documentElement.scrollWidth>innerWidth+2)),'geen horizontale overflow');
   assert.deepEqual(errors,[]);

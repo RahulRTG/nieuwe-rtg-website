@@ -102,10 +102,12 @@ function maakAnkerpost({ ankerdienst, nu, haal, omgeving } = {}) {
      de nieuwe kop maar ook het getekende bewijs waarom de oude kop een andere
      zegel kreeg. Zonder dat bewijs zou de ontvanger een teruggang zien. */
   let laatstGepost = null;
-  async function post({ herzegelingen } = {}) {
+  async function post({ herzegelingen, herstelverklaringen } = {}) {
     const blok = ankerdienst.blok();
     const lijf = { blok, at: new Date(tijd()).toISOString() };
     if (Array.isArray(herzegelingen) && herzegelingen.length) lijf.herzegelingen = herzegelingen;
+    if (Array.isArray(herstelverklaringen) && herstelverklaringen.length)
+      lijf.herstelverklaringen = herstelverklaringen;
     const uit = await spreek('anker', lijf);
     if (uit.ok) laatstGepost = { zegel: blok.zegel, at: blok.at };
     return Object.assign({ blok }, uit);

@@ -52,6 +52,22 @@ test('1. alles gemeten en niets aan de hand: dan, en alleen dan, staat alles kla
   assert.match(k.stelt, /niets voor/);
 });
 
+test('1b. de kaart gebruikt dezelfde lokale kalenderdag als het rooster', () => {
+  const lokaleDag = '2099-01-02';
+  const kaart = maakOchtendkaart({
+    db: { data: { suppliers: [{ code: 'Z', roosterVast: { [lokaleDag]: {} } }], groothandelOrders: [], reserveringen: [] } },
+    vrij: 'Vrij',
+    scheduleFor: () => ({ days: [{ date: lokaleDag, staff: [
+      { id: 1, name: 'Amir', role: 'staff', shift: 'Ochtend 07:00-15:00' }
+    ] }] }),
+    klokVan: () => ({ open: false }),
+    inplanbaar: () => ({ plan: true })
+  }).kaart('Z', 1);
+  assert.equal(kaart.datum, lokaleDag);
+  assert.equal(kaart.naam, 'Amir', 'de eigen naam blijft rond de lokale datumgrens op de kaart');
+  assert.equal(kaart.regels[0].graad, 'gemeten');
+});
+
 test('2. een niet vastgesteld rooster en een stille verzuimlaag zegt de kop hardop', () => {
   const patroon = wereld({ vast: false })('Z', 1);
   assert.equal(patroon.kop, 'Het rooster van vandaag is nog niet vastgesteld: dit is het standaardpatroon.');

@@ -11,4 +11,92 @@
   .ds-accountdeur .wissel { background: none; border: 0; text-decoration: underline; color: inherit; }
   .ds-accountdeur [role=status] { min-block-size: 1.5em; margin-block-start: var(--ds-ruimte-3); }
   .ds-accountdeur :focus-visible { outline: 2px solid var(--ds-focus); outline-offset: 3px; }
+
+  /* Gedeelde pas-, gezins- en personeelsdeur. De toegangstekst en gidsdata
+     blijven eigendom van shared/deur.js; dit is uitsluitend de presentatie. */
+  .ds-accountdeur.ds-accountdeur--poort {
+    max-inline-size: 34rem;
+    margin: var(--ds-ruimte-6) auto;
+    padding: var(--ds-ruimte-6);
+    text-align: start;
+    border: 1px solid var(--ds-lijnkleur);
+    border-radius: var(--ds-radius-inhoud);
+    background: var(--ds-oppervlak);
+  }
+  .ds-accountdeur--poort .rtgdeur-wat { margin-block-end: var(--ds-ruimte-4); color: var(--ds-inkt); line-height: 1.6; }
+  .ds-accountdeur--poort .rtgdeur-kop { margin-block: 0 var(--ds-ruimte-2); }
+  .ds-accountdeur--poort ul { margin: 0 0 var(--ds-ruimte-4); padding: 0; list-style: none; }
+  .ds-accountdeur--poort li { position: relative; padding: var(--ds-ruimte-3) 0 var(--ds-ruimte-3) var(--ds-ruimte-4); border-block-end: 1px solid var(--ds-lijnkleur); line-height: 1.5; }
+  .ds-accountdeur--poort li:last-child { border-block-end: 0; }
+  .ds-accountdeur--poort li::before { position: absolute; inset-block-start: 1.15rem; inset-inline-start: 0; inline-size: .25rem; block-size: .25rem; border-radius: var(--ds-radius-cirkel); background: var(--ds-accent); content: ""; }
+  .ds-accountdeur--poort .rtgdeur-weg { padding-block-start: var(--ds-ruimte-4); border-block-start: 1px solid var(--ds-lijnkleur); color: var(--ds-inkt); line-height: 1.65; }
+  .ds-accountdeur--poort .rtgdeur-weg a { color: var(--ds-accent); }
+
+  /* Tijdelijke Schoolpasdeur op bestaande Foundation-hosts. Het gedrag en de
+     rechten blijven in rtg-school-session.js; deze variant bezit alleen de
+     presentatie. Native dialog + inert schermen de werkruimte af zonder een
+     !important-overlay of een tweede stijlsysteem. */
+  .ds-accountdeur.ds-accountdeur--school {
+    position: fixed;
+    inset: 0;
+    z-index: 2147483001;
+    inline-size: 100%;
+    block-size: 100%;
+    max-inline-size: none;
+    max-block-size: none;
+    margin: 0;
+    border: 0;
+    place-items: center;
+    padding: var(--ds-ruimte-4);
+    background: var(--ds-cover-grond);
+    color: var(--ds-cover-inkt);
+    font-family: var(--ds-letter-tekst);
+  }
+  .ds-accountdeur.ds-accountdeur--school[open] { display: grid; }
+  .ds-accountdeur--school::backdrop { background: var(--ds-cover-grond); }
+  .ds-accountdeur--school .ds-accountdeur__kaart {
+    inline-size: min(92vw, 34rem);
+    padding: var(--ds-ruimte-6);
+    border: 1px solid var(--ds-glasrand);
+    border-radius: var(--ds-radius-inhoud);
+    background: var(--ds-glas);
+    box-shadow: var(--ds-schaduw-systeem);
+  }
+  .ds-accountdeur--school .ds-accountdeur__merk {
+    color: var(--ds-cover-metaal);
+    font-size: var(--ds-maat-meta);
+    font-weight: 600;
+    letter-spacing: var(--ds-spatie-label);
+    text-transform: uppercase;
+  }
+  .ds-accountdeur--school h1 {
+    margin-block: var(--ds-ruimte-2) var(--ds-ruimte-3);
+    color: var(--ds-cover-inkt);
+    font-family: var(--ds-letter-display);
+    font-size: var(--ds-maat-kop);
+    font-weight: 500;
+    line-height: 1.15;
+  }
+  .ds-accountdeur--school p {
+    margin-block: 0 var(--ds-ruimte-4);
+    color: var(--ds-cover-inkt);
+    line-height: 1.55;
+  }
+  .ds-accountdeur--school .ds-accountdeur__acties { display: flex; flex-wrap: wrap; gap: var(--ds-ruimte-2); }
+  .ds-accountdeur--school a {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: var(--ds-doel);
+    padding: var(--ds-ruimte-3) var(--ds-ruimte-4);
+    border: 1px solid var(--ds-glasrand);
+    border-radius: var(--ds-radius-knop);
+    color: var(--ds-cover-inkt);
+    text-decoration: none;
+  }
+  .ds-accountdeur--school [data-school-open] {
+    border-color: var(--ds-cover-inkt);
+    background: var(--ds-cover-inkt);
+    color: var(--ds-cover-grond);
+    font-weight: 700;
+  }
 }

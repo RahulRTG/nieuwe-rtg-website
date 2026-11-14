@@ -1,24 +1,24 @@
 {
  "stempel": {
-  "op": "2026-10-22T23:54:46.404Z",
-  "commit": "d8e1a45c21",
+  "op": "2026-11-10T19:53:20.918Z",
+  "commit": "ecb2d7f33",
   "boomVuil": false,
-  "boomAnders": 1,
+  "boomAnders": 0,
   "instrument": "scripts/bewijsschuld.js",
-  "node": "v26.12.0"
+  "node": "v24.18.0"
  },
  "uitleg": "Wat er nog niet gemeten is, en waarom niet. MAG ALLEEN KRIMPEN -- zie test/bewijsschuld.test.js. Een post van soort \"grens\" sluit nooit; die telt niet als achterstand maar als de rand van de methode.",
  "grens": "Dit is een lijst van wat we WETEN dat we niet hebben gemeten. Wat niemand heeft bedacht staat er per definitie niet in, en dat is de gevaarlijkste categorie -- een schuldenlijst is geen dekkingsbewijs. De aantallen komen uit de registers en zijn dus zo vers als de laatste ronde; zie scripts/versheid.js.",
  "telling": {
   "posten": 18,
-  "meetwerk": 339,
+  "meetwerk": 338,
   "instrument": 466,
   "grens": 722
  },
  "aflossing": {
   "doel": 0,
   "wat": "de achterstand (meetwerk + instrument) gaat naar nul. `grens` telt niet mee en sluit nooit -- dat is de rand van de methode en geen werk.",
-  "staat": 805,
+  "staat": 804,
   "regels": [
    "de achterstand mag nooit groeien zonder een reden IN dit register (--groei=...)",
    "een post mag niet van soort veranderen om onder de poort uit te komen: naar `grens` verplaatsen laat de achterstand dalen zonder dat er iets gemeten is",
@@ -28,7 +28,7 @@
  },
  "gemeten": {
   "postenTotaal": 18,
-  "achterstand": 805,
+  "achterstand": 804,
   "randVanDeMethode": 722,
   "auth-onbeslist": 1,
   "capability-in-handler": 587,
@@ -46,7 +46,7 @@
   "gevolg-onbekend": 97,
   "droogloop-onbeoordeeld": 2,
   "herstel-onbevestigd": 49,
-  "idem-ongeclassificeerd": 133,
+  "idem-ongeclassificeerd": 132,
   "wegwerpserver-kopieen": 0
  },
  "posten": [
@@ -182,7 +182,7 @@
    "id": "idem-ongeclassificeerd",
    "soort": "meetwerk",
    "wat": "muterende routes zonder uitspraak over herhalen: wat gebeurt er bij een tweede keer",
-   "aantal": 133,
+   "aantal": 132,
    "waarom": "autonomie zonder herhaalsemantiek is niet te doen: een keten die halverwege afbreekt moet weten of opnieuw beginnen veilig is. Het doel is niet dat alles idempotent IS -- het is dat van elke route vastligt wat een tweede keer betekent.",
    "sluit": "per route beslissen en vastleggen in de canonieke server/lib/mutatiecontracten (gevalideerd met dezelfde contractkeuring), of het oudere IDEMBESLUIT.json. Een fixtureblokkade, tebeslissen of onbekende semantiek blijft open. Dit telt uitsluitend het bestaan van een geldig besluit; runtimebewijs blijft afzonderlijk in IDEMPROEF.json en de bewijsmatrix staan."
   },
@@ -198,23 +198,19 @@
  "historie": {
   "auth-onbeslist": [
    {
-    "op": "2026-10-18",
-    "aantal": 1
-   },
-   {
     "op": "2026-10-19",
     "aantal": 1
    },
    {
     "op": "2026-10-22",
     "aantal": 1
+   },
+   {
+    "op": "2026-11-10",
+    "aantal": 1
    }
   ],
   "capability-in-handler": [
-   {
-    "op": "2026-10-18",
-    "aantal": 589
-   },
    {
     "op": "2026-10-19",
     "aantal": 590
@@ -222,13 +218,13 @@
    {
     "op": "2026-10-22",
     "aantal": 587
+   },
+   {
+    "op": "2026-11-10",
+    "aantal": 587
    }
   ],
   "objectpoort": [
-   {
-    "op": "2026-10-18",
-    "aantal": 54
-   },
    {
     "op": "2026-10-19",
     "aantal": 54
@@ -236,195 +232,195 @@
    {
     "op": "2026-10-22",
     "aantal": 55
+   },
+   {
+    "op": "2026-11-10",
+    "aantal": 55
    }
   ],
   "output-deuren": [
-   {
-    "op": "2026-10-18",
-    "aantal": 21
-   },
    {
     "op": "2026-10-19",
     "aantal": 21
    },
    {
     "op": "2026-10-22",
+    "aantal": 21
+   },
+   {
+    "op": "2026-11-10",
     "aantal": 21
    }
   ],
   "lichaamssleutel": [
    {
-    "op": "2026-10-18",
-    "aantal": 112
-   },
-   {
     "op": "2026-10-19",
     "aantal": 110
    },
    {
     "op": "2026-10-22",
+    "aantal": 110
+   },
+   {
+    "op": "2026-11-10",
     "aantal": 110
    }
   ],
   "output-niet-toerekenbaar": [
    {
-    "op": "2026-10-18",
-    "aantal": 0
-   },
-   {
     "op": "2026-10-19",
     "aantal": 0
    },
    {
     "op": "2026-10-22",
+    "aantal": 0
+   },
+   {
+    "op": "2026-11-10",
     "aantal": 0
    }
   ],
   "output-blind": [
    {
-    "op": "2026-10-18",
-    "aantal": 0
-   },
-   {
     "op": "2026-10-19",
     "aantal": 0
    },
    {
     "op": "2026-10-22",
+    "aantal": 0
+   },
+   {
+    "op": "2026-11-10",
     "aantal": 0
    }
   ],
   "output-onwaarneembaar": [
    {
-    "op": "2026-10-18",
-    "aantal": 4
-   },
-   {
     "op": "2026-10-19",
     "aantal": 4
    },
    {
     "op": "2026-10-22",
+    "aantal": 4
+   },
+   {
+    "op": "2026-11-10",
     "aantal": 4
    }
   ],
   "audit-wisselend": [
    {
-    "op": "2026-10-18",
-    "aantal": null
-   },
-   {
     "op": "2026-10-19",
     "aantal": null
    },
    {
     "op": "2026-10-22",
+    "aantal": null
+   },
+   {
+    "op": "2026-11-10",
     "aantal": null
    }
   ],
   "audit-verklaard": [
    {
-    "op": "2026-10-18",
-    "aantal": null
-   },
-   {
     "op": "2026-10-19",
     "aantal": null
    },
    {
     "op": "2026-10-22",
+    "aantal": null
+   },
+   {
+    "op": "2026-11-10",
     "aantal": null
    }
   ],
   "rollback-gezakt": [
    {
-    "op": "2026-10-18",
-    "aantal": 1
-   },
-   {
     "op": "2026-10-19",
     "aantal": 1
    },
    {
     "op": "2026-10-22",
+    "aantal": 1
+   },
+   {
+    "op": "2026-11-10",
     "aantal": 1
    }
   ],
   "object-vooraf": [
    {
-    "op": "2026-10-18",
-    "aantal": 466
-   },
-   {
     "op": "2026-10-19",
     "aantal": 466
    },
    {
     "op": "2026-10-22",
+    "aantal": 466
+   },
+   {
+    "op": "2026-11-10",
     "aantal": 466
    }
   ],
   "proefruis": [
    {
-    "op": "2026-10-18",
-    "aantal": 1
-   },
-   {
     "op": "2026-10-19",
     "aantal": 1
    },
    {
     "op": "2026-10-22",
+    "aantal": 1
+   },
+   {
+    "op": "2026-11-10",
     "aantal": 1
    }
   ],
   "gevolg-onbekend": [
    {
-    "op": "2026-10-18",
-    "aantal": 97
-   },
-   {
     "op": "2026-10-19",
     "aantal": 97
    },
    {
     "op": "2026-10-22",
+    "aantal": 97
+   },
+   {
+    "op": "2026-11-10",
     "aantal": 97
    }
   ],
   "droogloop-onbeoordeeld": [
    {
-    "op": "2026-10-18",
-    "aantal": 2
-   },
-   {
     "op": "2026-10-19",
     "aantal": 2
    },
    {
     "op": "2026-10-22",
+    "aantal": 2
+   },
+   {
+    "op": "2026-11-10",
     "aantal": 2
    }
   ],
   "herstel-onbevestigd": [
    {
-    "op": "2026-10-18",
-    "aantal": 49
-   },
-   {
     "op": "2026-10-19",
     "aantal": 49
    },
    {
     "op": "2026-10-22",
     "aantal": 49
+   },
+   {
+    "op": "2026-11-10",
+    "aantal": 49
    }
   ],
   "idem-ongeclassificeerd": [
-   {
-    "op": "2026-10-18",
-    "aantal": 152
-   },
    {
     "op": "2026-10-19",
     "aantal": 152
@@ -432,19 +428,23 @@
    {
     "op": "2026-10-22",
     "aantal": 133
+   },
+   {
+    "op": "2026-11-10",
+    "aantal": 132
    }
   ],
   "wegwerpserver-kopieen": [
-   {
-    "op": "2026-10-18",
-    "aantal": 0
-   },
    {
     "op": "2026-10-19",
     "aantal": 0
    },
    {
     "op": "2026-10-22",
+    "aantal": 0
+   },
+   {
+    "op": "2026-11-10",
     "aantal": 0
    }
   ]

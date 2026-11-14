@@ -12,8 +12,9 @@ test('Decision Room heeft vier echte, responsive werkstanden', () => {
     assert.match(html, new RegExp('data-dr-paneel="' + stand + '"'));
     assert.match(html, new RegExp('data-dr-open="' + stand + '"'));
   }
-  assert.match(html, /rtg-decision-room-2026\.css/);
-  assert.match(lees('public/shared/rtg-decision-room-2026.css'), /@media\(max-width:720px\)/);
+  assert.match(html, /href="\/ds\/rtg-ds.css"/);
+  assert.doesNotMatch(html, /href="\/shared\/[^"]+\.css"/);
+  assert.match(lees('public/ds/componenten/werkdocument.css'), /@media \(max-width: 48rem\)/);
 });
 
 test('de besluitintake is een herkenbare en heropenbare dialoog', () => {

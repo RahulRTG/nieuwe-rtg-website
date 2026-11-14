@@ -3,78 +3,17 @@
      van onderen opkomt, donker, met een gouden accent. Bewust dezelfde vorm --
      het is hetzelfde soort ding, en twee soorten bladen naast elkaar is weer
      een device erbij. */
-  function stijl() {
-    if (d.getElementById('amnCss')) return;
-    var s = d.createElement('style'); s.id = 'amnCss';
-    s.textContent =
-      /* de knop zelf */
-      '.amn-knop{position:relative;background:none;border:none;padding:0;cursor:pointer;' +
-        'color:var(--muted,#8A8680);width:34px;height:34px;flex-shrink:0;' +
-        'display:flex;align-items:center;justify-content:center;}' +
-      '.amn-knop svg{width:21px;height:21px;stroke:currentColor;fill:none;' +
-        'stroke-width:1.7;stroke-linecap:round;}' +
-      '.amn-knop:hover{color:var(--txt,#F7F5F1);}' +
-      '.amn-knop:focus-visible{outline:2px solid var(--gold,#857007);outline-offset:3px;border-radius:0;}' +
-      /* de linkercel van de navigatiebalk: hamburger, dan de terugweg */
-      '.ios-nav-links{grid-column:1;justify-self:start;display:flex;align-items:center;gap:0.15rem;}' +
-      /* de hamburger naast de eigen terugweg van een pagina zonder kopbalk */
-      '.amn-koprij{display:flex;align-items:center;gap:0.5rem;}' +
-      '.amn-koprij > .amn-knop{margin-left:-0.35rem;}' +
-      /* zwevend, voor de paar pagina\'s zonder eigen kopbalk. LINKS en zonder
-         vlak: geen achtergrond, geen rand, geen afgeronde doos. Dat was het
-         zwaarste element van de kopbalk terwijl het het lichtste hoort te zijn. */
-      '.amn-knop.amn-zweef{position:fixed;z-index:9970;' +
-        'top:calc(env(safe-area-inset-top,0px) + .55rem);' +
-        'left:calc(env(safe-area-inset-left,0px) + .7rem);' +
-        'width:38px;height:38px;border-radius:0;color:var(--txt,#EDE9E3);' +
-        'background:none;border:0;backdrop-filter:none;-webkit-backdrop-filter:none;}' +
-      /* het blad */
-      '.amn-scrim{position:fixed;inset:0;z-index:9994;display:none;' +
-        'align-items:flex-end;justify-content:center;background:rgba(6,5,5,.62);' +
-        'backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);}' +
-      '.amn-scrim.amn-open{display:flex;}' +
-      '.amn-blad{width:min(430px,100%);max-height:86vh;overflow-y:auto;' +
-        'background:linear-gradient(180deg,#151312,#0C0C0B);color:#F4F1EC;' +
-        'border:1px solid var(--line,rgba(255,255,255,.14));border-bottom:none;' +
-        'border-radius:0;' +
-        'padding:.7rem 1.1rem calc(env(safe-area-inset-bottom,0px) + 1.1rem);' +
-        'font-family:Inter,system-ui,sans-serif;box-shadow:0 -18px 50px rgba(0,0,0,.5);}' +
-      '@media (min-width:640px){.amn-scrim{align-items:center;}' +
-        '.amn-blad{border-radius:0;border-bottom:1px solid var(--line,rgba(255,255,255,.14));}}' +
-      '.amn-greep{width:38px;height:4px;border-radius:0;margin:0 auto .7rem;' +
-        'background:rgba(255,255,255,.18);}' +
-      '.amn-kop{display:flex;align-items:baseline;justify-content:space-between;gap:.8rem;}' +
-      '.amn-kop b{font-family:"Bodoni Moda",Georgia,serif;font-weight:500;font-size:1.2rem;' +
-        'letter-spacing:-.01em;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}' +
-      '.amn-x{background:none;border:none;color:#8A8680;font-size:1rem;cursor:pointer;padding:.3rem .1rem;}' +
-      '.amn-x:hover{color:#F4F1EC;}' +
-      '.amn-sectie{color:#8A8680;font-size:.6rem;letter-spacing:.16em;text-transform:uppercase;' +
-        'margin:1.1rem 0 .5rem;}' +
-      /* de tegels: de functies van deze app, twee op een rij */
-      '.amn-rooster{display:grid;grid-template-columns:1fr 1fr;gap:.5rem;}' +
-      '.amn-tegel{display:flex;align-items:center;gap:.55rem;text-align:left;cursor:pointer;' +
-        'background:rgba(255,255,255,.04);border:1px solid var(--line,rgba(255,255,255,.12));' +
-        'border-radius:0;padding:.7rem .75rem;color:#F4F1EC;font:inherit;font-size:.82rem;' +
-        'line-height:1.25;min-height:52px;}' +
-      '.amn-tegel:hover{border-color:color-mix(in srgb, var(--gold,#857007) 55%, ' +
-        'var(--line,rgba(255,255,255,.12)));}' +
-      '.amn-tegel span{min-width:0;overflow:hidden;text-overflow:ellipsis;}' +
-      '.amn-tegel svg,.amn-rij svg{width:17px;height:17px;flex-shrink:0;stroke:var(--gold,#857007);' +
-        'fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;}' +
-      /* de vaste rijen: overal hetzelfde, dus een lijst en geen tegels */
-      '.amn-lijst{display:flex;flex-direction:column;}' +
-      '.amn-rij{display:flex;align-items:center;gap:.7rem;width:100%;cursor:pointer;' +
-        'background:none;border:none;border-top:1px solid var(--line,rgba(255,255,255,.1));' +
-        'padding:.85rem .1rem;color:#F4F1EC;font:inherit;font-size:.88rem;text-align:left;}' +
-      '.amn-lijst .amn-rij:first-child{border-top:none;}' +
-      '.amn-rij:hover{color:#fff;}' +
-      '.amn-rij em{font-style:normal;margin-left:auto;color:#8A8680;font-size:.72rem;' +
-        'font-variant-numeric:tabular-nums;}' +
-      '.amn-tegel:focus-visible,.amn-rij:focus-visible{outline:2px solid var(--gold,#857007);' +
-        'outline-offset:2px;border-radius:0;}' +
-      '.amn-leeg{color:#8A8680;font-size:.78rem;line-height:1.5;margin:0;}';
-    (d.head || d.documentElement).appendChild(s);
+  function laadAppmenuPresentatie(pad) {
+    if (document.documentElement.hasAttribute('data-ds')) return;
+    if (document.getElementById('rtgDsRuntimeCss')) return;
+    var appmenuStijlLink = document.createElement('link');
+    appmenuStijlLink.id = 'rtgDsRuntimeCss';
+    appmenuStijlLink.rel = 'stylesheet';
+    appmenuStijlLink.href = pad;
+    document.head.appendChild(appmenuStijlLink);
   }
+
+  function stijl() { laadAppmenuPresentatie('/ds/rtg-ds.css'); }
 
   /* ------------------------------------------------------------ tekens */
   /* Een handvol lijntekeningen, in dezelfde taal als de rest van het OS
@@ -107,4 +46,3 @@
     svg.appendChild(p);
     return svg;
   }
-

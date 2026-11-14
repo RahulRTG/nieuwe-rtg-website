@@ -1,0 +1,11 @@
+/* De kleurmotor berekent uitsluitend de vier levende variabelen. Deze ene
+   component presenteert ze op ieder inlogvlak, zonder een tweede thema- of
+   stijllaag te introduceren. Zonder JavaScript blijft de grond van de host. */
+@layer rtg.component {
+  .ds-inlogkleur {
+    background:
+      radial-gradient(155% 78% at 50% -6%, var(--inlog-top), transparent 60%),
+      radial-gradient(135% 68% at 50% 116%, var(--inlog-onder), transparent 62%),
+      var(--inlog-basis);
+  }
+}

@@ -89,10 +89,22 @@ function loopMap(map, filter, uit) {
    de client niet te meten. */
 function bundelDelen() {
   const bundels = new Set(); const delenMappen = [];
+  /* De bundelkaart is de bron van waarheid voor afwijkende bronmappen, zoals
+     shared/rahul-tab-entry/. Alleen de gelijknamige-mapconventie volgen zou
+     zulke delen als zelfstandige programma's parsen, terwijl zij bewust pas
+     samen een gesloten browserscope vormen. */
+  const kaart = require('./bundel').bundels;
+  for (const [uit, bron] of Object.entries(kaart)) {
+    bundels.add(path.join(WORTEL, 'public', uit));
+    delenMappen.push(path.join(WORTEL, 'public', bron));
+  }
   for (const f of loopMap(path.join(WORTEL, 'public'), p => p.endsWith('.js'))) {
     const zonder = f.slice(0, -3);
     try {
-      if (fs.statSync(zonder).isDirectory()) { bundels.add(f); delenMappen.push(zonder); }
+      if (fs.statSync(zonder).isDirectory()) {
+        bundels.add(f);
+        if (!delenMappen.includes(zonder)) delenMappen.push(zonder);
+      }
     } catch (e) { /* geen gelijknamige map: een los bestand */ }
   }
   return { bundels, isDeel: p => delenMappen.some(m => p.startsWith(m + path.sep)) };

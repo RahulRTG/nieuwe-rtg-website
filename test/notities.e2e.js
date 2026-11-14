@@ -5,7 +5,7 @@
    Draai: npm run e2e */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
+const { startServer, letOpFouten, laadPlaywright, browserOpties, geenBrowser, wachtOpSchil } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -41,7 +41,7 @@ test('Notities: lijst bouwen, afvinken op de kaart, delen en samen bijwerken',
         localStorage.setItem('rtg_lang', 'nl'); localStorage.setItem('rtg_cookieinfo_v1', '1');
       }, token);
       await page.goto(base + '/apps/notities.html', { waitUntil: 'domcontentloaded' });
-      await page.waitForSelector('body[data-rtg-adaptive-ready="true"]', { timeout: 15000 });
+      await wachtOpSchil(page, { timeout: 15000 });
     };
 
     /* ---- A bouwt een lijst met Enter ---- */
@@ -54,7 +54,7 @@ test('Notities: lijst bouwen, afvinken op de kaart, delen en samen bijwerken',
       await page.press('#ntNieuwTaak', 'Enter');
     }
     await page.click('#ntBewaar');
-    await page.waitForFunction(() => /Bewaard/.test(document.querySelector('#melding').textContent),
+    await page.waitForFunction(() => /Bewaard/.test(document.querySelector('#ntMelding').textContent),
       null, { timeout: 8000 });
     await page.waitForFunction(() => /Weekend/.test(document.querySelector('#bord').textContent),
       null, { timeout: 8000 });
@@ -68,7 +68,7 @@ test('Notities: lijst bouwen, afvinken op de kaart, delen en samen bijwerken',
     await page.waitForSelector('#ntScrim.open', { timeout: 5000 });
     await page.fill('#ntCode', codeB);
     await page.click('#ntDeel');
-    await page.waitForFunction(() => /samen/.test(document.querySelector('#melding').textContent),
+    await page.waitForFunction(() => /samen/.test(document.querySelector('#ntMelding').textContent),
       null, { timeout: 8000 });
 
     /* ---- B ziet de lijst en vinkt mee ---- */

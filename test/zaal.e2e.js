@@ -180,7 +180,11 @@ test('Van lied naar zaal: zingen, samen maken, uitgeven en horen',
     await page.check('#tKlaar');
     await naarDeel(page, 'uitgeven');
     await require('./helper').edgeActies(page);
-    await page.locator('.rtg-adaptive-controls').getByRole('button', { name: 'Bewaren', exact: true }).click();
+    const edgeBewaren = page.locator('.rtg-adaptive-controls').getByRole('button', { name: 'Bewaren', exact: true });
+    const edgeLabels = await page.locator('.rtg-adaptive-controls button').allTextContents();
+    assert.equal(await edgeBewaren.count(), 1,
+      'de Edge houdt Bewaren bereikbaar; aanwezige acties: ' + edgeLabels.join(' | '));
+    await edgeBewaren.click();
     await page.waitForFunction(() => /Bewaard/.test(document.querySelector('#melding').textContent),
       null, { timeout: 20000 });
     await page.waitForSelector('#uitgaveVlak input', { timeout: 20000 });

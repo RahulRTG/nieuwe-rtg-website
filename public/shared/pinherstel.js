@@ -23,7 +23,7 @@ function opvangen(API, T){
   try { var u = new URL(location.href); u.searchParams.delete('pinherstel'); history.replaceState(null, '', u); } catch(e){}
 
   var scrim = document.createElement('div');
-  scrim.style.cssText = 'position:fixed;inset:0;z-index:9990;background:rgba(0,0,0,.72);display:flex;align-items:center;justify-content:center;padding:1.2rem;';
+  scrim.className = 'ds-pinherstel';
   var doos = document.createElement('div');
   doos.setAttribute('role','dialog');
   /* aria-modal hoort erbij en stond er niet. Dit scherm LIGT modaal -- een
@@ -33,22 +33,22 @@ function opvangen(API, T){
      daarom zelf af als "buiten het venster". Wat modaal is, zegt dat. */
   doos.setAttribute('aria-modal','true');
   doos.setAttribute('aria-label', T('pinh.kop','Nieuwe algemene pin'));
-  doos.style.cssText = 'width:min(22rem,100%);background:var(--paneel,#151312);border:1px solid var(--line);border-radius:0;padding:1.2rem;color:var(--txt,#F7F5F1);font-family:Inter,system-ui,sans-serif;';
+  doos.className = 'ds-pinherstel__doos';
   var kop = document.createElement('div');
   kop.textContent = T('pinh.kop','Nieuwe algemene pin');
-  kop.style.cssText = 'font-family:"Bodoni Moda",Georgia,serif;font-size:1.15rem;margin-bottom:.5rem;';
+  kop.className = 'ds-pinherstel__kop';
   var uit = document.createElement('p');
   uit.textContent = T('pinh.uit','Kies een pincode van 4 tot 8 cijfers. Dezelfde pin beschermt uw prive-apps en opent uw werk-apps.');
-  uit.style.cssText = 'margin:0 0 .9rem;font-size:.85rem;line-height:1.55;color:var(--muted,#8A8680);';
+  uit.className = 'ds-pinherstel__uitleg';
   var inp = document.createElement('input');
   inp.type='password'; inp.inputMode='numeric'; inp.maxLength=8; inp.autocomplete='off';
   inp.setAttribute('aria-label', T('pinh.veld','Nieuwe pin'));
-  inp.style.cssText = 'width:100%;margin:0 0 .5rem;background:var(--card2,#1B1817);border:1px solid var(--line);border-radius:0;padding:.6rem .8rem;font-size:1rem;letter-spacing:.4em;text-align:center;color:var(--txt);';
+  inp.className = 'ds-pinherstel__veld';
   var fout = document.createElement('div');
-  fout.style.cssText = 'min-height:1.2rem;font-size:.8rem;color:var(--burgundy-on-dark,#C23A5E);margin-bottom:.6rem;';
+  fout.className = 'ds-pinherstel__melding';
   var ga = document.createElement('button');
   ga.type='button'; ga.textContent = T('pinh.zet','Pin instellen');
-  ga.style.cssText = 'width:100%;border:none;border-radius:0;padding:.65rem;font:inherit;font-size:.86rem;font-weight:600;background:var(--gold,#857007);color:#0C0C0B;cursor:pointer;';
+  ga.className = 'ds-pinherstel__doe';
   ga.addEventListener('click', async function(){
     var pin = inp.value.trim();
     if (!/^\d{4,8}$/.test(pin)) { fout.textContent = T('pin.vorm','4 tot 8 cijfers.'); return; }
@@ -72,7 +72,7 @@ function opvangen(API, T){
   const vergeten = document.createElement('button');
   vergeten.type = 'button';
   vergeten.textContent = T('pin.vergeten', 'Pin vergeten?');
-  vergeten.style.cssText = 'display:block;margin:0.7rem auto 0;background:none;border:none;color:var(--muted,#8A8680);font:inherit;font-size:0.8rem;text-decoration:underline;cursor:pointer;';
+  vergeten.className = 'ds-pinherstel__vergeten';
   vergeten.addEventListener('click', async () => {
     vergeten.disabled = true;
     try {
@@ -82,9 +82,10 @@ function opvangen(API, T){
         location.href = r.devPinUrl;
         return;
       }
-      fout.style.color = 'var(--gold,#857007)';
+      fout.classList.add('ds-pinherstel__melding--goed');
       fout.textContent = T('pin.verstuurd', 'We hebben u een link gestuurd om een nieuwe pin te kiezen. Hij is een uur geldig.');
     } catch (e) {
+      fout.classList.remove('ds-pinherstel__melding--goed');
       fout.textContent = e.message || T('pin.mis', 'Dat ging niet goed.');
       vergeten.disabled = false;
     }

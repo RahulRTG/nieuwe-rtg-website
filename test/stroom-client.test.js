@@ -20,6 +20,7 @@ const BRON = fs.readFileSync(path.join(__dirname, '..', 'public', 'shared', 'str
 
 function wereld({ antwoorden }) {
   const bronnen = [], vragen = [], wekkers = [];
+  class NepMediaElement {}
   class NepBron {
     constructor(url) { this.url = url; this.readyState = 0; this.luister = {}; bronnen.push(this); }
     addEventListener(naam, fn) { (this.luister[naam] = this.luister[naam] || []).push(fn); }
@@ -31,12 +32,12 @@ function wereld({ antwoorden }) {
     const a = antwoorden.shift() || { status: 500 };
     return Promise.resolve({ ok: a.status === 200, status: a.status, json: () => Promise.resolve(a.lijf || {}) });
   };
-  const venster = { EventSource: NepBron, fetch, setTimeout: (fn, ms) => { wekkers.push({ fn, ms }); return wekkers.length; },
+  const venster = { EventSource: NepBron, HTMLMediaElement: NepMediaElement, fetch, setTimeout: (fn, ms) => { wekkers.push({ fn, ms }); return wekkers.length; },
     clearTimeout: () => {} };
   venster.window = venster;
   vm.runInNewContext(BRON, Object.assign(venster, { JSON, encodeURIComponent, Promise }));
   const rust = () => new Promise(r => setImmediate(r));
-  return { S: venster.RTGStroom, bronnen, vragen, wekkers, rust };
+  return { S: venster.RTGStroom, bronnen, vragen, wekkers, rust, NepMediaElement };
 }
 
 test('1. de sessie gaat in de kop naar de ruilplek, en alleen het ticket staat in het adres', async () => {
@@ -93,8 +94,9 @@ test('4. een eigen ruilplek (het schoolkanaal) en een kijkticket voor een video'
   assert.equal(w.vragen[0].url, '/api/foundation/school/belkanaal/ticket');
   assert.deepEqual(JSON.parse(w.vragen[0].opties.body), { klasCode: 'K1', code: 'G1' });
   assert.equal(w.bronnen[0].url, '/api/foundation/school/belkanaal?klasCode=K1&code=G1&ticket=ST.K');
-  const video = { attrs: {}, luister: {}, getAttribute(k) { return this.attrs[k]; },
-    addEventListener(n, fn) { (this.luister[n] = this.luister[n] || []).push(fn); }, removeEventListener() {} };
+  const video = new w.NepMediaElement();
+  Object.assign(video, { attrs: {}, luister: {}, getAttribute(k) { return this.attrs[k]; },
+    addEventListener(n, fn) { (this.luister[n] = this.luister[n] || []).push(fn); }, removeEventListener() {} });
   Object.defineProperty(video, 'src', { set(v) { this.attrs.src = v; }, get() { return this.attrs.src; } });
   await w.S.kijk(video, '/api/theater/kijk/v1', { stroom: 'theater-kijk', id: 'v1', token: 'LID' });
   assert.deepEqual(JSON.parse(w.vragen[1].opties.body), { stroom: 'theater-kijk', id: 'v1' });

@@ -125,7 +125,7 @@ function gebaarlaag(tabel, alGeladen) {
     tagName: String(tag).toUpperCase(), attrs: {}, style: { setProperty() {}, removeProperty() {} },
     classList: { add() {}, remove() {}, contains() { return false; } },
     setAttribute(k, v) { this.attrs[k] = String(v); }, getAttribute(k) { return k in this.attrs ? this.attrs[k] : null; },
-    removeAttribute(k) { delete this.attrs[k]; }, appendChild(n) { kinderen.push(n); return n; },
+    removeAttribute(k) { delete this.attrs[k]; }, hasAttribute(k) { return k in this.attrs; }, appendChild(n) { kinderen.push(n); return n; },
     addEventListener() {}, querySelectorAll() { return []; }, isConnected: true,
     get src() { return this.attrs.src; }, set src(v) { this.attrs.src = v; }
   });

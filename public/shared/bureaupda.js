@@ -73,24 +73,7 @@
     });
   };
 
-  /* De stijl die de studio al had en de andere twee misten: de disciplinerij
-     als rustige balk met een gouden streep onder de actieve, in plaats van
-     pillen. De `.chips >`-voorvoegsels zijn nodig omdat de gedeelde pilrij in
-     rtg-ui.css als `body.rtg-stijl .chips > button` staat en dus zwaarder
-     weegt dan een kale `.chip` -- zonder dat voorvoegsel stond deze regel er
-     wel maar deed hij niets. Gemeten in de browser, niet gehoopt. */
-  var CSS =
-    'body.rtg-stijl .chips{display:flex;gap:.15rem;overflow-x:auto;margin:0 0 .2rem;padding:0 0 .1rem;' +
-      'border-bottom:1px solid var(--line);scrollbar-width:none;}' +
-    'body.rtg-stijl .chips::-webkit-scrollbar{display:none;}' +
-    'body.rtg-stijl .chips > .chip{white-space:nowrap;background:none;border:0;border-bottom:2px solid transparent;' +
-      'border-radius:0;margin-bottom:-1px;padding:.55rem .8rem .6rem;font-family:\'Inter\',system-ui,sans-serif;' +
-      'font-size:.72rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);cursor:pointer;}' +
-    'body.rtg-stijl .chips > .chip:hover{color:var(--txt);border-bottom-color:transparent;}' +
-    'body.rtg-stijl .chips > .chip.aan{background:none;color:var(--txt);border-bottom-color:var(--gold);}' +
-    '.bp-swatch{width:1rem;height:1rem;border-radius:50%;border:1px solid var(--line);display:inline-block;}';
-
-  w.RTGBureauPDA = { BUREAUS: BUREAUS, esc: esc, CSS: CSS };
+  w.RTGBureauPDA = { BUREAUS: BUREAUS, esc: esc };
 })(window);
 /* De bureau-PDA, deel 2: de werking.
 
@@ -114,8 +97,6 @@
   Z.start = function (bureauId) {
     var B = Z.BUREAUS[bureauId];
     if (!B) return;
-    var st = d.createElement('style'); st.textContent = Z.CSS;
-    (d.head || d.documentElement).appendChild(st);
 
     var $ = function (s) { return d.querySelector(s); };
     var TOKEN = null;
@@ -144,8 +125,8 @@
     };
     function meld(t) {
       var m = $('#melding'); if (!m) return;
-      m.textContent = t; m.style.opacity = '1';
-      clearTimeout(m._t); m._t = setTimeout(function () { m.style.opacity = '0'; }, 2400);
+      m.textContent = t; m.classList.add('toon');
+      clearTimeout(m._t); m._t = setTimeout(function () { m.classList.remove('toon'); }, 2400);
     }
 
     var DATA = null, filter = '';
@@ -161,7 +142,7 @@
           }).join('');
         }
         render();
-      }).catch(function (e) { $('#pLijst').innerHTML = '<div class="leeg">' + esc(e.message) + '</div>'; });
+      }).catch(function (e) { $('#pLijst').innerHTML = '<div class="ds-meta">' + esc(e.message) + '</div>'; });
     }
 
     /* Meenemen (shared/uitvoer.js): het register uit het eigen model, veld voor
@@ -176,8 +157,7 @@
     });
 
     function statusPil(s) {
-      var g = s === 'productie' ? 'var(--gold)' : (s === 'archief' ? 'var(--muted)' : 'var(--txt)');
-      return '<span class="pil" style="color:' + g + ';">' + esc(s) + '</span>';
+      return '<span class="ds-meta">' + esc(s) + '</span>';
     }
     function volgende(s) {
       var i = DATA.statussen.indexOf(s);
@@ -185,9 +165,9 @@
     }
 
     function render() {
-      $('#pFilters').innerHTML = '<button class="chip' + (filter === '' ? ' aan' : '') + '" data-f="">Alle</button>' +
+      $('#pFilters').innerHTML = '<button class="chip ds-chip' + (filter === '' ? ' aan' : '') + '" aria-pressed="' + (filter === '' ? 'true' : 'false') + '" data-f="">Alle</button>' +
         DATA.disciplines.map(function (c) {
-          return '<button class="chip' + (filter === c.id ? ' aan' : '') + '" data-f="' + esc(c.id) + '">' +
+          return '<button class="chip ds-chip' + (filter === c.id ? ' aan' : '') + '" aria-pressed="' + (filter === c.id ? 'true' : 'false') + '" data-f="' + esc(c.id) + '">' +
             glyf(c.icon) + ' ' + esc(c.label) + (c.aantal ? ' (' + c.aantal + ')' : '') + '</button>';
         }).join('');
       $('#pFilters').querySelectorAll('.chip').forEach(function (b) {
@@ -197,23 +177,23 @@
       var lijst = DATA.ontwerpen.filter(function (o) { return !filter || o.discipline === filter; });
       $('#pLijst').innerHTML = lijst.length ? lijst.map(function (o) {
         var c = o.concept, nx = volgende(o.status);
-        return '<div class="kaart" style="margin-bottom:0.75rem;">' +
-          '<div class="rij" style="justify-content:space-between;">' +
-            '<h2 style="font-size:1.02rem;">' + glyf(o.icon) + ' ' + esc(o.naam) + '</h2>' + statusPil(o.status) + '</div>' +
-          '<div style="font-size:.72rem;color:var(--muted);margin-bottom:0.5rem;">' +
+        return '<div class="ds-sectie">' +
+          '<div class="ds-handelingen">' +
+            '<h2 class="ds-titel ds-titel--scherm">' + glyf(o.icon) + ' ' + esc(o.naam) + '</h2>' + statusPil(o.status) + '</div>' +
+          '<div class="ds-meta">' +
             esc(o.disciplineLabel) + (o.huis ? ' · ' + esc(o.huis) : '') + '</div>' +
           (c
-            ? (c.kleuren && c.kleuren.length ? '<div class="rij" style="margin-bottom:0.5rem;">' +
-                c.kleuren.map(function (k) { return '<span class="bp-swatch" title="' + esc(k.naam) + '" style="background:' + esc(k.hex) + ';"></span>'; }).join('') + '</div>' : '') +
-              '<div style="font-size:.82rem;line-height:1.55;"><b>' + esc(c[B.velden[0]]) + '</b> · ' + esc(c[B.velden[1]]) + '</div>'
-            : '<div class="leeg">Nog geen concept.</div>') +
-          (o.kritiek ? '<div style="margin-top:0.5rem;border-left:2px solid var(--gold);padding-left:.6rem;font-size:.8rem;line-height:1.5;">' + esc(o.kritiek) + '</div>' : '') +
-          '<div class="rij h-mt60">' +
-            '<button class="knop stil" data-concept="' + esc(o.id) + '">' + (c ? 'Herteken' : 'Teken') + '</button>' +
-            '<button class="knop stil" data-kritiek="' + esc(o.id) + '">Kritiek</button>' +
-            (nx ? '<button class="knop" data-next="' + esc(o.id) + '" data-s="' + esc(nx) + '" style="margin-left:auto;">→ ' + esc(nx) + '</button>' : '') +
+            ? (c.kleuren && c.kleuren.length ? '<div class="ds-handelingen">' +
+                c.kleuren.map(function (k) { return '<svg width="16" height="16" viewBox="0 0 16 16" role="img" aria-label="' + esc(k.naam) + '"><title>' + esc(k.naam) + '</title><circle cx="8" cy="8" r="7" fill="' + esc(k.hex) + '"/></svg>'; }).join('') + '</div>' : '') +
+              '<div class="ds-meta"><b>' + esc(c[B.velden[0]]) + '</b> · ' + esc(c[B.velden[1]]) + '</div>'
+            : '<div class="ds-meta">Nog geen concept.</div>') +
+          (o.kritiek ? '<div class="ds-sectie ds-sectie--open">' + esc(o.kritiek) + '</div>' : '') +
+          '<div class="ds-handelingen">' +
+            '<button class="ds-knop ds-knop--stil" data-concept="' + esc(o.id) + '">' + (c ? 'Herteken' : 'Teken') + '</button>' +
+            '<button class="ds-knop ds-knop--stil" data-kritiek="' + esc(o.id) + '">Kritiek</button>' +
+            (nx ? '<button class="ds-knop" data-next="' + esc(o.id) + '" data-s="' + esc(nx) + '">→ ' + esc(nx) + '</button>' : '') +
           '</div></div>';
-      }).join('') : '<div class="leeg">Geen concepten in deze discipline.</div>';
+      }).join('') : '<div class="ds-meta">Geen concepten in deze discipline.</div>';
       bind();
     }
 

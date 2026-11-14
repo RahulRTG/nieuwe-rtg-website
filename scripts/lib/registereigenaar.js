@@ -113,6 +113,7 @@ const EIGENAAR = {
     waarom: 'Handgeschreven besluitbestand van de inventaris (AFBOUWPROGRAMMA.md): afgewezen en extern zijn een oordeel en geen markering. scripts/lib/toezegklassen.js leest het en schrijft het niet; test/toezegklassen.test.js houdt elk citaat tegen zijn document.' },
   'ONTWERPSYSTEEM.md': { soort: 'BRON', waarom: 'Handgeschreven eigenaarsbesluit en architectuur van het RTG Design System (19 oktober 2026); scripts/ontwerpsysteem.js en test/ontwerpsysteem.test.js leveren het bewijs.' },
   'TRAVELOS-MIGRATIE.md': { soort: 'BRON', waarom: 'Handgeschreven werkdossier van de TravelOS-migratie (nulmeting, batches, open punten); de browsertoetsen per scherm leveren het bewijs.' },
+  'TRAVELOS-UITVOERING.md': { soort: 'BRON', waarom: 'Handgeschreven uitvoeringsbijlage bij REIZEN.md en TRAVELCOMMERCE.md met contractgrenzen en open kwalificatiepunten; geen generator schrijft dit document en het vervangt geen uitvoeringsbewijs.' },
   'ONTWERPSTANDAARD-METING.md': { soort: 'BRON', waarom: 'Handgeschreven meetverslag van website tegenover app (#585), op een genoemde commit; verandert geen code.' },
   'TRAVELOS-SPATIAL-VERTICAL-SLICE.md': { soort: 'BRON',
     waarom: 'Handgeschreven implementatiepassport voor de eerste TravelOS Spatial-proef; het beschrijft een voorstel en bestaand bronbewijs, geen generator schrijft dit document.' },
@@ -201,6 +202,10 @@ const EIGENAAR = {
     waarom: 'Handmatig geschreven richtingsdocument (de terugweg van productie naar bewijs); de namen en bronverwijzingen erin zijn met de hand gemeten, er is geen generator die het schrijft.' },
   'CIVILIS.md': { soort: 'BRON',
     waarom: 'Handmatig geschreven besluit van de eigenaar (18 oktober 2026, RTG als universele infrastructuur); er is geen generator die het schrijft.' },
+  'CIVILIS-UITVOERING.md': { soort: 'BRON',
+    waarom: 'Handmatig geschreven traceerbare uitvoeringsaudit en ketenarchitectuur voor CIVILIS; de afzonderlijke tests en registers leveren het uitvoerbare bewijs, er is geen generator die dit document schrijft.' },
+  'PERSONALOS.md': { soort: 'BRON',
+    waarom: 'Handmatig geschreven architectuur- en afbouwdocument voor de persoonlijke compositielaag; de PersonalOS-, Authority- en browserproeven leveren het afzonderlijke bewijs, er is geen generator die dit document schrijft.' },
   'CONSOLIDATIE.md': { soort: 'BRON',
     waarom: 'Handmatig geschreven besluit van de eigenaar (12 oktober 2026, het opruimen van RTG); er is geen generator die het schrijft.' },
   'AGENTS.md': { soort: 'BRON',
@@ -233,6 +238,10 @@ const EIGENAAR = {
      zijn twee bestanden, en alleen de eerste heeft een schrijver. */
   'SCHERMFUNCTIE.json': { schrijver: 'scripts/schermfunctie.js' },
   'EXPERIENCEWERKT.json': { schrijver: 'scripts/experience-coverage.js' },
+  'APPWERKT.json': { schrijver: 'scripts/appwerkt.js',
+    waarom: 'scripts/appwerkt.js bezit en schrijft de volledige browsermeting. scripts/appwerkt-samenstellen.js ' +
+      'ververst uitsluitend de bewijshelften uit reeds bestaande, verse registers en bewaart de echte browserwaarneming; ' +
+      'beide gebruiken hetzelfde contract en hetzelfde register zodat er geen tweede APPWERKT-waarheid ontstaat.' },
   'SCHERMEIGENAAR.json': { handmatig: true, lezer: 'test/schermeigenaar.test.js',
     waarom: 'het eigenaarsregister is een BESLUIT per capability en per overlappend paar; de toets houdt het ' +
       'tegen een verse meting van scripts/schermfunctie.js, en wie het uit die meting genereert laat de toets ' +

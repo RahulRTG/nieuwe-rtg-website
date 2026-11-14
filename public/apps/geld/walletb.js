@@ -118,7 +118,6 @@
 
   function start() {
     var Deel = w.RTGGeldDeel.wallet;
-    Deel.stijl();
     $('#waWrap').addEventListener('click', klik);
     Deel.laadPas();
     laad();

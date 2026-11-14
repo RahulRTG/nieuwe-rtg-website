@@ -41,14 +41,14 @@
   balk.setAttribute('aria-label', 'Sociale commandobalk');
   balk.setAttribute('data-rtg-platform-chrome', 'suite-merkbalk');
   var merk = maak('a', 'rtg-suitebrand');
-  merk.href = '/apps/sociaal.html';
+  merk.setAttribute('href', '/apps/sociaal.html');
   merk.appendChild(maak('span', 'rtg-suitebrand-mark', 'RTG'));
   merk.appendChild(maak('span', 'rtg-suitebrand-world', 'LivingOS · Social'));
   balk.appendChild(merk);
   var staat = maak('span', 'rtg-suitestate', actief === 'private' ? 'Privé · toegang bewaakt' : 'Besloten ledennetwerk');
   balk.appendChild(staat);
   var persoon = maak('a', 'rtg-suiteperson');
-  persoon.href = '/apps/salon.html#ik';
+  persoon.setAttribute('href', '/apps/salon.html#ik');
   persoon.setAttribute('aria-label', 'Open uw profiel');
   persoon.appendChild(maak('span', 'rtg-suiteperson-copy', 'Rahul'));
   persoon.appendChild(maak('span', 'rtg-suiteperson-seal', 'R'));
@@ -59,7 +59,7 @@
   nav.setAttribute('data-rtg-platform-chrome', 'suite-navigatie');
   routes.forEach(function (route) {
     var link = maak('a', 'rtg-suitenav-link');
-    link.href = route.href;
+    link.setAttribute('href', route.href);
     link.dataset.sleutel = route.sleutel;
     link.appendChild(maak('span', 'rtg-suitenav-label', route.label));
     link.appendChild(maak('small', 'rtg-suitenav-note', route.toelichting));

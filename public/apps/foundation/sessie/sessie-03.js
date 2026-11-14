@@ -87,16 +87,16 @@
      een script dat hier wordt ingehangen draait pas nadat deze bundel klaar is,
      en dan staat RTGWereld er dus al. */
   try {
-    if (!d.querySelector('link[href="/shared/wereldschil.css"]')) {
+    if (!document.documentElement.hasAttribute('data-ds') && !d.querySelector('link[href="/shared/wereldschil.css"]')) {
       var blad = d.createElement('link');
       blad.rel = 'stylesheet';
       blad.href = '/shared/wereldschil.css';
       (d.head || d.documentElement).appendChild(blad);
     }
     if (!d.querySelector('script[src="/shared/wereldschil.js"]')) {
-      var s = d.createElement('script');
-      s.src = '/shared/wereldschil.js';
-      (d.head || d.documentElement).appendChild(s);
+      var foundationWereldschilScriptNode = document.createElement('script');
+      foundationWereldschilScriptNode.src = '/shared/wereldschil.js';
+      document.head.appendChild(foundationWereldschilScriptNode);
     }
   } catch (e) {}
 })(window, document);

@@ -128,5 +128,5 @@
     }
     document.querySelectorAll('#content [data-goto]').forEach(b => b.addEventListener('click', () => openTab(b.dataset.goto)));
     const fEl = $('#homeFoundation'); if (fEl) fEl.style.display='none';
-    const gtab = $('#tabGezin'); if (gtab) gtab.style.display='none';
+    const gtab = $('#tabGezin'); if (gtab) gtab.classList.add('h-weg');
     // een gratis account (met paspoort) kan vrienden toevoegen en met hen chatten

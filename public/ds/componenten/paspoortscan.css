@@ -1,0 +1,21 @@
+@layer rtg.component {
+  .ds-paspoortscan { position: fixed; inset: 0; z-index: 200; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: calc(env(safe-area-inset-top, 0px) + 1rem) 1rem calc(env(safe-area-inset-bottom, 0px) + 1.2rem); background: var(--ds-cover-grond); }
+  .ds-paspoortscan .pscan-podium { position: relative; inline-size: min(560px, 94vw); aspect-ratio: 1.42 / 1; overflow: hidden; background: var(--ds-cover-grond); border-radius: 0; box-shadow: var(--ds-schaduw-systeem); }
+  .ds-paspoortscan .pscan-podium :is(video, img) { display: block; inline-size: 100%; block-size: 100%; object-fit: cover; }
+  .ds-paspoortscan .pscan-podium :is(video, img)[hidden] { display: none; }
+  .ds-paspoortscan .pscan-kader { position: absolute; inset: 7% 5%; border: 2px solid var(--ds-cover-metaal); border-radius: 0; box-shadow: 0 0 0 100vmax var(--ds-glas); pointer-events: none; }
+  .ds-paspoortscan .pscan-hoek { position: absolute; inline-size: 22px; block-size: 22px; border: 3px solid var(--ds-cover-metaal); }
+  .ds-paspoortscan .pscan-hoek.lb { inset-inline-start: -2px; inset-block-start: -2px; border-inline-end: 0; border-block-end: 0; }
+  .ds-paspoortscan .pscan-hoek.rb { inset-inline-end: -2px; inset-block-start: -2px; border-inline-start: 0; border-block-end: 0; }
+  .ds-paspoortscan .pscan-hoek.lo { inset-inline-start: -2px; inset-block-end: -2px; border-inline-end: 0; border-block-start: 0; }
+  .ds-paspoortscan .pscan-hoek.ro { inset-inline-end: -2px; inset-block-end: -2px; border-inline-start: 0; border-block-start: 0; }
+  .ds-paspoortscan .pscan-mrz { position: absolute; inset-inline: 6%; inset-block-end: 9%; block-size: 15%; border: 1px dashed var(--ds-cover-inkt); }
+  .ds-paspoortscan .pscan-zin { margin: 1.1rem 0 .2rem; color: var(--ds-cover-inkt); font-family: var(--ds-letter-display); font-size: 1.05rem; text-align: center; text-wrap: balance; }
+  .ds-paspoortscan .pscan-sub { min-block-size: 1rem; margin-block-end: 1rem; color: var(--ds-inkt-zacht); font-size: .78rem; text-align: center; }
+  .ds-paspoortscan .pscan-knoppen { display: flex; flex-wrap: wrap; gap: .7rem; align-items: center; justify-content: center; }
+  .ds-paspoortscan .pscan-knoppen button { padding: .7rem 1.3rem; border: 1px solid var(--ds-lijnkleur); border-radius: 0; background: transparent; color: var(--ds-cover-inkt); font: inherit; font-size: .85rem; cursor: pointer; }
+  .ds-paspoortscan .pscan-knoppen button.prim { border-color: var(--ds-cover-metaal); background: var(--ds-cover-metaal); color: var(--ds-cover-grond); font-weight: 700; }
+  .ds-paspoortscan .pscan-knoppen .pscan-sluiter { position: relative; inline-size: 66px; block-size: 66px; padding: 0; border: 3px solid var(--ds-cover-metaal); border-radius: var(--ds-radius-cirkel); background: var(--ds-glas); }
+  .ds-paspoortscan .pscan-sluiter::after { position: absolute; inset: 7px; border-radius: var(--ds-radius-cirkel); background: var(--ds-cover-metaal); content: ""; }
+  .ds-paspoortscan .pscan-evenwicht { inline-size: 66px; }
+}

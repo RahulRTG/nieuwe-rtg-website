@@ -6,10 +6,10 @@ const schoon = (v, n) => String(v ?? '').slice(0, n);
 const A = { tier: 'rtg', key: 'actor-a', codename: 'Anna' };
 const B = { tier: 'rtg', key: 'actor-b', codename: 'Bram' };
 
-// Alleen de randombron en externe effecten zijn testdoubles. Ritbetekenis,
+// Randombron, puntenlogica en externe effecten zijn testdoubles. Ritbetekenis,
 // idem, geldboeking, duurzame bundel en SQLite-opslag zijn de echte modules.
 function proef(t, reeks) {
-  const p = fixture(t, { rides: [], live: {}, paySaldi: { 'lid:Anna': 100000, 'lid:Bram': 100000,
+  const p = fixture(t, { rides: [], live: {}, punten: {}, paySaldi: { 'lid:Anna': 100000, 'lid:Bram': 100000,
     'extern:start': -200000 }, payBoekingen: [], facturen: [] });
   const { db, save, bijeen } = p;
   let teller = 0, willekeur = 0;

@@ -57,7 +57,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop, letOpFouten, veegDoor, laadPlaywright, browserOpties, geenBrowser, wachtOpRust } = require('./helper');
+const { startServer, stop, letOpFouten, veegDoor, laadPlaywright, browserOpties, geenBrowser, wachtOpRust, wachtOpSchil } = require('./helper');
 
 const pw = laadPlaywright();
 const BROWSER = process.env.RTG_CHROMIUM || undefined;
@@ -144,10 +144,7 @@ test('een veeg zet een bestand in de prullenbak, en de weg terug haalt het eruit
     /* Het scherm staat pas stil als het wereldkader klaar is EN de adaptieve
        Edge er staat: daarna gaan duimbalk en kopbalk uit de flow en schuift de
        lijst omhoog. Zie de kop van dit bestand. */
-    await page.waitForFunction(() => {
-      const st = document.body.dataset.rtgDesktopState;
-      return (st === 'ready' || st === 'error') && document.body.dataset.rtgAdaptiveReady === 'true';
-    }, null, { timeout: 20000 });
+    await wachtOpSchil(page, { timeout: 20000 });
     assert.equal(await page.locator('#lijst .item').count(), 2, 'beide bestanden horen op het bord te staan');
 
     /* 0. EERST: PAST DE KNOP IN ZIJN EIGEN LADE? Gemeten op de OPEN lade en niet
@@ -161,7 +158,16 @@ test('een veeg zet een bestand in de prullenbak, en de weg terug haalt het eruit
        laatste letter er geschaafd uit. Daarom staat .gb-lade op content-box. */
     const eerste = page.locator('#lijst .item').first();
     const d0 = await maat(eerste);
-    await veegDoor(page, d0, { afstand: -112, stappen: 16, kiezer: await kiezerVan(eerste) });
+    /* De DS-kamer gebruikt de volle inhoudsbreedte. Open de lade daarom met
+       dezelfde relatieve beweging als een mens, in plaats van de historische
+       vaste 112px die op een brede regel onder de openingsdrempel blijft. */
+    await veegDoor(page, d0, { afstand: -Math.max(112, d0.width * .3), stappen: 16,
+      kiezer: await kiezerVan(eerste), loslaten: false });
+    /* Laat pas los nadat de renderer de beweging heeft verwerkt. Daarmee kan
+       een late scroll van scrollIntoView de nog niet geopende lade niet als
+       een oude, open lade sluiten. */
+    await page.waitForFunction(() => !!document.querySelector('#lijst [data-gb]'));
+    await page.mouse.up();
     /* Wachten tot de lade ER IS, niet tot het scherm stil is. wachtOpRust telt
        stilte, en vlak na een veeg is het nog stil omdat de lade nog moet
        opengaan -- dan meet de regel hieronder een lade die er niet staat. */
@@ -177,7 +183,7 @@ test('een veeg zet een bestand in de prullenbak, en de weg terug haalt het eruit
        Vergelijken met de doelbreedte en niet met "twee keer hetzelfde": een
        transition die net begint staat twee frames lang op nul en zou zo als
        rust doorgaan. */
-    await page.waitForFunction(() => {
+    try { await page.waitForFunction(() => {
       const l = document.querySelector('#lijst .gb-lade');
       if (!l) return false;
       const st = getComputedStyle(l);
@@ -189,7 +195,13 @@ test('een veeg zet een bestand in de prullenbak, en de weg terug haalt het eruit
          nog groeit liet een knop half uitsteken en verborg zo dat hij in rust
          1px uitstak, omdat een reset de content-box overschreef. */
       return doel > 0 && Math.abs(parseFloat(st.width) - doel) < 0.05;
-    }, null, { timeout: 15000 });
+    }, null, { timeout: 15000 }); } catch (e) {
+      const stand = await page.locator('#lijst .gb-lade').evaluate((l) => {
+        const st = getComputedStyle(l);
+        return { doel: st.getPropertyValue('--gb-lade'), breedte: st.width, doos: st.boxSizing, duur: st.transitionDuration };
+      });
+      assert.fail('de gebaarlade bereikt haar doelbreedte niet: ' + JSON.stringify(stand));
+    }
     const uit = await page.evaluate(() => {
       const l = document.querySelector('#lijst .gb-lade');
       if (!l) return ['er staat geen open lade om te meten'];

@@ -13,10 +13,28 @@ test('Wonen vormt één herkenbare LivingOS-flow met drie echte schermen', () =>
   for (const naam of schermen) {
     const html = lees(`public/apps/${naam}.html`);
     assert.match(html, /data-rtg-world="living"/);
-    assert.match(html, /\/shared\/rtg-wonen-2026\.css/);
+    assert.match(html, /data-rtg-layout="standard"/, 'de bestaande workspace-ingang blijft actief');
+    assert.match(html, /\/ds\/rtg-ds\.css/);
+    assert.match(html, /\/ds\/shell\.js/);
+    assert.match(html, /class="ds-scherm"/);
+    assert.doesNotMatch(html, /<style\b|\sstyle=/);
+    const bladen = [...html.matchAll(/<link\b[^>]*href="([^"]+\.css)"/g)].map(m => m[1]).sort();
+    assert.deepEqual(bladen, ['/ds/rtg-ds.css', '/fonts/fonts.css'],
+      'gebaren en werkruimte behouden hun eigenaar met canonieke presentatie');
     assert.match(html, /\/apps\/wonen\.js/);
     for (const route of schermen) assert.match(html, new RegExp(`/apps/${route}\\.html`));
   }
+});
+
+test('Wonen behoudt de gedeelde bediening tot de DS-vervanging compleet is', () => {
+  for (const naam of ['wonen', 'onderhoud', 'woningdossier']) {
+    const html = lees(`public/apps/${naam}.html`);
+    for (const script of ['metgezel', 'schermbeeld', 'bediening', 'randen', 'rtg-world-desktop', 'ios']) {
+      assert.ok(html.includes('/shared/' + script + '.js'), script + ' blijft beschikbaar');
+    }
+  }
+  assert.equal(fs.existsSync(path.join(root, 'public/shared/rtg-wonen-2026.css')), false,
+    'de exclusieve vervangen stijl blijft niet achter');
 });
 
 test('Wonen gebruikt de bestaande woning en kluis en verzint geen uitvoering', () => {

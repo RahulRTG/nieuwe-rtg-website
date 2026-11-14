@@ -10,7 +10,7 @@
   var originLink = d.querySelector('.world-back'), home = new URL('../../../', d.baseURI).href;
   // The page's real home link also supports a static GitHub Pages project prefix.
   if (originLink) home = new URL(originLink.href).href.split('#')[0];
-  function link(label, href) { var a = d.createElement('a'); a.textContent = label; a.href = href; nav.appendChild(a); }
+  function link(label, href) { var a = d.createElement('a'); a.textContent = label; a.setAttribute('href', href); nav.appendChild(a); }
   ['living', 'travel', 'work', 'foundation'].forEach(function (key) {
     var names = { living: 'LivingOS', travel: 'TravelOS', work: 'WorkOS', foundation: 'FoundationOS, altijd 100% gratis' };
     link(names[key], new URL('site/werelden/' + key + 'os.html', w.RTGPublicPlatform ? w.RTGPublicPlatform.asset() : new URL('../..',d.baseURI)).href);

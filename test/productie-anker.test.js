@@ -25,6 +25,12 @@ test('een geldig adres met sleutel is in orde; zonder sleutel een waarschuwing',
   assert.match(keur({ RTG_ANKERPOST_URL: 'https://anker.voorbeeld.test/' }, false).w.join(' '), /RTG_ANKERPOST_SLEUTEL/);
 });
 
+test('de app mag de aparte private herstelbevoegdheid nooit bezitten', () => {
+  const r = keur({ RTG_ANKERPOST_URL: 'https://anker.voorbeeld.test/', RTG_ANKERPOST_SLEUTEL: 's',
+    RTG_ANKER_HERSTEL_SIGN_KEY_FILE: '/offline/herstel.pem' }, false);
+  assert.ok(r.f.some(x => /private audit-herstelsleutel/.test(x)));
+});
+
 test('de productiekeuring roept hem werkelijk aan', () => {
   const r = require('../server/config').valideer({ NODE_ENV: 'production' });
   assert.ok(r.fouten.some(f => /RTG_ANKERPOST_URL/.test(f)), JSON.stringify(r.fouten).slice(0, 300));

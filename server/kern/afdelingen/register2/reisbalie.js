@@ -29,7 +29,7 @@ module.exports = (ctx) => {
     reisbureau: { naam: 'Reisbureau', icoon: 'reisboek', naamInzage: true,
       missie: 'Elke reisaanvraag door een mens bevestigd, en nooit iets beloven wat nog niet rond is.',
       kpis: () => {
-        const alle = lijst(d().reisAanvragen);
+        const alle = lijst(d().reisAanvragen).filter(a => !a.keten);
         const open = alle.filter(a => a.status === 'aangevraagd');
         /* Een wijzigingsverzoek op een bevestigde reis is OOK werk voor deze
            balie, en het telt apart: een nieuwe aanvraag en een lid dat zijn
@@ -43,12 +43,12 @@ module.exports = (ctx) => {
           ['Bevestigd', alle.filter(a => a.status === 'bevestigd').length],
           ['Afgewezen', alle.filter(a => a.status === 'afgewezen').length],
           ['Afgezegd na bevestiging', alle.filter(a => a.status === 'afgezegd').length],
-          ['Aanvragen deze week', recent(d().reisAanvragen, 'at', 7)],
+          ['Aanvragen deze week', recent(alle, 'at', 7)],
           ['Reizen in de etalage', tel(d().partnerTrips)]
         ];
       },
       lijsten: () => {
-        const alle = lijst(d().reisAanvragen);
+        const alle = lijst(d().reisAanvragen).filter(a => !a.keten);
         return [
           { titel: 'Aanvragen die op een besluit wachten', items: alle.filter(a => a.status === 'aangevraagd').slice(0, 10)
             .map(a => a.ref + ' · ' + a.titel + ' (' + a.bestemming + ') · ' + a.personen + ' pers'

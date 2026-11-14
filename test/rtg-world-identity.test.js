@@ -1,18 +1,10 @@
 /* DE HERITAGE-ROUTEKAART IS FAIL-CLOSED.
    Een nieuw echt scherm mag niet ongemerkt een vijfde kleur erven en een oude
    redirect mag geen tweede productoppervlak worden. Daarom wordt het manifest
-   hier tegen de werkelijke HTML-boom gehouden: 298 schermen, 18 doorwijzers,
-   (290 sinds deze tak /apps/verificatie.html en /apps/vertegenwoordiging.html
-   toevoegde, 292 sinds /apps/loopbaan.html en /apps/loopbaanbewijs.html erbij
-   kwamen, 293 sinds /apps/mijn-neigingen.html en 294 sinds /apps/connect.html,
-   en terug naar 293 met 17 doorwijzers sinds /apps/vandaag.html in RTG Life
-   opging (SCHERMEIGENAAR.json), en 292 met 18 sinds /apps/toestemming.html een
-   weergave van Wie heeft toegang tot mij werd, en 293 sinds /apps/leerhuis.html, en 295 sinds DemocratieOS V1
-   (/apps/foundation/kwesties.html en kwestiekantoor.html), en 296 sinds
-   /apps/leerhuis-werk.html, en 297 sinds /apps/living-world.html, en 298 sinds /apps/library.html (LibraryOS) --
-   het getal is een grendel tegen
-   een scherm dat er stil bij komt, en hoort dus mee te bewegen met een scherm
-   dat er BEWUST bij komt), ieder exact eenmaal. */
+   hier tegen de werkelijke HTML-boom gehouden: 296 schermen, 20 doorwijzers,
+   ieder exact eenmaal. Kantoor-PDA en Zorgbalie waren al aliases volgens
+   SCHERMEIGENAAR.json en hun meta/JS; hun overbodige basis-loader maakte hen
+   geen productschermen. De totale boom blijft 316 documenten. */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');
@@ -36,24 +28,24 @@ function route(bestand) {
 
 const BESTANDEN = htmlBestanden(APPS).sort();
 const ALLE_ROUTES = BESTANDEN.map(route).sort();
+const isDoorwijzer = (bestand) => /<meta\b[^>]*http-equiv=["']refresh["']/i.test(fs.readFileSync(bestand, 'utf8'));
 const ECHTE_ROUTES = BESTANDEN.filter((bestand) =>
-  /\/shared\/basis\.js/.test(fs.readFileSync(bestand, 'utf8'))).map(route).sort();
-const DOORWIJZERS = BESTANDEN.filter((bestand) =>
-  !/\/shared\/basis\.js/.test(fs.readFileSync(bestand, 'utf8'))).map(route).sort();
+  !isDoorwijzer(bestand)).map(route).sort();
+const DOORWIJZERS = BESTANDEN.filter(isDoorwijzer).map(route).sort();
 
-test('het manifest dekt 298 echte schermen en 18 redirects precies eenmaal', () => {
+test('het manifest dekt 296 echte schermen en 20 redirects precies eenmaal', () => {
   /* DE MUTATIE: voeg een HTML-scherm toe zonder manifestregel, of zet één pad
      in twee werelden. De setvergelijking of de lengtetoets moet dan zakken. */
   const echtManifest = identiteit.VALUES.flatMap((wereld) => identiteit.MANIFEST[wereld]);
   const allesManifest = echtManifest.concat(identiteit.REDIRECTS);
 
   assert.equal(BESTANDEN.length, 316, 'de appboom hoort 316 HTML-bestanden te bevatten');
-  assert.equal(ECHTE_ROUTES.length, 298, 'exact 298 blijvende schermen horen basis.js te laden');
-  assert.equal(DOORWIJZERS.length, 18, 'exact 18 oude adressen horen doorwijzers te blijven');
-  assert.equal(echtManifest.length, 298, 'het vierwereldenmanifest hoort 298 schermen te bevatten');
+  assert.equal(ECHTE_ROUTES.length, 296, 'exact 296 blijvende schermen');
+  assert.equal(DOORWIJZERS.length, 20, 'exact 20 oude adressen horen doorwijzers te blijven');
+  assert.equal(echtManifest.length, 296, 'het vierwereldenmanifest hoort 296 schermen te bevatten');
   assert.deepEqual(identiteit.VALUES, ['living', 'travel', 'work', 'foundation'],
     'Core ondersteunt de werelden maar mag geen vijfde zichtbare wereld zijn');
-  assert.equal(identiteit.REDIRECTS.length, 18, 'het redirectmanifest hoort 18 adressen te bevatten');
+  assert.equal(identiteit.REDIRECTS.length, 20, 'het redirectmanifest hoort 20 adressen te bevatten');
   assert.equal(new Set(allesManifest).size, allesManifest.length,
     'geen route mag in twee werelden of ook als redirect staan');
   assert.deepEqual(echtManifest.slice().sort(), ECHTE_ROUTES,
@@ -62,6 +54,18 @@ test('het manifest dekt 298 echte schermen en 18 redirects precies eenmaal', () 
     'doorwijzers horen apart en volledig in het manifest te staan');
   assert.deepEqual(allesManifest.slice().sort(), ALLE_ROUTES,
     'manifest en fysieke appboom horen dezelfde routes te bevatten');
+  const owners = JSON.parse(fs.readFileSync(path.join(WORTEL, 'SCHERMEIGENAAR.json'))).schermen;
+  assert.deepEqual(Object.entries(owners).filter(([, value]) => value.rol === 'alias')
+    .map(([pad]) => '/' + pad).sort(), DOORWIJZERS,
+  'de bestaande alias-eigenaar, meta-doorverwijzing en wereldidentiteit moeten overeenkomen');
+});
+
+test('de bestaande coveragelezer leidt redirectprofielen af zonder nieuwe schermen of signatures', () => {
+  const screens = require('../scripts/lib/experience/coverage').screenInventory(WORTEL);
+  assert.equal(screens.length, 316);
+  assert.deepEqual(screens.filter((screen) => screen.profile === 'redirect').map((screen) => screen.route).sort(), DOORWIJZERS);
+  assert.deepEqual(screens.filter((screen) => screen.profile === 'interface').map((screen) => screen.route).sort(), ECHTE_ROUTES);
+  assert.equal(screens.every((screen) => screen.profile !== 'redirect' || screen.owner.rol === 'alias'), true);
 });
 
 test('bestaande expliciete body-werelden spreken het manifest niet tegen', () => {
@@ -111,9 +115,9 @@ test('classificatie normaliseert adressen en toepassen bewaakt het centrale mani
 test('basis laadt de routekaart vroeg en het heritage-blad laat en uniek', () => {
   const bron = fs.readFileSync(path.join(WORTEL, 'public', 'shared', 'basis', 'basis-01.js'), 'utf8');
   assert.equal((bron.match(/\.src = '\/shared\/rtg-world-identity\.js'/g) || []).length, 1);
-  assert.equal((bron.match(/\.href = '\/shared\/rtg-heritage\.css'/g) || []).length, 1);
+  assert.equal((bron.match(/voegBasisStijlToe\('\/shared\/rtg-heritage\.css', 'rtgHeritageCss'\)/g) || []).length, 1);
   assert.ok(bron.includes("getElementById('rtgWorldIdentityJs')"));
-  assert.ok(bron.includes("getElementById('rtgHeritageCss')"));
+  assert.ok(bron.includes('document.getElementById(id)'), 'de gedeelde stijllader ontdubbelt ieder centraal blad op id');
   assert.ok(bron.indexOf('/shared/rtg-world-identity.js') < bron.indexOf('/shared/i18n.js'),
     'wereldidentiteit hoort voor de overige gedeelde lagen te starten');
   /* Op een scherm van het RTG Design System (html[data-ds]) laadt het

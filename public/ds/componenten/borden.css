@@ -1,0 +1,31 @@
+/* Gedeeld werkbord voor leden, leveranciers en medewerkers. De bordowner
+   beheert gegevens en acties; het Design System bezit de presentatie. */
+@layer rtg.component {
+  .ds-borden .bd-chips { display: flex; gap: var(--ds-ruimte-2); flex-wrap: wrap; margin-block-start: var(--ds-ruimte-3); }
+  .ds-borden .bd-chip { min-block-size: var(--ds-doel); background: var(--ds-oppervlak); border: 1px solid var(--ds-lijnkleur); border-radius: var(--ds-radius-inhoud); padding: var(--ds-ruimte-2) var(--ds-ruimte-3); font: 600 var(--ds-maat-klein)/1.3 var(--ds-letter-tekst); color: var(--ds-inkt); cursor: pointer; }
+  .ds-borden .bd-chip.aan { border-color: var(--ds-accent); color: var(--ds-accent); }
+  .ds-borden .bd-kolommen { display: flex; gap: var(--ds-ruimte-3); overflow-x: auto; padding-block: var(--ds-ruimte-4); align-items: flex-start; overscroll-behavior-inline: contain; }
+  .ds-borden .bd-kolom { background: var(--ds-oppervlak); border: 1px solid var(--ds-lijnkleur); border-radius: var(--ds-radius-inhoud); padding: var(--ds-ruimte-3); min-inline-size: 14.375rem; max-inline-size: 16.25rem; flex-shrink: 0; }
+  .ds-borden .bd-kolom .kop { display: flex; justify-content: space-between; align-items: center; gap: var(--ds-ruimte-2); padding: 0 var(--ds-ruimte-1) var(--ds-ruimte-2); color: var(--ds-inkt-zacht); font: 700 var(--ds-maat-klein)/1.3 var(--ds-letter-tekst); letter-spacing: .1em; text-transform: uppercase; }
+  .ds-borden .bd-kaart { background: var(--ds-oppervlak-sterk); border: 1px solid var(--ds-lijnkleur); border-radius: var(--ds-radius-inhoud); padding: var(--ds-ruimte-3); margin-block-end: var(--ds-ruimte-2); font: 400 var(--ds-maat-klein)/1.4 var(--ds-letter-tekst); color: var(--ds-inkt); }
+  .ds-borden .bd-kaart.klaar { opacity: .55; }
+  .ds-borden .bd-kaart.klaar b { text-decoration: line-through; }
+  .ds-borden .bd-kaart b { display: block; font-weight: 600; line-height: 1.35; }
+  .ds-borden .bd-notitie { margin-block-start: var(--ds-ruimte-1); color: var(--ds-inkt-zacht); font-size: var(--ds-maat-klein); white-space: pre-wrap; }
+  .ds-borden .bd-kaart .mt { display: flex; gap: var(--ds-ruimte-1); align-items: center; flex-wrap: wrap; margin-block-start: var(--ds-ruimte-2); color: var(--ds-inkt-zacht); font-size: var(--ds-maat-klein); }
+  .ds-borden .bd-due { border: 1px solid var(--ds-lijnkleur); border-radius: var(--ds-radius-inhoud); padding: var(--ds-ruimte-1) var(--ds-ruimte-2); }
+  .ds-borden .bd-due.laat { color: var(--ds-accent); border-color: var(--ds-accent); }
+  .ds-borden .bd-av { display: inline-flex; align-items: center; justify-content: center; background: var(--ds-oppervlak); border: 1px solid var(--ds-metaal); color: var(--ds-metaal); border-radius: var(--ds-radius-cirkel); inline-size: 1.5rem; block-size: 1.5rem; font-size: var(--ds-maat-klein); font-weight: 700; }
+  .ds-borden .bd-knopjes { display: flex; gap: var(--ds-ruimte-1); margin-block-start: var(--ds-ruimte-2); }
+  .ds-borden :is(.bd-knopjes button, .bd-kopknop) { min-inline-size: var(--ds-doel); min-block-size: var(--ds-doel); background: transparent; border: 1px solid var(--ds-lijnkleur); border-radius: var(--ds-radius-inhoud); color: var(--ds-inkt-zacht); font: 600 var(--ds-maat-klein)/1 var(--ds-letter-tekst); padding: var(--ds-ruimte-1); cursor: pointer; }
+  .ds-borden :is(.bd-knopjes button, .bd-kopknop):hover { color: var(--ds-inkt); border-color: var(--ds-metaal); }
+  .ds-borden .bd-vuil { inline-size: .9em; block-size: .9em; vertical-align: -.12em; display: inline-block; }
+  .ds-borden .bd-kolom .kop .bd-vuil { inline-size: .95em; block-size: .95em; }
+  .ds-borden .bd-add { inline-size: 100%; min-block-size: var(--ds-doel); background: transparent; border: 1px dashed var(--ds-lijnkleur); border-radius: var(--ds-radius-inhoud); color: var(--ds-inkt-zacht); font: 600 var(--ds-maat-klein)/1.3 var(--ds-letter-tekst); padding: var(--ds-ruimte-2); cursor: pointer; }
+  .ds-borden .bd-in { inline-size: 100%; min-block-size: var(--ds-doel); box-sizing: border-box; background: var(--ds-oppervlak-sterk); border: 1px solid var(--ds-lijnkleur); border-radius: var(--ds-radius-inhoud); padding: var(--ds-ruimte-2) var(--ds-ruimte-3); color: var(--ds-inkt); font: inherit; margin-block-end: var(--ds-ruimte-2); }
+  .ds-borden .bd-groep { margin-block-start: var(--ds-ruimte-2); display: flex; gap: var(--ds-ruimte-2); flex-wrap: wrap; align-items: center; color: var(--ds-inkt-zacht); font-size: var(--ds-maat-klein); }
+  .ds-borden .bd-groep label { display: inline-flex; gap: var(--ds-ruimte-1); align-items: center; min-block-size: var(--ds-doel); cursor: pointer; }
+  .ds-borden .bd-bweg { margin-inline-start: auto; }
+  .ds-borden .bd-leeg { margin-block-start: var(--ds-ruimte-6); color: var(--ds-inkt-zacht); font-size: var(--ds-maat-klein); }
+  .ds-borden :is(.bd-chip, .bd-add, .bd-knopjes button, .bd-kopknop, .bd-in):focus-visible { outline: 2px solid var(--ds-focus); outline-offset: 3px; }
+}

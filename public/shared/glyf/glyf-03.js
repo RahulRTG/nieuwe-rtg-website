@@ -38,7 +38,7 @@
      omzetting nooit iets weghalen dat het wel deed. */
   function tekst(naam) {
     var n = naam == null ? '' : String(naam);
-    if (P[n]) return svgHTML(n, { klasse: 'gl-inline' });
+    if (P[n]) return svgHTML(n, { klasse: 'gl-inline ds-icoon' });
     return n.replace(/[&<>"']/g, function (c) {
       return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c];
     });

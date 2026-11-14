@@ -23,7 +23,7 @@
   }
   function renderEntree(){
     const tabBtn = document.getElementById('tabEntree');
-    if (tabBtn) tabBtn.style.display = heeftEntree() ? '' : 'none';
+    if (tabBtn) tabBtn.classList.toggle('h-weg', !heeftEntree());
     const wrap = $('#entreeWrap');
     if (!wrap) return;
     if (!heeftEntree()){ wrap.innerHTML = ''; return; }

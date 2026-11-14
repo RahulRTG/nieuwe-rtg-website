@@ -9,22 +9,26 @@ const fout = (status, error) => ({ status, error });
 const leden = () => fout(403, 'RTG Vervoer is voor leden.');
 const onbeschikbaar = () => fout(503, 'De werktoegang kan nu niet veilig worden gecontroleerd.');
 
+function persoon(accounts, session) {
+  const m = /^user-([1-9]\d*)$/.exec(String(session?.key || ''));
+  const id = m && Number(m[1]);
+  if (!Number.isSafeInteger(id) || Number(session?.account?.id) !== id) return leden();
+  if (typeof accounts?.getUserById !== 'function' || typeof accounts?.isActief !== 'function')
+    return onbeschikbaar();
+  const account = accounts.getUserById(id);
+  return account && Number(account.id) === id && accounts.isActief(account) ? { ok: true } : leden();
+}
+
+/* Accountcontrole is een pure domeinpolicy, geen extra globale kernfunctie.
+   Route en reizigerskern gebruiken rechtstreeks dezelfde actuele bron. */
+function mobEigenToegang(accounts, session) {
+  // Bestaande betaalde/demo-ingangen blijven gelijk; gratis nazorg vraagt
+  // een echte, actuele persoon. De domeinfunctie toetst daarna het object.
+  if (session?.key && session.tier !== 'guest') return { ok: true };
+  try { return persoon(accounts, session); } catch (_) { return onbeschikbaar(); }
+}
+
 module.exports = ({ accounts, werktBij, findSupplier, zaakAbonnement }) => {
-  function persoon(session) {
-    const m = /^user-([1-9]\d*)$/.exec(String(session?.key || ''));
-    const id = m && Number(m[1]);
-    if (!Number.isSafeInteger(id) || Number(session?.account?.id) !== id) return leden();
-    if (typeof accounts?.getUserById !== 'function' || typeof accounts?.isActief !== 'function')
-      return onbeschikbaar();
-    const account = accounts.getUserById(id);
-    return account && Number(account.id) === id && accounts.isActief(account) ? { ok: true } : leden();
-  }
-  function mobEigenToegang(session) {
-    // Bestaande betaalde/demo-ingangen blijven gelijk; gratis nazorg vraagt
-    // een echte, actuele persoon. De domeinfunctie toetst daarna het object.
-    if (session?.key && session.tier !== 'guest') return { ok: true };
-    try { return persoon(session); } catch (_) { return onbeschikbaar(); }
-  }
   function mobVraagToegang(session, body = {}) {
     const org = typeof body.namensOrganisatie === 'string' ? body.namensOrganisatie.trim().toUpperCase() : '';
     if (body.betaler === 'organisatie' && (!org || org.length > 20))
@@ -34,7 +38,7 @@ module.exports = ({ accounts, werktBij, findSupplier, zaakAbonnement }) => {
     if (!session?.key) return leden();
     if (!werk) return { ok: true, organisatie: org.slice(0, 20) || null };
     try {
-      const p = persoon(session); if (p.error) return p;
+      const p = persoon(accounts, session); if (p.error) return p;
       if (typeof werktBij !== 'function' || typeof findSupplier !== 'function' ||
           typeof zaakAbonnement?.mag !== 'function' || typeof zaakAbonnement?.magDienst !== 'function')
         return onbeschikbaar();
@@ -49,5 +53,6 @@ module.exports = ({ accounts, werktBij, findSupplier, zaakAbonnement }) => {
       return { ok: true, organisatie: org };
     } catch (_) { return onbeschikbaar(); }
   }
-  return { mobVraagToegang, mobEigenToegang };
+  return { mobVraagToegang };
 };
+module.exports.mobEigenToegang = mobEigenToegang;

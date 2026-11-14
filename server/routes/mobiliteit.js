@@ -20,9 +20,10 @@
    en RTG zelf staan in ./mobiliteit/werkkant.js, onderaan gemount op dezelfde
    kern. Die knip zit er om de omvangregel, en de naad valt waar hij hoort:
    boven wie een rit vraagt, onder wie hem uitvoert. */
+const { mobEigenToegang } = require('../kern/mobiliteit/werktoegang');
 module.exports = (kern) => {
   const { app, auth, supplierAuth, accounts, schoon, gegevensStop,
-    mobAanbod, mobMijn, mobVraag, mobAnnuleer, mobVraagToegang, mobEigenToegang,
+    mobAanbod, mobMijn, mobVraag, mobAnnuleer, mobVraagToegang,
     plekLijst, favZet, favLijst,
     opdrachtMet, opdrachtBeeld, opdrachtNaar, opdrachtPositie,
     dispatchBeeld, pendelReserveer, pendelVoorMedewerker,
@@ -34,7 +35,7 @@ module.exports = (kern) => {
     return false;
   };
   const eigenStop = (req, res) => {
-    const r = mobEigenToegang(req.session);
+    const r = mobEigenToegang(accounts, req.session);
     if (r.error) { stuur(res, r); return true; }
     return false;
   };

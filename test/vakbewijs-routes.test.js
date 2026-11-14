@@ -277,6 +277,8 @@ test('eigen vakbewijs blijft accountgebonden, ook met een vreemde sleutel in de 
   assert.equal(mijn.status, 200);
   const vog = mijn.body.vakbewijzen.find(v => v.wat === 'vog');
   assert.ok(vog && vog.nummer, 'de vreemde kaart bevat daadwerkelijk een documentnummer');
+  assert.ok(mijn.body.eisen.some(e => e.genre === 'kinderopvang'),
+    'de echte werkgeversrelatie levert op dezelfde route haar eigen beroepseisen');
   const ander = await api('/api/auth/register', { name: 'Andere Medewerker', email: 'vakbewijs-ander@x.nl',
     phone: '0612345698', password: 'geheim123', geboortedatum: '1990-01-01' });
   assert.equal(ander.status, 200, JSON.stringify(ander.body));

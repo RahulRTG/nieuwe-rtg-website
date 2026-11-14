@@ -79,6 +79,12 @@ test('Experience surface: Economic Proof en bevestigde actie zijn mobiel zichtba
     assert.equal(proofs[0].proof.integrity, true);
     assert.ok(proofs[0].proof.ledgerTransactions > 0, 'het bewijs verifieert echte economische ledgerboekingen');
     assert.ok(proofs[0].proof.evidenceItems > 0, 'het bewijs bevat betaal-evidence, niet alleen een status');
+    const herlezen = await api(base, '/api/experience/bootstrap', { world: 'living' }, token);
+    assert.equal(herlezen.status, 200);
+    assert.equal(herlezen.body.projection.view.valueProofs.length, 1,
+      'een nieuwe projectielezing houdt het betaalbewijs vast; het is geen eenmalig betaalantwoord');
+    assert.deepEqual(herlezen.body.projection.view.valueProofs[0].requestedValue, proofs[0].requestedValue);
+    assert.equal(herlezen.body.projection.view.valueProofs[0].proof.integrity, true);
 
     browser = await pw.chromium.launch(browserOpties(pw));
     const context = await browser.newContext({ viewport: { width: 320, height: 720 } });

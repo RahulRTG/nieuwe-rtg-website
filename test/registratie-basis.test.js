@@ -7,7 +7,9 @@ const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
 const { startServer, stopNet } = require('./helper');
+const historischAccount = require('./lib/historisch-account');
 const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-registratie-basis-'));
+const bestaandEmail = 'bestaande-factuur@registratie.test', bestaandFactuur = 'BESTAANDE-DIENSTVERLENING';
 let srv, teller = 0;
 async function api(pad, body = {}, token) {
   const r = await fetch(srv.base + pad, { method: 'POST', headers: {
@@ -21,10 +23,23 @@ const registratie = (tier, pasApp = 'rtg') => api('/api/auth/register', {
 });
 const start = async () => { srv = await startServer({ env: { RTG_DATA_DIR: dir,
   RTG_STORE: 'sqlite', DATABASE_URL: '', PG_URL: '', SMTP_URL: '' } }); };
-test.before(start);
+test.before(async () => {
+  historischAccount(dir, { email: bestaandEmail, tier: 'guest', memberState: {
+    invoices: [{ id: bestaandFactuur, desc: 'Bestaande factuur dienstverlening', netto: 0,
+      bijdrage: 12.10, status: 'open', date: 'Historische afspraak' }]
+  } });
+  await start();
+});
 test.after(async () => { if (srv) await stopNet(srv.child); fs.rmSync(dir, { recursive: true, force: true }); });
 
 test('geen enkele aangeleverde tier koopt een pas of maakt een factuur', async () => {
+  const bestaand = await api('/api/auth/login', { login: bestaandEmail, password: 'geheim123', pasApp: 'rtg' });
+  assert.equal(bestaand.status, 200);
+  assert.equal(bestaand.body.state.user.tier, 'guest');
+  const eigen = await api('/api/state', {}, bestaand.body.token);
+  assert.equal(eigen.status, 200);
+  assert.equal(eigen.body.state.invoices.length, 1, 'de projectie verbergt bestaande facturen niet bij alle gratis accounts');
+  assert.equal(eigen.body.state.invoices[0].id, bestaandFactuur);
   for (const tier of [undefined, 'guest', 'rtg', 'business', 'lifestyle', 'business-lite', 'beheerder']) {
     const r = await registratie(tier);
     assert.equal(r.status, 200, JSON.stringify(r.body));

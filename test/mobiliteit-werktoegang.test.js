@@ -163,6 +163,21 @@ test('exact contracteinde en ongeldige zaakbinding sluiten nieuwe ritten zonder 
 test('personeels- en contractintrekking nemen eigen lezen, volgen, ontvangst en annuleren niet af', async () => {
   const f = await fixture(), gemaakt = f.route('/api/mob/vraag', aanvraag());
   const ref = gemaakt.body.opdracht.ref, o = f.ctx.opdrachtMet(ref);
+  // Expliciete eerdere betaalde sessie: een echte opgeslagen favoriet mag na
+  // terugval niet als persoonlijk pasrecht meeliften op de gratis nazorg.
+  const betaald = { ...f.sessie, tier: 'rtg' };
+  const plekken = require('../server/kern/mobiliteit/plekken')(f.ctx);
+  const bewaard = plekken.favZet(betaald, { naam: 'Mijn vertrekpunt', plek: { lat: 38.9, lng: 1.4 } });
+  assert.equal(bewaard.ok, true);
+  f.ctx.favLijst = session => {
+    assert.notEqual(session.tier, 'guest', 'gratis nazorg opent de favorietenbron niet');
+    return plekken.favLijst(session);
+  };
+  const metPas = f.route('/api/mob/mijn', {}, betaald);
+  assert.equal(metPas.status, 200);
+  assert.equal(metPas.body.favorieten.length, 1);
+  assert.equal(metPas.body.favorieten[0].id, bewaard.favoriet.id);
+  assert.equal(metPas.body.favorieten[0].naam, 'Mijn vertrekpunt');
   f.posities[0].active = 0; f.abo.beperk(); f.zaak.partnerStatus = 'beeindigd';
   assert.equal(f.route('/api/mob/vraag', aanvraag()).status, 403);
   const mijn = f.route('/api/mob/mijn', { key: 'user-999', accountId: 999, namensOrganisatie: 'ANDER' });

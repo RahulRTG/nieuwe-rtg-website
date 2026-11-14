@@ -699,7 +699,7 @@ omlaag.
 
 ## `shared/cookie.js`
 
-`public/shared/cookie/` -- 2 delen, 133 regels in de delen
+`public/shared/cookie/` -- 2 delen, 137 regels in de delen
 
 | deel | onderwerp |
 |---|---|

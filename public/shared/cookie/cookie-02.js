@@ -22,7 +22,11 @@
     if (ds) {
       /* Een DS-host reserveert ruimte in de documentstroom. */
       var vlak = document.querySelector('.ds-wereldwerkruimte .wd-page') || document.body;
-      vlak.insertBefore(el, vlak.firstChild);
+      /* De springlink is de eerste keyboardbestemming. De opslagmelding blijft
+         vroeg in de leesvolgorde, maar mag die fundamentele uitweg niet voor
+         zijn -- ook niet op publieke DS-schermen zonder app-shell. */
+      var spring = vlak.querySelector(':scope > .skip-link, :scope > .skip, :scope > .wd-skip');
+      vlak.insertBefore(el, spring ? spring.nextSibling : vlak.firstChild);
       return;
     }
     /* Oudere hosts behouden hun bestaande overlaypositie, maar de vormgeving

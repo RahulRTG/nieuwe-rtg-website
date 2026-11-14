@@ -1,11 +1,11 @@
 {
   "stempel": {
-    "op": "2026-11-10T14:28:37.259Z",
-    "commit": "aa79dabfa",
+    "op": "2026-11-14T17:18:30.647Z",
+    "commit": "594b13ce6",
     "boomVuil": false,
-    "boomAnders": 0,
+    "boomAnders": 1,
     "instrument": "scripts/edgekaart.js",
-    "node": "v24.18.0"
+    "node": "v24.22.1"
   },
   "uitleg": "Gemaakt met scripts/edgekaart.js; de methode staat in de kop. Rollen en verantwoordelijkheden zijn VERKLAARD en elk citaat staat letterlijk in zijn bestand. Elk citaat hangt aan het etiket (naam:letter) waar het over gaat, of aan null als het over geen van de veertien gaat; elk etiket s of b heeft minstens een citaat. schrijver = houdt of zet de toestand zelf; beslisser = kiest de uitkomst; lezer = leest haar of voedt haar via de API van de eigenaar. `gemeten` komt uit de bron zonder commentaar en kent alleen letterlijke namen: attributen alleen op body/html of een alias daarvan, opslag `onbekend` als de opslag niet letterlijk local- of sessionStorage heet. Fetch volgt daarnaast letterlijke aanroepen van eenduidige top-level const-helpers die direct fetch(parameter) doen; geen algemene callgraph. dodeKanalen gaat over rtg-events in public/ (zonder public/dist, .min.js en bundels, wel hun delen) plus index.html; een naam in luisterZonderZender kan nog een zender hebben onder `dynamisch`. `afgeleid` is wat de lexicale lezer over dezelfde wandeling vindt en naast de kaart legt: wie registerAction aanroept op de Edge-kern, wie data-rtg-world en wie data-rtg-edge-2-state op body zet. Een ondergrens: een samengestelde naam ontsnapt. Een dubbele eigenaar is een vondst en geen oordeel.",
   "bestanden": [
@@ -3369,8 +3369,8 @@
         {
           "rol": "schrijft",
           "etiket": "wereld:s",
-          "wat": "wereld op body in de werelden-scene",
-          "citaat": "if(id==='werelden'){d.body.dataset.rtgWorld=X.currentWorld();"
+          "wat": "wereld op body in de werelden-scene, buiten de magazine-eigenaar",
+          "citaat": "if(!d.body.classList.contains('ds-magazine-page'))d.body.dataset.rtgWorld=X.currentWorld();"
         }
       ],
       "verantwoordelijkheden": [
@@ -3465,6 +3465,41 @@
       }
     },
     {
+      "pad": "public/site/platform-magazine.js",
+      "laag": "afnemer",
+      "rollen": [
+        {
+          "rol": "schrijft",
+          "etiket": "wereld:s",
+          "wat": "terug naar het openbare magazine herstelt de living-wereld",
+          "citaat": "d.body.dataset.rtgWorld='living';"
+        }
+      ],
+      "verantwoordelijkheden": [
+        {
+          "naam": "wereld",
+          "als": "schrijver"
+        }
+      ],
+      "gemeten": {
+        "globals": [
+          "RTGPublicMagazine"
+        ],
+        "zendt": [
+          "rtg-public-reading-change"
+        ],
+        "luistert": [
+          "rtglang"
+        ],
+        "attributen": [
+          "data-magazine-view",
+          "data-rtg-world"
+        ],
+        "opslag": [],
+        "fetch": []
+      }
+    },
+    {
       "pad": "public/site/start/experience-edge.js",
       "laag": "afnemer",
       "rollen": [
@@ -3550,6 +3585,39 @@
         "luistert": [],
         "attributen": [
           "data-rtg-world"
+        ],
+        "opslag": [],
+        "fetch": []
+      }
+    },
+    {
+      "pad": "public/site/website-truth.js",
+      "laag": "afnemer",
+      "rollen": [
+        {
+          "rol": "schrijft",
+          "etiket": "wereld:s",
+          "wat": "de appkaart draagt haar bronwereld; de publieke paginakleur blijft bij de DS-presentatie",
+          "citaat": "kaart.dataset.rtgWorld = wereld.id;"
+        }
+      ],
+      "verantwoordelijkheden": [
+        {
+          "naam": "wereld",
+          "als": "schrijver"
+        }
+      ],
+      "gemeten": {
+        "globals": [
+          "RTGWebsiteTruth",
+          "RTGWebsiteTruthRefresh"
+        ],
+        "zendt": [
+          "rtg-website-truth"
+        ],
+        "luistert": [],
+        "attributen": [
+          "data-website-truth"
         ],
         "opslag": [],
         "fetch": []
@@ -3805,9 +3873,11 @@
         "public/site/platform-app.js",
         "public/site/platform-controller.js",
         "public/site/platform-controller.js",
+        "public/site/platform-magazine.js",
         "public/site/start/experience-edge.js",
         "public/site/start/experience-graph.js",
-        "public/site/start/experience.js"
+        "public/site/start/experience.js",
+        "public/site/website-truth.js"
       ],
       "beslissers": [
         "public/shared/command/bladstand.js",
@@ -3877,9 +3947,11 @@
       "public/shared/social-intelligence-runtime.js",
       "public/site/platform-app.js",
       "public/site/platform-controller.js",
+      "public/site/platform-magazine.js",
       "public/site/start/experience-edge.js",
       "public/site/start/experience-graph.js",
-      "public/site/start/experience.js"
+      "public/site/start/experience.js",
+      "public/site/website-truth.js"
     ],
     "blikveld": [
       "public/shared/edge/actiestaat.js",
@@ -4115,9 +4187,11 @@
         "public/site/platform-app.js",
         "public/site/platform-controller.js",
         "public/site/platform-controller.js",
+        "public/site/platform-magazine.js",
         "public/site/start/experience-edge.js",
         "public/site/start/experience-graph.js",
-        "public/site/start/experience.js"
+        "public/site/start/experience.js",
+        "public/site/website-truth.js"
       ],
       "beslissers": [
         "public/shared/command/bladstand.js",
@@ -4125,7 +4199,7 @@
         "public/shared/rtg-edge-smart-menu/rtg-edge-smart-menu-00.js",
         "public/shared/rtg-edge-system.js"
       ],
-      "waarom": "De huidige wereld wordt op vier plekken BEPAALD: de casco (key, anders work), randen.js (eigen padlijst), bladstand.js (het actieve blad) en de wereldcatalogus naast MAPPEN; het slimme menu laat het blad voorgaan op de casco. GESCHREVEN wordt hij op meer: rtg-world-identity.js bakt hem uit het MANIFEST op body, het wereldbureau zet zijn label in het merk van de Edge, en de landing zet hem per scene vanuit drie scripts."
+      "waarom": "De huidige wereld wordt op vier plekken BEPAALD: de casco (key, anders work), randen.js (eigen padlijst), bladstand.js (het actieve blad) en de wereldcatalogus naast MAPPEN; het slimme menu laat het blad voorgaan op de casco. GESCHREVEN wordt hij op meer: rtg-world-identity.js bakt hem uit het MANIFEST op body, het wereldbureau zet zijn label in het merk van de Edge, de landing zet hem per scene vanuit drie scripts en de openbare wereldpagina projecteert de appbron op body."
     },
     {
       "naam": "zichtbaarheidsstand",
@@ -4186,6 +4260,7 @@
       "public/shared/rtg-world-identity.js",
       "public/site/platform-app.js",
       "public/site/platform-controller.js",
+      "public/site/platform-magazine.js",
       "public/site/start/experience-edge.js",
       "public/site/start/experience-graph.js",
       "public/site/start/experience.js"
@@ -4202,10 +4277,10 @@
     ]
   },
   "telling": {
-    "bestanden": 78,
-    "rollen": 218,
+    "bestanden": 80,
+    "rollen": 220,
     "dubbeleEigenaars": 12,
     "dodeKanalen": 0,
-    "levendeKanalen": 19
+    "levendeKanalen": 20
   }
 }

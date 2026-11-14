@@ -25,6 +25,167 @@ function laad(d, fetch, poort, verander = s => s) {
   return vm.runInNewContext(verander(bron(d)) + '\napi;', { fetch, TOKEN: 'test-lid', window: { RTGGegevensPoort: poort } });
 }
 const antwoord = (status, data) => ({ status, ok: status >= 200 && status < 300, json: async () => data });
+// Echte Experience-client; alleen DOM en transport vormen de testgrens.
+function experienceScherm(verwerk, token = 'lid-a') {
+  const calls = [];
+  function node(tag) {
+    return { tag, children: [], dataset: {}, attrs: {}, events: {}, className: '',
+      appendChild(c) { this.children.push(c); return c; },
+      replaceChildren() { this.children = []; },
+      replaceWith(c) { oud.vervanger = c; },
+      setAttribute(k, v) { this.attrs[k] = v; },
+      getAttribute(k) { return this.attrs[k]; },
+      addEventListener(k, f) { this.events[k] = f; }, showModal() {}, close() {} };
+  }
+  const body = node('body'), oud = node('span');
+  body.attrs['data-rtg-world'] = 'travel';
+  const window = { addEventListener() {}, RTGId: (() => { let i = 0; return () => token + '-' + ++i; })() };
+  vm.runInNewContext(fs.readFileSync(path.join(__dirname, '../public/shared/experience-kernel.js'), 'utf8'), {
+    window, document: { body, readyState: 'complete', createElement: node,
+      querySelector: s => s === '.os-switcher__state' ? oud : null },
+    localStorage: { getItem: () => token }, location: { pathname: '/apps/rtg.html', search: '' },
+    async fetch(url, options) {
+      const call = { route: url.slice('/api/experience/'.length), body: JSON.parse(options.body),
+        authorization: options.headers.Authorization };
+      calls.push(call);
+      const r = await verwerk(call, calls);
+      return antwoord(r.status || 200, r.body);
+    }
+  }, { filename: 'public/shared/experience-kernel.js' });
+  function vind(cls, n = body) {
+    if (n.className.split(' ').includes(cls)) return n;
+    for (const c of n.children) { const match = vind(cls, c); if (match) return match; }
+  }
+  const klaar = () => new Promise(resolve => setImmediate(resolve));
+  return { calls, api: window.RTGExperience, klaar, vind,
+    async open() { await klaar(); oud.vervanger.events.click(); },
+    async klik() { const knop = vind('xp-action'); assert.ok(knop); assert.notEqual(knop.disabled, true);
+      knop.events.click(); await klaar(); } };
+}
+function experienceBeeld(titel = 'Vlucht om 19:30') {
+  return { currentWorld: 'travel', currentContext: { id: 'persoonlijk' },
+    contexts: [{ id: 'persoonlijk', label: 'Persoonlijk' }], manifests: { travel: { name: 'Reizen' } },
+    projection: { attention: [{ id: 'aandacht-1', revision: 'rev-' + titel, title: titel, lifecycle: 'OPEN', severity: 'INFO' }],
+      attentionSummary: { open: 1 }, completeness: { status: 'COMPLETE' }, provenance: { sources: ['reis'] } } };
+}
+function experienceAntwoord(call, calls, execute, bootstrap = () => experienceBeeld()) {
+  if (call.route === 'bootstrap') return { body: bootstrap() };
+  if (call.route === 'evidence') return { body: { evidence: [] } };
+  if (call.route === 'intent/preview') return { body: { preview: {
+    id: 'preview-' + calls.filter(c => c.route === 'intent/preview').length,
+    parameters: { attentionRevision: bootstrap().projection.attention[0].revision } } } };
+  assert.equal(call.route, 'intent/execute'); return execute(call);
+}
+test('Experience: serverstatus en foutcode blijven beschikbaar voor gericht herstel', async () => {
+  const s = experienceScherm((call, calls) => experienceAntwoord(call, calls,
+    () => ({ status: 409, body: { code: 'STALE_ATTENTION', error: 'Bron gewijzigd.' } })));
+  await s.klaar();
+  await assert.rejects(s.api.execute({ previewId: 'oud' }), e => {
+    assert.equal(e.status, 409); assert.equal(e.code, 'STALE_ATTENTION');
+    assert.equal(e.message, 'Bron gewijzigd.'); return true;
+  });
+});
+test('Experience: gewijzigde aandacht laadt de bron opnieuw en vraagt twee nieuwe menselijke stappen', async () => {
+  let gewijzigd = false, uitvoeringen = 0;
+  const s = experienceScherm((call, calls) => experienceAntwoord(call, calls, () => {
+    uitvoeringen++; gewijzigd = true;
+    return uitvoeringen === 1 ? { status: 409, body: { code: 'STALE_ATTENTION', error: 'Bron gewijzigd.' } }
+      : { body: { ok: true } };
+  }, () => experienceBeeld(gewijzigd ? 'Vlucht om 17:00' : 'Vlucht om 19:30')));
+  await s.open(); await s.klik(); await s.klik();
+  assert.equal(s.api.bootstrap().projection.attention[0].title, 'Vlucht om 17:00');
+  assert.match(s.vind('xp-flash').textContent, /gewijzigd.*bevestig opnieuw/i);
+  assert.equal(s.vind('xp-flash').attrs.role, 'status');
+  assert.equal(s.vind('xp-action').textContent, 'Gezien');
+  assert.equal(uitvoeringen, 1, 'vernieuwen voert nooit automatisch uit');
+  await s.klik();
+  assert.equal(uitvoeringen, 1, 'ook de eerste nieuwe klik maakt alleen een preview');
+  assert.equal(s.vind('xp-action').textContent, 'Bevestig gezien');
+  await s.klik();
+  const verzonden = s.calls.filter(c => c.route === 'intent/execute');
+  assert.equal(verzonden.length, 2);
+  assert.notEqual(verzonden[0].body.previewId, verzonden[1].body.previewId);
+  assert.notEqual(verzonden[0].body.idempotencyKey, verzonden[1].body.idempotencyKey);
+});
+test('Experience: verdwenen aandacht vóór preview vernieuwt zonder uitvoering', async () => {
+  const s = experienceScherm((call, calls) => call.route === 'intent/preview'
+    ? { status: 409, body: { code: 'STALE_ATTENTION', error: 'Verdwenen.' } }
+    : experienceAntwoord(call, calls, () => { throw new Error('mag niet uitvoeren'); }));
+  await s.open(); await s.klik();
+  assert.equal(s.calls.filter(c => c.route === 'bootstrap').length, 2);
+  assert.equal(s.calls.filter(c => c.route === 'intent/execute').length, 0);
+  assert.match(s.vind('xp-flash').textContent, /gewijzigd/);
+});
+test('Experience: bronwijziging tussen getoond beeld en preview vraagt eerst een nieuw beeld', async () => {
+  let gewijzigd = false, uitvoeringen = 0;
+  const s = experienceScherm((call, calls) => {
+    if (call.route === 'intent/preview') gewijzigd = true;
+    return experienceAntwoord(call, calls, () => { uitvoeringen++; return { body: { ok: true } }; },
+      () => experienceBeeld(gewijzigd ? 'Vlucht om 17:00' : 'Vlucht om 19:30'));
+  });
+  await s.open(); await s.klik();
+  assert.equal(s.api.bootstrap().projection.attention[0].title, 'Vlucht om 17:00');
+  assert.equal(s.vind('xp-action').textContent, 'Gezien', 'de ongelezen revisie is geen bevestigbare preview');
+  assert.equal(uitvoeringen, 0);
+  await s.klik();
+  assert.equal(s.vind('xp-action').textContent, 'Bevestig gezien');
+  assert.equal(uitvoeringen, 0);
+  await s.klik();
+  assert.equal(uitvoeringen, 1);
+  assert.equal(s.calls.find(c => c.route === 'intent/execute').body.previewId, 'preview-2');
+});
+test('Experience: preview zonder bronrevisie kan geen gezien bevestigen', async () => {
+  const s = experienceScherm((call, calls) => call.route === 'intent/preview'
+    ? { body: { preview: { id: 'oud-protocol', parameters: {} } } }
+    : experienceAntwoord(call, calls, () => { throw new Error('mag niet uitvoeren'); }));
+  await s.open(); await s.klik(); await s.klik();
+  assert.equal(s.calls.filter(c => c.route === 'intent/execute').length, 0);
+  assert.equal(s.vind('xp-action').textContent, 'Gezien');
+});
+test('Experience: na mislukte bronvernieuwing mag de oude getoonde aandacht geen nieuwe preview krijgen', async () => {
+  let gewijzigd = false, herladen = 0;
+  const s = experienceScherm((call, calls) => experienceAntwoord(call, calls, () => {
+    gewijzigd = true; return { status: 409, body: { code: 'STALE_ATTENTION', error: 'Bron gewijzigd.' } };
+  }, () => { if (gewijzigd && ++herladen === 1) throw new Error('Offline');
+    return experienceBeeld(gewijzigd ? 'Vlucht om 17:00' : 'Vlucht om 19:30'); }));
+  await s.open(); await s.klik(); await s.klik();
+  assert.match(s.vind('xp-flash').textContent, /niet.*opgehaald/i);
+  await s.open(); await s.klik();
+  assert.equal(s.calls.filter(c => c.route === 'intent/preview').length, 1,
+    'opnieuw openen en klikken probeert alleen de actuele bron te laden');
+  assert.equal(s.calls.filter(c => c.route === 'intent/execute').length, 1);
+  assert.equal(s.api.bootstrap().projection.attention[0].title, 'Vlucht om 17:00');
+  await s.klik();
+  assert.equal(s.calls.filter(c => c.route === 'intent/preview').length, 2);
+});
+for (const fout of ['netwerk', 'UNAUTHORIZED', 'FORBIDDEN', 'STALE_CONTEXT']) {
+  test('Experience: ' + fout + ' vervangt geen bevestiging of herhaalsleutel en wisselt geen account', async () => {
+    let pogingen = 0;
+    const s = experienceScherm((call, calls) => experienceAntwoord(call, calls, () => {
+      if (++pogingen > 1) return { body: { ok: true, replay: true } };
+      if (fout === 'netwerk') throw new Error('Verbinding verbroken na verzenden');
+      return { status: fout === 'UNAUTHORIZED' ? 401 : fout === 'FORBIDDEN' ? 403 : 409,
+        body: { code: fout, error: 'Aanvraag geweigerd.' } };
+    }));
+    await s.open(); await s.klik(); await s.klik();
+    assert.equal(s.calls.filter(c => c.route === 'bootstrap').length, 1);
+    assert.equal(s.calls.filter(c => c.route === 'intent/preview').length, 1);
+    assert.equal(pogingen, 1, 'geen automatische herhaling na een fout');
+    await s.klik();
+    const uitvoer = s.calls.filter(c => c.route === 'intent/execute');
+    assert.deepEqual(uitvoer[1], uitvoer[0], 'een mogelijk uitgevoerde aanvraag wordt exact herhaald');
+    assert.ok(s.calls.every(c => c.authorization === 'Bearer lid-a'), 'herstel verandert de actor niet');
+    const ander = experienceScherm((call, calls) => experienceAntwoord(call, calls,
+      () => ({ body: { ok: true } })), 'lid-b');
+    await ander.open(); await ander.klik();
+    assert.equal(ander.calls.filter(c => c.route === 'intent/execute').length, 0,
+      'een ander account erft geen bevestiging');
+    await ander.klik();
+    const tweede = ander.calls.find(c => c.route === 'intent/execute');
+    assert.equal(tweede.authorization, 'Bearer lid-b');
+    assert.notEqual(tweede.body.idempotencyKey, uitvoer[0].body.idempotencyKey);
+  });
+}
 function verzoek(pad, opties, verwacht, body) {
   assert.equal(pad, verwacht, 'geen dubbele prefix of relatieve route');
   assert.equal(opties.method, 'POST');

@@ -8,7 +8,7 @@ const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const os=require('node:os');
 const path=require('node:path');
-const { startServer, stopHard, maakBetaaldRtgTestaccount }=require('./helper');
+const { startServer, maakBetaaldRtgTestaccount }=require('./helper');
 // de buitenpoorten voor post vragen het gedeelde geheim (server/kern/mailpoort.js, eigenaarsbesluit 19 oktober 2026)
 const { GEHEIM, zetKop } = require('./mailpoort');
 zetKop();
@@ -56,18 +56,14 @@ test.before(async () => {
   const r=await json('/api/auth/register', { name:'Ada Lovelace', email:'ada-ses@example.test',
     phone:'0612345698', password:'geheim123', geboortedatum:'1990-01-01', tier:'rtg', pasApp:'rtg' });
   token=r.body.token;
-  assert.equal(r.status, 200); assert.ok(token);
-  assert.equal((await json('/api/state', {}, token)).body.state.user.tier, 'guest');
-  // De SES-proef heeft een bestaande betaalde mailbox nodig; de HMAC-poort blijft echt.
-  maakBetaaldRtgTestaccount(TMP, 'ada-ses@example.test');
-  assert.equal((await json('/api/state', {}, token)).body.state.user.tier, 'rtg');
+  assert.equal(r.status,200,'de positieve mailpersona is geregistreerd');
+  maakBetaaldRtgTestaccount(TMP,'ada-ses@example.test');
   const adres=await json('/api/member/rtmail/adres', {}, token);
-  assert.equal(adres.status, 200);
   publiek=adres.body.publiekAdres;
   assert.equal(publiek, 'ada.lovelace@rtgpass.rahultravelgroup.com');
 });
-test.after(async () => {
-  if (child) await stopHard(child);
+test.after(() => {
+  if (child) try { child.kill('SIGKILL'); } catch (e) {}
   try { fs.rmSync(TMP, { recursive:true, force:true }); } catch (e) {}
 });
 

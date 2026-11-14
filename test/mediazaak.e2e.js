@@ -17,7 +17,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
+const { startServer, stop, maakBetaaldRtgTestaccount, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
 
 const pw = laadPlaywright();
 
@@ -35,8 +35,12 @@ test('de leiding begint een interne bibliotheek, en wie nergens werkt ziet hem n
     const baas = await api('/api/auth/register', { name: 'Baas', email, phone: '06' + u,
       password: wachtwoord, geboortedatum: '1985-01-01', tier: 'rtg', pasApp: 'rtg' });
     assert.ok(baas.body.token, 'de baas is ingelogd');
+    maakBetaaldRtgTestaccount(TMP, email);
     const buiten = await api('/api/auth/register', { name: 'Buiten', email: 'mzb' + u + '@x.nl', phone: '07' + u,
       password: wachtwoord, geboortedatum: '1985-01-01', tier: 'rtg', pasApp: 'rtg' });
+
+    assert.equal(buiten.status, 200);
+    maakBetaaldRtgTestaccount(TMP, 'mzb' + u + '@x.nl');
 
     // hem echt aan een zaak koppelen, langs de weg die het huis daarvoor heeft
     const roster = (await api('/api/supplier/roster', { code: 'KIKUNOI' })).body;

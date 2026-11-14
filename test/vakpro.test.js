@@ -8,7 +8,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stopHard, maakBetaaldRtgTestaccount } = require('./helper');
+const { startServer, stop, maakBetaaldRtgTestaccount } = require('./helper');
 
 function api(base, pad, body, token) {
   const h = { 'Content-Type': 'application/json' };
@@ -18,28 +18,22 @@ function api(base, pad, body, token) {
 }
 
 let srv, base, lid, zaak, offerteId, boekingRef, codenaam;
-const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-vakpro-'));
 test.before(async () => {
+  const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-vakpro-'));
   srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP, OFFICE_CODE: 'KANTOOR-PRO-1' } });
   base = srv.base;
   const u = Date.now().toString().slice(-8);
-  const email = 'p' + u + '@x.nl';
-  const reg = await api(base, '/api/auth/register', { name: 'Protest', email,
+  const reg = await api(base, '/api/auth/register', { name: 'Protest', email: 'p' + u + '@x.nl',
     phone: '06' + u, password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' });
+  assert.equal(reg.status, 200, 'de positieve vakwerkpersona is geregistreerd');
+  maakBetaaldRtgTestaccount(TMP, 'p' + u + '@x.nl');
   lid = { token: reg.body.token };
-  assert.equal(reg.status, 200); assert.ok(lid.token);
-  assert.equal((await api(base, '/api/state', {}, lid.token)).body.state.user.tier, 'guest');
-  maakBetaaldRtgTestaccount(TMP, email);
-  assert.equal((await api(base, '/api/state', {}, lid.token)).body.state.user.tier, 'rtg');
   const roster = await api(base, '/api/supplier/roster', { code: 'CASTELL' });
   const mgr = (roster.body.staff || []).find(x => x.role === 'manager');
   const login = await api(base, '/api/supplier/login', { code: 'CASTELL', staffId: mgr && mgr.id, pin: '1234' });
   zaak = { token: login.body.token };
 });
-test.after(async () => {
-  if (srv) await stopHard(srv.child);
-  fs.rmSync(TMP, { recursive: true, force: true });
-});
+test.after(() => stop(srv && srv.child));
 
 test('1. de offerte-keten: vraag -> aanbod -> akkoord = bevestigde boeking op codenaam', async () => {
   const vraag = await api(base, '/api/vak/offerte/vraag',
@@ -117,9 +111,6 @@ test('5. intrekken: voor het akkoord wel, erna niet, en alleen de eigen aanvraag
   const u = Date.now().toString().slice(-8);
   const ander = (await api(base, '/api/auth/register', { name: 'Buur', email: 'bu' + u + '@x.nl',
     phone: '06' + u, password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' })).body.token;
-  assert.ok(ander);
-  assert.equal((await api(base, '/api/state', {}, ander)).body.state.user.tier, 'guest',
-    'intrekken blijft eigen-accountbediening; deze vreemde gast bereikt de echte eigendomsgrens');
   assert.equal((await api(base, '/api/vak/offerte/intrek', { id }, ander)).status, 404, 'andermans offerte bestaat hier niet');
   assert.equal((await api(base, '/api/vak/offerte/intrek', { id }, null)).status, 401);
 

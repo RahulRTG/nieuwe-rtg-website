@@ -23,12 +23,13 @@ async function post(base, route, body, token) {
   return data;
 }
 
-async function member(base) {
+async function member(base, dataDir) {
   const unique = Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
   const account = await post(base, '/api/auth/register', {
     name: 'Travel bevestigingsproef', email: 'travel-confirm-' + unique + '@voorbeeld.test',
     phone: '0612345678', password: 'geheim12345', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg'
   });
+  h.maakBetaaldRtgTestaccount(dataDir, 'travel-confirm-' + unique + '@voorbeeld.test');
   const status = await post(base, '/api/onboarding/status', {}, account.token);
   await post(base, '/api/onboarding/teken', {
     naam: 'Travel bevestigingsproef', akkoord: true, contractVersion: status.contract.versie
@@ -45,7 +46,7 @@ test('TravelOS toont het bestaande menselijke besluit zonder een tweede statusbr
     } });
     const browser = await h.startBrowser(pw);
     try {
-      const token = await member(server.base);
+      const token = await member(server.base, dataDir);
       const context = await browser.newContext({ viewport: { width: 1440, height: 960 }, serviceWorkers: 'block' });
       await context.addInitScript((value) => {
         localStorage.setItem('rtg_member_token', value);

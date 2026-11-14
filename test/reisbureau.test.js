@@ -7,7 +7,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stopHard, maakBetaaldRtgTestaccount } = require('./helper');
+const { maakBetaaldRtgTestaccount, startServer, stop } = require('./helper');
 
 function api(base, pad, body, token) {
   const h = { 'Content-Type': 'application/json' };
@@ -18,15 +18,14 @@ function api(base, pad, body, token) {
 function overNdagen(n) { return new Date(Date.now() + n * 86400000).toISOString().slice(0, 10); }
 
 let srv, base, lid, office;
-const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-reisbureau-'));
 test.before(async () => {
+  const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-reisbureau-'));
   srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   base = srv.base;
   const u = Date.now().toString().slice(-8);
   const reg = await api(base, '/api/auth/register', { name: 'Reiziger', email: 'r' + u + '@x.nl',
-    phone: '06' + u, password: 'geheim123', geboortedatum: '1990-01-01', pasApp: 'rtg' });
-  assert.equal(reg.status, 200, JSON.stringify(reg.body));
-  // Deze boekingsketen veronderstelt een betaalde RTG-pas, niet een Businessgoedkeuring.
+    phone: '06' + u, password: 'geheim123', geboortedatum: '1990-01-01', tier: 'business', pasApp: 'business' });
+  assert.equal(reg.status, 200);
   maakBetaaldRtgTestaccount(TMP, 'r' + u + '@x.nl');
   lid = { token: reg.body.token };
   /* Het kantoor erbij: de reisbalie is een kamer van het RTG-kantoor, en de
@@ -35,10 +34,7 @@ test.before(async () => {
   office = kantoor.body.token;
   assert.ok(office, 'het kantoor logt in');
 });
-test.after(async () => {
-  await stopHard(srv && srv.child);
-  fs.rmSync(TMP, { recursive: true, force: true });
-});
+test.after(() => stop(srv && srv.child));
 
 test('1. het reisbureau toont reizen; alleen na inlog', async () => {
   assert.equal((await api(base, '/api/reisbureau', {}, null)).status, 401);

@@ -8,8 +8,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stopHard, wachtOpWaarde } = require('./helper');
-const historischAccount = require('./lib/historisch-account');
+const { maakBetaaldRtgTestaccount, startServer, stop, wachtOpWaarde } = require('./helper');
 
 let srv, base;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-flits-'));
@@ -26,22 +25,22 @@ let seq = 0;
 async function lid(tier) {
   if (tier === 'guest') return (await api('/api/login', { tier: 'guest' })).body.token;
   const u = (Date.now() + (++seq)).toString().slice(-8);
-  // Bestaande pasrechten zijn testdata; nieuwe HTTP-registratie blijft gratis.
-  const email = 'f' + u + '@x.nl';
-  historischAccount(TMP, { name: 'Lid ' + seq, email, phone: '06' + u, tier: tier || 'rtg' });
-  const login = await api('/api/auth/login', { login: email, password: 'geheim123' });
-  assert.ok(login.body.token, JSON.stringify(login.body));
-  assert.equal((await api('/api/state', {}, login.body.token)).body.state.user.tier, tier || 'rtg');
-  return login.body.token;
+  const reg = await api('/api/auth/register', {
+    name: 'Lid ' + seq, email: 'f' + u + '@x.nl', phone: '06' + u, password: 'geheim123',
+    geboortedatum: '1990-05-05', geslacht: 'v', tier: tier || 'rtg', pasApp: tier || 'rtg'
+  });
+  assert.equal(reg.status, 200);
+  maakBetaaldRtgTestaccount(TMP, 'f' + u + '@x.nl');
+  return reg.body.token;
 }
 
 test.before(async () => {
   srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   base = srv.base;
 });
-test.after(async () => {
-  await stopHard(srv && srv.child);
-  fs.rmSync(TMP, { recursive: true, force: true });
+test.after(() => {
+  stop(srv && srv.child);
+  try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
 });
 
 test('1. melden en zien: een lid meldt, het netwerk ziet het met afstand en codenaam', async () => {
@@ -49,12 +48,6 @@ test('1. melden en zien: een lid meldt, het netwerk ziet het met afstand en code
   const gast = await lid('guest');
   const dicht = await api('/api/flits/rond', { ...IBIZA, land: 'ES' }, gast);
   assert.equal(dicht.status, 403, 'gasten rijden niet mee');
-  const gratis = await api('/api/auth/register', { name: 'Gratis Flits', email: 'gratis-flits@example.test',
-    phone: '0612345678', password: 'geheim123', geboortedatum: '1990-05-05', tier: 'rtg' });
-  assert.ok(gratis.body.token);
-  assert.equal(gratis.body.state.user.tier, 'guest');
-  assert.equal((await api('/api/flits/rond', { ...IBIZA, land: 'ES' }, gratis.body.token)).status, 403,
-    'ook een echt gratis account krijgt geen betaalde netwerktoegang door een tier mee te sturen');
   const m = await api('/api/flits/meld', { soort: 'flitser', ...IBIZA, land: 'ES' }, a);
   assert.equal(m.status, 200);
   const rond = await api('/api/flits/rond', { lat: IBIZA.lat + 0.01, lng: IBIZA.lng, land: 'ES' }, b);

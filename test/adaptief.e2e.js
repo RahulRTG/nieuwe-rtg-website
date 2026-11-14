@@ -18,7 +18,7 @@
    overgeslagen. Draai: npm run e2e */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { laadScherm, startServer, stopHard, maakBetaaldRtgTestaccount, letOpFouten, browserOpties, geenBrowser, wachtOpRust, pasAppAdres } = require('./helper');
+const { laadScherm, startServer, maakBetaaldRtgTestaccount, stop, letOpFouten, browserOpties, geenBrowser, wachtOpRust, pasAppAdres } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -33,20 +33,21 @@ async function api(base, pad, body) {
   return r.json();
 }
 
-/* Eén betaald RTG-lid voor Office/Geld, één server, en een venster op de maat die je meten wil. De intake
+/* Eén lid, één server, en een venster op de maat die je meten wil. De intake
    wordt op de STATUS gemockt en niet met `onbGate.hidden = true`: dat laatste is
    een wedloop met een serveraanroep die de poort even later gewoon weer opent
    (zie test/appmenu.e2e.js, waar dat is uitgezocht). */
 async function metLid(breedte, hoogte, fn) {
   const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-adaptief-'));
-  let child, base, browser;
+  const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
+  let browser;
   try {
-    ({ child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } }));
-    const email = 'adaptief' + process.pid + breedte + '@x.nl';
     const reg = await api(base, '/api/auth/register', { name: 'Adaptief Lid',
-      email, phone: '0612345799', password: 'geheim123', geboortedatum: '1990-01-01', pasApp: 'rtg' });
+      email: 'adaptief' + process.pid + breedte + '@x.nl', phone: '0612345799',
+      password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' });
     assert.ok(reg.token, 'lid-registratie geeft een token');
-    maakBetaaldRtgTestaccount(TMP, email);
+    maakBetaaldRtgTestaccount(TMP, 'adaptief' + process.pid + breedte + '@x.nl');
+
     browser = await pw.chromium.launch(browserOpties(pw));
     const ctx = await browser.newContext({ viewport: { width: breedte, height: hoogte } });
     await ctx.route('**/api/onboarding/status', (r) => r.fulfill({
@@ -67,11 +68,8 @@ async function metLid(breedte, hoogte, fn) {
       null, { timeout: 20000 });
     await fn(page, base, fouten);
   } finally {
-    try { if (browser) await browser.close(); }
-    finally {
-      await stopHard(child);
-      fs.rmSync(TMP, { recursive: true, force: true });
-    }
+    if (browser) await browser.close();
+    await stop(child);
   }
 }
 

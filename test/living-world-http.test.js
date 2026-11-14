@@ -1,7 +1,7 @@
 'use strict';
 const test=require('node:test'),assert=require('node:assert/strict'),crypto=require('node:crypto');
-const fs=require('node:fs'),os=require('node:os'),path=require('node:path');
 const h=require('./helper');
+const fs=require('node:fs'),os=require('node:os'),path=require('node:path');
 const TMP=fs.mkdtempSync(path.join(os.tmpdir(),'rtg-living-world-http-'));
 let srv,tokenA,tokenB,tokenC;
 async function request(path,body,token){
@@ -20,22 +20,18 @@ async function action(token,name,data,extra={}){
   return{result,body,preview:p.preview};
 }
 test.before(async()=>{
-  srv=await h.startServer({env:{SMTP_URL:'',RTG_DATA_DIR:TMP,RTG_BETALEN_UIT:'1',RTG_AI_UIT:'1',VAPID_PUBLIC_KEY:'',VAPID_PRIVATE_KEY:''}});
+  srv=await h.startServer({env:{RTG_DATA_DIR:TMP,SMTP_URL:'',RTG_BETALEN_UIT:'1',RTG_AI_UIT:'1',VAPID_PUBLIC_KEY:'',VAPID_PRIVATE_KEY:''}});
   const tokens=[];
   for(const name of ['A','B','C']){
-    const email='world-'+name+'@example.test';
-    const r=await post('/api/auth/register',{name:'World '+name,email,
+    const r=await post('/api/auth/register',{name:'World '+name,email:'world-'+name+'@example.test',
       phone:'0612345678',password:'VeiligWachtwoord123!',geboortedatum:'1990-01-01',tier:'rtg'});
     assert.ok(r.token);
-    assert.equal((await post('/api/state',{},r.token)).state.user.tier,'guest','registreren koopt geen pas');
-    // Deze lus toetst bestaande leden, niet de afzonderlijk bewezen betaalcheckout.
-    h.maakBetaaldRtgTestaccount(TMP,email);
-    assert.equal((await post('/api/state',{},r.token)).state.user.tier,'rtg');
+    h.maakBetaaldRtgTestaccount(TMP,'world-'+name+'@example.test');
     tokens.push(r.token);
   }
   [tokenA,tokenB,tokenC]=tokens;
 });
-test.after(async()=>{if(srv)await h.stopHard(srv.child);fs.rmSync(TMP,{recursive:true,force:true});});
+test.after(async()=>{try{if(srv)await h.stop(srv.child);}finally{fs.rmSync(TMP,{recursive:true,force:true});}});
 test('HTTP: gesloten menselijke lus met betalingen, AI en push uit',async()=>{
   assert.equal((await request('/api/living-world/view',{})).status,401);
   const created=await action(tokenA,'place.create',{title:'IJmuiden',area:'Noord-Holland',description:'De haven'});

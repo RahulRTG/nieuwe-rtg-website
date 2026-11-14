@@ -89,7 +89,12 @@
     if (ds) {
       /* Een DS-host reserveert ruimte in de documentstroom. */
       var vlak = document.querySelector('.ds-wereldwerkruimte .wd-page') || document.body;
-      vlak.insertBefore(el, vlak.firstChild);
+      // De bestaande springlink blijft de eerste toetsenbordingang.
+      var eerste = vlak.firstElementChild;
+      var href = eerste && eerste.tagName === 'A' && eerste.getAttribute('href');
+      var doel = href && href.charAt(0) === '#' && document.getElementById(href.slice(1));
+      var springt = doel && doel.matches('main,[role="main"],#main');
+      vlak.insertBefore(el, springt ? eerste.nextSibling : vlak.firstChild);
       return;
     }
     /* Oudere hosts behouden hun bestaande overlaypositie, maar de vormgeving

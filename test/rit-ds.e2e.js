@@ -13,11 +13,14 @@
         dir="rtl" zonder overloop.
    Zet RTG_DS_BEELDEN=<map> om de schermafbeeldingen te bewaren. */
 'use strict';
+const fixtureFs = require('node:fs'), fixtureOs = require('node:os'), fixturePath = require('node:path');
+const betaaldData = fixtureFs.mkdtempSync(fixturePath.join(fixtureOs.tmpdir(), 'rtg-'+'rit-ds'+'-'));
+
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
-const { startServer, stop, laadPlaywright, browserOpties, geenBrowser, letOpFouten } = require('./helper');
+const { startServer, maakBetaaldRtgTestaccount, stop, laadPlaywright, browserOpties, geenBrowser, letOpFouten } = require('./helper');
 const { decodeer, PAD } = require('../server/middleware/stijlbundel-rij');
 
 const pw = laadPlaywright(), skip = geenBrowser(pw);
@@ -62,11 +65,12 @@ async function kiesPlek(page, veld, lijst, naam) {
 
 test.before(async () => {
   if (skip) return;
-  srv = await startServer({ env: { SMTP_URL: '', RTG_AI_UIT: '1' } });
+  srv = await startServer({ env: { SMTP_URL: '', RTG_AI_UIT: '1', RTG_DATA_DIR: betaaldData } });
   browser = await pw.chromium.launch(browserOpties(pw));
   const now = Date.now();
   token = (await post('/api/auth/register', { name: 'Rit Lid', email: 'rit-' + now + '@e.test',
     phone: '06' + String(now).slice(-8), password: 'geheim123', geboortedatum: '1980-01-01', tier: 'rtg', pasApp: 'rtg' }, null)).token;
+  maakBetaaldRtgTestaccount(betaaldData, 'rit-' + now + '@e.test');
 });
 test.after(async () => { if (browser) await browser.close(); if (srv) await stop(srv.child); });
 

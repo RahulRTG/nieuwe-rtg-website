@@ -26,7 +26,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stopHard, maakBetaaldRtgTestaccount } = require('./helper');
+const { maakBetaaldRtgTestaccount, startServer, stop } = require('./helper');
 
 const dag = (n) => { const x = new Date(); x.setDate(x.getDate() + n); return x.toISOString().slice(0, 10); };
 let srv, base, lid, manager, deur;
@@ -40,11 +40,8 @@ test.before(async () => {
   srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   base = srv.base;
   const u = Date.now().toString().slice(-8);
-  const reg = await post('/api/auth/register', { name: 'Reiziger', email: 'ra' + u + '@x.nl',
-    phone: '06' + u, password: 'geheim123', geboortedatum: '1990-01-01', pasApp: 'rtg' });
-  assert.equal(reg.status, 200, JSON.stringify(reg.body));
-  lid = reg.body.token;
-  // Het verblijf is een betaalde ledendienst; tickets worden verder echt gekocht en betaald.
+  lid = (await post('/api/auth/register', { name: 'Reiziger', email: 'ra' + u + '@x.nl',
+    phone: '06' + u, password: 'geheim123', geboortedatum: '1990-01-01', tier: 'business', pasApp: 'business' })).body.token;
   maakBetaaldRtgTestaccount(TMP, 'ra' + u + '@x.nl');
   const roster = (await post('/api/supplier/roster', { code: 'ESVEDRA' })).body;
   const man = roster.staff.find(x => x.role === 'manager');
@@ -53,10 +50,7 @@ test.before(async () => {
   deur = (await post('/api/supplier/login', { code: 'ESVEDRA', staffId: rest.id, pin: '5678' })).body.token;
   assert.ok(lid && manager && deur, 'lid en zaak staan klaar');
 });
-test.after(async () => {
-  await stopHard(srv && srv.child);
-  fs.rmSync(TMP, { recursive: true, force: true });
-});
+test.after(() => { stop(srv && srv.child); try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {} });
 
 test('1. een betaald ticket hoort bij de reis naar dezelfde stad', async () => {
   // een verblijf in Ibiza, en een excursie bij Es Vedra Cruises (ook Ibiza)

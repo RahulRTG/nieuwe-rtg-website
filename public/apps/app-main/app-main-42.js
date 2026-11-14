@@ -104,6 +104,8 @@
   // en solliciteren. Geen ledenpas, geen reis, geen Rahul. Wat hij wel en niet
   // kan staat bij Ter plaatse -- dat is zijn app.
   function renderHomeGuest(){
+    // Een gratis eigen account kan ook aan een gezin gekoppeld zijn.
+    renderFoundation();
     document.documentElement.setAttribute('data-stem', 'rtg');
     stemKoppen();
     $('#homeSub').textContent = T('app.guestsub','Gratis, zonder pas');

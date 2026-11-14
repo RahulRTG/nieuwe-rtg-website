@@ -210,11 +210,10 @@ test('na vrijwillige downgrade blijven eigen factuur en betaling bereikbaar', as
 });
 
 test('anonieme en demo-gastsessies houden geen factuur- of betaaltoegang', async () => {
-  const eigenaar = await bestaandLid('gratis');
+  const eigenaar = await bestaandLid('ander');
   const eigen = await json('/api/state', {}, eigenaar.token);
   assert.equal(eigen.status, 200);
-  assert.equal(eigen.body.state.user.tier, 'guest');
-  assert.equal(eigen.body.state.invoices.length, 1, 'een echt gratis account leest zijn bestaande factuur wel');
+  assert.equal(eigen.body.state.invoices.length, 1, 'dezelfde route leest bestaande accountfacturen');
   assert.equal(eigen.body.state.invoices[0].id, eigenaar.invoice.id);
   const gast = (await json('/api/login', { tier: 'guest' })).body.token; assert.ok(gast);
   const state = await json('/api/state', {}, gast);

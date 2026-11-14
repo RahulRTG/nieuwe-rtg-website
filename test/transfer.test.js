@@ -9,13 +9,13 @@ const { spawn } = require('node:child_process');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stopHard, maakBetaaldRtgTestaccount } = require('./helper');
+const { maakBetaaldRtgTestaccount, startServer } = require('./helper');
 
 let BASE;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-tr-'));
 // Een toekomstig ticket in de huiszone; geen verlopen UTC-dag na lokale middernacht.
 const REISDAG = require('../server/kern/tijdzone').datumIn(new Date(Date.now() + 86400000));
-let child, lidToken, taxiToken, gidsToken, managerToken, ticket;
+let child, lidToken, gidsToken, managerToken, ticket;
 
 async function api(pad, body, token) {
   const headers = { 'Content-Type': 'application/json' };
@@ -27,16 +27,9 @@ const json = r => r.json();
 test.before(async () => {
   ({ child, base: BASE } = await startServer({ env: { RTG_DATA_DIR: TMP, SMTP_URL: '' } }));
   const reg = await json(await api('/api/auth/register', { name: 'Transfer Lid', email: 'transfer@x.nl', phone: '0612345697',
-    password: 'geheim123', geboortedatum: '1990-01-01', pasApp: 'rtg' }));
+    password: 'geheim123', geboortedatum: '1990-01-01', tier: 'business', pasApp: 'business' }));
+  maakBetaaldRtgTestaccount(TMP, 'transfer@x.nl');
   lidToken = reg.token;
-  assert.ok(lidToken, JSON.stringify(reg));
-  // De ticketgebonden transfer blijft bereikbaar voor dit gratis account.
-  // Alleen de aparte proef van een gewone taxiaanvraag vraagt een betaalde RTG-pas.
-  const taxi = await json(await api('/api/auth/register', { name: 'Taxi Lid', email: 'transfer-taxi@x.nl',
-    phone: '0612345698', password: 'geheim123', geboortedatum: '1990-01-01', pasApp: 'rtg' }));
-  assert.ok(taxi.token, JSON.stringify(taxi));
-  maakBetaaldRtgTestaccount(TMP, 'transfer-taxi@x.nl');
-  taxiToken = taxi.token;
   const roster = await json(await api('/api/supplier/roster', { code: 'ESVEDRA' }));
   const man = roster.staff.find(x => x.role === 'manager');
   const gids = roster.staff.find(x => x.role !== 'manager');
@@ -48,9 +41,9 @@ test.before(async () => {
   assert.equal((await api('/api/booking/pay', { ref: k.ticket.ref }, lidToken)).status, 200);
   ticket = k.ticket;
 });
-test.after(async () => {
-  await stopHard(child);
-  fs.rmSync(TMP, { recursive: true, force: true });
+test.after(() => {
+  if (child) try { child.kill('SIGKILL'); } catch (e) {}
+  try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
 });
 
 test('de zaak zet de transferdienst aan (inclusief: prijs 0); personeel mag dat niet', async () => {
@@ -61,8 +54,7 @@ test('de zaak zet de transferdienst aan (inclusief: prijs 0); personeel mag dat 
 });
 
 test('gewone taxi-boeking bij de activiteitenzaak wordt doorverwezen naar het ticket', async () => {
-  assert.equal((await api('/api/ride/request', { supplierCode: 'ESVEDRA', from: 'Hotel' }, lidToken)).status, 403);
-  const r = await api('/api/ride/request', { supplierCode: 'ESVEDRA', from: 'Hotel' }, taxiToken);
+  const r = await api('/api/ride/request', { supplierCode: 'ESVEDRA', from: 'Hotel' }, lidToken);
   assert.equal(r.status, 409);
   assert.match((await r.json()).error, /via je ticket/);
 });

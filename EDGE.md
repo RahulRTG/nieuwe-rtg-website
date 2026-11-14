@@ -58,8 +58,8 @@ staan; ontbreekt er een, dan zakt het script, want een verklaring die niet meer
 op de code past is een verouderde kaart en geen kaart. `--controle` hercompileert
 en vergelijkt met het ingecheckte register.
 
-Uitslag: <!--getal:edgekaart.bestanden-->78<!--/getal--> bestanden met
-<!--getal:edgekaart.rollen-->218<!--/getal--> verklaarde rollen, allemaal met een
+Uitslag: <!--getal:edgekaart.bestanden-->80<!--/getal--> bestanden met
+<!--getal:edgekaart.rollen-->220<!--/getal--> verklaarde rollen, allemaal met een
 citaat dat letterlijk staat;
 <!--getal:edgekaart.dubbeleEigenaars-->12<!--/getal--> verantwoordelijkheden met
 meer dan één schrijver of beslisser (par. 1), en
@@ -71,7 +71,7 @@ waren het er 17, en vijf daarvan waren precies de signalen die de Edge zou
 moeten krijgen (`rtg-adaptive-project`, `-presence`, `-identity`,
 `-continuation`, `-action`: de adaptieve Edge luisterde, en geen enkel scherm
 verstuurde ze). Ronde 1 heeft ze alle 17 gesloten (par. 11). Daarnaast staan er
-<!--getal:edgekaart.levendeKanalen-->19<!--/getal--> levende kanalen, met zender
+<!--getal:edgekaart.levendeKanalen-->20<!--/getal--> levende kanalen, met zender
 én luisteraar: dat getal houdt de nul eerlijk, want een wandeling die niets ziet
 geeft ook nul dood. Namen die in code worden samengesteld, staan apart onder
 `dynamisch` en worden niet geraden.

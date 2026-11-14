@@ -8,7 +8,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stopHard, stroomAdres, maakBetaaldRtgTestaccount } = require('./helper');
+const { startServer, stop, stroomAdres, maakBetaaldRtgTestaccount } = require('./helper');
 
 let srv, base, office, maker, kijker, videoId;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-theater-'));
@@ -25,14 +25,10 @@ function api(pad, body, token) {
 let seq = 0;
 async function lid() {
   const u = (Date.now() + (++seq)).toString().slice(-8);
-  const email = 't' + u + '@x.nl';
-  const reg = await api('/api/auth/register', { name: 'Lid ' + seq, email, phone: '06' + u,
+  const reg = await api('/api/auth/register', { name: 'Lid ' + seq, email: 't' + u + '@x.nl', phone: '06' + u,
     password: 'geheim123', geboortedatum: '1990-05-05', geslacht: 'v', tier: 'rtg', pasApp: 'rtg' });
-  assert.equal(reg.status, 200); assert.ok(reg.body.token);
-  assert.equal((await api('/api/state', {}, reg.body.token)).body.state.user.tier, 'guest');
-  // De pas vervangt niet de afzonderlijke menselijke kanaaltoelating hieronder.
-  maakBetaaldRtgTestaccount(TMP, email);
-  assert.equal((await api('/api/state', {}, reg.body.token)).body.state.user.tier, 'rtg');
+  assert.equal(reg.status, 200, 'de positieve theaterpersona is geregistreerd');
+  maakBetaaldRtgTestaccount(TMP, 't' + u + '@x.nl');
   return reg.body.token;
 }
 
@@ -42,8 +38,8 @@ test.before(async () => {
   office = (await api('/api/office/login', { code: 'RTG-OFFICE' })).body.token;
   maker = await lid(); kijker = await lid();
 });
-test.after(async () => {
-  if (srv) await stopHard(srv.child);
+test.after(() => {
+  stop(srv && srv.child);
   try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
 });
 

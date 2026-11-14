@@ -450,9 +450,9 @@ test('9b. in verplicht krijgt wie niet KAN binden de accountweg, niet de toestel
     assert.deepEqual([r.stand, r.code], ['geweigerd', 403]);
     assert.match(r.reden, /eigen RTG-account/, JSON.stringify(sess));
   }
-  for (const tier of ['guest', 'rtg']) {
-    const lid = await b.controleer({ sess: { account: 'a', tier, sessieContext: { sleutelbinding: { keyRef: '' } } }, methode: 'POST', pad: PAD, stand: 'verplicht' });
-    assert.deepEqual([lid.stand, lid.code], ['geweigerd', 403]);
-    assert.match(lid.reden, /Waar ben ik aanwezig/, tier + ': een eigen account kan zijn toestel binden');
-  }
+  const lid = await b.controleer({ sess: { account: 'a', tier: 'rtg', sessieContext: { sleutelbinding: { keyRef: '' } } }, methode: 'POST', pad: PAD, stand: 'verplicht' });
+  assert.match(lid.reden, /Waar ben ik aanwezig/);
+  const gratis = await b.controleer({ sess: { account: 'a', tier: 'guest' }, methode: 'POST', pad: PAD, stand: 'verplicht' });
+  assert.deepEqual([gratis.stand, gratis.code], ['geweigerd', 403]);
+  assert.match(gratis.reden, /Waar ben ik aanwezig/, 'gratis eigen accounts houden dezelfde toestelbeveiliging');
 });

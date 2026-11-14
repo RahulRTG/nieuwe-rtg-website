@@ -24,6 +24,30 @@ function sources(html) {
     .filter(Boolean);
 }
 
+// Een bron kan een bestand én een genummerde documentsectie aanwijzen. Beide
+// moeten bestaan; alleen de sectieverwijzing afknippen zou een fout verbergen.
+function sourceExists(source) {
+  const match = /^([^§]+?)(?:\s+§\s*(\d+(?:\.\d+)*))?$/.exec(source);
+  if (!match) return false;
+  const file = path.resolve(root, match[1].trim());
+  if (!file.startsWith(root + path.sep) || !fs.existsSync(file)) return false;
+  if (!fs.statSync(file).isFile()) return !match[2] && match[1].trim().endsWith('/') && fs.statSync(file).isDirectory();
+  if (!match[2]) return true;
+  if (!file.endsWith('.md')) return false;
+  return [...fs.readFileSync(file, 'utf8').matchAll(/^#{1,6}\s+(\d+(?:\.\d+)*)(?:\.?\s|$)/gm)]
+    .some(heading => heading[1] === match[2]);
+}
+
+test('documentankers controleren de exacte sectie en weigeren ongeldige bronnen', () => {
+  for (const source of ['FOUNDATION.md §5', 'PRIJZEN.md §7.7', 'server/foundation/zorg.js', 'public/apps/horeca/']) {
+    assert.equal(sourceExists(source), true, source);
+  }
+  for (const source of ['FOUNDATION.md §9999', 'PRIJZEN.md §7.70', 'PRIJZEN.md §7.7.extra',
+    'PRIJZEN.md §', 'server/foundation/zorg.js §5', 'bestaat-niet.md', '../README.md', 'server']) {
+    assert.equal(sourceExists(source), false, source);
+  }
+});
+
 test('alle compacte startblokken openen een begrensde uitleg uit de codebasis', () => {
   const html = read('index.html');
   const cards = [...html.matchAll(/<button type="button" class="fragment" data-code-proof[\s\S]*?<\/button>/g)];
@@ -53,7 +77,7 @@ test('elk resultaat- en mogelijkheidsblok op de vier wereldpagina’s heeft verd
 test('alle genoemde code-ankers bestaan in deze repository', () => {
   const html = [read('index.html'), read('public/site/techniek/techniek.html'), ...worldPages.map(read)].join('\n');
   for (const source of sources(html)) {
-    assert.equal(fs.existsSync(path.join(root, source)), true, 'onbekend code-anker: ' + source);
+    assert.equal(sourceExists(source), true, 'onbekend bestand of documentsectie: ' + source);
   }
 });
 

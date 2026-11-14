@@ -49,7 +49,6 @@
    heeft aangeroepen; de rest houdt zijn profiel en zijn op-stempel.
 
    Draai:  node scripts/inhoudskaart.js
-   Hermeet ook bestaande waarneembare profielen: voeg --hermeet-kaart toe.
    ========================================================================== */
 'use strict';
 const fs = require('fs');
@@ -58,30 +57,11 @@ const { start } = require('./lib/wegwerpserver');
 const { alleRoutes, rolVan } = require('./lib/routes');
 const { plausibelLijf } = require('./lib/rolproef');
 const { stempel, eisSchoneBoom, magSchrijven } = require('./lib/stempel');
-const { haalSleutels, meldSleutels } = require('./lib/proefsleutels');
-const { accountRolVoor } = require('./lib/accountroutes');
+const { haalSleutels, meldSleutels, BASISROLLEN } = require('./lib/proefsleutels');
 
 const WORTEL = path.join(__dirname, '..');
 const UITSLAG = path.join(WORTEL, 'INHOUDSKAART.json');
 const OUTPUT = path.join(WORTEL, 'OUTPUTPROEF.json');
-
-/* De generator en inhoudswacht meten dezelfde ongebonden synthetische sessies.
-   Dit is antwoordVORM, geen bewijs van de productie-toestelpoort. Aanbevolen
-   weigert nog steeds een gebonden sessie zonder bewijs; verplicht blijft de
-   productiestandaard. Alleen deze eigen wegwerpserver krijgt de meetstand. */
-const MEETOMGEVING = Object.freeze({ RTG_DEMO: '1', RTG_MAGNAAT_TEST: '1',
-  OFFICE_CODE: 'RTG-OFFICE-PROEF', RTG_BEZITSBEWIJS: 'aanbevolen' });
-
-function meetRolVoor(route) {
-  const rol = rolVan(route.bewakers);
-  if (rol) return rol;
-  /* Deze ene route bewaakt de sessie IN de handler met elke.magSessie, niet
-     met benoemde middleware (server/routes/social.js; publieke-rand.test.js).
-     De vormproef houdt zijn positieve ledensessie; geen anonieme 401 als nieuw
-     contract. Een nieuwe benoemde poort mag deze fixture niet passeren. */
-  if (!(route.bewakers || []).length && route.methode === 'GET' && route.pad === '/api/push/key') return 'member';
-  return null;
-}
 
 /* Het profiel van een antwoord: pure functie, los toetsbaar. */
 function profielVan(data) {
@@ -120,63 +100,34 @@ function grondVan(status, profiel) {
   return null;
 }
 
-/* Hermeten verandert geen OUTPUTPROEF-oordeel: het ververst alleen het echte
-   antwoordprofiel. Ook oude kaartregels moeten nog in de huidige bron staan. */
-function kiesMeetdoel(output, kaart, inventaris, deuren, hermeetKaart = false) {
-  const kandidaten = new Set(Object.entries(output)
-    .filter(([, c]) => c.staat === 'blind' || c.staat === 'onbeslist').map(([k]) => k));
-  if (hermeetKaart) {
-    for (const [k, p] of Object.entries(kaart)) if (!p.onwaarneembaar) kandidaten.add(k);
-  }
-  const dicht = deuren.split(',').filter(Boolean);
-  return new Set(inventaris.filter(r => r.pad.startsWith('/api/') &&
-    !dicht.some(d => r.pad === d || r.pad.startsWith(d)) && kandidaten.has(r.methode + ' ' + r.pad))
-    .map(r => r.methode + ' ' + r.pad));
-}
-
-function eisMeetsleutels(routes, tokens) {
-  const missen = [...new Set(routes.map(r => r.rol))]
-    .filter(rol => rol !== 'publiek' && !tokens[rol]);
-  if (missen.length) throw new Error('De inhoudskaart mist sleutels voor ' + missen.join(', ') +
-    '; geen terugval naar een demo-pas of anonieme meting.');
-}
-
-async function ruimMeetserverOp({ kind, klaar }) {
-  // klaar() verwijdert de map direct; wacht eerst tot het eigen kind niet meer kan schrijven.
-  if (kind.exitCode === null && kind.signalCode === null) {
-    await new Promise((resolve, reject) => {
-      kind.once('exit', resolve);
-      try {
-        if (!kind.kill('SIGKILL')) throw new Error('De inhoudskaart kon de meetserver niet stoppen.');
-      } catch (e) { kind.removeListener('exit', resolve); reject(e); }
-    });
-  }
-  await klaar();
-}
-
-module.exports = { profielVan, onwaarneembaar, grondVan, kiesMeetdoel, eisMeetsleutels, ruimMeetserverOp,
-  MEETOMGEVING, meetRolVoor };
+module.exports = { profielVan, onwaarneembaar, grondVan };
 if (require.main !== module) return;
 
 (async () => {
   let reg;
   try { reg = JSON.parse(fs.readFileSync(OUTPUT, 'utf8')); }
   catch (e) { console.error('geen OUTPUTPROEF.json; zonder blindenlijst valt er niets in kaart te brengen'); process.exit(2); }
-  let oud = {};
-  try { oud = JSON.parse(fs.readFileSync(UITSLAG, 'utf8')).perRoute || {}; }
-  catch (e) { if (!e || e.code !== 'ENOENT') throw e; }
   /* Blind EN onbeslist: allebei zijn het routes zonder toerekenbare
      inhoudstoets, en voor allebei is een vormcontract de sluitweg. DEUREN
      doen niet mee: die worden in elke lie-run gespaard (RTG_LIEG_NIET), dus
      een contract erop kan nooit tot een gerichte meting leiden. */
   const { DEUREN } = require('./mutatie');
-  const inventaris = alleRoutes();
-  const hermeetKaart = process.argv.includes('--hermeet-kaart');
-  const doel = kiesMeetdoel(reg.perRoute || {}, oud, inventaris, DEUREN, hermeetKaart);
-  if (!doel.size) { console.log('geen te meten routes binnen de huidige bron en selectie'); return; }
+  const isDeur = (pad) => DEUREN.split(',').some(d => pad === d || pad.startsWith(d));
+  const doel = new Set(Object.entries(reg.perRoute || {})
+    .filter(([, c]) => c.staat === 'blind' || c.staat === 'onbeslist')
+    .filter(([k]) => !isDeur(k.split(' ')[1]))
+    .filter(([k]) => k.split(' ')[1].startsWith('/api/'))
+    .map(([k]) => k));
+  // Bestaande vormcontracten moeten ook opnieuw kunnen worden gemeten nadat
+  // de OUTPUT-proef ze heeft bewezen; anders verouderen ze onherstelbaar.
+  let oud = {};
+  try { oud = JSON.parse(fs.readFileSync(UITSLAG, 'utf8')).perRoute || {}; } catch (e) { if (!e || e.code !== 'ENOENT') throw e;}
+  for (const [k, v] of Object.entries(oud))
+    if (!v.onwaarneembaar && !isDeur(k.split(' ')[1])) doel.add(k);
+  if (!doel.size) { console.log('geen routes met een te meten vormcontract'); return; }
 
-  /* De rolverdeling, met de PUBLIEKE routes erbij: meetRolVoor() behoudt ook
-     de expliciete intern bewaakte sessiefixture. Een route zonder poort is
+  /* De rolverdeling, met de PUBLIEKE routes erbij: rolVan() geeft daar niets
+     terug en verdeelOpRol zou ze wegleggen, maar een route zonder poort is
      juist de makkelijkste om in kaart te brengen -- gewoon aankloppen zonder
      token. Eigenrollen (boardroom, scim, webauthn, werkplekbaas) blijven
      erbuiten met hun reden: dit instrument heeft er geen sleutel voor. */
@@ -189,81 +140,76 @@ if (require.main !== module) return;
   const KENT = new Set(['member', 'office', 'supplier', 'kantoor-op-naam']);
   const routes = [];
   let zonderSleutel = 0;
-  for (const r of inventaris) {
+  for (const r of alleRoutes()) {
     const s = r.methode + ' ' + r.pad;
     if (!doel.has(s)) continue;
-    const rol = meetRolVoor(r);
+    const rol = rolVan(r.bewakers);
     if (!rol) routes.push({ methode: r.methode, pad: r.pad, rol: 'publiek' });
-    else if (KENT.has(rol)) routes.push({ methode: r.methode, pad: r.pad,
-      rol: accountRolVoor(rol, r.pad).rol || rol });
+    else if (KENT.has(rol)) routes.push({ methode: r.methode, pad: r.pad, rol });
     else zonderSleutel++;
   }
   const verdeling = { metRol: routes, zonderRol: { length: zonderSleutel } };
   console.log('\n=== DE INHOUDSKAART ===\n');
-  console.log('  geselecteerde bronroutes (geen deur) : ' + doel.size +
-    (hermeetKaart ? ' (inclusief bestaande waarneembare kaart)' : ' (blind/onbeslist)'));
+  console.log('  blinde + onbesliste routes (geen deur): ' + doel.size);
   console.log('  bereikbaar (publiek of bekende rol)   : ' + verdeling.metRol.length);
 
-  console.log('  bezitsbewijs meetopstelling            : ' + MEETOMGEVING.RTG_BEZITSBEWIJS + ' (ongebonden synthetische sessies)');
-  const server = await start({ naam: 'inhoudskaart', env: MEETOMGEVING });
-  const { basis } = server;
+  const server = await start({ naam: 'inhoudskaart', env: { NODE_ENV: 'test', RTG_DEMO: '1', RTG_MAGNAAT_TEST: '1',
+    // Dezelfde geïsoleerde toestelstand als test/inhoudswacht.test.js.
+    RTG_BEZITSBEWIJS: 'aanbevolen', OFFICE_CODE: 'RTG-OFFICE-PROEF' } });
+  const { basis, klaar } = server;
+  const doe = async (methode, pad, lijf, tok) => {
+    try {
+      const r = await fetch(basis + pad, { method: methode,
+        headers: { 'Content-Type': 'application/json', ...(tok ? { Authorization: 'Bearer ' + tok } : {}) },
+        body: methode === 'GET' || methode === 'HEAD' ? undefined : JSON.stringify(lijf || {}) });
+      let data = null; try { data = await r.json(); } catch (e) {}
+      return { status: r.status, data };
+    } catch (e) { return { status: 0, data: null }; }
+  };
+  /* De sleutelbos: ./lib/proefsleutels.js. `doe` heeft de methode vooraan, dus
+     de bos krijgt hier een post() die daarop aansluit -- geen tweede kopie. */
+  const bos = await haalSleutels({ post: (pad, lijf, tok) => doe('POST', pad, lijf, tok) });
+  const { tokens } = bos;
+  meldSleutels(bos);
+
+  /* Vaste volgorde: de wacht roept straks in dezelfde volgorde aan, zodat de
+     opgebouwde toestand (route A maakte iets dat route B ziet) gelijk loopt. */
+  const rij = verdeling.metRol.slice().sort((a, b) =>
+    (a.methode + ' ' + a.pad).localeCompare(b.methode + ' ' + b.pad));
+
   const nuOp = new Date().toISOString();
   const vers = {};
   let waarneembaar = 0, kaal = 0, dood = 0;
-  try {
-    const doe = async (methode, pad, lijf, tok) => {
-      try {
-        const r = await fetch(basis + pad, { method: methode,
-          headers: { 'Content-Type': 'application/json', ...(tok ? { Authorization: 'Bearer ' + tok } : {}) },
-          body: methode === 'GET' || methode === 'HEAD' ? undefined : JSON.stringify(lijf || {}) });
-        let data = null; try { data = await r.json(); } catch (e) {}
-        return { status: r.status, data };
-      } catch (e) { return { status: 0, data: null }; }
-    };
-    /* De sleutelbos: ./lib/proefsleutels.js. `doe` heeft de methode vooraan, dus
-       de bos krijgt hier een post() die daarop aansluit -- geen tweede kopie. */
-    const bos = await haalSleutels({ post: (pad, lijf, tok) => doe('POST', pad, lijf, tok) });
-    const { tokens } = bos;
-    meldSleutels(bos);
-    eisMeetsleutels(routes, tokens);
-
-    /* Vaste volgorde: de wacht roept straks in dezelfde volgorde aan, zodat de
-       opgebouwde toestand (route A maakte iets dat route B ziet) gelijk loopt. */
-    const rij = verdeling.metRol.slice().sort((a, b) =>
-      (a.methode + ' ' + a.pad).localeCompare(b.methode + ' ' + b.pad));
-
-    for (const r of rij) {
-      const uit = await doe(r.methode, r.pad, plausibelLijf(r.pad), tokens[r.rol]);
-      const sleutel = r.methode + ' ' + r.pad;
-      if (!uit.status) { dood++; continue; }
-      const profiel = profielVan(uit.data);
-      /* Geen JSON (een bundel, een CSV-export): daar valt met sleutels niets te
-         bewaken, en een leeg profiel in de kaart zou een wacht zijn die niets
-         wacht. Eerlijk onwaarneembaar, met de vorm als reden. */
-      const grond = grondVan(uit.status, profiel);
-      if (grond === 'geen-json') {
-        kaal++;
-        vers[sleutel] = { methode: r.methode, pad: r.pad, rol: r.rol, status: uit.status,
-          onwaarneembaar: true, grond: 'geen-json', op: nuOp,
-          reden: 'het antwoord is geen JSON-object (vorm: ' + profiel.vorm + '); een vormcontract ' +
-            'op sleutels kan hier niets bewaken' };
-        continue;
-      }
-      if (grond === 'gelijk-aan-leugen') {
-        kaal++;
-        vers[sleutel] = { methode: r.methode, pad: r.pad, rol: r.rol, status: uit.status,
-          onwaarneembaar: true, grond: 'gelijk-aan-leugen', op: nuOp,
-          reden: 'het ware antwoord is zelf niet van de leugen te onderscheiden (200 met hoogstens ok); ' +
-            'hier valt met vormen niets te bewaken -- een echte inhoudstoets moet dieper kijken dan dit register kan' };
-        continue;
-      }
-      waarneembaar++;
+  for (const r of rij) {
+    const uit = await doe(r.methode, r.pad, plausibelLijf(r.pad), tokens[r.rol]);
+    const sleutel = r.methode + ' ' + r.pad;
+    if (!uit.status) { dood++; continue; }
+    const profiel = profielVan(uit.data);
+    /* Geen JSON (een bundel, een CSV-export): daar valt met sleutels niets te
+       bewaken, en een leeg profiel in de kaart zou een wacht zijn die niets
+       wacht. Eerlijk onwaarneembaar, met de vorm als reden. */
+    const grond = grondVan(uit.status, profiel);
+    if (grond === 'geen-json') {
+      kaal++;
       vers[sleutel] = { methode: r.methode, pad: r.pad, rol: r.rol, status: uit.status,
-        sleutels: profiel.sleutels, dragend: profiel.dragend, op: nuOp };
+        onwaarneembaar: true, grond: 'geen-json', op: nuOp,
+        reden: 'het antwoord is geen JSON-object (vorm: ' + profiel.vorm + '); een vormcontract ' +
+          'op sleutels kan hier niets bewaken' };
+      continue;
     }
-  } finally {
-    await ruimMeetserverOp(server);
+    if (grond === 'gelijk-aan-leugen') {
+      kaal++;
+      vers[sleutel] = { methode: r.methode, pad: r.pad, rol: r.rol, status: uit.status,
+        onwaarneembaar: true, grond: 'gelijk-aan-leugen', op: nuOp,
+        reden: 'het ware antwoord is zelf niet van de leugen te onderscheiden (200 met hoogstens ok); ' +
+          'hier valt met vormen niets te bewaken -- een echte inhoudstoets moet dieper kijken dan dit register kan' };
+      continue;
+    }
+    waarneembaar++;
+    vers[sleutel] = { methode: r.methode, pad: r.pad, rol: r.rol, status: uit.status,
+      sleutels: profiel.sleutels, dragend: profiel.dragend, op: nuOp };
   }
+  klaar();
 
   /* Stapelen: vers wint, de rest blijft. */
   /* Snoeien bij het stapelen: geen niet-/api/-paden (buiten bereik van de
@@ -296,9 +242,6 @@ if (require.main !== module) return;
     grens: 'Een profiel borgt de VORM van het antwoord, niet de waarheid van de waarden -- dit is de ' +
       'vloer, geen plafond. Routes met onwaarneembaar:true zijn eerlijk niet te bewaken op vorm en ' +
       'blijven blind. En de kaart kent alleen rollen waarvoor dit instrument een token heeft.',
-    opstellingDezeRun: { bezitsbewijs: MEETOMGEVING.RTG_BEZITSBEWIJS,
-      sessies: 'synthetisch, zonder toestelbinding',
-      grens: 'Geldt voor versDezeRun, niet voor overgenomen profielen. Antwoordvormbewijs, geen bewijs van de productie-toestelpoort.' },
     gemeten: { doelRoutes: doel.size, inKaart: Object.keys(perRoute).length,
       waarneembaar: Object.values(perRoute).filter(p => !p.onwaarneembaar).length,
       onwaarneembaar: Object.values(perRoute).filter(p => p.onwaarneembaar).length,

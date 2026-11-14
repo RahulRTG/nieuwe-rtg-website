@@ -1,11 +1,11 @@
 {
   "stempel": {
-    "op": "2026-11-14T14:50:51.571Z",
-    "commit": "49eb24cfb",
+    "op": "2026-11-14T18:52:50.822Z",
+    "commit": "3885a337f",
     "boomVuil": false,
-    "boomAnders": 17,
+    "boomAnders": 2,
     "instrument": "scripts/doorbelasting.js",
-    "node": "v26.13.1"
+    "node": "v24.22.1"
   },
   "graad": "gemeten",
   "wat": "of de doorbelasting van RTG aantoonbaar te classificeren is: per vorm en per euro",

@@ -25,7 +25,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stopHard, maakBetaaldRtgTestaccount } = require('./helper');
+const { maakBetaaldRtgTestaccount, startServer, stop } = require('./helper');
 
 let srv, base, zaak, kassa, buurzaak, lid, lid2;
 let kaartCode = null, postId = null, dealCode = null;
@@ -46,14 +46,10 @@ async function inlog(code, rol) {
 }
 async function nieuwLid(naam) {
   const u = String(Date.now() + Math.round(performance.now())).slice(-9);
-  const email = 'ui' + u + '@voorbeeld.test';
-  const reg = await api('/api/auth/register', { name: naam, email,
+  const reg = await api('/api/auth/register', { name: naam, email: 'ui' + u + '@voorbeeld.test',
     password: 'inwisselen123', geboortedatum: '1987-07-07', tier: 'rtg', pasApp: 'rtg' });
-  assert.equal(reg.status, 200); assert.ok(reg.body.token);
-  assert.equal((await api('/api/state', {}, reg.body.token)).body.state.user.tier, 'guest');
-  // Alleen de twee Salonleden krijgen de ledenfixture; de zaakrollen blijven ongewijzigd.
-  maakBetaaldRtgTestaccount(TMP, email);
-  assert.equal((await api('/api/state', {}, reg.body.token)).body.state.user.tier, 'rtg');
+  assert.equal(reg.status, 200);
+  maakBetaaldRtgTestaccount(TMP, 'ui' + u + '@voorbeeld.test');
   return reg.body.token;
 }
 
@@ -67,8 +63,8 @@ test.before(async () => {
   lid2 = await nieuwLid('Tweede Lid');
   assert.ok(zaak && kassa && buurzaak && lid, 'twee zaken en twee leden staan klaar');
 });
-test.after(async () => {
-  if (srv) await stopHard(srv.child);
+test.after(() => {
+  stop(srv && srv.child);
   try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
 });
 

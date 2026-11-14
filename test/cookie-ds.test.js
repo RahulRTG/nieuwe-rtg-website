@@ -24,5 +24,6 @@ test('cookiebundel volgt alleen eigen delen; DS-tokengebruik en doelen blijven t
 test('alle cookiehosts declareren hun centrale presentatiebron',()=>{
  const hosts=[];function loop(map){for(const e of fs.readdirSync(map,{withFileTypes:true})){const p=map+'/'+e.name;if(e.isDirectory())loop(p);else if(e.name.endsWith('.html')){const s=fs.readFileSync(p,'utf8');if(s.includes('shared/cookie.js'))hosts.push([p,s]);}}}loop('public');
  assert.equal(hosts.length,255);
+ assert.ok(hosts.some(([pad])=>pad==='public/site/404.html'),'de publieke 404 behoudt de functionele opslagmelding');
  for(const [pad,s] of hosts){const volledig=s.includes('/ds/rtg-ds.css')||s.includes('/ds/bediening.css');const minimaal=s.includes('/ds/tokens.css')&&s.includes('/ds/componenten/cookie.css');assert.ok(volledig||minimaal,pad);assert.ok(!s.includes('/ds/componenten/cookie.css')||s.match(/\/ds\/componenten\/cookie\.css/g).length===1,pad);}
 });

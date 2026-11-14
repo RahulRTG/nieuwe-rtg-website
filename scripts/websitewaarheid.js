@@ -13,9 +13,11 @@ const appgids = require('../server/kern/appgids');
 
 const ROOT = path.join(__dirname, '..');
 const WERELDBRON = path.join(ROOT, 'public/shared/rtg-edge-worlds.js');
+const PRESENTATIEBRON = path.join(ROOT, 'public/shared/interface/world-presentation.js');
 const DOEL = path.join(ROOT, 'public/site/website-truth.json');
 const VOLGORDE = ['living', 'travel', 'work', 'foundation'];
 const WERELDMAP = { living: 'map-rtg', travel: 'map-reizen', work: 'map-werk', foundation: 'map-rtf' };
+const THEMABRON = Object.fromEntries(VOLGORDE.map((id) => [id, 'public/ds/thema/' + id + '.css']));
 const PLATFORM = [
   { id: 'organisatie', audience: 'Organisatie', name: 'RTG Werk OS', route: '/apps/werk.html',
     image: 'images/start/app-schermen/organisatie.png', action: 'Open RTG Werk OS' },
@@ -57,10 +59,31 @@ function wereldenUitBron() {
   return { code, werelden: sandbox.window.RTGEdgeWorlds };
 }
 
+function presentatieUitBron() {
+  const code = fs.readFileSync(PRESENTATIEBRON, 'utf8');
+  const sandbox = { window: {}, document: {} };
+  vm.runInNewContext(code, sandbox, { filename: PRESENTATIEBRON });
+  const presentatie = sandbox.window.RTGWorldPresentationData;
+  if (!presentatie) throw new Error('world-presentation.js leverde geen openbare presentatiebron op');
+  return { code, presentatie };
+}
+
 function routeBestaat(route) {
   const schoon = String(route || '').split(/[?#]/)[0];
   if (!schoon.startsWith('/')) return false;
   return fs.existsSync(path.join(ROOT, 'public', schoon.replace(/^\//, '')));
+}
+
+function themaVoor(id) {
+  const source = THEMABRON[id];
+  const bestand = path.join(ROOT, source);
+  if (!fs.existsSync(bestand)) throw new Error('thema ontbreekt voor ' + id + ': ' + source);
+  const css = fs.readFileSync(bestand, 'utf8');
+  const selector = '[data-rtg-world="' + id + '"]';
+  if (!css.includes(selector) || !css.includes('--ds-accent:')) {
+    throw new Error('thema voor ' + id + ' mist zijn wereldselector of accentcontract');
+  }
+  return { source, selector, sourceHash: crypto.createHash('sha256').update(css).digest('hex') };
 }
 
 function euro(centen) {
@@ -90,6 +113,7 @@ function appUitleg(app, route) {
 
 function maak() {
   const { code, werelden } = wereldenUitBron();
+  const { code: presentatieCode, presentatie } = presentatieUitBron();
   if (!werelden) throw new Error('rtg-edge-worlds.js leverde geen werelden op');
 
   const wereldUit = {};
@@ -116,7 +140,13 @@ function maak() {
       .concat(apps.map((app) => app.route));
     const ontbreekt = [...new Set(routes)].filter((route) => !routeBestaat(route));
     if (ontbreekt.length) throw new Error(id + ' verwijst naar ontbrekende app-route(s): ' + ontbreekt.join(', '));
+    const hoofdbeeld = presentatie[id] && presentatie[id][8];
+    if (!/^\/images\/[a-z0-9/_-]+\.(?:jpe?g|webp|png|avif)$/i.test(hoofdbeeld || '') ||
+        !fs.existsSync(path.join(ROOT, 'public', hoofdbeeld.replace(/^\//, '')))) {
+      throw new Error(id + ' mist een geldig hoofdbeeld in de app-presentatiebron');
+    }
     wereldUit[id] = {
+      id,
       name: volledigeWereld.naam,
       appName: wereld.naam,
       publicRoute: volledigeWereld.wereld,
@@ -125,6 +155,7 @@ function maak() {
       action: wereld.actie,
       groupCount: groepen.length,
       featureCount: apps.length,
+      theme: Object.assign(themaVoor(id), { image: hoofdbeeld }),
       groups: groepen,
       tools: wereld.tools.map((functie) => ({ id: functie[0], name: functie[1], route: functie[3] }))
     };
@@ -168,12 +199,12 @@ function maak() {
     return Object.assign({}, scherm, { summary: gids.wat, actions, note: gids.tip, sourceHash });
   });
 
-  const hashBron = code + '\n' + wereldregister.BRON + '\n' + JSON.stringify(ladder) + '\n' +
+  const hashBron = code + '\n' + presentatieCode + '\n' + wereldregister.BRON + '\n' + JSON.stringify(ladder) + '\n' +
     JSON.stringify(wereldUit) + '\n' + JSON.stringify(platform);
   const uit = {
-    schema: 4,
-    source: ['public/apps/app-main.js', 'public/shared/rtg-edge-worlds.js', 'server/kern/pasladder.js', 'server/kern/appgids.js',
-      'public/apps/werk.html', 'public/apps/leverancier.html', 'public/apps/app.html'],
+    schema: 5,
+    source: ['public/apps/app-main.js', 'public/shared/rtg-edge-worlds.js', 'public/shared/interface/world-presentation.js', 'server/kern/pasladder.js', 'server/kern/appgids.js',
+      ...VOLGORDE.map((id) => THEMABRON[id]), 'public/apps/werk.html', 'public/apps/leverancier.html', 'public/apps/app.html'],
     sourceHash: crypto.createHash('sha256').update(hashBron).digest('hex'),
     platform,
     worlds: wereldUit,

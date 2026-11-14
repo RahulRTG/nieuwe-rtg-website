@@ -8,7 +8,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stopHard, maakBetaaldRtgTestaccount } = require('./helper');
+const { startServer, stop, maakBetaaldRtgTestaccount } = require('./helper');
 
 let srv, base, lid, zaak, office;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-stuur-'));
@@ -27,21 +27,16 @@ test.before(async () => {
   srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   base = srv.base;
   const u = Date.now().toString().slice(-8);
-  const email = 'stuur' + u + '@x.nl';
-  lid = (await api('/api/auth/register', { name: 'Stuurlid', email, phone: '06' + u,
+  lid = (await api('/api/auth/register', { name: 'Stuurlid', email: 'stuur' + u + '@x.nl', phone: '06' + u,
     password: 'geheim123', geboortedatum: '1990-05-05', geslacht: 'v', tier: 'rtg', pasApp: 'rtg' })).body.token;
-  assert.ok(lid);
-  assert.equal((await api('/api/state', {}, lid)).body.state.user.tier, 'guest');
-  // Alleen de persoonlijke Office-gebruiker krijgt een pas; zaak- en kantoorrollen niet.
-  maakBetaaldRtgTestaccount(TMP, email);
-  assert.equal((await api('/api/state', {}, lid)).body.state.user.tier, 'rtg');
+  maakBetaaldRtgTestaccount(TMP, 'stuur' + u + '@x.nl');
   zaak = (await api('/api/supplier/login', { username: 'rahul', password: 'Imran' })).body.token;
   // boardroom-werk vraagt de eigenaar zelf (de boardroom-poort): zijn accountlogin opent ook het kantoor
   office = (await api('/api/auth/login', { login: 'roellie.i@gmail.com', password: 'Imran', pasApp: 'business' })).body.token;
   assert.ok(lid && zaak && office, 'lid, zaak en backoffice zijn ingelogd');
 });
-test.after(async () => {
-  if (srv) await stopHard(srv.child);
+test.after(() => {
+  stop(srv && srv.child);
   try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
 });
 

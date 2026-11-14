@@ -75,6 +75,9 @@ test('1. zonder verraad zetten en weghalen het lid zijn grens en regel gewoon', 
   assert.equal(r.body.ok, true);
   const id = (r.body.regel && r.body.regel.id) || null;
   assert.ok(id, 'de regel hoort zijn id terug te geven');
+  const voor = await api(eerlijk.base, 'geld/beleid', {}, tok);
+  assert.equal(voor.body.regels.length, 1);
+  assert.equal(voor.body.regels[0].id, id, 'de te verwijderen regel bestaat echt');
   const weg = await api(eerlijk.base, 'geld/beleid/weg', { id }, tok);
   assert.equal(weg.status, 200);
   assert.equal(weg.body.ok, true);
@@ -106,6 +109,13 @@ test('3. een weigering van de schrijver blijft zijn eigen weigering', async () =
 });
 
 test('4. de lezer blijft werken onder een liegende opslag', async () => {
+  const eigenaar = await lid(eerlijk.base);
+  const gezet = await api(eerlijk.base, 'geld/grens/zet', { periode: 'maand', centen: 42000 }, eigenaar);
+  assert.equal(gezet.status, 200);
+  const gevuld = await api(eerlijk.base, 'geld/grens', {}, eigenaar);
+  assert.equal(gevuld.status, 200);
+  assert.equal(gevuld.body.grenzen.length, 1, 'de eerlijke lezer vindt een werkelijk opgeslagen grens');
+  assert.equal(gevuld.body.grenzen[0].centen, 42000);
   const tok = await lid(leugen.base);
   const r = await api(leugen.base, 'geld/grens', {}, tok);
   assert.equal(r.status, 200);

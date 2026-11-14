@@ -5,6 +5,7 @@ const path = require('node:path');
 const {fingerprint,sha} = require('./evidence');
 const {appInventory,interactionInventory,screenInventory,signatureFor}=require('./subjects');
 const {requirements,dimensionRows,evidenceStatus,DIMENSION_ORDER}=require('./dimensions');
+const planning=require('./qualification-planning');
 
 
 function json(file) { return JSON.parse(fs.readFileSync(file, 'utf8')); }
@@ -17,8 +18,9 @@ function stable(value) {
   if (value && typeof value === 'object') return Object.fromEntries(Object.keys(value).sort().map(k => [k, stable(value[k])]));
   return value;
 }
-function sourceHash(root, contract, signatures) {
-  return sha(fingerprint(root) + JSON.stringify(stable(contract)) + JSON.stringify(stable(signatures)));
+function sourceHash(root, contract, signatures, acceptance = planning.acceptanceSource(root)) {
+  return sha(fingerprint(root) + JSON.stringify(stable(contract)) + JSON.stringify(stable(signatures)) +
+    JSON.stringify(stable({status:acceptance.status,files:acceptance.files,reason:acceptance.reason || null})));
 }
 
 function build(root, options = {}) {
@@ -27,7 +29,8 @@ function build(root, options = {}) {
   const evidence = options.evidence || {version:1,records:[]};
   const apps = options.apps || appInventory(root);
   const screens = options.screens || screenInventory(root);
-  const source = options.sourceHash || sourceHash(root,contract,signatures);
+  const acceptance = planning.acceptanceSource(root);
+  const source = options.sourceHash || sourceHash(root,contract,signatures,acceptance);
   const candidate = options.commit || null;
   const screenByRoute = new Map(screens.map(screen => [screen.route,screen]));
   const logicalApps = apps.map(app => {
@@ -35,9 +38,14 @@ function build(root, options = {}) {
     // Het document is fysiek één scherm; query en fragment blijven hieronder
     // onverkort in destination/entry en dus in het afzonderlijke appcontract.
     const screen = screenByRoute.get(physicalRoute(app.destination));
-    return {...app,screenIds:screen ? [screen.id] : [],signature,
+    // Een catalogusingang leent uitsluitend de werkelijk gevonden fysieke
+    // eigenaar. Geen titelheuristiek of los meegegeven app-owner als terugval.
+    const subject = {...app,owner:screen?.owner || null,
+      acceptanceRequirements:planning.acceptanceRequirements(acceptance.entries,[app.function]).ids};
+    return {...subject,screenIds:screen ? [screen.id] : [],signature,
+      qualificationPlan:planning.binding(contract,subject.owner,'interface',acceptance.entries,[app.function]),
       scope:{profile:'interface',states:'coverage-contract#states + signature.additionalStates',devices:'coverage-contract#devices + signature.additionalDevices'},
-      dimensions:dimensionRows(root,contract,'interface',app,'app',signature,evidence,source,candidate)};
+      dimensions:dimensionRows(root,contract,'interface',subject,'app',signature,evidence,source,candidate)};
   });
   const appIdsByRoute = new Map();
   for (const app of logicalApps) for (const screenId of app.screenIds) {
@@ -45,15 +53,18 @@ function build(root, options = {}) {
   }
   const screenRows = screens.map(screen => {
     const signature = signatureFor(signatures,'screen',screen);
-    return {...screen,logicalAppIds:appIdsByRoute.get(screen.id) || [],signature,
+    const subject = {...screen,acceptanceRequirements:planning.acceptanceRequirements(acceptance.entries,screen.owner?.afbouw?.workFunctions).ids};
+    return {...subject,logicalAppIds:appIdsByRoute.get(screen.id) || [],signature,
+      qualificationPlan:planning.binding(contract,screen.owner,screen.profile,acceptance.entries),
       scope:{profile:screen.profile,states:'coverage-contract#states + signature.additionalStates',devices:'coverage-contract#devices + signature.additionalDevices'},
-      dimensions:dimensionRows(root,contract,screen.profile,screen,'screen',signature,evidence,source,candidate)};
+      dimensions:dimensionRows(root,contract,screen.profile,subject,'screen',signature,evidence,source,candidate)};
   });
   const all = logicalApps.concat(screenRows);
   const applicable = all.flatMap(subject => subject.dimensions.filter(d => d.applicable));
   const proven = applicable.filter(d => d.status === 'PROVEN').length;
-  const completeApps = logicalApps.filter(row => row.signature.status === 'DECLARED' && row.dimensions.filter(d=>d.applicable).every(d=>d.status==='PROVEN')).length;
-  const completeScreens = screenRows.filter(row => row.signature.status === 'DECLARED' && row.dimensions.filter(d=>d.applicable).every(d=>d.status==='PROVEN')).length;
+  const complete = row => row.qualificationPlan.status === 'CONTRACT_DEFINED' && row.signature.status === 'DECLARED' && row.dimensions.filter(d=>d.applicable).every(d=>d.status==='PROVEN');
+  const completeApps = logicalApps.filter(complete).length;
+  const completeScreens = screenRows.filter(complete).length;
   const qualificationGates = (contract.release.requiredQualificationGates || []).map(gate => ({
     id:gate.id,label:gate.label,status:'NOT_TESTED',requires:gate.requires
   }));
@@ -63,6 +74,7 @@ function build(root, options = {}) {
     generatedFrom:['MAPPEN','public/apps/**/*.html','experience-architecture/coverage-contract.json','experience-architecture/signatures.json'],
     sourceHash:source,
     candidateCommit:candidate,
+    acceptanceSources:{status:acceptance.status,files:acceptance.files,...(acceptance.reason ? {reason:acceptance.reason} : {})},
     status:completeApps === logicalApps.length && completeScreens === screenRows.length && qualificationComplete ? 'PROVEN' : 'NOT_TESTED',
     summary:{logicalApps:{proven:completeApps,total:logicalApps.length},screens:{proven:completeScreens,total:screenRows.length},dimensions:{proven,total:applicable.length}},
     releaseReadiness:{status:qualificationComplete?'PROVEN':'NOT_TESTED',qualificationGates,experienceBudgets:contract.release.experienceBudgets},
@@ -73,6 +85,13 @@ function build(root, options = {}) {
 
 function validate(root, report, contract, signatures) {
   const errors = [];
+  const acceptance = planning.acceptanceSource(root);
+  if (acceptance.status !== 'CONTRACT_DEFINED') errors.push('SPECIFIC_ACCEPTANCE_SOURCE_MISSING:'+acceptance.reason);
+  const sourceView = {status:acceptance.status,files:acceptance.files,...(acceptance.reason ? {reason:acceptance.reason} : {})};
+  if (JSON.stringify(stable(report.acceptanceSources)) !== JSON.stringify(stable(sourceView))) errors.push('SPECIFIC_ACCEPTANCE_SOURCE_CHANGED');
+  const qualification = contract.qualificationPlanning;
+  if (!qualification || qualification.version !== 1 || qualification.status !== 'CONTRACT_DEFINED') errors.push('QUALIFICATION_PLANNING_MISSING');
+  if (!planning.premiumGateDefined(qualification?.premiumExperienceGate)) errors.push('PREMIUM_EXPERIENCE_GATE_INCOMPLETE');
   const appIds = new Set(report.logicalApps.map(row => row.id));
   const routes = new Set(report.screens.map(row => row.route));
   if (appIds.size !== report.logicalApps.length) errors.push('DUPLICATE_APP');
@@ -90,9 +109,21 @@ function validate(root, report, contract, signatures) {
   for (const row of report.screens) if (!row.owner || !row.owner.rol || (!row.owner.capability && !(row.owner.rol === 'alias' && row.owner.naar))) errors.push('SCREEN_WITHOUT_OWNER:' + row.id);
   for (const key of Object.keys(signatures.apps || {})) if (!appIds.has(key)) errors.push('UNKNOWN_APP_SIGNATURE:' + key);
   for (const key of Object.keys(signatures.screens || {})) if (!routes.has(key)) errors.push('UNKNOWN_SCREEN_SIGNATURE:' + key);
-  for (const subject of report.logicalApps.concat(report.screens)) for (const dimension of subject.dimensions) {
-    if (dimension.applicable && !dimension.requirementCount) errors.push('EMPTY_REQUIREMENTS:' + subject.id + ':' + dimension.id);
-    if (!dimension.applicable && contract.release.notApplicableRequiresDecisionAndReason && (!dimension.decision || !dimension.reason)) errors.push('UNJUSTIFIED_NOT_APPLICABLE:' + subject.id + ':' + dimension.id);
+  for (const subject of report.logicalApps.concat(report.screens)) {
+    const profile = subject.profile || 'interface';
+    const functions = subject.function ? [subject.function] : subject.owner?.afbouw?.workFunctions;
+    const expectedAcceptance = planning.acceptanceRequirements(acceptance.entries,functions);
+    const expected = planning.binding(contract,subject.owner,profile,acceptance.entries,functions);
+    if (expectedAcceptance.missing.length) errors.push('SPECIFIC_ACCEPTANCE_MISSING:'+subject.id);
+    if (JSON.stringify(subject.acceptanceRequirements) !== JSON.stringify(expectedAcceptance.ids)) errors.push('SPECIFIC_ACCEPTANCE_BINDING_MISMATCH:'+subject.id);
+    if (expected.status !== 'CONTRACT_DEFINED' || !expected.criteria.length || !expected.scenarios.length || expected.budgets.length !== contract.devices.length) errors.push('QUALIFICATION_BINDING_MISSING:' + subject.id);
+    if (JSON.stringify(stable(subject.qualificationPlan)) !== JSON.stringify(stable(expected))) errors.push('QUALIFICATION_BINDING_MISMATCH:' + subject.id);
+    for (const dimension of subject.dimensions) {
+      if (dimension.applicable && !dimension.requirementCount) errors.push('EMPTY_REQUIREMENTS:' + subject.id + ':' + dimension.id);
+      if (dimension.applicable && dimension.requirementCount !== requirements(contract,profile,dimension.id,subject.signature,
+        {...subject,acceptanceRequirements:expectedAcceptance.ids}).length) errors.push('QUALIFICATION_REQUIREMENT_COUNT_MISMATCH:' + subject.id + ':' + dimension.id);
+      if (!dimension.applicable && contract.release.notApplicableRequiresDecisionAndReason && (!dimension.decision || !dimension.reason)) errors.push('UNJUSTIFIED_NOT_APPLICABLE:' + subject.id + ':' + dimension.id);
+    }
   }
   return errors;
 }

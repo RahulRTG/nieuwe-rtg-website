@@ -19,7 +19,11 @@ function fixture(suppliers = [supplier('A')]) {
     kantoorwereld: { werkdag: key => ({ regels: [{ soort: 'taak', titel: 'Taak van ' + key,
       kenmerk: key + '-1', link: '/apps/notities.html' }], bronnen: ['taken'], stil: [] }) } };
   const experience = maakExperience({ kern, db, save, crypto, bijeen }).experience;
-  return { db, kern, experience, saves: () => saves };
+  const open = () => null; // Expliciete serverpolicy voor de in-memory domeinfixture.
+  return { db, kern, experience: { ...experience,
+    preview: (key, body, principal, beleid = open) => experience.preview(key, body, principal, beleid),
+    execute: (key, body, beleid = open) => experience.execute(key, body, beleid)
+  }, saves: () => saves };
 }
 const request = (world = 'work', intent = {}) => ({ key: 'alice', body: { world,
   intent: { goal: 'Een plan', needs: ['product'], city: 'Haarlem', country: 'NL', ...intent } } });

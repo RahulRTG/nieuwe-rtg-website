@@ -4,8 +4,8 @@
   var roles = {
     organisatie: {
       eyebrow: 'ORGANISATIE / WORKOS',
-      title: 'Bestuur uw organisatie zonder haar op te knippen.',
-      summary: 'Werk, mensen, planning en informatie blijven één bestuurbare omgeving.',
+      title: 'De context blijft bij het werk.',
+      summary: 'Projecten, taken en documenten binnen uw werkruimte, met toegang die past bij de verantwoordelijkheid.',
       capabilities: ['Werk', 'Mensen', 'Planning', 'Communicatie', 'Documenten', 'Financiën', 'Toegang'],
       route: '/apps/werk.html',
       action: 'Open RTG Werk OS',
@@ -15,8 +15,8 @@
     },
     partner: {
       eyebrow: 'PARTNER / PARTNER OS',
-      title: 'Verbind uw bedrijf met het RTG-netwerk.',
-      summary: 'Klanten, boekingen, bestellingen, betalingen, aanbod en team komen samen in de eigen zaakomgeving.',
+      title: 'Uw zaak. Uw eigen karakter.',
+      summary: 'Een eigen omgeving voor aanbod, klanten en aanvragen. Aansluiting en verkooprechten volgen de afspraken voor uw onderneming.',
       capabilities: ['Klanten', 'Boekingen', 'Bestellingen', 'Betalingen', 'Aanbod', 'Team', 'Bereik'],
       route: '/apps/leverancier.html',
       action: 'Open de partneromgeving',
@@ -26,8 +26,8 @@
     },
     gebruiker: {
       eyebrow: 'GEBRUIKER / RTG OS',
-      title: 'Eén plek voor het dagelijks leven.',
-      summary: 'Living, Travel, Work en Foundation blijven verschillende werelden met dezelfde bediening.',
+      title: 'Uw plannen beginnen hier.',
+      summary: 'Verken reizen, houd afspraken bij en deel een moment met uw mensen. Begin bij wat voor u relevant is.',
       capabilities: ['Living', 'Travel', 'Work', 'Foundation'],
       route: '/apps/app.html',
       action: 'Open RTG',

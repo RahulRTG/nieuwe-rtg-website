@@ -46,7 +46,8 @@
     var world = truth && truth.worlds && truth.worlds[id];
     if (!world) return;
     currentWorld = id;
-    d.body.dataset.rtgWorld = id;
+    // World selection changes the catalogue, not the public magazine's brand.
+    if (!d.body.classList.contains('ds-magazine-page')) d.body.dataset.rtgWorld = id;
     d.querySelectorAll('[data-explore-world]').forEach(function (button) {
       button.setAttribute('aria-pressed', String(button.dataset.exploreWorld === id));
     });

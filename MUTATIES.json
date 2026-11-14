@@ -1,11 +1,11 @@
 {
   "stempel": {
-    "op": "2026-11-14T12:29:59.392Z",
-    "commit": "8380a6852",
+    "op": "2026-11-14T17:25:21.811Z",
+    "commit": "3ea738352",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
-    "node": "v26.13.1"
+    "node": "v24.22.1"
   },
   "uitleg": "Per toetsbestand: kan hij zakken? Pure toetsen krijgen een bronmutatie in de module die ze laden; servertoetsen krijgen de liegpoort (RTG_LIEG). scherp = de deuren bleven open, dus hij zakte op de INHOUD en niet op de inlog.",
   "grens": "een toets die zakt is bewezen GEVOELIG, niet bewezen GOED -- hij kan op de verkeerde reden zakken. Een toets die groen blijft is niet bewezen waardeloos: de operatoren zijn mechanisch en er zijn fouten die ze niet maken.",
@@ -161,6 +161,97 @@
       "gezakt": 1,
       "geprobeerd": 1
     },
+    "abonnementen-herstelketen.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/aanmeldingen/abonnementsmeldingen.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 1,
+      "geprobeerd": 3
+    },
+    "abonnementen-jaarvervolg.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/aanmeldingen/abonnementstermijn.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "abonnementen-keten.test.js": {
+      "soort": "puur",
+      "staat": "geen module gevonden"
+    },
+    "abonnementen-klantactie.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/routes/aanmeldingen/automatisch.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 2,
+      "geprobeerd": 1
+    },
+    "abonnementen-laatste-termijn.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/commercie/contract/abonnement.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 5,
+      "geprobeerd": 1
+    },
+    "abonnementen-menselijk.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/aanmeldingen/besluit.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 3,
+      "geprobeerd": 1
+    },
+    "abonnementen-ronde.test.js": {
+      "soort": "gericht",
+      "staat": "gezakt",
+      "module": "server/kern/aanmeldingen/abonnementen.js",
+      "operator": "expliciete bronmutatie",
+      "gezakt": 1,
+      "geprobeerd": 1,
+      "bewijs": {
+        "bestand": "/tmp/rtg-directed-final/abonnementen-ronde.test.js.evidence.json",
+        "sha256": "1dc8fa0ca01d05de28689bf5cf15239a1323ce570ed54b0e32378f8549d2b077",
+        "commit": "3ea738352098c9de9de3fce0baa0d832b90741a7",
+        "sourceSha256": "2d5881003dc0753483a0812e94536b73a7756727d324f68df839f6ae10cfe950",
+        "testSha256": "ba76b3615857723771d076a4b5743b143d4dab9af63f661af966e109982823b4"
+      }
+    },
+    "abonnementen-sqlite.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/db/index.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 2
+    },
+    "abonnementsaanbod-intrekken.test.js": {
+      "soort": "puur",
+      "staat": "geen module gevonden"
+    },
+    "abonnementsaanbod-ontvangst.test.js": {
+      "soort": "puur",
+      "staat": "geen module gevonden"
+    },
+    "abonnementsaanbod-route.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/middleware/functiebeleid.js",
+      "operator": "&&->||#0",
+      "gezakt": 8,
+      "geprobeerd": 5
+    },
+    "abonnementsaanbod.test.js": {
+      "soort": "puur",
+      "staat": "geen module gevonden"
+    },
+    "abonnementsactivering-race.test.js": {
+      "soort": "puur",
+      "staat": "geen module gevonden"
+    },
     "abonnementscredit-bewijs.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -177,6 +268,69 @@
       "gezakt": 7,
       "geprobeerd": 1
     },
+    "abonnementsdiensten-ai-werkos.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/ai.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "abonnementsdiensten-betaalherstel.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/pay/boeking.js",
+      "operator": "!==->===#0",
+      "gezakt": 4,
+      "geprobeerd": 4
+    },
+    "abonnementsdiensten-bureau.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/aanmeldingen/abonnementsherstel.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "abonnementsdiensten-cadeaukaart.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/db/collectie-bewerken.js",
+      "operator": "===->!==#0",
+      "gezakt": 6,
+      "geprobeerd": 2
+    },
+    "abonnementsdiensten-callers.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/kassa/herhaling.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 2,
+      "geprobeerd": 1
+    },
+    "abonnementsdiensten.test.js": {
+      "soort": "gericht",
+      "staat": "gezakt",
+      "module": "server/kern/aanmeldingen/abonnementsdiensten.js",
+      "operator": "expliciete bronmutatie",
+      "gezakt": 1,
+      "geprobeerd": 1,
+      "bewijs": {
+        "bestand": "/tmp/rtg-directed-basisrechten/abonnementsdiensten.test.js.evidence.json",
+        "sha256": "385ae5d0119af1c73a5afb0c0bebd94f512cbf92cc47eda94e6f5eda939b6370",
+        "commit": "3ea738352098c9de9de3fce0baa0d832b90741a7",
+        "sourceSha256": "b5740368bf33de5f77eb067e3b9b616dce541df2f85a5e3dbba066130923b967",
+        "testSha256": "74288b4b2546853770626e14aebca4b8484d927e84945c72777767984e46bf9b"
+      }
+    },
+    "abonnementsherstel.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/aanmeldingen/abonnementsherstel.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 6,
+      "geprobeerd": 1
+    },
     "abonnementsopzegging.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -185,6 +339,30 @@
       "gezakt": 1,
       "geprobeerd": 2
     },
+    "abonnementsorganisatie-aanbod.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/aanmeldingen/abonnementscontext.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 4,
+      "geprobeerd": 1
+    },
+    "abonnementsorganisatie-lite-overlap.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/aanmeldingen/abonnementscontext.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 4,
+      "geprobeerd": 1
+    },
+    "abonnementsorganisatie-route.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/aanmeldingen/besluit.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
     "abonnementsprijs.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -192,6 +370,14 @@
       "operator": "voorwaarde-omkeren#0",
       "gezakt": 3,
       "geprobeerd": 1
+    },
+    "abonnementssettlement.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/accounts/index.js",
+      "operator": "optie-uit#0",
+      "gezakt": 1,
+      "geprobeerd": 2
     },
     "abonnementsverrekening.test.js": {
       "soort": "puur",
@@ -1796,6 +1982,22 @@
       "gezakt": 1,
       "geprobeerd": 2
     },
+    "bedrijf-automatisch.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/aanmeldingen/abonnementsaanbod-vorm.js",
+      "operator": "&&->||#0",
+      "gezakt": 11,
+      "geprobeerd": 15
+    },
+    "bedrijf-eigenaar-account.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/accounts/index.js",
+      "operator": "optie-uit#0",
+      "gezakt": 1,
+      "geprobeerd": 2
+    },
     "bedrijfbeeld.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -2269,6 +2471,22 @@
       "module": "server/betaal.js",
       "operator": "===->!==",
       "gezakt": 1
+    },
+    "betaalwaarheid-herstartgrens.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/betaalwaarheid/staten.js",
+      "operator": "===->!==#0",
+      "gezakt": 2,
+      "geprobeerd": 1
+    },
+    "betaalwaarheid-publicatie.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/betaalwaarheid/index.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 11,
+      "geprobeerd": 1
     },
     "betaalwaarheid.test.js": {
       "soort": "puur",
@@ -5611,6 +5829,14 @@
       "gezakt": 3,
       "scherp": "gezakt"
     },
+    "experience-network-recovery.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/experience/index.js",
+      "operator": "===->!==#0",
+      "gezakt": 6,
+      "geprobeerd": 7
+    },
     "experience-network-scale.test.js": {
       "soort": "puur",
       "staat": "geen module gevonden"
@@ -6662,6 +6888,14 @@
       "operator": "===->!==",
       "gezakt": 6,
       "scherp": "gezakt"
+    },
+    "geld-abonnementsaanbod-ui.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/apps/geld/lidmaatschap-aanbod-intake.js",
+      "operator": "browser-export-weg#0",
+      "gezakt": 3,
+      "geprobeerd": 1
     },
     "geld-conservatie-last.test.js": {
       "soort": "server",
@@ -11982,6 +12216,14 @@
       "gezakt": 1,
       "scherp": "gezakt"
     },
+    "memberbetalen-ui.test.js": {
+      "soort": "puur",
+      "staat": "geen bruikbare mutatie",
+      "modules": [
+        "public/apps/app-main/app-main-45.js"
+      ],
+      "posities": 1
+    },
     "memo.e2e.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -13884,6 +14126,42 @@
       "gezakt": 6,
       "scherp": "gezakt"
     },
+    "organisatieabonnement-betaalstart.test.js": {
+      "soort": "puur",
+      "staat": "geen module gevonden"
+    },
+    "organisatieabonnement-tenant.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/lib/klok.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "organisatieabonnement-upgrade.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/aanmeldingen/abonnementsaanbod-vorm.js",
+      "operator": "===->!==#0",
+      "gezakt": 6,
+      "geprobeerd": 4
+    },
+    "organisatieabonnement-zaakgrens.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/aanmeldingen/abonnementsaanbod-vorm.js",
+      "operator": "===->!==#0",
+      "gezakt": 7,
+      "geprobeerd": 4
+    },
+    "organisatieabonnement.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/tenant/lezen.js",
+      "operator": "===->!==#0",
+      "gezakt": 4,
+      "geprobeerd": 1
+    },
     "outputartifact.test.js": {
       "soort": "gericht",
       "staat": "gezakt",
@@ -14777,14 +15055,6 @@
       "gezakt": 1,
       "geprobeerd": 2
     },
-    "pg-schaduwmerge.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "server/pg/verzoekbijzonder.js",
-      "operator": "===->!==#0",
-      "gezakt": 9,
-      "geprobeerd": 1
-    },
     "pg-snapshot.test.js": {
       "soort": "server",
       "staat": "slaat zichzelf over",
@@ -15464,6 +15734,52 @@
       "gezakt": 2,
       "scherp": "gezakt"
     },
+    "public-brand-lockup.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/site/platform-elements.js",
+      "operator": "browser-export-weg#0",
+      "gezakt": 1,
+      "geprobeerd": 15
+    },
+    "public-editorial-pages.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/site/passen/rtg-pass.html",
+      "operator": "html-hoofdinhoud-weg#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "public-magazine.test.js": {
+      "soort": "gericht",
+      "staat": "gezakt",
+      "module": "public/ds/componenten/magazine.css",
+      "operator": "expliciete bronmutatie",
+      "gezakt": 1,
+      "geprobeerd": 1,
+      "bewijs": {
+        "bestand": "/tmp/rtg-directed-final/public-magazine.test.js.evidence.json",
+        "sha256": "a7535630f6f843a813500a74195800bd54e858fd65ad19afb5738aca523121fc",
+        "commit": "3ea738352098c9de9de3fce0baa0d832b90741a7",
+        "sourceSha256": "15e1cc23f7ae0534cb2df59940cb4d4514aaa1470d61a4df66143bf1dd12e812",
+        "testSha256": "b4492097bdd5c990a617928fa14ce6ca03443e2259ffc3a8bf5b4a378b7d883b"
+      }
+    },
+    "public-painted-site.test.js": {
+      "soort": "gericht",
+      "staat": "gezakt",
+      "module": "public/site/werelden/livingos.html",
+      "operator": "expliciete bronmutatie",
+      "gezakt": 1,
+      "geprobeerd": 1,
+      "bewijs": {
+        "bestand": "/tmp/rtg-directed-final/public-painted-site.test.js.evidence.json",
+        "sha256": "5914ef499e51a283271534cf41a2de630e16bb500caa1fb951c67053bc547a5f",
+        "commit": "3ea738352098c9de9de3fce0baa0d832b90741a7",
+        "sourceSha256": "5c653c3732613a90ceea536d2499db5ed76a3a8bac34544cfa07c8d2052ec7b7",
+        "testSha256": "a6c399ac6f26a1b21f290cd83035d025fac48bd62f7a00a6ec15be69a62acca2"
+      }
+    },
     "public-platform-owner.test.js": {
       "soort": "puur",
       "staat": "geen bronmutatie mogelijk",
@@ -15476,6 +15792,21 @@
       "operator": "browser-export-weg#0",
       "gezakt": 1,
       "geprobeerd": 1
+    },
+    "public-storyline.test.js": {
+      "soort": "gericht",
+      "staat": "gezakt",
+      "module": "public/site/website-truth.js",
+      "operator": "expliciete bronmutatie",
+      "gezakt": 1,
+      "geprobeerd": 1,
+      "bewijs": {
+        "bestand": "/tmp/rtg-directed-final/public-storyline.test.js.evidence.json",
+        "sha256": "40b279e22d8a2da482828827e1c6bc990fd29642a40f83073e44f36dd9bbc6b4",
+        "commit": "3ea738352098c9de9de3fce0baa0d832b90741a7",
+        "sourceSha256": "d7b8c132d8cac7141bd1a79906f9811ada7ad5febce9beba3d2baef654a98433",
+        "testSha256": "8d5490d2ca357997934e33dccb66e66fca6ef4121126227f4b80e1c8f9deb458"
+      }
     },
     "publieke-adressen.test.js": {
       "soort": "server",
@@ -17425,14 +17756,6 @@
       "gezakt": 1,
       "geprobeerd": 1
     },
-    "rtg-heritage-overlay.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "public/shared/rtg-heritage-components.js",
-      "operator": "browser-export-weg#0",
-      "gezakt": 8,
-      "geprobeerd": 1
-    },
     "rtg-heritage-transition.test.js": {
       "soort": "puur",
       "staat": "geen module gevonden"
@@ -17448,6 +17771,22 @@
       "operator": "liegpoort /api/",
       "gezakt": 1,
       "scherp": "gezakt"
+    },
+    "rtg-next-app-proof-binding.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/bewijsraakvlak.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 6,
+      "geprobeerd": 1
+    },
+    "rtg-next-coverage.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/experience/coverage.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 2,
+      "geprobeerd": 1
     },
     "rtg-operation.test.js": {
       "soort": "puur",

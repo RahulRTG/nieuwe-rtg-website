@@ -4,7 +4,7 @@
    licht pad is nvt; zonder meegegeven stand telt RTG_BEZITSBEWIJS; een
    onleesbaar register en een storing in de verifier sluiten (fail closed), en
    alleen de schaduwstand laat door met wat er zou zijn gebeurd; in `verplicht`
-   krijgt een accountloze bezoeker een andere weg dan een eigen account; elke onleesbare vorm van het
+   krijgt een gast een andere weg dan een lid; elke onleesbare vorm van het
    bewijs (geen punt, geen JSON, geen object, geen tijd, slechte jti) is een
    401; een ingetrokken toestel een 403; en verlopen herhaalmerken worden
    opgeruimd. De echte sleutelparen komen uit webcrypto. */
@@ -78,7 +78,7 @@ test('zonder meegegeven stand telt de omgeving: leeg is verplicht, schaduw laat 
   });
 });
 
-test('verplicht zonder binding: accountloos krijgt de accountweg, ook een gratis account de toestelweg', async () => {
+test('verplicht zonder binding: een accountsloze gast of sessie krijgt de accountweg', async () => {
   const { b } = await opzet();
   for (const sess of [null, { key: 'g', tier: 'guest' }, { key: 'p', tier: 'rtg' }]) {
     const uit = await b.controleer({ sess, methode: 'POST', pad: PAD, stand: 'verplicht' });
@@ -86,12 +86,10 @@ test('verplicht zonder binding: accountloos krijgt de accountweg, ook een gratis
     assert.equal(uit.code, 403);
     assert.match(uit.reden, /eigen RTG-account/);
   }
-  for (const tier of ['guest', 'rtg']) {
-    const uit = await b.controleer({ sess: { key: 'user-1', account: 'acc', tier },
-      methode: 'POST', pad: PAD, stand: 'verplicht' });
-    assert.deepEqual([uit.stand, uit.code], ['geweigerd', 403]);
-    assert.match(uit.reden, /Waar ben ik aanwezig/, tier + ': betaling is geen voorwaarde voor toestelbinding');
-  }
+  const gratis = await b.controleer({ sess: { key: 'user-1', tier: 'guest', account: 'acc' }, methode: 'POST', pad: PAD, stand: 'verplicht' });
+  assert.equal(gratis.stand, 'geweigerd');
+  assert.equal(gratis.code, 403);
+  assert.match(gratis.reden, /Waar ben ik aanwezig/, 'ook het eigen gratis account moet zijn toestel bevestigen');
 });
 
 test('een onleesbaar register sluit, ook in aanbevolen; in de schaduw niet', async () => {

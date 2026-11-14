@@ -108,6 +108,7 @@ test('een leerling komt via de deellink van het bord in de les, en het geheim bl
       await bord.goto(base + '/apps/foundation/leren.html', { waitUntil: 'domcontentloaded' });
       await bord.evaluate((l) => window.RTGSchoolSession.zet('rtf_docent', { code: l.lesId, token: l.token }), les);
       await bord.goto(base + '/apps/foundation/bord.html?code=' + les.lesId, { waitUntil: 'domcontentloaded' });
+      await bord.waitForFunction(() => !document.documentElement.classList.contains('rtf-toegang-dicht'));
       assert.equal(await bord.locator('#btnDeel').isHidden(), true, 'zonder lescode is er niets te delen');
       const roteer = bord.waitForResponse((r) => r.url().endsWith('/api/foundation/les/code/roteer'));
       await bord.locator('#btnKopieer').click();

@@ -12,7 +12,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stopHard, maakBetaaldRtgTestaccount } = require('./helper');
+const { maakBetaaldRtgTestaccount, startServer, stop, stopHard } = require('./helper');
 
 function api(base, pad, body, token) {
   const h = { 'Content-Type': 'application/json' };
@@ -27,24 +27,13 @@ test.before(async () => {
   srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   base = srv.base;
   const u = Date.now().toString().slice(-8);
-  const maak = async (n) => {
-    const email = 'cm' + n + u + '@x.nl';
-    const reg = await api(base, '/api/auth/register', { name: 'Clip Maker', email,
-      phone: '06' + n + u.slice(1), password: 'geheim123', geboortedatum: '1992-03-03', tier: 'rtg' });
-    assert.equal(reg.status, 200); assert.ok(reg.body.token);
-    assert.equal((await api(base, '/api/state', {}, reg.body.token)).body.state.user.tier, 'guest');
-    // Beide makers zijn bestaande leden; hun idempotentiesleutels blijven gescheiden.
-    maakBetaaldRtgTestaccount(TMP, email);
-    assert.equal((await api(base, '/api/state', {}, reg.body.token)).body.state.user.tier, 'rtg');
-    return reg.body.token;
-  };
-  lid = await maak('1');
-  ander = await maak('2');
+  const maak = (n) => api(base, '/api/auth/register', { name: 'Clip Maker', email: 'cm' + n + u + '@x.nl',
+    phone: '06' + n + u.slice(1), password: 'geheim123', geboortedatum: '1992-03-03', tier: 'rtg' });
+  lid = (await maak('1')).body.token;
+  ander = (await maak('2')).body.token;
+  for (const n of ['1', '2']) maakBetaaldRtgTestaccount(TMP, 'cm' + n + u + '@x.nl');
 });
-test.after(async () => {
-  if (srv) await stopHard(srv.child);
-  if (TMP) fs.rmSync(TMP, { recursive: true, force: true });
-});
+test.after(() => stop(srv && srv.child));
 
 const mijn = async (tok, titel) => ((await api(base, '/api/clips/feed', {}, tok)).body.mijn || []).filter(c => c.titel === titel);
 

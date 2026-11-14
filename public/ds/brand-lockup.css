@@ -1,0 +1,5 @@
+/* Minimale ingang op publieke legacy-hosts. De component blijft bij DS;
+   deze ingang verdwijnt zodra alle hosts de volledige DS-root gebruiken. */
+@layer rtg.reset, rtg.tokens, rtg.thema, rtg.component, rtg.scherm;
+@import url("tokens.css");
+@import url("componenten/brand-lockup.css");

@@ -25,8 +25,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stopNet, stopHard } = require('./helper');
-const historischAccount = require('./lib/historisch-account');
+const { maakBetaaldRtgTestaccount, startServer, stop } = require('./helper');
 
 const mappen = [];
 const verseMap = () => { const m = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-bnkd-')); mappen.push(m); return m; };
@@ -36,11 +35,14 @@ const post = (basis, pad, body, token) => fetch(basis + '/api/' + pad, {
   body: JSON.stringify(body || {})
 }).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
 
+let seq = 0;
+const mapVan = new Map();
 async function nieuwLid(basis) {
-  const r = await post(basis, 'auth/login', { login: 'bankduurzaam@example.test', password: 'geheim123' });
-  assert.ok(r.body.token, JSON.stringify(r.body));
-  assert.equal((await post(basis, 'state', {}, r.body.token)).body.state.user.tier, 'rtg',
-    'de duurzaamheidsproef bereikt de bank met bestaande betaalrechten, ook onder opslagfalen');
+  const u = (Date.now() + (++seq)).toString().slice(-8);
+  const r = await post(basis, 'auth/register', { name: 'Bank Duurzaam ' + seq, email: 'bnkd' + u + '@x.nl',
+    phone: '06' + u, password: 'geheim123', geboortedatum: '1990-03-03', geslacht: 'v', tier: 'rtg', pasApp: 'rtg' });
+  assert.equal(r.status, 200);
+  maakBetaaldRtgTestaccount(mapVan.get(basis), 'bnkd' + u + '@x.nl');
   return r.body.token;
 }
 
@@ -76,25 +78,21 @@ test.before(async () => {
      dat dus niet meer: de boardroom zet de bank daarom live op een EERLIJKE server met
      dezelfde datamap, en pas daarna start de liegende server op die map. */
   const leugenMap = verseMap();
-  const eerlijkMap = verseMap();
-  // Zet dezelfde bestaande pas vast VOOR opslagfalen; registratie koopt geen pas.
-  for (const dir of [leugenMap, eerlijkMap]) {
-    historischAccount(dir, { name: 'Bank Duurzaam', email: 'bankduurzaam@example.test' });
-  }
   const voor = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: leugenMap, OFFICE_CODE: 'KANTOOR-BNKD-2' } });
-  try {
-    await bankLive(voor.base, 'KANTOOR-BNKD-2');
-  } finally {
-    await stopNet(voor.child);
-  }
+  await bankLive(voor.base, 'KANTOOR-BNKD-2');
+  const weg = new Promise(r => voor.child.once('exit', r));
+  stop(voor.child);
+  await weg;
   leugen = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: leugenMap, OFFICE_CODE: 'KANTOOR-BNKD-2',
     RTG_VERRAAD: 'schrijf-verloren' } });
+  const eerlijkMap = verseMap();
   eerlijk = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: eerlijkMap, OFFICE_CODE: 'KANTOOR-BNKD-1' } });
+  mapVan.set(eerlijk.base, eerlijkMap); mapVan.set(leugen.base, leugenMap);
   await bankLive(eerlijk.base, 'KANTOOR-BNKD-1');
 });
-test.after(async () => {
-  await Promise.all([stopHard(eerlijk && eerlijk.child), stopHard(leugen && leugen.child)]);
-  for (const m of mappen) fs.rmSync(m, { recursive: true, force: true });
+test.after(() => {
+  stop(eerlijk && eerlijk.child); stop(leugen && leugen.child);
+  for (const m of mappen) { try { fs.rmSync(m, { recursive: true, force: true }); } catch (e) {} }
 });
 
 test('1. zonder verraad opent het akkoord gewoon een betaalrekening', async () => {

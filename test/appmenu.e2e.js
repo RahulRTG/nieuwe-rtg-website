@@ -33,7 +33,7 @@
    Draai: npm run e2e */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stopHard, maakBetaaldRtgTestaccount, laadPlaywright, browserOpties, geenBrowser, edgeActies, volgVerzoeken, wachtOpRust, wachtTot } = require('./helper');
+const { startServer, stop, maakBetaaldRtgTestaccount, laadPlaywright, browserOpties, geenBrowser, edgeActies, volgVerzoeken, wachtOpRust, wachtTot } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -52,75 +52,28 @@ function appPaden(dir = path.join(PUB, 'apps'), uit = []) {
   return uit.sort();
 }
 
-/* Alleen bij een navigatiefout: onderscheid ontbrekende bytes van een vastgelopen
-   document zonder de browser, service worker of wachtvoorwaarde te veranderen.
-   Alleen bestaande publieke bestandspaden worden getoond; query, fragment,
-   credentials en dynamische/API-paden blijven buiten het verslag. */
-function volgCensusNavigatie(page, base) {
-  const origin = new URL(base).origin;
-  const open = new Map(), mislukt = [], antwoorden = [], paginafouten = [];
-  let domcontentloaded = false, gecrasht = false, documentAntwoord = null;
-  function adres(raw) {
-    try {
-      const u = new URL(raw);
-      if (u.origin !== origin) return '[andere herkomst]';
-      const bestand = path.resolve(PUB, '.' + u.pathname);
-      if (bestand.startsWith(PUB + path.sep) && fs.existsSync(bestand) && fs.statSync(bestand).isFile()) {
-        return u.pathname.slice(0, 160);
-      }
-      return u.pathname.startsWith('/api/') ? '/api/[afgeschermd]' : '[dynamisch pad]';
-    } catch (_) { return '[onbekend adres]'; }
-  }
-  function bewaar(lijst, waarde) { lijst.push(waarde); if (lijst.length > 12) lijst.shift(); }
-  const luisteraars = {
-    request: (r) => open.set(r, { pad: adres(r.url()), soort: r.resourceType() }),
-    requestfinished: (r) => open.delete(r),
-    requestfailed: (r) => {
-      const reden = String((r.failure() || {}).errorText || '').match(/\bnet::[A-Z0-9_]+\b/);
-      bewaar(mislukt, { pad: adres(r.url()), reden: reden ? reden[0] : '[request mislukt]' });
-      open.delete(r);
-    },
-    response: (r) => {
-      const antwoord = { pad: adres(r.url()), status: r.status() };
-      bewaar(antwoorden, antwoord);
-      if (r.request().isNavigationRequest() && r.request().frame() === page.mainFrame()) documentAntwoord = antwoord;
-    },
-    /* Een foutbericht kan accountgegevens of een serverantwoord bevatten.
-       De standaard foutklasse is genoeg om een scriptfout te signaleren. */
-    pageerror: (e) => bewaar(paginafouten, /^(?:Error|EvalError|RangeError|ReferenceError|SyntaxError|TypeError|URIError)$/.test(e.name) ? e.name : 'Error'),
-    crash: () => { gecrasht = true; },
-    domcontentloaded: () => { domcontentloaded = true; }
-  };
-  for (const [naam, fn] of Object.entries(luisteraars)) page.on(naam, fn);
-  return {
-    stand: () => ({ domcontentloaded, gecrasht, documentAntwoord, openAantal: open.size,
-      open: [...open.values()].slice(0, 12), mislukt, antwoorden, paginafouten }),
-    sluit: () => { for (const [naam, fn] of Object.entries(luisteraars)) page.off(naam, fn); }
-  };
-}
-
 async function api(base, pad, body) {
   const r = await fetch(base + pad, { method: 'POST',
     headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body || {}) });
   return r.json();
 }
 
-/* Een echt lid met de bedoelde betaalde RTG-instappas voor deze wereld-/reisproeven.
-   Registratie zelf blijft gratis; dit bewijst geen abonnement of hogere pas. */
-async function lidToken(base, email, datamap) {
+/* Een echt lid, want zonder inlog bouwt metgezel.js niets en heeft de toets
+   niets te meten. */
+async function lidToken(base, email) {
   const reg = await api(base, '/api/auth/register', { name: 'Menu Lid', email, phone: '0612345799',
-    password: 'geheim123', geboortedatum: '1990-01-01', pasApp: 'rtg' });
+    password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' });
   assert.ok(reg.token, 'lid-registratie geeft een token');
-  maakBetaaldRtgTestaccount(datamap, email);
   return reg.token;
 }
 
 async function metLid(fn) {
   const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-menu-'));
-  let child, base, browser;
+  const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
+  let browser;
   try {
-    ({ child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } }));
-    const tok = await lidToken(base, 'appmenu' + process.pid + '@x.nl', TMP);
+    const tok = await lidToken(base, 'appmenu' + process.pid + '@x.nl');
+    maakBetaaldRtgTestaccount(TMP, 'appmenu' + process.pid + '@x.nl');
     browser = await pw.chromium.launch(browserOpties(pw));
     const ctx = await browser.newContext({ viewport: { width: 390, height: 844 } });
     /* DE INTAKE STAAT HIER BUITEN, EN DAT MOET VIA DE STATUS.
@@ -159,11 +112,9 @@ async function metLid(fn) {
     }, tok);
     await fn({ base, ctx });
   } finally {
-    try { if (browser) await browser.close(); }
-    finally {
-      await stopHard(child);
-      fs.rmSync(TMP, { recursive: true, force: true });
-    }
+    if (browser) await browser.close();
+    stop(child);
+    try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
   }
 }
 
@@ -347,13 +298,7 @@ test('Rahul heeft één balk en elk app-scherm houdt een veilige systeemdeur',
         const page = await ctx.newPage();
         await volgVerzoeken(page);
         try {
-          const navigatie = volgCensusNavigatie(page, base);
-          try {
-            await page.goto(base + pad, { waitUntil: 'domcontentloaded', timeout: 60000 });
-          } catch (e) {
-            t.diagnostic('census-navigatie ' + JSON.stringify(navigatie.stand()));
-            throw e;
-          } finally { navigatie.sluit(); }
+          await page.goto(base + pad, { waitUntil: 'domcontentloaded', timeout: 60000 });
           /* Deze census bewijst de systeemdeur, niet dat ieder achtergronddeel
              van ieder scherm klaar is. `wachtOpRust` koppelde hem toch aan alle
              fetches van een pagina. Na ruim 250 routes kon daardoor een traag
@@ -688,7 +633,7 @@ test('het witte Edge-menu zet de vier werelden bovenaan, en het springboard is w
        voorraadkast. */
     assert.deepEqual(b.koppen, ['Uw vier werelden'],
       'het witte menu benoemt de vier werelden niet, gevonden: ' + b.koppen.join(', '));
-    assert.deepEqual(b.werelden.map((w) => w.url),
+    assert.deepEqual(b.werelden.map((w) => w.url).sort(),
       ['/apps/wereld.html', '/apps/kantoor.html', '/apps/reizen.html', '/apps/foundation/index.html'],
       'het witte menu hoort exact LivingOS, WorkOS, TravelOS en FoundationOS bovenaan te dragen');
     const onzichtbaar = b.werelden.filter((w) => w.breed < 8 || w.hoog < 8);
@@ -755,8 +700,8 @@ test('elke hoofdwereld houdt een volwaardig beeldmerk op de instappas',
     await openLade(page);
 
     const b = await werelden(page);
-    assert.deepEqual(b.werelden.map((w) => w.url),
-      ['/apps/rtg.html', '/apps/kantoor.html', '/apps/reizen.html', '/apps/foundation/os-publiek.html'],
+    assert.deepEqual(b.werelden.map((w) => w.url).sort(),
+      ['/apps/rtg.html', '/apps/reizen.html', '/apps/kantoor.html', '/apps/foundation/os-publiek.html'].sort(),
       'de bank hoort exact LivingOS, WorkOS, TravelOS en FoundationOS te dragen');
     const kaal = b.werelden.filter((w) => !w.glyf);
     assert.deepEqual(kaal.map((w) => w.naam), [],

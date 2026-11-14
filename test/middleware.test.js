@@ -123,7 +123,8 @@ test('3b. de Node-landing gebruikt dezelfde bron met alleen lokale adressen', ()
   for (const naam of ['rtg-api-base', 'rtg-app-base', 'rtg-asset-base']) {
     assert.match(html, new RegExp('name="' + naam + '" content="/"'), naam + ' blijft same-origin');
   }
-  assert.match(html, /href="\/site\/start\/start-base\.css"/);
+  assert.match(html, /href="\/ds\/rtg-ds\.css"/);
+  assert.match(html, /href="\/fonts\/fonts\.css"/);
   assert.match(html, /data-app-path="\/apps\/app\.html" href="\/apps\/app\.html"/);
 });
 

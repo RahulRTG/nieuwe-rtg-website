@@ -70,6 +70,7 @@ test('Experience surface: Economic Proof en bevestigde actie zijn mobiel zichtba
     assert.ok(voldaan.betaalBewijzen[0].id, 'het betaalbewijs komt uit de echte settlementketen');
     const naBetaling = await api(base, '/api/experience/bootstrap', { world: 'living' }, token);
     assert.equal(naBetaling.status, 200, JSON.stringify(naBetaling.body));
+    assert.equal(naBetaling.body.projection.view.valueProofs.length, 1);
     const proofs = naBetaling.body.projection.view.valueProofs;
     assert.equal(proofs.length, 1, 'alleen de uitgevoerde betaling levert een Economic Proof op');
     assert.equal(proofs[0].purpose, 'MEMBERSHIP.CONTRIBUTION');

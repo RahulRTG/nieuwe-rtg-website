@@ -1,0 +1,45 @@
+{
+  "selectedDirection": "A — Inkt",
+  "approvedBy": "RTG-eigenaar, 12 november 2026: ‘Ik ga voor A. Want met deze style kunnen we de website afmaken’",
+  "path": "public/images/brand/rtg-ink-artwork.webp",
+  "source": "exec-3bdfcfcc-57e5-4fd3-88e6-01049712365e.png",
+  "reference": "exec-8b5cf651-a76f-4873-a810-e01735535301.png",
+  "tool": "built-in image_gen",
+  "prompt": "Use case: precise-object-edit. Input image 1 is the approved original RTG A — Inkt board. Extract ONLY the large hand-painted lips occupying the upper two thirds. Delete the small lower silhouette and the A — Inkt label. Preserve the large artwork faithfully: asymmetrical double cupid bow, rising right corner, diagonal open white mouth space, full lower lip, refined dry brush texture and deep bordeaux #7F1634 pigment. This is a faithful production cleanup of the chosen painting, not a new design. Place that one artwork centered on absolutely pure flat white #FFFFFF (not transparent), white also in mouth opening. Wide 3:2 canvas, artwork fully visible with 7% white safety margin on every side, no cropping of fine tips. No glow, no shadow, no gradient backdrop, no black, no vignette, no paper texture in background, no text, no second mark. Artwork should retain the richness and restrained painted character of original.",
+  "width": 1536,
+  "height": 1024,
+  "sha256": "b05da6d9046245217948db31f58615f138cef8e2d158d71e36acc9f5ae16812b",
+  "optimization": "WebP quality 88, original dimensions, no crop or recoloring",
+  "usage": "One editorial artwork on white; rtg-mark.svg is a hand-authored optical microreduction for navigation, not the large painting.",
+  "scope": "Visual implementation only; not trademark clearance or proof of brand recognition.",
+  "paintExtensions": [
+    {
+      "path": "public/images/brand/rtg-painted-horizon.webp",
+      "source": "exec-cf80e32f-794e-4485-bae3-fc531cca4346.png",
+      "prompt": "Use case: stylized-concept. Asset type: reusable painterly chapter separator for the Rahul Travel Group luxury travel and lifestyle magazine website. Input image 1 is STYLE REFERENCE ONLY: borrow its tactile dry-brush pigment, elegant movement and artful confidence, do NOT draw lips or any logo. Create an original long horizontal painted horizon, a few broad expressive strokes gliding from deep navy into dark forest green, warm antique gold and a final burgundy gesture. A subtle sense of a coast, journey and connection but abstract, not a literal landscape illustration. Color anchors navy #14233A, forest #16302A, antique gold #857007, bordeaux #7F1634, naturally lighter/darker pigment variation. Genuine layered brushed ink and gouache, visible bristles, fine dry feathered edges, painterly richness, sophisticated contemporary gallery artwork. Wide 3:1 composition, strokes occupy central 55 percent of height, long uninterrupted flowing form with substantial interesting material, fully contained with clean white safety margins. Pure flat white #FFFFFF background everywhere outside pigment. No drop shadow, no glow, no gradient background, no black background, no paper rectangle or paper texture, no neon, no splatters, no lettering, no frame, no graphic symbols, no words, no lips. Not a website mockup; only the finished artwork.",
+      "width": 1536,
+      "height": 512,
+      "sha256": "33eb3173e72ee0dfa5c6b917b74b270c46f512e30f09b3fbdf329912544e495b",
+      "bytes": 183028,
+      "usage": "Decorative painted horizon in opening and closing, alt empty; no user information or control is painted.",
+      "optimization": "Original 2172x724 downsampled proportionally to 1536x512; WebP quality 84; generated alpha preserved; no crop or recoloring.",
+      "reference": "public/images/brand/rtg-ink-artwork.webp (style only, not logo replacement)",
+      "tool": "built-in image_gen",
+      "approvedDirection": "RTG-eigenaar, 12 november 2026: geschilderde look vaker, chique kleurrijk."
+    },
+    {
+      "path": "public/images/brand/rtg-painted-colourfield.webp",
+      "source": "exec-7f2a604c-359c-45a4-abf9-66bd801580e0.png",
+      "prompt": "Use case: stylized-concept. Asset type: original artwork for an editorial color spread in Rahul Travel Group's high-end lifestyle magazine website. Input image 1 is STYLE REFERENCE ONLY: borrow confident brushed ink material and the sense of an expressive single painterly gesture. Create an abstract painting celebrating curiosity, human connection and a love of life. Two generous curving sweeps of deep bordeaux and navy meet a warm antique-gold field and dark forest-green stroke, leaving eloquent white negative space. Energetic yet very refined, sculptural sweeps with thick pigment ridges, deliberate brush direction, tiny dry-brush imperfections, like a genuine tactile contemporary artwork. Do not depict lips, bodies, faces or any known artist's painting. Palette anchors #7F1634 burgundy, #14233A navy, #16302A forest green and #857007 antique gold, with varied pigment density and warm ochre highlights. Near-square 4:5 portrait composition, painting concentrated in a bold asymmetrical central silhouette occupying about 85 percent with white breathing space around. Pure white #FFFFFF background; no paper texture outside pigment. No generic watercolor blob, no rainbow, no neon, no shadows, no glow, no shiny 3D render, no decorative icons, no letters, no text, no frame, no mockup. This is independent RTG AI-generated editorial art, not a Georgia O'Keeffe work.",
+      "width": 960,
+      "height": 1200,
+      "sha256": "c4cf9678a86a554fa1f78a821859bdce4e73df15d3307248ea787c04bf1ecba5",
+      "bytes": 165196,
+      "usage": "Standalone RTG art alongside independently attributed quote; separate AI credit, not artwork by the quoted author.",
+      "optimization": "Original 1122x1402 downsampled proportionally to 960x1200, rounded output dimensions; WebP quality 84; no crop or recoloring.",
+      "reference": "public/images/brand/rtg-ink-artwork.webp (style only, not logo replacement)",
+      "tool": "built-in image_gen",
+      "approvedDirection": "RTG-eigenaar, 12 november 2026: geschilderde look vaker, chique kleurrijk."
+    }
+  ]
+}

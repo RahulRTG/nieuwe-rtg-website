@@ -3,12 +3,12 @@
  "uitleg": "Lezers van bewijs- en gezagsstate die een ONLEESBAAR bestand als een AFWEZIG bestand behandelen. Bewijs kent drie toestanden (bestaat+geldig, bestaat+ongeldig, bestaat niet) en een catch die op null valt, maakt van de tweede de derde -- en leeg betekent in dit huis bijna overal \"geen beperking\". De spiegel van STILSPOOR.json: die meet schrijvers wier falen wordt opgegeten, deze meet lezers die het onderscheid verliezen. Nooit optellen.",
  "grens": "Lexicaal, dus een ONDERGRENS: de werkelijke schuld is minstens dit. server/ en scripts/ worden nooit opgeteld -- daar staat een handeling tegenover een meting. `smeltSamen` mag alleen dalen, `bewijslezingen` alleen stijgen: een schuld die daalt doordat de meter blind wordt, is de gevaarlijkste vorm van vooruitgang.",
  "stempel": {
-  "op": "2026-11-14T18:54:41.146Z",
-  "commit": "a175c308f",
+  "op": "2026-11-14T17:41:13.967Z",
+  "commit": "c7b4fbb9b",
   "boomVuil": false,
-  "boomAnders": 28,
+  "boomAnders": 1,
   "instrument": "scripts/stillezing.js",
-  "node": "v26.13.1"
+  "node": "v24.22.1"
  },
  "gemeten": {
   "server": {
@@ -22,9 +22,9 @@
   },
   "scripts": {
    "bewijslezingen": 185,
-   "metVanger": 108,
+   "metVanger": 109,
    "smeltSamen": 1,
-   "zegtHet": 16,
+   "zegtHet": 17,
    "onderscheidt": 8,
    "gooit": 61,
    "anders": 22
@@ -156,7 +156,7 @@
    },
    {
     "bestand": "scripts/bewijsladder.js",
-    "regel": 424,
+    "regel": 425,
     "leest": [
      "BEWIJSLADDER.json",
      "LADDER.json"
@@ -205,7 +205,7 @@
    },
    {
     "bestand": "scripts/check.js",
-    "regel": 3367,
+    "regel": 3359,
     "leest": [
      "APPWERKT.json"
     ],
@@ -213,7 +213,7 @@
    },
    {
     "bestand": "scripts/check.js",
-    "regel": 3480,
+    "regel": 3472,
     "leest": [
      "SLO.json"
     ],
@@ -221,7 +221,7 @@
    },
    {
     "bestand": "scripts/check.js",
-    "regel": 4865,
+    "regel": 4857,
     "leest": [
      "MUTATIECONTRACT.json"
     ],
@@ -229,7 +229,7 @@
    },
    {
     "bestand": "scripts/check.js",
-    "regel": 5369,
+    "regel": 5361,
     "leest": [
      "APPWERKT.json",
      "MUTATIECONTRACT.json"
@@ -238,7 +238,7 @@
    },
    {
     "bestand": "scripts/check.js",
-    "regel": 5640,
+    "regel": 5632,
     "leest": [
      "TEKSTOPPERVLAK.json"
     ],
@@ -246,7 +246,7 @@
    },
    {
     "bestand": "scripts/check.js",
-    "regel": 5816,
+    "regel": 5808,
     "leest": [
      "EERSTEMINUUT.json"
     ],
@@ -254,7 +254,7 @@
    },
    {
     "bestand": "scripts/check.js",
-    "regel": 5829,
+    "regel": 5821,
     "leest": [
      "NORM.json"
     ],
@@ -262,7 +262,7 @@
    },
    {
     "bestand": "scripts/check.js",
-    "regel": 6044,
+    "regel": 6036,
     "leest": [
      "APPWERKT.json"
     ],
@@ -334,7 +334,7 @@
    },
    {
     "bestand": "scripts/edgekaart.js",
-    "regel": 841,
+    "regel": 845,
     "leest": [
      "EDGEKAART.json"
     ],
@@ -535,7 +535,7 @@
    },
    {
     "bestand": "scripts/inhoudskaart.js",
-    "regel": 164,
+    "regel": 109,
     "leest": [
      "OUTPUTPROEF.json"
     ],
@@ -543,7 +543,7 @@
    },
    {
     "bestand": "scripts/inhoudskaart.js",
-    "regel": 167,
+    "regel": 208,
     "leest": [
      "INHOUDSKAART.json"
     ],
@@ -613,6 +613,14 @@
      "TOETSDUUR.json"
     ],
     "soort": "gooit"
+   },
+   {
+    "bestand": "scripts/lib/experience/qualification-gates.js",
+    "regel": 90,
+    "leest": [
+     "APPWERKT-RAAKVLAK.json"
+    ],
+    "soort": "zegtHet"
    },
    {
     "bestand": "scripts/lib/idemmeting.js",
@@ -843,7 +851,7 @@
    },
    {
     "bestand": "scripts/rolronde.js",
-    "regel": 498,
+    "regel": 489,
     "leest": [
      "NORM.json"
     ],
@@ -931,7 +939,7 @@
    },
    {
     "bestand": "scripts/veranderbereik.js",
-    "regel": 666,
+    "regel": 755,
     "leest": [
      "VERANDERBEREIK-RONDE.json"
     ],

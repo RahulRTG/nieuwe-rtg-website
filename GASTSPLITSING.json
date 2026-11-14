@@ -1,11 +1,11 @@
 {
   "stempel": {
-    "op": "2026-11-14T14:37:10.307Z",
-    "commit": "d8c5a59d5",
+    "op": "2026-11-14T17:18:32.070Z",
+    "commit": "594b13ce6",
     "boomVuil": false,
-    "boomAnders": 6,
+    "boomAnders": 2,
     "instrument": "scripts/gastsplitsing.js",
-    "node": "v26.13.1"
+    "node": "v24.22.1"
   },
   "graad": "vermoed",
   "grens": "Lexicaal ingedeeld. Dit zegt NIET of een gratis account er werkelijk langs komt (dat meet npm run doelgroepbereik, met een echte gratis-accountsessie), en NIET of een deur voor een gratis account open hoort te staan -- dat is een productvraag (SAMENLEVING.md, de verklaring van de bodem). `leden` is geen fout: het woord is dubbelzinnig omdat een Community-lid ook lid heet. Een toets die het onderscheid via een andere poort maakt dan account of idGeverifieerd, telt hier als weigering.",
@@ -124,17 +124,17 @@
       "zegt": "Alleen voor leden."
     },
     {
-      "plek": "server/kern/mobiliteit/reiziger.js:39",
+      "plek": "server/kern/mobiliteit/reiziger.js:38",
       "soort": "vertakt",
       "zegt": null
     },
     {
-      "plek": "server/kern/mobiliteit/werktoegang.js:27",
+      "plek": "server/kern/mobiliteit/werktoegang.js:25",
       "soort": "vertakt",
       "zegt": null
     },
     {
-      "plek": "server/kern/mobiliteit/werktoegang.js:37",
+      "plek": "server/kern/mobiliteit/werktoegang.js:33",
       "soort": "vertakt",
       "zegt": null
     },
@@ -569,7 +569,7 @@
       "zegt": null
     },
     {
-      "plek": "server/routes/mobiliteit.js:34",
+      "plek": "server/routes/mobiliteit.js:33",
       "soort": "leden",
       "zegt": "RTG Vervoer is voor leden."
     },

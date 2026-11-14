@@ -3,18 +3,39 @@
   "uitleg": "Feiten per scherm (paden, domeinen, rol, wereld, inkomende links, alias) en de paren schermen die dezelfde API-paden raken. Het oordeel over die paren staat in SCHERMEIGENAAR.json; dit register stelt niets vast behalve wat er gemeten is.",
   "stempel": {
     "op": "2026-11-14",
-    "commit": "d8c5a59d5"
+    "commit": "594b13ce6"
   },
   "bronnen": {
     "schermroutes": {
       "op": "2026-11-14",
-      "commit": "d8c5a59d5",
+      "commit": "01319f65b",
       "invoer": {
         "meting": "invoerspoor",
         "versie": 1,
-        "boomVuil": false,
+        "boomVuil": true,
         "ongecommitteInvoer": [
-          "ROUTEBRON.json"
+          "ROUTEBRON.json",
+          "public/apps/app-main/app-main-01.js",
+          "public/apps/app-main/app-main-02.js",
+          "public/apps/app-main/app-main-50.js",
+          "public/apps/app-main/app-main-51.js",
+          "public/apps/app.html",
+          "public/apps/foundation/sw.js",
+          "public/apps/service-bel.js",
+          "public/apps/service.html",
+          "public/apps/werkruimte.html",
+          "public/shared/basis/basis-02b.js",
+          "public/shared/kantoorgesprek.js",
+          "public/shared/servicebel.js",
+          "public/site/passen/business-lite.html",
+          "public/site/passen/business-pass.html",
+          "public/site/passen/community.html",
+          "public/site/passen/lifestyle-pass.html",
+          "public/site/passen/rtg-pass.html",
+          "public/site/platform-app.js",
+          "public/site/platform-company.js",
+          "public/site/techniek/techniek.html",
+          "public/sw.js"
         ],
         "bestanden": [
           "ROUTEBRON.json",
@@ -28,7 +49,6 @@
           "public/apps/app-main/app-main-01.js",
           "public/apps/app-main/app-main-01b.js",
           "public/apps/app-main/app-main-02.js",
-          "public/apps/app-main/app-main-02_state.js",
           "public/apps/app-main/app-main-02a.js",
           "public/apps/app-main/app-main-02b.js",
           "public/apps/app-main/app-main-03.js",
@@ -2126,7 +2146,7 @@
     },
     "schermgedrag": {
       "op": "2026-11-14",
-      "commit": "d8c5a59d5"
+      "commit": "01319f65b"
     }
   },
   "ruis": [
@@ -2245,6 +2265,18 @@
       "schermen": 10
     },
     {
+      "script": "public/site/edge-door.js",
+      "schermen": 11
+    },
+    {
+      "script": "public/site/edge-editorial.js",
+      "schermen": 11
+    },
+    {
+      "script": "public/site/edge-quiet.js",
+      "schermen": 11
+    },
+    {
       "script": "public/site/platform-data.js",
       "schermen": 10
     },
@@ -2262,7 +2294,7 @@
     },
     {
       "script": "public/site/storyline-edge.js",
-      "schermen": 10
+      "schermen": 11
     },
     {
       "script": "public/site/storyline-stage.js",
@@ -3144,11 +3176,12 @@
         "/api/avond"
       ],
       "zonderServer": false,
-      "inkomend": 5,
+      "inkomend": 6,
       "inIndex": 2,
       "inkomendVan": [
         "public/apps/leven.js",
         "public/apps/lifestyle.html",
+        "public/site/werelden/livingos.html",
         "server/kern/appgids-data/deel1b.js",
         "server/kern/lidmaatschap.js",
         "server/kern/wereld/context.js"
@@ -9693,11 +9726,10 @@
         "/api/supplier"
       ],
       "zonderServer": false,
-      "inkomend": 3,
+      "inkomend": 2,
       "inIndex": 3,
       "inkomendVan": [
         "public/apps/kantoor.html",
-        "public/site/werelden/travelos.html",
         "server/kern/appgids-data/deel2b.js"
       ]
     },
@@ -9860,7 +9892,7 @@
         "/api/toestellen"
       ],
       "zonderServer": false,
-      "inkomend": 15,
+      "inkomend": 16,
       "inIndex": 7,
       "inkomendVan": [
         "public/apps/app-main/app-main-23a.js",
@@ -12161,7 +12193,7 @@
         "/api/supplier"
       ],
       "zonderServer": false,
-      "inkomend": 53,
+      "inkomend": 52,
       "inIndex": 5,
       "inkomendVan": [
         "public/apps/app-main/app-main-24b.js",
@@ -12532,7 +12564,7 @@
         "/api/reis"
       ],
       "zonderServer": false,
-      "inkomend": 17,
+      "inkomend": 16,
       "inIndex": 9,
       "inkomendVan": [
         "public/apps/app-main/app-main-24.js",
@@ -12582,7 +12614,7 @@
         "/api/reisbureau"
       ],
       "zonderServer": false,
-      "inkomend": 24,
+      "inkomend": 23,
       "inIndex": 6,
       "inkomendVan": [
         "public/apps/app-main/app-main-42.js",
@@ -12672,7 +12704,7 @@
         "/api/veiligheid"
       ],
       "zonderServer": false,
-      "inkomend": 7,
+      "inkomend": 6,
       "inIndex": 9,
       "inkomendVan": [
         "public/apps/app-main/app-main-24.js",
@@ -12680,7 +12712,6 @@
         "public/apps/reizen-wereld.js",
         "public/apps/reizen.html",
         "public/apps/rtg.html",
-        "public/site/werelden/travelos.html",
         "server/kern/appgids-data/deel12.js"
       ]
     },
@@ -14563,7 +14594,7 @@
         "/api/veiligheid"
       ],
       "zonderServer": false,
-      "inkomend": 23,
+      "inkomend": 22,
       "inIndex": 8,
       "inkomendVan": [
         "public/apps/app-main/app-main-24.js",
@@ -15413,26 +15444,31 @@
       "bestand": "public/site/404.html",
       "url": "/site/404.html",
       "titel": "Pagina niet gevonden, Rahul Travel Group",
-      "h1": "Deze pagina bestaat niet.",
+      "h1": "Even een andere route.",
       "soort": "scherm",
       "aliasNaar": null,
       "wereld": [],
       "rollen": [],
       "schrijft": "nee",
-      "schil": [],
+      "schil": [
+        "public/site/edge-door.js",
+        "public/site/edge-editorial.js",
+        "public/site/storyline-edge.js",
+        "public/site/edge-quiet.js"
+      ],
       "paden": [],
       "schilPaden": [],
       "domeinen": [],
       "zonderServer": true,
       "inkomend": 0,
-      "inIndex": 0,
+      "inIndex": 1,
       "inkomendVan": []
     },
     {
       "bestand": "public/site/passen/business-lite.html",
       "url": "/site/passen/business-lite.html",
       "titel": "RTG Business Lite | Rahul Travel Group",
-      "h1": "Minder dubbel werk. Meer grip op uw zaak.",
+      "h1": "Van klantvraag naar dagelijks werk.",
       "soort": "scherm",
       "aliasNaar": null,
       "wereld": [],
@@ -15457,14 +15493,17 @@
         "public/site/platform-elements.js",
         "public/shared/interface/world-desktop-copy.js",
         "public/site/platform-detail.js",
-        "public/site/storyline-edge.js"
+        "public/site/edge-door.js",
+        "public/site/edge-editorial.js",
+        "public/site/storyline-edge.js",
+        "public/site/edge-quiet.js"
       ],
       "paden": [],
       "schilPaden": [],
       "domeinen": [],
       "zonderServer": true,
       "inkomend": 4,
-      "inIndex": 0,
+      "inIndex": 1,
       "inkomendVan": [
         "public/site/passen/business-pass.html",
         "public/site/passen/community.html",
@@ -15476,7 +15515,7 @@
       "bestand": "public/site/passen/business-pass.html",
       "url": "/site/passen/business-pass.html",
       "titel": "RTG Business Pass | Rahul Travel Group",
-      "h1": "Zakelijke regie, met duidelijke verantwoordelijkheid.",
+      "h1": "Zakelijk onderweg. Met duidelijke afspraken.",
       "soort": "scherm",
       "aliasNaar": null,
       "wereld": [],
@@ -15501,14 +15540,17 @@
         "public/site/platform-elements.js",
         "public/shared/interface/world-desktop-copy.js",
         "public/site/platform-detail.js",
-        "public/site/storyline-edge.js"
+        "public/site/edge-door.js",
+        "public/site/edge-editorial.js",
+        "public/site/storyline-edge.js",
+        "public/site/edge-quiet.js"
       ],
       "paden": [],
       "schilPaden": [],
       "domeinen": [],
       "zonderServer": true,
       "inkomend": 4,
-      "inIndex": 0,
+      "inIndex": 1,
       "inkomendVan": [
         "public/site/passen/business-lite.html",
         "public/site/passen/community.html",
@@ -15520,7 +15562,7 @@
       "bestand": "public/site/passen/community.html",
       "url": "/site/passen/community.html",
       "titel": "RTG Community | Rahul Travel Group",
-      "h1": "Meedoen begint zonder drempel.",
+      "h1": "Een eerste verbinding. Zonder abonnementskosten.",
       "soort": "scherm",
       "aliasNaar": null,
       "wereld": [],
@@ -15545,14 +15587,17 @@
         "public/site/platform-elements.js",
         "public/shared/interface/world-desktop-copy.js",
         "public/site/platform-detail.js",
-        "public/site/storyline-edge.js"
+        "public/site/edge-door.js",
+        "public/site/edge-editorial.js",
+        "public/site/storyline-edge.js",
+        "public/site/edge-quiet.js"
       ],
       "paden": [],
       "schilPaden": [],
       "domeinen": [],
       "zonderServer": true,
       "inkomend": 4,
-      "inIndex": 0,
+      "inIndex": 1,
       "inkomendVan": [
         "public/site/passen/business-lite.html",
         "public/site/passen/business-pass.html",
@@ -15564,7 +15609,7 @@
       "bestand": "public/site/passen/lifestyle-pass.html",
       "url": "/site/passen/lifestyle-pass.html",
       "titel": "RTG Lifestyle Pass | Rahul Travel Group",
-      "h1": "Niet meer alles zelf hoeven regelen.",
+      "h1": "Uw wensen. Met persoonlijke aandacht.",
       "soort": "scherm",
       "aliasNaar": null,
       "wereld": [],
@@ -15589,14 +15634,17 @@
         "public/site/platform-elements.js",
         "public/shared/interface/world-desktop-copy.js",
         "public/site/platform-detail.js",
-        "public/site/storyline-edge.js"
+        "public/site/edge-door.js",
+        "public/site/edge-editorial.js",
+        "public/site/storyline-edge.js",
+        "public/site/edge-quiet.js"
       ],
       "paden": [],
       "schilPaden": [],
       "domeinen": [],
       "zonderServer": true,
       "inkomend": 4,
-      "inIndex": 0,
+      "inIndex": 1,
       "inkomendVan": [
         "public/site/passen/business-lite.html",
         "public/site/passen/business-pass.html",
@@ -15608,7 +15656,7 @@
       "bestand": "public/site/passen/rtg-pass.html",
       "url": "/site/passen/rtg-pass.html",
       "titel": "RTG Pass | Rahul Travel Group",
-      "h1": "Meer overzicht. Ruimte voor je plannen.",
+      "h1": "Je plannen bij elkaar. De keuzes blijven van jou.",
       "soort": "scherm",
       "aliasNaar": null,
       "wereld": [],
@@ -15633,14 +15681,17 @@
         "public/site/platform-elements.js",
         "public/shared/interface/world-desktop-copy.js",
         "public/site/platform-detail.js",
-        "public/site/storyline-edge.js"
+        "public/site/edge-door.js",
+        "public/site/edge-editorial.js",
+        "public/site/storyline-edge.js",
+        "public/site/edge-quiet.js"
       ],
       "paden": [],
       "schilPaden": [],
       "domeinen": [],
       "zonderServer": true,
       "inkomend": 4,
-      "inIndex": 0,
+      "inIndex": 1,
       "inkomendVan": [
         "public/site/passen/business-lite.html",
         "public/site/passen/business-pass.html",
@@ -15652,7 +15703,7 @@
       "bestand": "public/site/techniek/techniek.html",
       "url": "/site/techniek/techniek.html",
       "titel": "Techniek | Rahul Travel Group",
-      "h1": "Liever nagelezen dan geloofd.",
+      "h1": "Vertrouwen verdient een onderbouwing.",
       "soort": "scherm",
       "aliasNaar": null,
       "wereld": [],
@@ -15676,21 +15727,24 @@
         "public/site/platform-elements.js",
         "public/shared/interface/world-desktop-copy.js",
         "public/site/platform-detail.js",
-        "public/site/storyline-edge.js"
+        "public/site/edge-door.js",
+        "public/site/edge-editorial.js",
+        "public/site/storyline-edge.js",
+        "public/site/edge-quiet.js"
       ],
       "paden": [],
       "schilPaden": [],
       "domeinen": [],
       "zonderServer": true,
       "inkomend": 0,
-      "inIndex": 0,
+      "inIndex": 1,
       "inkomendVan": []
     },
     {
       "bestand": "public/site/werelden/foundationos.html",
       "url": "/site/werelden/foundationos.html",
       "titel": "FoundationOS | Rahul Travel Group",
-      "h1": "Vooruitgang die niemand uit beeld laat verdwijnen.",
+      "h1": "Samen leren. Ruimte om mee te doen.",
       "soort": "scherm",
       "aliasNaar": null,
       "wereld": [],
@@ -15715,14 +15769,17 @@
         "public/site/platform-elements.js",
         "public/shared/interface/world-desktop-copy.js",
         "public/site/platform-detail.js",
-        "public/site/storyline-edge.js"
+        "public/site/edge-door.js",
+        "public/site/edge-editorial.js",
+        "public/site/storyline-edge.js",
+        "public/site/edge-quiet.js"
       ],
       "paden": [],
       "schilPaden": [],
       "domeinen": [],
       "zonderServer": true,
       "inkomend": 3,
-      "inIndex": 0,
+      "inIndex": 1,
       "inkomendVan": [
         "public/site/werelden/livingos.html",
         "public/site/werelden/travelos.html",
@@ -15733,7 +15790,7 @@
       "bestand": "public/site/werelden/livingos.html",
       "url": "/site/werelden/livingos.html",
       "titel": "LivingOS | Rahul Travel Group",
-      "h1": "Uw dagelijks leven, als één geheel.",
+      "h1": "Ruimte om te leven.",
       "soort": "scherm",
       "aliasNaar": null,
       "wereld": [],
@@ -15758,14 +15815,17 @@
         "public/site/platform-elements.js",
         "public/shared/interface/world-desktop-copy.js",
         "public/site/platform-detail.js",
-        "public/site/storyline-edge.js"
+        "public/site/edge-door.js",
+        "public/site/edge-editorial.js",
+        "public/site/storyline-edge.js",
+        "public/site/edge-quiet.js"
       ],
       "paden": [],
       "schilPaden": [],
       "domeinen": [],
       "zonderServer": true,
       "inkomend": 3,
-      "inIndex": 0,
+      "inIndex": 1,
       "inkomendVan": [
         "public/site/werelden/foundationos.html",
         "public/site/werelden/travelos.html",
@@ -15776,7 +15836,7 @@
       "bestand": "public/site/werelden/travelos.html",
       "url": "/site/werelden/travelos.html",
       "titel": "TravelOS | Rahul Travel Group",
-      "h1": "Uw hele reis in één verhaal.",
+      "h1": "De reis is groter dan de boeking.",
       "soort": "scherm",
       "aliasNaar": null,
       "wereld": [],
@@ -15801,14 +15861,17 @@
         "public/site/platform-elements.js",
         "public/shared/interface/world-desktop-copy.js",
         "public/site/platform-detail.js",
-        "public/site/storyline-edge.js"
+        "public/site/edge-door.js",
+        "public/site/edge-editorial.js",
+        "public/site/storyline-edge.js",
+        "public/site/edge-quiet.js"
       ],
       "paden": [],
       "schilPaden": [],
       "domeinen": [],
       "zonderServer": true,
       "inkomend": 3,
-      "inIndex": 0,
+      "inIndex": 1,
       "inkomendVan": [
         "public/site/werelden/foundationos.html",
         "public/site/werelden/livingos.html",
@@ -15819,7 +15882,7 @@
       "bestand": "public/site/werelden/workos.html",
       "url": "/site/werelden/workos.html",
       "titel": "WorkOS | Rahul Travel Group",
-      "h1": "Laat uw organisatie als één geheel werken.",
+      "h1": "Uw onderneming. Uw volgende stap.",
       "soort": "scherm",
       "aliasNaar": null,
       "wereld": [],
@@ -15844,14 +15907,17 @@
         "public/site/platform-elements.js",
         "public/shared/interface/world-desktop-copy.js",
         "public/site/platform-detail.js",
-        "public/site/storyline-edge.js"
+        "public/site/edge-door.js",
+        "public/site/edge-editorial.js",
+        "public/site/storyline-edge.js",
+        "public/site/edge-quiet.js"
       ],
       "paden": [],
       "schilPaden": [],
       "domeinen": [],
       "zonderServer": true,
       "inkomend": 3,
-      "inIndex": 0,
+      "inIndex": 1,
       "inkomendVan": [
         "public/site/werelden/foundationos.html",
         "public/site/werelden/livingos.html",

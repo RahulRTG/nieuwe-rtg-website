@@ -13,6 +13,12 @@
     return new URL(pad.replace(/^\//, ''), appUrl).href;
   }
 
+  function naarBeeld(route) {
+    var pad = String(route || '');
+    if (!/^\/images\/[A-Za-z0-9_./-]+\.(?:jpe?g|webp|png|avif)$/.test(pad)) return '';
+    return new URL(pad.replace(/^\//, ''), middelenBasis).href;
+  }
+
   function zetTekst(element, tekst) {
     if (element) element.textContent = tekst;
   }
@@ -28,6 +34,11 @@
   }
 
   function bindWereld(kaart, wereld) {
+    kaart.dataset.rtgWorld = wereld.id;
+    kaart.dataset.appTruthTheme = wereld.theme.source;
+    var beeld = kaart.querySelector(':scope > img');
+    var beeldUrl = naarBeeld(wereld.theme.image);
+    if (beeld && beeldUrl) beeld.setAttribute('src', beeldUrl);
     zetTekst(kaart.querySelector('[data-app-truth-name]'), wereld.name);
     vulLijst(kaart.querySelector('[data-app-truth-tools]'), wereld.tools.slice(0, 3).map(function (tool) { return tool.name; }));
     var link = kaart.querySelector('[data-app-truth-link]');
@@ -39,9 +50,9 @@
     var plek = kaart.querySelector('[data-app-truth-detail]');
     if (!plek) return;
     var summary = document.createElement('summary');
-    summary.textContent = 'Alle apps in ' + wereld.name;
+    summary.textContent = 'Onderdelen van ' + wereld.name;
     var telling = document.createElement('p');
-    telling.textContent = wereld.featureCount + ' actuele apps, verdeeld over ' + wereld.groupCount + ' appvormen. Deze productkaart komt rechtstreeks uit MAPPEN in de app.';
+    telling.textContent = wereld.featureCount + ' onderdelen in de app-indeling. Bekijk per onderdeel de functie en toegangsgrenzen; een vermelding is geen beschikbaarheidsgarantie.';
     plek.replaceChildren(summary, telling, maakAppgroepen(wereld));
   }
 
@@ -95,7 +106,7 @@
 
   function bindPubliekeWereld(id, wereld) {
     document.querySelectorAll('[data-public-world-facts="' + id + '"]').forEach(function (element) {
-      element.textContent = wereld.featureCount + ' apps · ' + wereld.groupCount + ' appvormen · rechtstreeks uit MAPPEN';
+      element.textContent = wereld.featureCount + ' onderdelen · toegang verschilt per functie';
       var kaart = element.closest('[data-public-widget]');
       if (kaart) kaart.dataset.search = wereld.groups.map(function (groep) {
         return groep.name + ' ' + groep.apps.map(function (app) {
@@ -106,20 +117,19 @@
   }
 
   function bindWereldpagina(wereld) {
-    var kopie = document.querySelector('.world-hero-copy');
+    var kopie = document.querySelector('[data-world-truth-slot]') || document.querySelector('.world-hero-copy');
     if (!kopie || kopie.querySelector('[data-app-truth-panel]')) return;
     var blok = document.createElement('aside');
     blok.className = 'app-truth-panel';
     blok.dataset.appTruthPanel = '';
     var titel = document.createElement('strong');
-    titel.textContent = 'Actueel in ' + wereld.name;
+    titel.textContent = 'Verken ' + wereld.name;
     var tekst = document.createElement('p');
-    tekst.textContent = wereld.featureCount + ' onderdelen in ' + wereld.groupCount + ' appvormen: ' +
-      wereld.groups.map(function (groep) { return groep.name; }).join(', ') + '.';
+    tekst.textContent = 'Bekijk de onderwerpen en hun mogelijkheden. Toegang en beschikbaarheid verschillen per onderdeel.';
     var catalogus = document.createElement('details');
     catalogus.className = 'app-truth-detail app-truth-catalog';
     var samenvatting = document.createElement('summary');
-    samenvatting.textContent = 'Bekijk alle ' + wereld.featureCount + ' apps';
+    samenvatting.textContent = 'Bekijk de ' + wereld.featureCount + ' onderdelen';
     catalogus.append(samenvatting, maakAppgroepen(wereld));
     var link = document.createElement('a');
     link.setAttribute('href', naarApp(wereld.publicRoute));

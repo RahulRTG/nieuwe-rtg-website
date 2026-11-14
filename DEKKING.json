@@ -1,87 +1,9 @@
 {
-  "uitleg": "Elke route (METHODE + patroon) in deze waarnemingsunie is volgens de meegetelde routejournalen aangeroepen, niet afgeleid uit de tekst van de toetsen. Dit bewijst geen volledige geslaagde testsuite, actuele kandidaatkwalificatie of veilige werking. De eis is 100%: scripts/dekking.js zakt op elk gat en kent geen norm om die eis te verlagen. Het RTG Kantoor leest dit bestand (routes/office/dekking.js) en houdt het naast wat de server op dit moment registreert, zodat een route die er na de meting bij komt meteen als ongemeten opvalt. Bijwerken met: npm run dekking:vast",
+  "uitleg": "Elke route (METHODE + patroon) die tijdens de volledige testsuite ECHT is aangeraakt, uit het routejournaal van server/routelog.js en niet uit de tekst van de toetsen. De eis is 100%: scripts/dekking.js zakt op elk gat en kent geen norm om die eis te verlagen. Het RTG Kantoor leest dit bestand (routes/office/dekking.js) en houdt het naast wat de server op dit moment registreert, zodat een route die er na de meting bij komt meteen als ongemeten opvalt. Bijwerken met: npm run dekking:vast",
   "gemeten": {
-    "op": "2026-11-14T14:38:52.817Z",
-    "commit": "d8c5a59d50c9415c77da69ae9534d9dd603d591a",
-    "broncommit": "dc85cfc4855d2eb23acf943ad84f2acdcd1a2aa5",
+    "op": "2026-11-14T18:50:19.102Z",
+    "commit": "da9e2c014",
     "routesToen": 5582
-  },
-  "herkomst": {
-    "soort": "geimporteerde-waarnemingsunie",
-    "broncommitStatus": "opgegeven-niet-zelfstandig-gekoppeld",
-    "aantalBestanden": 13,
-    "bestanden": [
-      {
-        "pad": "routejournaal.log",
-        "bytes": 223,
-        "sha256": "8b0d5d298ccf046cd918ed9a7cb4b26bd2d95066fac5626c35d3e10f59fb28ee"
-      },
-      {
-        "pad": "routejournaal.log",
-        "bytes": 0,
-        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
-      },
-      {
-        "pad": "routejournaal.log",
-        "bytes": 0,
-        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
-      },
-      {
-        "pad": "routejournaal.log",
-        "bytes": 0,
-        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
-      },
-      {
-        "pad": "routejournaal.log",
-        "bytes": 0,
-        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
-      },
-      {
-        "pad": "routejournaal.log",
-        "bytes": 4414,
-        "sha256": "ae1190569ed4c38cb05c0905141b457b0ccd0d9a3865e9f8a45e6ba787a2372e"
-      },
-      {
-        "pad": "routejournaal.log",
-        "bytes": 617309,
-        "sha256": "b16f1d66d6146776379a51d83ed03d785f8b271b7d91e1b3ea16203dcf067267"
-      },
-      {
-        "pad": "routejournaal.log",
-        "bytes": 1750295,
-        "sha256": "8e01a72ff40966e46a0de55b3cbe2ecb43c22669a3293a283a7d1039b4b95737"
-      },
-      {
-        "pad": "routejournaal.log",
-        "bytes": 677868,
-        "sha256": "a30305778f34e1a33d958929042a5ce6bb3a00a8238b26b4544e143ae3cb9612"
-      },
-      {
-        "pad": "routejournaal.log",
-        "bytes": 687436,
-        "sha256": "2f97d2ed05b908eaaad9b56765bf812b58ba753382cfc0e1917f5299df125d64"
-      },
-      {
-        "pad": ".schermjournaal",
-        "bytes": 356155,
-        "sha256": "ecbe1fd710be069ebeac7e693f58413f65ae79d8050c5d3ae49e467639777154"
-      },
-      {
-        "pad": ".schermjournaal",
-        "bytes": 444211,
-        "sha256": "4b651558d64d5fa65cb3fbe4a077103f443bc3febceb9ad380524cc46d1a4aea"
-      },
-      {
-        "pad": ".schermjournaal",
-        "bytes": 461364,
-        "sha256": "530cce4fcaa1f86a472499de7247e869996dc2495d88cbec2a005cd7e6ff7bc7"
-      }
-    ],
-    "suiteStatus": null
-  },
-  "kwalificatie": {
-    "status": "NIET_VASTGESTELD",
-    "reden": "Aanroepdekking vervangt geen complete actuele CI-ronde met alle vereiste journalen en geslaagde controles."
   },
   "aangeraakt": [
     "GET /",

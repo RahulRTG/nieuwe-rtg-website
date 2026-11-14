@@ -13,7 +13,7 @@
    zodat een blijvend verschil (een proxy die niets doorlaat) geen herlaadlus
    wordt maar gewoon doorgaat. Doorgaan met een mismatch is nog altijd beter
    dan een zwart scherm, en de melding in de console zegt dan wat er speelt. */
-var RTG_BOUW = '97ed87f0';
+var RTG_BOUW = 'ddf4fb56';
 (function bouwWacht(){
   try {
     var m = document.querySelector('meta[name="rtg-bouw"]');
@@ -7855,6 +7855,8 @@ var RTG_BOUW = '97ed87f0';
   // en solliciteren. Geen ledenpas, geen reis, geen Rahul. Wat hij wel en niet
   // kan staat bij Ter plaatse -- dat is zijn app.
   function renderHomeGuest(){
+    // Een gratis eigen account kan ook aan een gezin gekoppeld zijn.
+    renderFoundation();
     document.documentElement.setAttribute('data-stem', 'rtg');
     stemKoppen();
     $('#homeSub').textContent = T('app.guestsub','Gratis, zonder pas');

@@ -1648,13 +1648,7 @@ const fonds = maakFonds({ db, save, bijeen, inBundel, betaal, log, env: process.
 muntbetaal.koppelStore(maakIdemRing({ data: () => db.data, naam: 'muntIdem', save }));
 const munten = maakMunten({ db, save, muntbetaal });
 
-/* Een bevestigde munt-ontvangst settelt de bijbehorende factuur langs de gewone
-   weg: gemarkeerd als betaald, en voor abonnementen de 30%-afdracht aan de
-   RTFoundation geboekt. Zo maakt het niet uit of een lid met kaart of met munten
-   betaalt: de rest van het systeem ziet hetzelfde. */
-/* De afwikkeling van een bevestigde betaling (munt EN kaart) staat in
-   kern/settlement.js, zodat hij los te toetsen is -- dat was hier niet mogelijk
-   en juist daar zat de fout: de kaartkant werd nooit afgewikkeld. */
+/* Munt en kaart delen dezelfde getoetste factuurafwikkeling. */
 const { maakSettlement } = require('./kern/settlement');
 /* payOplaadAfronden als LATE binding: de betaalkern wordt pas verderop gebouwd
    (kernlaag), maar deze functie draait pas als er een webhook binnenkomt -- dan

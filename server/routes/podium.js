@@ -15,7 +15,9 @@ module.exports = (kern) => {
     ? res.status(r.status || 400).json({ error: r.error, mag: r.mag, kaartje: r.kaartje, zone: r.zone, zones: r.zones })
     : res.json(r);
   const geenGast = (req, res) => {
-    if (req.session.tier === 'guest') { res.status(403).json({ error: 'Het Podium is voor leden.' }); return true; }
+    /* Een gratis account is een lid zonder betaalde pas. De zone bepaalt daarna
+       zelf welke deur geldt; alleen de anonieme gastpersona blijft buiten. */
+    if (req.session.tier === 'guest' && !req.session.account) { res.status(403).json({ error: 'Het Podium is voor accounts.' }); return true; }
     return false;
   };
 

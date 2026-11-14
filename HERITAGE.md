@@ -48,6 +48,22 @@ bruikbaarheid.
 | WorkOS | precies, kalm, beheerst | grafiet, zwartgroen, teal, messing, rookglas en steen | kort en exact |
 | FoundationOS | waardig, toegankelijk | nachtblauw, civiel goud, steenblauw, zacht wit, hout en daglicht | rustig samenvoegend |
 
+### Publieke website — beeldbesluit 14 november 2026
+
+De eigenaar koppelt vier eigen foto's aan de marketingwerelden: de rode
+groepsfoto aan FoundationOS, het roodleren auto-interieur aan TravelOS, het
+Griekse terras aan LivingOS en het warme kantoor aan WorkOS. De originelen en
+hun herkomst staan in `public/images/worlds/owner-20261114/`. Het zijn
+sfeerbeelden, geen bewijs van partners, begunstigden of geleverde diensten.
+LivingOS geeft de overige publieke pagina's de lichte zand/ivoor- en
+zeegroene basis; TravelOS, WorkOS en FoundationOS behouden hun eigen publieke
+accenten. `public/ds/thema/public-worlds.css` beheert dit publieke palet.
+De publieke compositie loopt tot beide schermranden: geen decoratieve
+scheidingslijnen of omlijnde kaarten, maar afwisselende kleurvlakken en foto's.
+Binnen die vlakken blijft de tekst ruim ingesprongen. Focusmarkeringen en
+functionele formulierfeedback blijven zichtbaar voor toetsenbordbediening.
+Dit verandert geen toegangsrechten of identiteit van de ingelogde appwerelden.
+
 De wereldidentiteit is informatiearchitectuur en geen door de gebruiker vrij
 te kiezen thema. De publieke vier-wereldenlanding is de neutrale RTG-hal;
 ieder blijvend appscherm, ook toegang, veiligheid en instellingen, is door het

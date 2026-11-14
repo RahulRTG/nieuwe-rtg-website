@@ -6,6 +6,8 @@
   function node(tag,cls,text){var e=d.createElement(tag);e.className=cls||'';if(text)e.textContent=text;return e;}
   function link(label,url){var a=node('a','wd-person',label);a.setAttribute('href',url);return a;}
   var world=d.body.dataset.rtgWorld||'living', base=P.asset();
+  var publicWorld=['living','travel','work','foundation'].includes(d.body.dataset.world)&&!d.body.dataset.pass;
+  if(publicWorld)d.body.dataset.publicWorld=world;
   var root=node('div','wd-shell pp-detail-shell ds-beleving'), head=node('header','rtg-edge-top pp-header pp-detail-header');
   root.dataset.dsBeleving='publiek';
   head.append(link('RTG',new URL('../',base).href));head.firstChild.className='rtg-edge-mark pp-brand';
@@ -27,6 +29,6 @@
   source.before(head,root);source.classList.add('wd-home');root.append(greeting,left,source,right,library);
   d.body.dataset.publicPlatform='detail';d.body.dataset.rtgDesktop=world;d.body.dataset.rtgDesktopState='ready';d.body.dataset.rtgLayout='standard';
   var hero=source.querySelector('.world-hero'), image=getComputedStyle(d.body).getPropertyValue('--world-image').trim();
-  var fallback={community:'images/editorial/moment-family-support.webp',rtg:'images/editorial/living-home.webp','business-lite':'images/editorial/company-opportunity.webp',business:'images/editorial/company-control.webp',lifestyle:'images/editorial/moment-dinner.webp',tech:'images/editorial/company-technology.webp'}[d.body.dataset.pass||d.body.dataset.world];
-  if(hero&&(fallback||/^url\(/.test(image))){var picture=node('div','wp-photo ds-beleving__beeld'),img=document.createElement('img');img.src=fallback?new URL(fallback,base).href:image.slice(4,-1).replace(/^['"]|['"]$/g,'');img.alt='';picture.appendChild(img);hero.appendChild(picture);}
+  var fallback=publicWorld?'images/worlds/owner-20261114/'+world+'.jpg':{community:'images/editorial/moment-family-support.webp',rtg:'images/editorial/living-home.webp','business-lite':'images/editorial/company-opportunity.webp',business:'images/editorial/company-control.webp',lifestyle:'images/editorial/moment-dinner.webp',tech:'images/editorial/company-technology.webp'}[d.body.dataset.pass||d.body.dataset.world];
+  if(hero&&(fallback||/^url\(/.test(image))){var picture=node('div','wp-photo ds-beleving__beeld'),img=document.createElement('img');img.src=fallback?new URL(fallback,base).href:image.slice(4,-1).replace(/^['"]|['"]$/g,'');img.alt=publicWorld?{living:'Terras met uitzicht op de Griekse zee',travel:'Een hand op de armsteun van een roodleren auto-interieur',work:'Warm kantoor met planten en avondlicht',foundation:'Samen in de avondzon, met een rood gekostumeerd figuur'}[world]:'';img.fetchPriority='high';picture.appendChild(img);hero.appendChild(picture);}
 })(window,document);

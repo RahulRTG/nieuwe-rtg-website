@@ -1,11 +1,10 @@
-/* The world owns the entire UI palette, including Edge. No per-route skins.
-   Media, documents and native canvases retain their actual content colours. */
+
 body[data-rtg-skin="heritage"]{
-  --rtg-world-bg:#100e0c!important;--rtg-world-card:#1b1713!important;
-  --rtg-world-card-strong:#29221c!important;--rtg-world-ink:#f5efe5!important;
-  --rtg-world-muted:#c3b8a9!important;--rtg-world-line:#4d4133!important;
-  --rtg-world-signature:#b58069!important;--rtg-world-metal:#dfbd88!important;
-  --rtg-world-action:#74263c!important;--rtg-world-action-ink:#fff7ed!important;
+  --rtg-world-bg:var(--ds-public-bg,#100e0c)!important;--rtg-world-card:var(--ds-public-card,#1b1713)!important;
+  --rtg-world-card-strong:var(--ds-public-card,#29221c)!important;--rtg-world-ink:var(--ds-public-ink,#f5efe5)!important;
+  --rtg-world-muted:var(--ds-public-muted,#c3b8a9)!important;--rtg-world-line:var(--ds-public-line,#4d4133)!important;
+  --rtg-world-signature:var(--ds-public-accent,#b58069)!important;--rtg-world-metal:var(--ds-public-accent,#dfbd88)!important;
+  --rtg-world-action:var(--ds-public-action,#74263c)!important;--rtg-world-action-ink:var(--ds-public-action-ink,#fff7ed)!important;
   --rtg-world-schema:dark!important;
 }
 body[data-rtg-skin="heritage"]:is([data-rtg-palette="living"],:not([data-rtg-palette])[data-rtg-world="living"]):not([data-public-platform]){
@@ -24,8 +23,7 @@ body[data-rtg-skin="heritage"]:is([data-rtg-palette="work"],:not([data-rtg-palet
   --rtg-world-signature:#8da99b!important;--rtg-world-metal:#dfbd88!important;
   --rtg-world-action:#74263c!important;--rtg-world-action-ink:#fff7ed!important;
 }
-/* Travel invitations are guest access to this world, not the neutral public
-   company website; they retain the same Travel palette without an app shell. */
+
 body[data-rtg-skin="heritage"]:is([data-rtg-palette="travel"],:not([data-rtg-palette])[data-rtg-world="travel"]):is(:not([data-public-platform]),[data-public-platform="travel-guest"]){
   --rtg-world-bg:#190d12!important;--rtg-world-card:#29171d!important;
   --rtg-world-card-strong:#3a222b!important;--rtg-world-ink:#f8efe7!important;
@@ -59,16 +57,12 @@ body[data-rtg-skin="heritage"][data-rtg-world][data-rtg-layout="standard"]{
   background:var(--rtg-world-bg)!important;color:var(--rtg-world-ink)!important;
   color-scheme:var(--rtg-world-schema)!important;
 }
-/* Controls share the same quiet treatment; focus remains an explicit outline. */
+
 body[data-rtg-skin="heritage"][data-rtg-layout="standard"] :is(button,input,select,textarea){
   box-shadow:none!important;text-shadow:none!important;
 }
 
-/* Palette coverage is independent of the desktop wrapper: embedded apps
-   receive these same colour pairs without inheriting desktop geometry.
-   Domain components consume the same palette as the approved world frame.
-   Explicit surface/text pairs replace old local skins. Photos, media canvases,
-   documents and safety colours keep their own content semantics. */
+
 body[data-rtg-skin="heritage"][data-rtg-layout="standard"]{
  --bg:var(--rtg-world-bg)!important;--card:var(--rtg-world-card)!important;--card2:var(--rtg-world-card-strong)!important;
  --txt:var(--rtg-world-ink)!important;--text:var(--rtg-world-ink)!important;--ink:var(--rtg-world-ink)!important;
@@ -93,13 +87,12 @@ body[data-rtg-skin="heritage"][data-rtg-layout="standard"].rtg-safe-experience :
 body[data-rtg-skin="heritage"][data-rtg-layout="standard"].rtg-sport-flow :is(.tabs,.sport-match,.sport-table,.sport-stadium,.sport-moment,.sport-moment div),
 body[data-rtg-skin="heritage"][data-rtg-layout="standard"].rtg-music-experience :is(.eigen-muziek,.samen,.speler),
 body[data-rtg-skin="heritage"][data-rtg-layout="standard"].foundation-hulp :is(.fh-leeg,.fh-afspraak,.fh-snel>a,.fh-belofte--licht){background:var(--rtg-world-card)!important;color:var(--rtg-world-ink);border-color:var(--rtg-world-line)!important;box-shadow:none!important}
-/* De Vitaal-logkaart krijgt hier de wereldgrond; haar tekst volgt diezelfde
-   grond in plaats van de donkere inkt van het omringende lichte formulier. */
+
 body[data-rtg-skin="heritage"].rtg-safe-experience[data-veilig-stand=vitaal] #log .stil{color:var(--muted)}
 body[data-rtg-skin="heritage"][data-rtg-layout="standard"]:is(.rtg-shop-flow,.rtg-night-flow,.rtg-safe-experience,.rtg-sport-flow,.rtg-music-experience) :is(input,select,textarea,.veld,.slot,.step button){background:var(--rtg-world-card)!important;color:var(--rtg-world-ink)!important;border-color:var(--rtg-world-line)!important}
 body[data-rtg-skin="heritage"][data-rtg-layout="standard"] :is(.gknop.vol,.brknop.vol,button.hoofd,#nKnop,#koppelKnop,.gx-primary,.shop-primary,.night-primary,.home-button:not(.alt),.sport-action){background:var(--rtg-world-action)!important;color:var(--rtg-world-action-ink)!important;border-color:var(--rtg-world-action)!important}
 body[data-rtg-skin="heritage"][data-rtg-layout="standard"] :is(.shop-hero,.night-hero,.home-hero,.veilig-rustig){--shop-ink:#f5f1e8;--shop-soft:#d5cbbd;--shop-gold:#dfc491;--night-ink:#f5f1e8;--night-soft:#d5cbbd;--night-gold:#dfc491;--home-cream:#f5f1e8;--home-muted:#d5cbbd;--home-gold:#dfc491;--safe-ink:#f5f1e8;--safe-soft:#d5cbbd;--safe-gold:#dfc491}
-/* These editorial headers have already become the shared context strip. */
+
 body[data-rtg-skin="heritage"][data-rtg-layout="standard"] [data-rtg-component="ContextStrip"]{--shop-ink:var(--rtg-world-ink);--shop-soft:var(--rtg-world-muted);--shop-gold:var(--rtg-world-metal);--night-ink:var(--rtg-world-ink);--night-soft:var(--rtg-world-muted);--night-gold:var(--rtg-world-metal);--home-cream:var(--rtg-world-ink);--home-muted:var(--rtg-world-muted);--home-gold:var(--rtg-world-metal)}
 body[data-rtg-skin="heritage"][data-rtg-layout="standard"]{--gx-bg:var(--rtg-world-bg)!important;--gx-card:var(--rtg-world-card)!important;--gx-card2:var(--rtg-world-card-strong)!important;--gx-ink:var(--rtg-world-ink)!important;--gx-ivory:var(--rtg-world-ink)!important;--gx-soft:var(--rtg-world-muted)!important;--gx-gold:var(--rtg-world-metal)!important;--gx-line:var(--rtg-world-line)!important;}
 body[data-rtg-skin="heritage"][data-rtg-layout="standard"]{--shop-bg:var(--rtg-world-bg)!important;--shop-card:var(--rtg-world-card)!important;--shop-card2:var(--rtg-world-card-strong)!important;--shop-ink:var(--rtg-world-ink)!important;--shop-ivory:var(--rtg-world-ink)!important;--shop-soft:var(--rtg-world-muted)!important;--shop-gold:var(--rtg-world-metal)!important;--shop-line:var(--rtg-world-line)!important;}
@@ -140,7 +133,7 @@ body[data-rtg-skin="heritage"][data-rtg-layout="standard"].rtg-music-experience 
 body[data-rtg-skin="heritage"][data-rtg-layout="standard"].rtg-music-experience .speler .sub{color:var(--rtg-world-muted)!important}
 body[data-rtg-skin="heritage"][data-rtg-layout="standard"].rtg-media-experience :is(#standen,.stuk,.stuk .knop){background:var(--rtg-world-card)!important;color:var(--rtg-world-ink)!important}
 
-/* The workspace is a world surface too, even when its own drawer opens late. */
+
 body[data-rtg-skin="heritage"][data-rtg-layout="standard"] .rtg-interface-second-screen{
  --rtg-txt:var(--rtg-world-ink)!important;--rtg-muted:var(--rtg-world-muted)!important;--rtg-soft:var(--rtg-world-muted)!important;
  --rtg-ss-bg:var(--rtg-world-bg)!important;--rtg-ss-card:var(--rtg-world-card)!important;--rtg-ss-line:var(--rtg-world-line)!important;
@@ -155,8 +148,7 @@ body[data-rtg-skin="heritage"][data-rtg-layout="standard"].rtg-media-experience 
 body[data-rtg-skin="heritage"][data-rtg-layout="standard"].rtg-media-experience .knop.rood{color:var(--rtg-status-danger,#9b2c42)!important}
 body[data-rtg-skin="heritage"][data-rtg-layout="standard"].rtg-music-experience #muziekStatus{color:var(--rtg-world-muted)!important}
 body[data-rtg-skin="heritage"][data-rtg-layout="standard"] :is(.wd-page>header,body>header) #kop{color:var(--rtg-world-ink)!important}
-/* The Living editorial photo owns its dark readability gradients and light
-   text. A solid world-card here hides the image above and below its centre. */
+
 
 body[data-rtg-skin="heritage"][data-rtg-layout="standard"] .rtg-interface-second-screen .cmd-bank{
  --rtg-txt:var(--rtg-world-ink)!important;--rtg-muted:var(--rtg-world-muted)!important;--rtg-soft:var(--rtg-world-muted)!important;
@@ -173,8 +165,7 @@ body[data-rtg-skin="heritage"][data-rtg-layout="standard"][data-rtg-world="work"
 body[data-rtg-skin="heritage"][data-rtg-layout="standard"][data-rtg-world="work"] #readinessRing>div{background:var(--rtg-world-card)}
 body[data-rtg-skin="heritage"][data-rtg-layout="standard"][data-rtg-world="work"] #readinessRing:after{background:var(--rtg-world-card)}
 
-/* Older operating shells and their entry forms must not paint a second world
-   inside the frame. Keep photographic headers and native content intact. */
+
 body[data-rtg-skin="heritage"][data-rtg-layout="standard"]{
  --wk-bg:var(--rtg-world-bg);--wk-text:var(--rtg-world-ink);--wk-soft:var(--rtg-world-muted);--wk-line:var(--rtg-world-line);--wk-red:var(--rtg-world-signature);--wk-gold:var(--rtg-world-metal);
  --wo-black:var(--rtg-world-bg);--wo-onyx:var(--rtg-world-bg);--wo-panel:var(--rtg-world-card);--wo-panel-hi:var(--rtg-world-card-strong);--wo-silver:var(--rtg-world-ink);--wo-muted:var(--rtg-world-muted);--wo-line:var(--rtg-world-line);--wo-line-gold:var(--rtg-world-line);--wo-gold:var(--rtg-world-metal);
@@ -198,7 +189,6 @@ body[data-rtg-skin="heritage"][data-rtg-layout="standard"][data-workos-premium] 
 body[data-rtg-skin="heritage"][data-rtg-layout="standard"][data-world-home="foundation"] :is(.onthaal-beeld,.band){
  background:var(--rtg-world-card)!important;color:var(--rtg-world-ink)!important;
 }
-/* The world switcher paints on its own ground (--rtg-bg of the page); under the
-   palette its ink follows the world, so its ground has to follow too. */
+
 body[data-rtg-skin="heritage"][data-rtg-layout="standard"] .os-switcher{background:var(--rtg-world-card)!important;color:var(--rtg-world-ink)!important;border-color:var(--rtg-world-line)!important;--world-ink:var(--rtg-world-ink);--world-soft:var(--rtg-world-muted)}
 body[data-rtg-skin="heritage"][data-rtg-layout="standard"] .os-switcher__links a span{color:var(--rtg-world-metal)!important}

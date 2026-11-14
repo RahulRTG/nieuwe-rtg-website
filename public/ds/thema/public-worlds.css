@@ -1,0 +1,61 @@
+/* Publieke website en wereldverhalen, afgestemd op de foto's van de eigenaar.
+   LivingOS is de publieke basis; expliciete werelden behouden hun eigen palet.
+   Publieke body-markeringen houden dit buiten de ingelogde appwerelden.
+   Dit thema zet alleen semantische kleuren; layout blijft bij de component. */
+@layer rtg.thema {
+  [data-public-world] {
+    --ds-public-bg: var(--ds-p-public-bg);
+    --ds-public-card: var(--ds-p-public-card);
+    --ds-public-ink: var(--ds-p-public-ink);
+    --ds-public-muted: var(--ds-p-public-muted);
+    --ds-public-line: transparent;
+    --ds-public-accent: var(--ds-p-public-accent);
+    --ds-public-action: var(--ds-p-public-action);
+    --ds-public-action-ink: var(--ds-p-public-action-ink);
+  }
+
+  :where(body[data-public-platform],body.rtg-experience,body.world-story),
+  [data-public-world="living"] {
+    --ds-public-bg: var(--ds-p-ivoor);
+    --ds-public-card: var(--ds-p-ivoor-licht);
+    --ds-public-ink: var(--ds-p-public-living-ink);
+    --ds-public-muted: var(--ds-p-public-living-muted);
+    --ds-public-line: transparent;
+    --ds-public-accent: var(--ds-p-public-living-accent);
+    --ds-public-action: var(--ds-p-public-living-action);
+    --ds-public-action-ink: var(--ds-p-public-action-ink);
+  }
+
+  [data-public-world="travel"] {
+    --ds-public-bg: var(--ds-p-public-bg);
+    --ds-public-card: var(--ds-p-public-travel-card);
+    --ds-public-ink: var(--ds-p-public-ink);
+    --ds-public-muted: var(--ds-p-public-travel-muted);
+    --ds-public-line: transparent;
+    --ds-public-accent: var(--ds-p-public-accent);
+    --ds-public-action: var(--ds-p-public-action);
+    --ds-public-action-ink: var(--ds-p-public-action-ink);
+  }
+
+  [data-public-world="work"] {
+    --ds-public-bg: var(--ds-p-public-work-bg);
+    --ds-public-card: var(--ds-p-public-work-card);
+    --ds-public-ink: var(--ds-p-public-ink);
+    --ds-public-muted: var(--ds-p-public-work-muted);
+    --ds-public-line: transparent;
+    --ds-public-accent: var(--ds-p-public-work-accent);
+    --ds-public-action: var(--ds-p-public-work-action);
+    --ds-public-action-ink: var(--ds-p-public-action-ink);
+  }
+
+  [data-public-world="foundation"] {
+    --ds-public-bg: var(--ds-p-public-foundation-bg);
+    --ds-public-card: var(--ds-p-public-foundation-card);
+    --ds-public-ink: var(--ds-p-public-action-ink);
+    --ds-public-muted: var(--ds-p-public-foundation-muted);
+    --ds-public-line: transparent;
+    --ds-public-accent: var(--ds-p-public-foundation-accent);
+    --ds-public-action: var(--ds-p-public-foundation-action);
+    --ds-public-action-ink: var(--ds-p-public-action-ink);
+  }
+}

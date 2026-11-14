@@ -23,7 +23,6 @@
   var stories=node('div',null,'pp-stories');stories.setAttribute('aria-label',copy('worlds'));
   data.stories.forEach(function(story){var b=button(null,function(){select(story.id,true);},'pp-story');b.dataset.publicStory=story.id;b.append(photo(story.photo),node('span',story.label));stories.append(b);});
   var more=button(null,function(){menu();},'pp-story pp-story-more');more.append(icon('menu'),node('span','more'));stories.append(more);
-  // The feature is the mobile introduction. Do not add a second welcome block.
   var feature=node('article',null,'wh-photo pp-feature'), picture=photo(selected.photo,'pp-feature-photo',true), featureCopy=node('div',null,'pp-feature-copy');
   var overline=node('span',company?'originLabel':'demo','pp-overline'), title=node('h1'), body=node('p'), action=button(company?'storyOpen':'intentOpen',function(){o.open(controller.selected().target);},'pp-button');
   title.id='platform-story-title';feature.setAttribute('aria-labelledby',title.id);
@@ -37,7 +36,7 @@
   var focus=node('section',null,'wd-focus pp-detail');focus.hidden=true;
   var focusHead=node('header',null,'wd-focus-head'), focusTitle=node('h2');focusTitle.tabIndex=-1;
   focusHead.append(focusTitle,button('back',collapse,'wd-text-button'));var detail=node('div',null,'pp-detail-content');focus.append(focusHead,detail);
-  var libraryHead=node('div',null,'wd-library-heading'), libraryTitle=node('div');libraryTitle.append(node('h2',company?'companyLibrary':'libraryApp'),node('p',company?'companyLibraryIntro':'libraryDemo'));
+  var libraryHead=node('div',null,'ds-beleving-sectiekop'), libraryTitle=node('div');libraryTitle.append(node('h2',company?'companyLibrary':'libraryApp'),node('p',company?'companyLibraryIntro':'libraryDemo'));
   var filters=node('div',null,'pp-library-tools'), searchLabel=node('label',null,'pp-search-label'),search=node('input',null,'wd-search');search.type='search';search.id='platform-search';searchLabel.htmlFor=search.id;searchLabel.append(node('span','search'),search);
   var filter=node('select',null,'pp-filter');filter.setAttribute('aria-label',copy('worlds'));filter.dataset.i18nAria='public.worlds';
   (company?['all','favorites','living','travel','work','foundation']:['all','living','travel','work','foundation']).forEach(function(value){var opt=node('option',value==='all'?'all':value==='favorites'?'companyFavorites':null);opt.value=value;if(!['all','favorites'].includes(value))opt.textContent={living:'LivingOS',travel:'TravelOS',work:'WorkOS',foundation:'FoundationOS'}[value];filter.append(opt);});
@@ -56,7 +55,7 @@
   root.append(greeting,languageNotice,people,home,favorites,focus,library);
   var footer=node('footer',null,'pp-footer');footer.append(node('p','freeFull'),node('span','footer'));
   source.before(header,root,footer,menuPanel,worldPanel);source.classList.add('pp-source');source.setAttribute('aria-hidden','true');
-  d.body.classList.add('rtg-stijl');d.body.dataset.rtgSkin='heritage';d.body.dataset.rtgLayout='standard';d.body.dataset.publicPlatform=kind;d.body.dataset.worldHome='living';d.body.dataset.rtgDesktop='living';
+  d.body.classList.add('rtg-stijl','ds-beleving-website');d.body.dataset.rtgSkin='heritage';d.body.dataset.rtgLayout='standard';d.body.dataset.publicPlatform=kind;d.body.dataset.worldHome='living';d.body.dataset.rtgDesktop='living';
   var skip=d.querySelector('.skip-link');if(skip)skip.href='#platform-home';
   controller=w.RTGPublicController({o:o,data:data,company:company,root:root,detail:detail,focus:focus,focusTitle:focusTitle,home:home,favorites:favorites,library:library,title:title,body:body,picture:picture,stories:stories,stepper:stepper,overline:overline,summary:summary,signalWorld:front.world,signalCount:front.count,language:language,search:search,filter:filter,catalog:catalog,empty:empty,gridButton:gridButton,listButton:listButton,menuPanel:menuPanel,worldPanel:worldPanel});
   var widgets=(company?w.RTGCompanyWidgets:w.RTGPublicWidgets)({o:o,data:data,company:company,favorites:favorites,refresh:refresh});

@@ -1,4 +1,3 @@
-/* RTG premium platform layer: quiet structure, real interfaces, one visual system. */
 :root{--rtg-paper:#f1eee7;--rtg-paper-2:#e8e3d9;--rtg-ink:#0d0e0c;--rtg-ink-2:#171813;--rtg-gold:#c9ad6a;--rtg-rule:rgba(33,29,22,.18);--rtg-max:1360px}
 .rtg-experience{background:var(--rtg-paper);font-kerning:normal;text-rendering:optimizeLegibility}
 .rtg-experience .scene{padding-inline:max(5vw,calc((100vw - var(--rtg-max))/2));}
@@ -40,5 +39,5 @@
 .entry-grid article,.platform-chain article{min-width:0}
 .experience-footer{padding-inline:max(5vw,calc((100vw - var(--rtg-max))/2));background:#0d0e0c}
 .pass-table-wrap{margin-right:0!important;padding-right:0!important}
-.rtg-experience .rtg-adaptive-edge{width:min(660px,calc(100% - 30px));--rtg-adaptive-height:70px}.rtg-experience .rtg-adaptive-bar{background:rgba(12,12,10,.9);box-shadow:0 18px 55px rgba(0,0,0,.35);backdrop-filter:blur(28px) saturate(1.1)}
+.rtg-experience .rtg-adaptive-edge{width:min(660px,calc(100% - 30px));--rtg-adaptive-height:70px}.rtg-experience .rtg-adaptive-bar{background:var(--ds-public-card,rgba(12,12,10,.9));box-shadow:0 18px 55px rgba(0,0,0,.35);backdrop-filter:blur(28px) saturate(1.1)}
 @media(prefers-reduced-motion:reduce){.arrival-interface,.stage-device{transition:none}}

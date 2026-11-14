@@ -236,6 +236,9 @@ test('redactionele beelden zijn uniek en komen overeen met hun herkomstregister'
 test('alle landingsbeelden hebben aantoonbare lokale herkomst', () => {
   const dagdelen = ['ochtend', 'middag', 'avond', 'nacht'];
   const herkomst = JSON.parse(fs.readFileSync(path.join(ROOT, 'public/images/editorial/PROVENANCE.json'), 'utf8'));
+  const wereldmap = 'images/worlds/owner-20261114/';
+  const aangeleverd = JSON.parse(fs.readFileSync(path.join(ROOT, 'public', wereldmap, 'PROVENANCE.json'), 'utf8'));
+  assert.equal(aangeleverd.source, 'user-provided');
 
   for (const dagdeel of dagdelen) {
     const set = start.beeldsetVoorDagdeel(dagdeel);
@@ -247,9 +250,12 @@ test('alle landingsbeelden hebben aantoonbare lokale herkomst', () => {
       naam + ' is byte voor byte het geregistreerde beeld');
 
     for (const rol of ['living', 'travel', 'work', 'foundation']) {
-      const beeld = herkomst.find(item => item.path === path.basename(set[rol]));
-      assert.ok(beeld, rol + ' heeft generatieherkomst');
-      assert.equal(beeld.tool, 'built-in image_gen');
+      const beeld = aangeleverd.images.find(item => item.world === rol);
+      assert.ok(beeld, rol + ' heeft aangeleverde beeldherkomst');
+      assert.equal(beeld.source, 'user-provided');
+      assert.equal(beeld.illustrative, true);
+      assert.equal(beeld.path, rol + '.jpg');
+      assert.equal(set[rol], wereldmap + beeld.path, rol + ' houdt de toegewezen foto in ieder dagdeel');
       assert.equal(crypto.createHash('sha256').update(fs.readFileSync(path.join(ROOT, 'public', set[rol]))).digest('hex'), beeld.sha256);
     }
   }

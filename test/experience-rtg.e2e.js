@@ -111,7 +111,14 @@ test('static project path and JavaScript-disabled visitors retain content and re
       if (javaScriptEnabled) {
         await ready(page);
         assert.equal(await page.locator('#roleCta').getAttribute('href'), 'https://app.rahultravelgroup.com/apps/werk.html');
-        assert.equal(await page.evaluate(() => getComputedStyle(document.querySelector('.rtg-adaptive-bar')).getPropertyValue('--edge-bar-bg').trim()), '#1b1713');
+        assert.equal(await page.evaluate(() => getComputedStyle(document.querySelector('.rtg-adaptive-bar')).getPropertyValue('--edge-bar-bg').trim()), '#FAF7F2', 'de publieke navigatie erft het lichte LivingOS-palet');
+        const publicLayout = await page.evaluate(() => {
+          const hero = document.querySelector('.pp-feature'), shell = document.querySelector('.pp-shell');
+          return [hero, shell].map(el => { const r = el.getBoundingClientRect(); return { left: r.left, right: r.right, viewport: innerWidth }; });
+        });
+        for (const frame of publicLayout) {
+          assert.ok(Math.abs(frame.left) < 1 && Math.abs(frame.right - frame.viewport) < 1, 'de publieke compositie loopt tot beide schermranden');
+        }
         assert.match(await page.locator('.pp-footer a[href$="/apps/juridisch/voorwaarden.html"]').innerText(), /bestaand/i,
           'ook de door JavaScript opgebouwde footer wijst herkenbaar naar bestaande voorwaarden');
         await page.locator('.pp-section-index button', { hasText: 'Wat wilt u weten?' }).click();

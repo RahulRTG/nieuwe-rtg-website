@@ -7,7 +7,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { startServer, stopHard, maakBetaaldRtgTestaccount } = require('./helper');
 const { APPS } = require('../server/kern/appbieb');
 
 function api(base, pad, body, token) {
@@ -18,16 +18,23 @@ function api(base, pad, body, token) {
 }
 
 let srv, base, lid;
+const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-appbieb-'));
 test.before(async () => {
-  const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-appbieb-'));
   srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   base = srv.base;
   const reg = await api(base, '/api/auth/register', { name: 'App Liefhebber', email: 'apps@x.nl', phone: '0612345678',
     password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' });
   lid = reg.body.token;
   assert.ok(lid, 'lid-registratie geeft een token');
+  assert.equal((await api(base, '/api/state', {}, lid)).body.state.user.tier, 'guest');
+  // Installeren is een pasvoordeel; deze fixture vertegenwoordigt een bestaand betaald lid.
+  maakBetaaldRtgTestaccount(TMP, 'apps@x.nl');
+  assert.equal((await api(base, '/api/state', {}, lid)).body.state.user.tier, 'rtg');
 });
-test.after(() => stop(srv && srv.child));
+test.after(async () => {
+  if (srv) await stopHard(srv.child);
+  fs.rmSync(TMP, { recursive: true, force: true });
+});
 
 /* Sinds de werelden zijn samengevoegd (PLATFORM.md par. 0) wijst een
    catalogusrij niet meer naar een eigen pagina maar naar een STAND binnen een

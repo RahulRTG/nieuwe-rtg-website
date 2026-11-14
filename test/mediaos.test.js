@@ -9,7 +9,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { startServer, stopHard, maakBetaaldRtgTestaccount } = require('./helper');
 
 let srv, base, maker, kijker, kale, office;
 let clipId, trackId, uitgaveId, videoId, kanaalId, makerNaam, kijkerNaam;
@@ -26,8 +26,15 @@ function api(pad, body, token) {
 let seq = 0;
 async function lid(naam) {
   const u = (Date.now() + (++seq)).toString().slice(-8);
-  return (await api('/api/auth/register', { name: naam, email: 'mos' + u + '@x.nl', phone: '06' + u,
-    password: 'geheim123', geboortedatum: '1990-04-04', geslacht: 'x', tier: 'rtg', pasApp: 'rtg' })).body.token;
+  const email = 'mos' + u + '@x.nl';
+  const reg = await api('/api/auth/register', { name: naam, email, phone: '06' + u,
+    password: 'geheim123', geboortedatum: '1990-04-04', geslacht: 'x', tier: 'rtg', pasApp: 'rtg' });
+  assert.equal(reg.status, 200); assert.ok(reg.body.token);
+  assert.equal((await api('/api/state', {}, reg.body.token)).body.state.user.tier, 'guest');
+  // Maker, kijker en het lege ledenaccount bereiken bewust dezelfde ledenpoort.
+  maakBetaaldRtgTestaccount(TMP, email);
+  assert.equal((await api('/api/state', {}, reg.body.token)).body.state.user.tier, 'rtg');
+  return reg.body.token;
 }
 const codenaamVan = async (token) => ((await api('/api/state', {}, token)).body.state || {}).user.codename;
 
@@ -62,18 +69,25 @@ test.before(async () => {
     method: 'POST', headers: { 'Content-Type': 'video/webm', Authorization: 'Bearer ' + maker }, body: WEBM });
   assert.equal(up.status, 200, 'de bytes staan op de kaart');
 });
-test.after(() => {
-  stop(srv && srv.child);
+test.after(async () => {
+  if (srv) await stopHard(srv.child);
   try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
 });
 
-test('1. de deur: zonder inlog niets, en een gast komt er niet in', async () => {
+test('1. de deur: accountloze gast buiten, echt gratis account in de mediawereld', async () => {
   assert.equal((await api('/api/mediaos/wereld', {})).status, 401, 'zonder token: 401');
   const gast = (await api('/api/login', { tier: 'guest', pasApp: 'rtg' })).body.token;
   assert.ok(gast, 'er is een gasttoken');
   const r = await api('/api/mediaos/wereld', {}, gast);
   assert.equal(r.status, 403, 'een gast krijgt 403');
-  assert.match(r.body.error, /voor leden/);
+  assert.match(r.body.error, /voor accounts/);
+  const gratis = await api('/api/auth/register', { name: 'Gratis Kijker', email: 'gratis-media@example.test',
+    password: 'geheim123', geboortedatum: '1990-04-04', tier: 'rtg' });
+  assert.ok(gratis.body.token);
+  assert.equal(gratis.body.state.user.tier, 'guest');
+  const wereld = await api('/api/mediaos/wereld', { modus: 'flow' }, gratis.body.token);
+  assert.equal(wereld.status, 200, 'een eigen gratis account is geen accountloze gast');
+  assert.ok(wereld.body.stukken.some(s => s.id === 'clip:' + clipId), 'de echte gepubliceerde clip is zichtbaar');
 });
 
 test('2. één catalogus, drie standen: elke vorm komt in zijn eigen stand terug', async () => {

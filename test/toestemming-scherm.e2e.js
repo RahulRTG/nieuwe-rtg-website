@@ -13,7 +13,7 @@
    Draai: npm run e2e */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop, letOpFouten, laadPlaywright, browserOpties, geenBrowser, edgeActies } = require('./helper');
+const { startServer, stopHard, letOpFouten, laadPlaywright, browserOpties, geenBrowser, edgeActies } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -40,6 +40,8 @@ test('Toestemming (per soort): het oude adres opent de weergave, de lijst toont 
         password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' })
     }).then(r => r.json());
     assert.ok(reg.token);
+    assert.equal(reg.state.user.tier, 'guest');
+    await require('./helper').keurLidGoed(base, reg.token, reg.state.user.codename, '1990-01-01');
     const api = (pad, body) => fetch(base + '/api/' + pad, {
       method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + reg.token },
       body: JSON.stringify(body || {})
@@ -47,7 +49,8 @@ test('Toestemming (per soort): het oude adres opent de weergave, de lijst toont 
 
     // twee toestemmingen aanzetten, elk in hun eigen laag
     const kliniek = (await api('care', {})).aanbieders.find(a => a.soort === 'kliniek');
-    await api('care/intake/deel', { aanbiederId: kliniek.id, medisch: 'bloedverdunner' });
+    const gedeeld = await api('care/intake/deel', { aanbiederId: kliniek.id, medisch: 'bloedverdunner' });
+    assert.equal(gedeeld.ok, true, JSON.stringify(gedeeld));
     await api('toestellen/koppel', { naam: 'Horloge' });
 
     browser = await pw.chromium.launch(browserOpties(pw));
@@ -100,7 +103,7 @@ test('Toestemming (per soort): het oude adres opent de weergave, de lijst toont 
     assert.deepEqual(paginaFouten, [], 'geen JS-fouten tijdens het scherm');
   } finally {
     if (browser) await browser.close();
-    stop(child);
+    await stopHard(child);
     try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
   }
 });

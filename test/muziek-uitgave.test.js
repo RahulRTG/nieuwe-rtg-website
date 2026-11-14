@@ -11,7 +11,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer } = require('./helper');
+const { startServer, maakBetaaldRtgTestaccount } = require('./helper');
 
 let BASE, child, baas, maat, kantoor, trackId, uitgaveId, maatCode;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-uitgave-'));
@@ -26,8 +26,10 @@ const t0 = Date.now();
 let seq = 0;
 async function lid(naam) {
   const u = String(t0 + (++seq)).slice(-8);
-  return (await api('/api/auth/register', { name: naam, email: 'ug' + u + '@u.test', phone: '06' + u,
-    password: 'geheim123', geboortedatum: '1992-02-02', tier: 'rtg' })).body.token;
+  const reg = await api('/api/auth/register', { name: naam, email: 'ug' + u + '@u.test', phone: '06' + u,
+    password: 'geheim123', geboortedatum: '1992-02-02', tier: 'rtg' });
+  maakBetaaldRtgTestaccount(TMP, 'ug' + u + '@u.test');
+  return reg.body.token;
 }
 const codenaamVan = async (tok) => (await api('/api/state', {}, tok)).body.state.user.codename;
 

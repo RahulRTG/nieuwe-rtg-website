@@ -6,7 +6,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop, laadPlaywright, browserOpties, geenBrowser, letOpFouten } = require('./helper');
+const { startServer, stopHard, maakBetaaldRtgTestaccount, laadPlaywright, browserOpties, geenBrowser, letOpFouten } = require('./helper');
 
 const pw = laadPlaywright();
 function stilleWav() {
@@ -21,7 +21,7 @@ async function post(base, pad, body) {
   return r.json();
 }
 
-test('een maker publiceert muziek en een ander luistert en geeft waardering',
+test('RTG Sound: een betalende maker publiceert muziek en een betalend lid luistert en geeft waardering',
   { skip: geenBrowser(pw) }, async () => {
     const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-muziek-scherm-'));
     const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: tmp } });
@@ -30,9 +30,12 @@ test('een maker publiceert muziek en een ander luistert en geeft waardering',
       const maker = (await post(base, '/api/auth/register', { name: 'Muziekmaker',
         email: 'muziekmaker@x.test', phone: '0612345671', password: 'geheim123',
         geboortedatum: '1990-01-01', tier: 'rtg' })).token;
+      maakBetaaldRtgTestaccount(tmp, 'muziekmaker@x.test');
       const luisteraar = (await post(base, '/api/auth/register', { name: 'Muziekluisteraar',
         email: 'muziekluisteraar@x.test', phone: '0612345672', password: 'geheim123',
         geboortedatum: '1991-01-01', tier: 'rtg' })).token;
+      // Deze Sound-journey vraagt twee betaalpassen, maar alleen de maker bezit het werk.
+      maakBetaaldRtgTestaccount(tmp, 'muziekluisteraar@x.test');
       browser = await pw.chromium.launch(browserOpties(pw));
       const fouten = [];
       const contextA = await browser.newContext(), pageA = await contextA.newPage(); letOpFouten(pageA, fouten);
@@ -70,7 +73,7 @@ test('een maker publiceert muziek en een ander luistert en geeft waardering',
       await contextA.close();
       assert.deepEqual(fouten, []);
     } finally {
-      if (browser) await browser.close(); stop(child);
+      if (browser) await browser.close(); await stopHard(child);
       try { fs.rmSync(tmp, { recursive: true, force: true }); } catch (e) {}
     }
   });

@@ -2,10 +2,22 @@
    (deur openen bij aankomst), om aandacht vragen (rekening/bestellen/hulp),
    de gastchat met de zaak per afdeling en de event-aanmelding (RSVP op de
    gastenlijst). Gemount vanuit routes/member.js. */
+const wie = require('../../kern/comm/wie');
 module.exports = (kern) => {
   const { app, auth, db, save, crypto, findSupplier, optieAan, unlockDoor, logActivity,
     notifySupplier, notify, sseToSupplier, sseToOffice, sseToCustomer, schoon, PERSONAS,
-    DOOR_RELOCK_MS, validDept, talen, trChat, commGast } = kern;
+    DOOR_RELOCK_MS, validDept, talen, trChat, commGast, comm } = kern;
+
+  // Nazorg leest de bestaande transactie, niet een door de klant genoemde
+  // gesprekssleutel. Geen gepagineerde schermlijst: ook een oudere, afgeronde
+  // of geannuleerde aankoop kan nog nazorg vragen. Dit kent geen nieuwe pas toe.
+  function eigenHandelsrelatie(key, code) {
+    const bezorgingen = db.data.modeBezorg;
+    if (Array.isArray(bezorgingen) && bezorgingen.some(b => b && b.ref && b.key === key && b.supplierCode === code)) return true;
+    const orders = db.data.groothandelOrders;
+    return Array.isArray(orders) && orders.some(o => o && o.ref && o.groothandelCode === code
+      && o.klant && o.klant.soort === 'lid' && o.klant.id === key);
+  }
 
   app.post('/api/live/door', auth, (req, res) => {
     const L = db.data.live[req.session.key];
@@ -49,13 +61,20 @@ module.exports = (kern) => {
   });
 
   app.post('/api/partner/chat/send', auth, (req, res) => {
-    if (req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor leden.' });
+    if (req.session.tier === 'guest' && !req.session.account) return res.status(403).json({ error: 'Alleen voor accounts.' });
     const s = findSupplier(req.body.supplierCode);
     if (!s) return res.status(404).json({ error: 'Partner niet gevonden.' });
     if (!optieAan(s, 'gastchat')) return res.status(409).json({ error: s.name + ' heeft de gastchat op dit moment uitstaan.' });
     const text = String(req.body.text || '').trim().slice(0, 500);
     if (!text) return res.status(400).json({ error: 'Leeg bericht.' });
     const dept = validDept(s, String(req.body.dept || ''));
+    if (req.session.tier === 'guest') {
+      const key = req.session.key;
+      const eigen = key === 'user-' + req.session.account.id && eigenHandelsrelatie(key, s.code);
+      const lijn = eigen && commGast.bestaand(s.code, key, dept);
+      if (!lijn || !comm.magErin(lijn, key) || !comm.magErin(lijn, wie.zaak(s.code)))
+        return res.status(403).json({ error: 'Deze nazorglijn hoort bij een eigen bestelling of bezorgaanvraag.' });
+    }
     const codename = req.session.account ? req.session.account.codename : PERSONAS[req.session.tier].codename;
     /* Sinds de verhuizing schrijft dit in de communicatiekern (kern/comm/
        gast.js) en niet meer in db.data.guestChats. Alles eromheen blijft

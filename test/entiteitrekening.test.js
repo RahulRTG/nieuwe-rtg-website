@@ -14,7 +14,7 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs'); const os = require('os'); const path = require('path');
-const { startServer, stop, kantoorAlsPersoon, kantoorKoppelBody } = require('./helper');
+const { startServer, stop, kantoorAlsPersoon, kantoorKoppelBody, maakBetaaldRtgTestaccount } = require('./helper');
 
 let srv, BAAS, W, B, E, OWN, FIN, ANDER;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-entiteitrekening-'));
@@ -22,11 +22,13 @@ const api = (pad, body, token) => fetch(srv.base + pad, { method: 'POST',
   headers: Object.assign({ 'Content-Type': 'application/json' }, token ? { Authorization: 'Bearer ' + token } : {}),
   body: JSON.stringify(body || {}) }).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
 let n = 0;
-async function rtgAccount(naam) {
+async function rtgAccount(naam, betaald = false) {
   n += 1;
   const u = (Date.now() + n * 7919).toString().slice(-8);
   const r = (await api('/api/auth/register', { name: naam, email: 'ent' + u + '@voorbeeld.test', phone: '06' + u,
     password: 'geheim123', geboortedatum: '1985-05-05', tier: 'rtg', pasApp: 'rtg' })).body;
+  assert.ok(r.token, 'het eigen account is geregistreerd');
+  if (betaald) maakBetaaldRtgTestaccount(TMP, 'ent' + u + '@voorbeeld.test');
   const me = (await api('/api/auth/me', {}, r.token)).body;
   return { token: r.token, codenaam: me.user.codename };
 }
@@ -46,7 +48,9 @@ test.before(async () => {
   assert.ok(BAAS, 'de eigenaar en zijn kantoorsessie');
   const w = (await api('/api/bedrijf/werkruimte/maak', { naam: 'Entiteit BV werkruimte', land: 'NL' })).body;
   W = w.werkruimte; B = w.beheerToken;
-  OWN = await lid('Olga', ['directie'], await rtgAccount('Olga Entiteit'));
+  // Alleen de eigenaar gebruikt ook de persoonlijke ledenbank; de vreemde
+  // en de kantoor-/werkrollen krijgen hierdoor geen extra rechten.
+  OWN = await lid('Olga', ['directie'], await rtgAccount('Olga Entiteit', true));
   FIN = await lid('Fenna', ['financieel']);
   ANDER = await rtgAccount('Vreemde Entiteit');
   E = (await api('/api/concern/entiteit/nieuw', { naam: 'Rekening Holding BV', land: 'NL', rechtsvorm: 'bv' }, OWN.rtg.token)).body.entiteit.id;

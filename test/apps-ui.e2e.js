@@ -7,7 +7,7 @@
    Draai: npm run e2e */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop, letOpFouten, laadPlaywright, browserOpties, geenBrowser, volgVerzoeken, wachtOpRust, wachtTot, bankDeur, edgeActies, pasAppAdres } = require('./helper');
+const { startServer, stopHard, maakBetaaldRtgTestaccount, elevateTier, letOpFouten, laadPlaywright, browserOpties, geenBrowser, volgVerzoeken, wachtOpRust, wachtTot, bankDeur, edgeActies, pasAppAdres } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -59,7 +59,7 @@ async function bootTest(opts) {
     assert.deepEqual(paginaFouten, [], 'geen JS-fouten tijdens het scherm');
   } finally {
     if (browser) await browser.close();
-    stop(child);
+    await stopHard(child);
     try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
   }
 }
@@ -86,6 +86,8 @@ test('Leden-app: de eigen pas komt beveiligd op na herstel van de sessie',
       const reg = await api(base, '/api/auth/register', { name: 'Lid Een', email: 'appboot@x.nl', phone: '0612345788',
         password: 'geheim123', geboortedatum: '1990-01-01', tier: 'business', pasApp: 'business' });
       assert.ok(reg.token, 'lid-registratie geeft een token');
+      await elevateTier(base, reg.token, 'business');
+      assert.equal((await api(base, '/api/state', {}, reg.token)).state.user.tier, 'business');
       return { rtg_member_token: reg.token };
     },
     /* HET BEGINSCHERM IS DE WERKTAFEL, EN DEZE TOETS IS MEEVERHUISD.
@@ -209,6 +211,7 @@ test('Leden-app: de ledenpas ligt in de wallet, niet meer op het beginscherm',
     const reg = await api(base, '/api/auth/register', { name: 'Pas Lid', email: 'walletpas@x.nl', phone: '0612345701',
       password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' });
     assert.ok(reg.token, 'lid-registratie geeft een token');
+    maakBetaaldRtgTestaccount(TMP, 'walletpas@x.nl');
 
     browser = await pw.chromium.launch(browserOpties(pw));
     const ctx = await browser.newContext({ viewport: { width: 430, height: 900 } });
@@ -253,7 +256,7 @@ test('Leden-app: de ledenpas ligt in de wallet, niet meer op het beginscherm',
     await thuis.close();
   } finally {
     if (browser) await browser.close();
-    stop(child);
+    await stopHard(child);
     try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
   }
 });
@@ -267,6 +270,8 @@ test('Leden-app: de dynamische passregel behoudt de Engelse vertaling',
     const reg = await api(base, '/api/auth/register', { name: 'Lid EN', email: 'appen@x.nl', phone: '0612345799',
       password: 'geheim123', geboortedatum: '1990-01-01', tier: 'business', pasApp: 'business' });
     assert.ok(reg.token, 'lid-registratie geeft een token');
+    await elevateTier(base, reg.token, 'business');
+    assert.equal((await api(base, '/api/state', {}, reg.token)).state.user.tier, 'business');
     browser = await pw.chromium.launch(browserOpties(pw));
     const page = await browser.newPage();
     const fouten = [];
@@ -289,7 +294,7 @@ test('Leden-app: de dynamische passregel behoudt de Engelse vertaling',
     assert.deepEqual(fouten, [], 'geen JS-fouten tijdens het scherm');
   } finally {
     if (browser) await browser.close();
-    stop(child);
+    await stopHard(child);
     try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
   }
 });
@@ -312,6 +317,7 @@ test('Leverancier-app: een betaalde bestelling komt bij Orders binnen en wordt d
     // een lid bestelt aan tafel 3 en betaalt (dan pas ziet de zaak het)
     const reg = await api(base, '/api/auth/register', { name: 'Kassa Lid', email: 'kassa@x.nl', phone: '0612345001',
       password: 'geheim123', geboortedatum: '1990-01-01', tier: 'business', pasApp: 'business' });
+    assert.equal(reg.state.user.tier, 'guest', 'een eigen bestelling vereist geen betaalde pas');
     const ord = await (await fetch(base + '/api/order', { method: 'POST', headers: authHead(reg.token),
       body: JSON.stringify({ supplierCode: 'KIKUNOI', items: [{ id: 'ramen', qty: 1 }], table: 'Tafel 3' }) })).json();
     assert.ok(ord.order && ord.order.ref, 'de bestelling is aangemaakt');
@@ -358,7 +364,7 @@ test('Leverancier-app: een betaalde bestelling komt bij Orders binnen en wordt d
     assert.deepEqual(fouten, [], 'geen JS-fouten tijdens het scherm');
   } finally {
     if (browser) await browser.close();
-    stop(child);
+    await stopHard(child);
     try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
   }
 });
@@ -372,6 +378,7 @@ test('Leden-app: het conciergegesprek toont een bericht veilig (geen XSS)',
     const reg = await api(base, '/api/auth/register', { name: 'Chat Lid', email: 'chat@x.nl', phone: '0612345002',
       password: 'geheim123', geboortedatum: '1990-01-01', tier: 'business', pasApp: 'business' });
     assert.ok(reg.token, 'lid-registratie geeft een token');
+    assert.equal(reg.state.user.tier, 'guest', 'de gratis chatproef wordt niet met betaalrechten gemaskeerd');
 
     browser = await pw.chromium.launch(browserOpties(pw));
     const page = await browser.newPage({ viewport: { width: 430, height: 900 } });
@@ -484,7 +491,7 @@ test('Leden-app: het conciergegesprek toont een bericht veilig (geen XSS)',
     assert.deepEqual(fouten, [], 'geen JS-fouten tijdens het scherm');
   } finally {
     if (browser) await browser.close();
-    stop(child);
+    await stopHard(child);
     try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
   }
 });
@@ -503,6 +510,7 @@ test('Leden-app: Rahul begint zelf op het beginscherm en antwoordt daar ook',
     const reg = await api(base, '/api/auth/register', { name: 'Thuis Lid', email: 'thuis@x.nl', phone: '0612345004',
       password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg' });
     assert.ok(reg.token, 'lid-registratie geeft een token');
+    maakBetaaldRtgTestaccount(TMP, 'thuis@x.nl');
 
     browser = await pw.chromium.launch(browserOpties(pw));
     const page = await browser.newPage({ viewport: { width: 430, height: 900 } });
@@ -585,7 +593,7 @@ test('Leden-app: Rahul begint zelf op het beginscherm en antwoordt daar ook',
     assert.deepEqual(fouten, [], 'geen JS-fouten tijdens het gesprek');
   } finally {
     if (browser) await browser.close();
-    stop(child);
+    await stopHard(child);
     try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
   }
 });
@@ -621,7 +629,7 @@ test('Verbinding: de offline-banner verschijnt bij verbindingsverlies en verdwij
     }, undefined, { timeout: 8000 });
   } finally {
     if (browser) await browser.close();
-    stop(child);
+    await stopHard(child);
     try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
   }
 });
@@ -674,7 +682,7 @@ test('Gedeelde klok: het vak is vierkant, dus de schaduw is rond',
       'het vak van de klok is vierkant (gemeten ' + vak.breed + ' bij ' + vak.hoog + '), anders wordt de schaduw een ellips');
   } finally {
     if (browser) await browser.close();
-    stop(child);
+    await stopHard(child);
     try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
   }
 });
@@ -709,7 +717,7 @@ test('Inlogportaal: toegang bezit het venster en houdt de standaard Edge verborg
       assert.ok(shape.end<=shape.gate&&shape.end<=shape.viewport);
       await ctx.close();
     }
-  } finally { if(browser) await browser.close(); stop(child); fs.rmSync(TMP,{recursive:true,force:true}); }
+  } finally { if(browser) await browser.close(); await stopHard(child); fs.rmSync(TMP,{recursive:true,force:true}); }
 });
 
 /* Het beginscherm mag niet verdwijnen doordat de app je plek onthoudt.
@@ -734,6 +742,7 @@ test('Leden-app: een verse start begint thuis, een onderbreking van seconden nie
     const reg = await api(base, '/api/auth/register', { name: 'Plek Lid', email: 'plek@x.nl', phone: '0612345703',
       password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' });
     assert.ok(reg.token, 'lid-registratie geeft een token');
+    maakBetaaldRtgTestaccount(TMP, 'plek@x.nl');
 
     browser = await pw.chromium.launch(browserOpties(pw));
     const actieveView = async (page) => page.evaluate(() => {
@@ -769,7 +778,7 @@ test('Leden-app: een verse start begint thuis, een onderbreking van seconden nie
       'een verse start toont het beginscherm, niet de app waar u het laatst was');
   } finally {
     if (browser) await browser.close();
-    stop(child);
+    await stopHard(child);
     try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
   }
 });

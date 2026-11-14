@@ -51,7 +51,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
-const { startServer, stop, kantoorAlsPersoon } = require('./helper');
+const { startServer, stop, kantoorAlsPersoon, maakBetaaldRtgTestaccount } = require('./helper');
 
 const ZAAK = 'MERIDIAAN';     // Meridiaan Toren -- NL, dus hier kan loon draaien
 const ANDERE = 'KIKUNOI';     // Sal de Mar -- het tweede paar ogen
@@ -123,6 +123,7 @@ test.before(async () => {
     tier: 'rtg', pasApp: 'rtg' });
   novaLid = reg.body.token;
   assert.ok(novaLid, 'Nova heeft een eigen RTG-account');
+  maakBetaaldRtgTestaccount(TMP, 'nova@rtg.example');
   const verb = await api('/api/werving/verbind', { kassacode: inv.body.invite.kassacode }, novaLid);
   assert.equal(verb.status, 200, 'verbinden: ' + JSON.stringify(verb.body).slice(0, 160));
   novaStaff = verb.body.staffId;

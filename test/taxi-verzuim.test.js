@@ -12,7 +12,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, maakBetaaldRtgTestaccount } = require('./helper');
 
 const STAD = { lat: 38.908, lng: 1.432 };
 const PAPIEREN_OK = { kenteken: '2030-01-01', verzekering: '2030-01-01', apk: '2030-01-01',
@@ -34,6 +34,7 @@ test('een afwezige bestuurder: overgeslagen door de matcher, met de hand toe te 
     const u = String(Date.now()).slice(-8);
     const lid = (await api('auth/register', { name: 'Taxi Lid', email: 'taxiverzuim' + u + '@x.nl', phone: '06' + u,
       password: 'geheim123', geboortedatum: '1990-05-05', geslacht: 'v', tier: 'rtg', pasApp: 'rtg' })).body.token;
+    maakBetaaldRtgTestaccount(TMP, 'taxiverzuim' + u + '@x.nl');
 
     const zet = await api('supplier/mob/voertuig', { categorie: 'taxi', naam: 'Verzuimtaxi', papieren: PAPIEREN_OK,
       loc: STAD, bestuurder: 'Een andere naam', bestuurderStaffId: ch.wie.id }, baas.tok);

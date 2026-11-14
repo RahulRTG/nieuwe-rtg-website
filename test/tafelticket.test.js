@@ -7,7 +7,7 @@
    Draai los: node --test test/tafelticket.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, maakBetaaldRtgTestaccount } = require('./helper');
 const fs = require('fs'); const os = require('os'); const path = require('path');
 
 function verseDataDir() { return fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-tt-')); }
@@ -16,12 +16,17 @@ async function api(base, pad, body, token) {
   const r = await fetch(base + pad, { method: 'POST', headers: h, body: JSON.stringify(body || {}) });
   return { status: r.status, body: await r.json() };
 }
-async function registreer(base) {
+async function registreer(base, dataDir) {
   const u = Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
-  return (await api(base, '/api/auth/register', {
+  const reg = await api(base, '/api/auth/register', {
     name: 'Tafel Lid', email: u + '@x.nl', phone: '06' + u.replace(/\D/g, '').padEnd(8, '1').slice(0, 8),
     password: 'geheim123', geboortedatum: '1990-01-01', tier: 'business', pasApp: 'business'
-  })).body.token;
+  });
+  assert.ok(reg.body.token, 'het tafelaccount is geregistreerd');
+  // Deze ledenbonnen dragen geen gast-servicekosten. Zo vergelijkt de
+  // omzetproef de zaakomzet met dezelfde items, niet met RTG-servicekosten.
+  maakBetaaldRtgTestaccount(dataDir, u + '@x.nl');
+  return reg.body.token;
 }
 async function eersteItem(base, token, code) {
   const kaart = (await api(base, '/api/supplier/menu/get', { code }, token)).body;
@@ -56,7 +61,7 @@ test('1. bonnen van dezelfde tafel op een ticket, en in een keer afrekenen', asy
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   try {
     const zaak = await zaakInlog(base, 'KIKUNOI');
-    const a = await registreer(base), b = await registreer(base);
+    const a = await registreer(base, TMP), b = await registreer(base, TMP);
     const item = await eersteItem(base, a, 'KIKUNOI');
     // twee gasten aan tafel 7, en eentje aan tafel 5 (die mag er nooit in)
     const o1 = (await api(base, '/api/order', { supplierCode: 'KIKUNOI', items: [{ id: item, qty: 1 }], table: '7' }, a)).body.order;
@@ -110,7 +115,7 @@ test('2. een lege tafel geeft geen ticket, en een andere zaak ziet deze bonnen n
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   try {
     const kiku = await zaakInlog(base, 'KIKUNOI');
-    const lid = await registreer(base);
+    const lid = await registreer(base, TMP);
     const item = await eersteItem(base, lid, 'KIKUNOI');
     await api(base, '/api/order', { supplierCode: 'KIKUNOI', items: [{ id: item, qty: 1 }], table: '7' }, lid);
 
@@ -142,7 +147,7 @@ test('3. afrekenen op contant laat de boekhouding met precies de som van de bonn
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   try {
     const { tokMgr, tokStaff } = await zaakInlogBeide(base, 'KIKUNOI');
-    const a = await registreer(base), b = await registreer(base);
+    const a = await registreer(base, TMP), b = await registreer(base, TMP);
     const item = await eersteItem(base, a, 'KIKUNOI');
     await api(base, '/api/order', { supplierCode: 'KIKUNOI', items: [{ id: item, qty: 1 }], table: '7' }, a);
     await api(base, '/api/order', { supplierCode: 'KIKUNOI', items: [{ id: item, qty: 2 }], table: '7' }, b);

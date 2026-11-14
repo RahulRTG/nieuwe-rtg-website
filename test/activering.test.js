@@ -240,3 +240,14 @@ test('9. de wikkel om elke handler is niet de eigenaar van de route', () => {
   assert.equal(eigenaarVan(['server/lib/foutisolatie.js']), null);
   assert.equal(eigenaarVan([]), null);
 });
+
+test('10. exacte contractbediening verklaart geen nieuwe instroom of toekomstig onderpad', () => {
+  const basis = '/api/mijn/abonnement';
+  for (const pad of [basis, basis + '/opzegvoorbeeld', basis + '/opzeggen',
+    ...['betalen', 'herstel', 'intrekken', 'stand'].map(p => basis + '/automatisch/' + p)])
+    assert.equal(A.isBediening(pad), true, pad);
+  for (const pad of [basis + '/nieuw', ...['aanbod', 'teken', 'nieuw', 'herstel/nieuw']
+    .map(p => basis + '/automatisch/' + p)]) assert.equal(A.isBediening(pad), false, pad);
+  assert.equal(A.isBediening('/api/privacy/export'), true, 'andere prefixverklaringen blijven intact');
+  assert.equal(A.isBediening('/api/privacy-onbekend'), false, 'ook die blijven segmentgebonden');
+});

@@ -26,7 +26,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, maakBetaaldRtgTestaccount } = require('./helper');
 
 let srv, base, host, hostMedewerker, buurzaak, gast, gast2;
 let huisId = null, ref = null;
@@ -48,8 +48,11 @@ async function lid(naam) {
   const u = String(Date.now() + Math.round(performance.now())).slice(-9);
   /* Met telefoonnummer: boeken is een reservering en gaat dus langs de
      gegevenspoort. Die heeft zijn eigen toetsen; hier is het opzet. */
-  return (await api('/api/auth/register', { name: naam, email: 'tz' + u + '@voorbeeld.test', phone: '06' + u.slice(0, 8),
-    password: 'thuisgeheim12', geboortedatum: '1989-04-04', tier: 'rtg', pasApp: 'rtg' })).body.token;
+  const reg = await api('/api/auth/register', { name: naam, email: 'tz' + u + '@voorbeeld.test', phone: '06' + u.slice(0, 8),
+    password: 'thuisgeheim12', geboortedatum: '1989-04-04', pasApp: 'rtg' });
+  assert.equal(reg.status, 200, JSON.stringify(reg.body));
+  maakBetaaldRtgTestaccount(TMP, 'tz' + u + '@voorbeeld.test');
+  return reg.body.token;
 }
 const dag = n => new Date(Date.now() + n * 86400000).toISOString().slice(0, 10);
 

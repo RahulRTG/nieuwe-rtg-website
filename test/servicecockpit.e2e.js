@@ -182,7 +182,7 @@ test('een medewerker vraagt toegang en opent niets uit zichzelf', { skip: geenBr
 
 /* DE AI VRAAGT LANGS DEZELFDE KNOP, EN HET LID ZIET DAT HET GEEN MENS IS.
    Twee dingen die alleen in de browser te zien zijn: dat de cockpit de AI kan
-   inzetten zonder zelf iets te openen, en dat de hulp-la van het lid "RTG AI"
+   inzetten zonder zelf iets te openen, en dat de hulp-la van het lid "Rahul AI"
    toont in plaats van de technische sleutel `ai:onderzoeker`. */
 test('de AI vraagt het lid om toegang, en opent niets uit zichzelf', { skip: geenBrowser(pw) }, async () => {
   await metCockpit(async (page, base, lidToken, balie) => {

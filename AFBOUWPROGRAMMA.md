@@ -1,5 +1,209 @@
 # Het afbouwprogramma — wat RTG heeft toegezegd, afbouwen en bewijzen
 
+## Actuele uitvoeringsvolgorde — 14 november 2026
+
+### Productrichting: minder schermen mag, minder overzicht of veiligheid niet
+
+Aanvullend eigenaarsbesluit: 316 (of 330) schermen is geen bouwdoel. Bestaande
+overlap mag worden samengevoegd tot minder, heldere plekken met een rustige,
+clean, natuurlijke en high-end magazinebeleving. Cover en Collectie dragen
+de redactionele ervaring; taken, contracten, geld en herstel gebruiken dezelfde
+vormtaal met een compacte, ondubbelzinnige bediening.
+
+De canonieke inventaris blijft alle bestaande routes en verschijningsvormen
+verantwoorden. Per item volgt expliciet: behouden, samenvoegen naar een
+genoemde screenId, redirect/alias, fragment of server-side gesloten. Een
+samengevoegde ingang houdt een veilige bestemming, passende rol-/tenantgrens,
+hervatting en bewijs; functies of gebruikersrechten verdwijnen niet door een
+kleiner schermgetal. Het aantal bereikbare schermen, route-ingangen en
+toestanden wordt apart benoemd en overal uit dezelfde inventaris afgeleid.
+
+De eerdere schatting op basis van 243 losse schermmigraties is geen
+uitvoeringsprognose meer. Eerst consolideren en de informatiearchitectuur
+vaststellen, daarna het werk meten per herbruikbare schermfamilie en journey.
+Geen routes verwijderen of schermen herontwerpen vóór Poort 0 en Poort 1.
+
+### Uitvoering
+
+Het definitieve eigenaarsplan van 14 november vervangt de losse
+vervolgopdrachten. De eigenaar staat een efficiëntere volgorde toe, zonder
+de Definition of Done te verlagen. Oudere voortgangsmetingen hieronder zijn
+historie en geen bewijs voor de huidige kandidaat.
+
+1. **Eerst Poort 0:** PR #725 en #727 beschermd afhandelen, mergeboom en
+   uitrolstatus verifiëren. Daarna één finale integratielijn vanaf die main.
+   Geen schermmigratie in #727 en geen productie-uitrol door deze integratie.
+2. **Daarna Poort 1:** één canonieke inventaris met stabiele screenIds,
+   eigenaars, launchstatus en migratiematrix. Alle bestaande meetlagen
+   consumeren diezelfde inventaris. Geen tweede voortgangsregister en geen
+   ontwerp/migratie zolang noemerdrift of eigenaarconflicten bestaan.
+3. **Na die basis: verticale tranches per schermfamilie.** Eerst het gedeelde
+   component- en contextcontract vastleggen en op een representatieve
+   kritieke journey beproeven. Daarna binnen iedere tranche UX-contract,
+   DS-migratie, Edge, functionele proeven, toegankelijkheid en Experience
+   samen afronden. Poorten 2 t/m 6 behouden hun volledige eindvoorwaarden;
+   een groene tranche betekent niet dat een hele poort gereed is. Geen
+   afzonderlijke herontwerpronde langs alle schermen, gevolgd door meerdere
+   nieuwe rondes voor styling, Edge en herstel. Tijdelijke werkverdeling
+   heeft exclusieve bestanden en één integrator; geen autonome varianten.
+4. **Externe doorlooptijd vroeg zichtbaar maken.** Eigenaars, benodigde
+   besluiten, configuratie en acceptatieproeven uit Poort 7 voorbereiden
+   naast de technische tranches. Dit autoriseert geen externe opdracht,
+   betaling of livegang. Kandidaatgebonden eindbewijs ontstaat pas op de
+   uiteindelijke configuratie en artefactbytes.
+5. **Bron bevriezen vóór eindkwalificatie.** Pas bij stabiele bron de
+   afgeleide bewijsbestanden verversen, vervolgens alle verplichte checks
+   en twee onafhankelijke integrale runs op dezelfde immutable kandidaat.
+   Een latere codewijziging maakt nieuw toepasselijk bewijs noodzakelijk.
+   Beschermde main en een afzonderlijk getekend GO/NO-GO blijven verplicht.
+
+### Minder dubbel werk tijdens Poort 0
+
+- Eén volledige foutinventaris per gekozen testselectie; reparaties bundelen
+  per aangetoonde oorzaak in plaats van telkens stoppen bij de eerste fout.
+- Tijdens reparaties de getroffen tests en hun grenzen gericht uitvoeren.
+  De bestaande eindselectie, skips/todos-verboden en normen blijven intact.
+- Testpersona's hergebruiken. Openbare registratie geeft geen betaalde pas;
+  een fixture voor een al betalend lid is geen bewijs van contractsluiting,
+  betaling of menselijke Business/Lifestyle-goedkeuring.
+- Kleine verklaarde commits behouden; remote CI en afgeleide rapporten niet
+  na iedere losse fixture opnieuw starten. Push per gecontroleerde tranche.
+- Een diagnostische run waarin de werkboom veranderde geldt uitsluitend als
+  foutinventaris, nooit als commitgebonden kwalificatiebewijs.
+
+### Goedgekeurde contractbediening — 14 november 2026
+
+De eigenaar heeft expliciet ingestemd met de grens 155 → 159, uitsluitend
+voor `/api/mijn/abonnement/automatisch/betalen`, `/herstel`, `/intrekken` en
+`/stand` onder diezelfde automatische abonnementprefix. Dit zijn vier
+bestaande-contractrechten, geen vier nieuwe schermen. Nieuwe aanbiedingen en
+ondertekening blijven instroom en afzonderlijk uitschakelbaar. Identiteit,
+eigen-contractbinding, veilige betaalconfiguratie en opslagpoorten blijven
+onverkort gelden; een leesactie mag niets innen of rechten toekennen.
+
+De regressiecontrole bewaakt de zes routes uitputtend en houdt voor alle
+andere bedieningsroutes de oude grens 155 aan. Een toekomstige route erft
+de uitzondering niet. Deze expliciete keuze is geen algemene toestemming
+om normen of meetgrenzen te verruimen. De lokale implementatie is gericht
+beproefd: 30 route-/registerproeven, 10 component-/browserproeven en 15
+HTTP-/activeringsproeven slagen zonder skip of todo. Ook na een echte
+serverherstart met gesloten instroom blijven eigen betalen, herstel en
+intrekken werken, zonder dubbele inning; een vreemd account wordt geweigerd.
+Daarnaast slagen 86 bredere abonnementsregressies voor onder meer menselijke
+toelating, organisatie-/zaakgrenzen, jaarvervolg, verrekening en herstel.
+Dit gebruikt een lokale providerfixture en is geen bewijs van een live
+betaalrail. De volledige consolidatie en remote checks blijven afzonderlijk.
+
+**Actuele open poort: 0; integrator is eigenaar.** De lokale reparatie van
+het contractleespad voorkomt dat `/api/state` lege aanmeldings-/betaallijsten
+aanmaakt zonder opslagbevestiging. De gerichte contractgroep slaagt 24/24;
+de echte PostgreSQL-ledengidsproef slaagt op een schone testdatabase.
+Negen verdere fixturebestanden slagen gericht met 57/57, nul skips/todos.
+De volledige diagnostische selectie `test:deel -- --deel=4/4
+--zonder-ijkingen --zonder-zware` is afgelopen: 38 bestanden met fouten;
+37 daarvan zijn inmiddels gericht groen, inclusief de hierboven benoemde
+schakelaarcontrole. De 27 volgende bestanden gaven eerst 223/228 groen;
+na herstel van de expliciete historische factuurfixture slaagt die volledige
+betrokken factuursaldogroep 6/6. Dit zijn deelruns, geen nieuwe volledige
+scherfrun. De resterende mutatiesemantiekcontrole vraagt een verse afleiding
+na bronintegratie. Dit is uitsluitend scherf 4, niet de totale
+platformachterstand.
+De machineleesbare foutinventaris staat in `.release/unit-test-fouten.json`
+(14 november, 09:34:46 UTC); de werkboom veranderde tijdens deze diagnose.
+De twee gerichte PostgreSQL-opslagbestanden slagen 3/3. De tweeserverproef
+GRAND met echte lokale PostgreSQL en Redis slaagt 11/11 na expliciete
+testpersona-/clustersleutelvoorbereiding en herstel van gelijktijdige
+schaduwmetingen. De meetmerge, requestcommitgrenzen en flushpublicatie slagen
+samen 56/56; beheerwijzigingen blijven conflictgevoelig en het meetvenster
+verschijnt pas na geslaagde opslag. De alternatieve flushbaan publiceert ook
+pas na COMMIT, bewaart later lokaal werk en blokkeert herschrijven bij een
+onopgelost publicatieconflict. De echte PostgreSQL-adapterproef slaagt 6/6;
+GRAND is na deze verharding opnieuw 11/11 groen. Dit is deelbewijs, geen
+groene volledige scherf, APPWERKT of Deep Green.
+De resterende testfouten, verplichte PostgreSQL/Redis-runs, beschermde remote
+checks en samenvoeging zijn nog open. De inventaris/migratiematrix volgt pas
+na de geverifieerde consolidatie; er wordt nog geen schermmigratie gestart.
+
+**Integratietranche 14 november, na PR #725.** De main-commit
+`fdb376b90fe7b9e6ffe2f9579d9f532ee3a6e151` is lokaal in de werkbranch
+geïntegreerd, met behoud van de Direct-/Service-overdracht en de eigen
+chatmodus. Dit is geen samenvoeging van #727 naar main. De bestaande
+generatoren hebben conflicterende bundels, route-/functieafleidingen en echte
+website-schermafbeeldingen opnieuw opgebouwd. De taalproeven slagen 27/27;
+Experience blijft eerlijk `NOT_TESTED` en de inventarisverschillen blijven
+voor Poort 1 open.
+
+De eerste CI-scherf is per oorzaak hersteld: expliciete betaalpersona's voor
+betaalde functies (29 bestanden), echte identiteitskeuring waar vereist en
+een gratis account dat eigen leeftijd en veilige hersteluitleg behoudt. De
+gerichte fixture-/accountgroep slaagt 224/224; de aanvullende
+identiteits-/reisherkomstgroep 32/32 en de profiel-/communicatiegroep 29/29.
+De contactreparatie is nadrukkelijk productiegedrag, geen verborgen testfix:
+gratis accounts kunnen over hun eigen aankoop communiceren, geschiedenis
+opvragen schept geen klantrelatie, herhaalde orders gebruiken de oorspronkelijke
+zaak en oude archieven herstellen geen ingetrokken deelnemers. Onderbroken
+historie-import hervat zonder dubbele berichten of veranderde tijdstempels;
+een gebleven lid behoudt zijn eigen historische gegevensuitvoer. De gerichte
+contact-/identiteitsgroep slaagt 61/61; de twee nieuwe migratieregressies
+zijn ook tegen hun foutvariant gezien. De afleidings-/communicatiekernproeven
+slagen 75/75. Al deze aantallen zijn lokale deelruns op Node 26, zonder skips
+of todos, geen opgeteld platformtotaal of kandidaatkwalificatie.
+
+De tweede gerichte fixturegroep slaagt in deelruns 123/123 en 122/122; de
+derde groep (38 bestanden) 220/220. Identiteitskeuring blijft los van betalen,
+gratis werknemers en negatieve account-/tenantproeven zijn niet opgewaardeerd.
+Historische factuurcorrectie gebruikt een expliciete bestaande factuur en de
+echte HTTP-betaalroute (17/17 met factuursaldo); de gezelschapsproeven slagen
+3/3. PIN-herstel en beoordelingen bij de eigen afgeronde bestelling zijn als
+aparte productreparatie vastgelegd (`d097dafcb`), met 46/46 gerichte
+regressies en 2/2 echte PIN-browserproeven. Eigen privacy-inzage is eveneens
+een accountrecht, geen betaalrecht (`8270f145f`): de oude fout is eerst
+gereproduceerd, een gevulde vreemde kaart blijft ondanks gespoofte IDs dicht.
+De aanvullende inzage-, Leerhuis-, kantoor-, refundmeter- en Experience-groep
+slaagt 45/45. De refundmeter trekt alleen werkelijk gevonden uitzonderingen
+af, met een positieve en negatieve tegenproef; norm en scanner blijven gelijk.
+Dit zijn lokale ontwikkelproeven op de gewijzigde boom, niet de vier volledige
+CI-scherven en niet samen een platformtotaal.
+
+De oude browserfouten zijn op oorzaak gegroepeerd: betaalpersona's, gratis
+identiteitskeuring, inmiddels herstelde eigen accountrechten en afzonderlijke
+werk-/privacy-/UI-fouten. Gedeelde fixtures mogen geen betaalrecht aan gratis
+medewerkers, kijkers of negatieve persona's geven. Schermproeven draaien pas
+na bevriezing van hun tranche, centraal en met begrensde paralleliteit.
+
+De daaropvolgende browsertranche corrigeert 66 browserbestanden en de bestaande
+reisketenhelper met expliciete persona's; de helper geeft standaard niemand
+een betaalde pas. De leden-/KYC-/Experience-groep slaagt 88/88. De media- en
+Office-groep gaf eerst 21/25; de vier herstelde bestanden slagen vervolgens
+6/6. Negen bestanden wachten nu op serverexit vóór het opruimen van hun eigen
+datamap; de volledige betrokken herproef slaagt 26/26. De aanvraagjourney is
+ook met een echte browser op haar eigen PostgreSQL-database geslaagd, inclusief
+de server-side uitschakeling en het behoud van resultaatbewijs. Dit is geen
+externe betaalrail: het historische factuur-/settlementscenario gebruikt de
+lokale Magnaat-testprovider en zaait geen betaald bewijs.
+
+De productreparaties zijn afzonderlijk vastgelegd. Eigen werkbewijzen en
+locatietoestemming blijven voor gratis werknemers bereikbaar (`0d27d17e9`):
+46/46 gerichte proeven en 8/8 browserproeven. Een werkelijk aanvaarde
+gezinsbinding blijft zichtbaar voor het eigen gratis account (`d7157aeb1`),
+zonder nieuwe bevoegdheid of Foundation-vrijgave: 26/26 inclusief de
+productiepoort. Rahul blijft een globale laag, buiten beide classifiers voor
+scherminhoud (`59fac4ea5`); 35/35 met werkelijk openen/sluiten/heropenen op
+desktop en mobiel. Werkgeversritten volgen dezelfde actuele account-,
+personeels- en centrale contractpoort in route én kern (`4d4313c53`); privéritten,
+menselijke goedkeuring en objectgebonden nazorg behouden hun grenzen. De
+reisbrowsergroep gaf eerst 83/85; beide gratis werkgeversscenario's slagen
+na deze oorzaakreparatie in de gezamenlijke mobiliteitsgroep van 64/64.
+Iedere oorzaak is eerst rood gereproduceerd. Deze deelruns zijn niet op te
+tellen tot een actuele integrale kwalificatie of Deep Green.
+
+Nog open: een verse volledige vierdelige suite, PostgreSQL/Redis, schermproeven en
+beschermde remote checks. De uit #725 overgenomen Direct-/Service-start is
+nog niet bewezen tegen een verloren antwoord met herhaling; dat herstelpunt
+blijft zichtbaar en wordt niet als idempotent afgevinkt. De systeemvervanging
+van Node 24 wacht apart op macOS-beheerdersgoedkeuring; dit blokkeert de
+repo-proeven met de geverifieerde tijdelijke Node 26 niet.
+
 *Eigenaarsbesluit van 11 oktober 2026. Dit document legt het besluit vast, de
 grenzen die eruit volgen, de vier werkstromen die het uitvoeren, en de
 inventaris die zegt wat er binnen de scope valt. Het is LEIDEND voor de verdere

@@ -17,7 +17,10 @@
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop, laadPlaywright, browserOpties, geenBrowser, letOpFouten, wachtOpNetstilte } = require('./helper');
+const fs = require('node:fs');
+const os = require('node:os');
+const path = require('node:path');
+const { startServer, stopHard, maakBetaaldRtgTestaccount, laadPlaywright, browserOpties, geenBrowser, letOpFouten, wachtOpNetstilte } = require('./helper');
 
 const pw = laadPlaywright();
 const SCHERM = '/apps/reizen-veilig.html';
@@ -30,11 +33,12 @@ async function post(base, pad, lijf, tok) {
   return { status: r.status, data: await r.json().catch(() => null) };
 }
 
-async function proeflid(base) {
+async function proeflid(base, datamap) {
   const u = Date.now().toString().slice(-8) + Math.floor(Math.random() * 90 + 10);
   const r = await post(base, '/api/auth/register', { name: 'Proeflid', email: 'rvv' + u + '@voorbeeld.nl',
     phone: '06' + u.slice(0, 8), password: 'geheim12345', geboortedatum: '1985-05-05', tier: 'rtg' });
   assert.equal(r.status, 200, 'proeflid: ' + JSON.stringify(r.data));
+  maakBetaaldRtgTestaccount(datamap, 'rvv' + u + '@voorbeeld.nl');
   return r.data.token;
 }
 
@@ -51,11 +55,12 @@ async function blad(browser, token) {
 
 test('Reizen & Veilig toont het echte volgende moment, het echte aanbod en geeft de wens door',
   { skip: geenBrowser(pw) }, async () => {
-  const srv = await startServer({ env: { SMTP_URL: '', NODE_ENV: 'test', RTG_DEMO: '1' } });
+  const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-reizen-veilig-e2e-'));
+  const srv = await startServer({ env: { SMTP_URL: '', NODE_ENV: 'test', RTG_DEMO: '1', RTG_DATA_DIR: TMP } });
   let browser;
   try {
     const base = srv.base;
-    const tok = await proeflid(base);
+    const tok = await proeflid(base, TMP);
     const bk = await post(base, '/api/booking/request', { supplierCode: 'KAITO', serviceId: 's1', date: morgen(), time: '08:00' }, tok);
     assert.equal(bk.status, 200, 'boeking: ' + JSON.stringify(bk.data));
     assert.equal((await post(base, '/api/booking/pay', { ref: bk.data.boeking.ref }, tok)).status, 200, 'betaald');
@@ -140,16 +145,18 @@ test('Reizen & Veilig toont het echte volgende moment, het echte aanbod en geeft
     await ctx.close();
   } finally {
     if (browser) await browser.close();
-    stop(srv);
+    await stopHard(srv.child);
+    fs.rmSync(TMP, { recursive: true, force: true });
   }
 });
 
 test('zonder reis zegt Reizen & Veilig waarom er geen volgend moment is, met de reden van Move',
   { skip: geenBrowser(pw) }, async () => {
-  const srv = await startServer({ env: { SMTP_URL: '', NODE_ENV: 'test', RTG_DEMO: '1' } });
+  const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-reizen-veilig-e2e-'));
+  const srv = await startServer({ env: { SMTP_URL: '', NODE_ENV: 'test', RTG_DEMO: '1', RTG_DATA_DIR: TMP } });
   let browser;
   try {
-    const tok = await proeflid(srv.base);
+    const tok = await proeflid(srv.base, TMP);
     const volg = await post(srv.base, '/api/move/volgende', {}, tok);
     assert.equal(volg.data.volgende, null, 'een vers lid heeft geen volgend onderdeel');
     browser = await pw.chromium.launch(browserOpties(pw));
@@ -170,6 +177,7 @@ test('zonder reis zegt Reizen & Veilig waarom er geen volgend moment is, met de 
     await ctx.close();
   } finally {
     if (browser) await browser.close();
-    stop(srv);
+    await stopHard(srv.child);
+    fs.rmSync(TMP, { recursive: true, force: true });
   }
 });

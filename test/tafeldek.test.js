@@ -11,7 +11,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, maakBetaaldRtgTestaccount } = require('./helper');
 
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-tafeldek-'));
 let srv, base, lid, codenaam, zaak;
@@ -39,6 +39,8 @@ test.before(async () => {
   base = srv.base;
   const reg = await api('/api/auth/register', { name: 'Tafel Lid', email: 'tafel@x.nl', phone: '0699887766',
     password: 'geheim123', geboortedatum: '1992-06-06', geslacht: 'v', tier: 'rtg', pasApp: 'rtg' });
+  // De betaalpas opent het zorgprofiel; delen en intrekken blijven echte keuzes.
+  maakBetaaldRtgTestaccount(TMP, 'tafel@x.nl');
   lid = reg.body.token;
   codenaam = (((await api('/api/state', {}, lid)).body.state || {}).user || {}).codename;
   const rooster = await api('/api/supplier/roster', { code: 'KIKUNOI' });

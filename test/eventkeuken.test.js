@@ -26,7 +26,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, maakBetaaldRtgTestaccount } = require('./helper');
 
 let srv, base, chef, kok, lid, lidKey;
 let eventId = null, allergieId = null;
@@ -52,6 +52,9 @@ test.before(async () => {
   const u = String(Date.now()).slice(-8);
   const reg = await api('/api/auth/register', { name: 'Gast Eventman', email: 'ev' + u + '@voorbeeld.test',
     password: 'eventgeheim12', geboortedatum: '1988-03-03', tier: 'rtg', pasApp: 'rtg' });
+  assert.equal(reg.status, 200);
+  assert.equal(reg.body.state.user.tier, 'guest', 'een evenementgast krijgt niet door registratie een betaalde pas');
+  maakBetaaldRtgTestaccount(TMP, 'ev' + u + '@voorbeeld.test');
   lid = reg.body.token;
   lidKey = (await api('/api/state', {}, lid)).body.state.user.codename;
   assert.ok(chef && kok && lid, 'chef, kok en lid staan klaar');

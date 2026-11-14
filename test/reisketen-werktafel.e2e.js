@@ -4,7 +4,7 @@
 'use strict';
 const test = require('node:test'), assert = require('node:assert/strict');
 const fs = require('node:fs'), os = require('node:os'), path = require('node:path');
-const { startServer, stop, laadPlaywright, browserOpties, letOpFouten } = require('./helper');
+const { startServer, stopHard, laadPlaywright, browserOpties, letOpFouten } = require('./helper');
 const { maakReisketenFixture, goed } = require('./lib/reisketen-fixture');
 
 test('oude werktafellezing kan een succesvol aangeboden nieuwe offerteversie niet terugzetten', async t => {
@@ -14,7 +14,7 @@ test('oude werktafellezing kan een succesvol aangeboden nieuwe offerteversie nie
   const srv = await startServer({ env: { RTG_DATA_DIR: map, SMTP_URL: '', OFFICE_CODE: 'RTG-OFFICE' } });
   let browser, laatDoor = () => {};
   try {
-    const x = await maakReisketenFixture(srv.base);
+    const x = await maakReisketenFixture(srv.base, { datamap: map, betaaldeReizigers: ['81'] });
     const reis = goed(await x.api('/api/reisbureau/keten/start', {
       titel: 'Werktafel concurrentieproef', bestemming: 'Ibiza', idem: 'werktafel-race-start'
     }, x.reiziger.token), 'reisaanvraag').reis;
@@ -77,7 +77,7 @@ test('oude werktafellezing kan een succesvol aangeboden nieuwe offerteversie nie
     assert.deepEqual(fouten, []);
     await ctx.close();
   } finally {
-    laatDoor(); if (browser) await browser.close(); await stop(srv);
+    laatDoor(); if (browser) await browser.close(); await stopHard(srv.child);
     fs.rmSync(map, { recursive: true, force: true });
   }
 });

@@ -7,7 +7,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, elevateTier } = require('./helper');
+const { startServer, elevateTier, maakBetaaldRtgTestaccount } = require('./helper');
 
 let BASE, child, token;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-rtmail-'));
@@ -25,6 +25,7 @@ test.before(async () => {
     password: 'geheim123', geboortedatum: '1992-05-05', tier: 'rtg', pasApp: 'rtg' }));
   token = reg.token;
   assert.ok(token, 'het lid is aangemeld');
+  maakBetaaldRtgTestaccount(TMP, 'post@x.nl');
 });
 test.after(() => {
   if (child) try { child.kill('SIGKILL'); } catch (e) {}
@@ -103,14 +104,15 @@ test('zonder inlog blijft het postvak dicht', async () => {
 
 test('elk lid krijgt een adres op het domein van zijn pas, en oude post komt aan', async () => {
   const t = Date.now();
-  // zelf-registreren geeft altijd RTG; om het domein per pas te toetsen tillen we
-  // Lifestyle/Business op langs de office-akkoordflow (het enige geldige pad).
+  // Registratie is gratis. RTG is een expliciete betaalde testpersona;
+  // Lifestyle/Business blijven langs de menselijke office-akkoordflow gaan.
   const office = (await json(await api('/api/office/login', { code: 'RTG-OFFICE' }))).token;
   const maak = async (tier) => {
     const regTier = (tier === 'lifestyle' || tier === 'business') ? 'rtg' : tier;
     const tok = (await json(await api('/api/auth/register', { name: 'Lid ' + tier + t,
       email: 'a' + tier + t + '@v.test', phone: '06' + String(t).slice(-7) + (tier === 'rtg' ? '1' : tier === 'business' ? '2' : '3'),
       password: 'geheim123', geboortedatum: '1990-01-01', tier: regTier }))).token;
+    maakBetaaldRtgTestaccount(TMP, 'a' + tier + t + '@v.test');
     if (tier === 'lifestyle' || tier === 'business') await elevateTier(BASE, tok, tier, office);
     return tok;
   };

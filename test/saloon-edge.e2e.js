@@ -5,7 +5,7 @@
 const test = require('node:test'), assert = require('node:assert/strict');
 const fs = require('node:fs'), os = require('node:os'), path = require('node:path');
 const pw = require('playwright');
-const { startServer, stop, browserOpties, geenBrowser, letOpFouten, edgeActies } = require('./helper');
+const { startServer, stopHard, browserOpties, geenBrowser, letOpFouten, edgeActies } = require('./helper');
 
 test('Saloon houdt Edge bereikbaar bij lezen, bewaren, teruggaan en bronuitval', { skip: geenBrowser(pw) }, async () => {
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-saloon-edge-'));
@@ -19,6 +19,7 @@ test('Saloon houdt Edge bereikbaar bij lezen, bewaren, teruggaan en bronuitval',
     };
     const lid = await api('/api/auth/register', { name: 'Saloon Lezer', email: 'edgelezer@example.test', phone: '0612345678',
       password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg' });
+    require('./helper').maakBetaaldRtgTestaccount(tmp, 'edgelezer@example.test');
     const rooster = await api('/api/supplier/roster', { code: 'BODE' });
     const zaak = await api('/api/supplier/login', { code: 'BODE', staffId: rooster.staff.find(x => x.role === 'manager').id, pin: '1234' });
     const nieuw = await api('/api/supplier/redactie/artikel/bewaar', { titel: 'Een nieuwe blik op de buurt',
@@ -145,5 +146,5 @@ test('Saloon houdt Edge bereikbaar bij lezen, bewaren, teruggaan en bronuitval',
     assert.equal(await lezer.isVisible(), false, 'een laat antwoord mag de gesloten lezer niet heropenen');
     assert.equal(await lezer.textContent(), '');
     assert.deepEqual(fouten.filter(x => !String(x).includes('503')), []);
-  } finally { if (browser) await browser.close(); stop(srv && srv.child); fs.rmSync(tmp, { recursive: true, force: true }); }
+  } finally { if (browser) await browser.close(); await stopHard(srv && srv.child); fs.rmSync(tmp, { recursive: true, force: true }); }
 });

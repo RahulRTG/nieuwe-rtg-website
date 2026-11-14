@@ -33,7 +33,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, kantoorAlsPersoon } = require('./helper');
+const { startServer, kantoorAlsPersoon, maakBetaaldRtgTestaccount } = require('./helper');
 
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-ladder-'));
 let child, BASE;
@@ -76,12 +76,14 @@ const APPS = [
 let teller = 0;
 async function nieuwLid(naam) {
   const u = String(Date.now()).slice(-7) + String(++teller).padStart(3, '0');
+  const email = naam.toLowerCase() + u + '@x.nl';
   const r = await post('/api/auth/register', {
-    name: naam, email: naam.toLowerCase() + u + '@x.nl', phone: '06' + u.slice(0, 8),
-    password: 'geheim123', geboortedatum: '1985-06-06', geslacht: 'v', tier: 'rtg', pasApp: 'rtg'
+    name: naam, email, phone: '06' + u.slice(0, 8),
+    password: 'geheim123', geboortedatum: '1985-06-06', geslacht: 'v', pasApp: 'rtg'
   });
   assert.ok(r.body.token, naam + ' is aangemeld: ' + JSON.stringify(r.body).slice(0, 160));
-  return { token: r.body.token, email: naam.toLowerCase() + u + '@x.nl', wachtwoord: 'geheim123' };
+  maakBetaaldRtgTestaccount(TMP, email);
+  return { token: r.body.token, email, wachtwoord: 'geheim123' };
 }
 
 test('de poort zit dicht: een RTG-lid komt bij geen van de dertien ingangen binnen', async () => {

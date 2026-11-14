@@ -34,7 +34,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, maakBetaaldRtgTestaccount } = require('./helper');
 
 let srv, base, lid, buur;
 let siteId = null, buurSiteId = null;
@@ -50,8 +50,9 @@ let n = 0;
 async function registreer(naam) {
   const u = Date.now().toString(36) + (n++) + Math.random().toString(36).slice(2, 6);
   const r = await api('/api/auth/register', { name: naam, email: u + '@voorbeeld.test',
-    password: 'sitegeheim12', geboortedatum: '1991-05-05', tier: 'rtg', pasApp: 'rtg' });
+    password: 'sitegeheim12', geboortedatum: '1991-05-05', pasApp: 'rtg' });
   assert.equal(r.status, 200, 'registreren: ' + JSON.stringify(r.body));
+  maakBetaaldRtgTestaccount(TMP, u + '@voorbeeld.test');
   return r.body.token;
 }
 

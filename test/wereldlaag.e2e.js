@@ -13,7 +13,7 @@
    Draai: npm run e2e */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop, letOpFouten, elevateTier, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
+const { startServer, stopHard, maakBetaaldRtgTestaccount, letOpFouten, elevateTier, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -26,7 +26,8 @@ const api = async (base, pad, body, token) => (await fetch(base + pad, {
 
 test('LivingOS editorial home: responsive example, real destinations, language and source failure',
   { skip: geenBrowser(pw) }, async () => {
-  const srv = await startServer({ env: { SMTP_URL: '', RTG_AI_UIT: '1', RTG_DEMO: '0' } });
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-wereld-editorial-'));
+  const srv = await startServer({ env: { SMTP_URL: '', RTG_AI_UIT: '1', RTG_DEMO: '0', RTG_DATA_DIR: tmp } });
   let browser;
   try {
     browser = await pw.chromium.launch(browserOpties(pw));
@@ -74,6 +75,7 @@ test('LivingOS editorial home: responsive example, real destinations, language a
     const member = await api(srv.base, '/api/auth/register', { name: 'Living reader', email: 'living' + n + '@e.test',
       phone: '06' + String(n).slice(-8), password: 'geheim123', geboortedatum: '1990-02-02', tier: 'rtg' });
     assert.ok(member.token);
+    maakBetaaldRtgTestaccount(tmp, 'living' + n + '@e.test');
     await page.evaluate(t => localStorage.setItem('rtg_member_token', t), member.token);
     await page.route('**/api/wereld/feed', route => route.fulfill({ status: 503, contentType: 'application/json', body: JSON.stringify({ error: 'Bron tijdelijk niet bereikbaar.' }) }));
     await page.reload({ waitUntil: 'domcontentloaded' });
@@ -89,7 +91,8 @@ test('LivingOS editorial home: responsive example, real destinations, language a
     await ctx.close();
   } finally {
     if (browser) await browser.close();
-    await stop(srv.child);
+    await stopHard(srv.child);
+    fs.rmSync(tmp, { recursive: true, force: true });
   }
 });
 
@@ -106,10 +109,11 @@ test('RTG Wereld: de schakelaar, de ene feed, en de sprong naar de berichten-app
       if (tier && tier !== 'rtg') {
         const office = (await api(base, '/api/office/login', { code: 'RTG-OFFICE' })).token;
         await elevateTier(base, d.token, tier, office);
-      }
+      } else maakBetaaldRtgTestaccount(TMP, 'e' + t + '@v.test');
+      assert.equal((await api(base, '/api/state', {}, d.token)).state.user.tier, tier || 'rtg');
       return d.token;
     };
-    // A is een gratis lid, B een Lifestyle-lid; ze zijn verbonden
+    // A heeft de expliciete RTG-testpas, B menselijke Lifestyle-toelating; ze zijn verbonden.
     const a = await maak(1, 'rtg'), b = await maak(2, 'lifestyle');
     const mijA = await api(base, '/api/member/connections', {}, a);
     const mijB = await api(base, '/api/member/connections', {}, b);
@@ -131,7 +135,7 @@ test('RTG Wereld: de schakelaar, de ene feed, en de sprong naar de berichten-app
     }, a);
     await page.goto(base + '/apps/wereld.html', { waitUntil: 'domcontentloaded' });
 
-    // 1. de vijf werelden staan er, en Business is voor de gratis pas DICHT --
+    // 1. de vijf werelden staan er, en Business is voor de RTG-pas DICHT --
     //    zichtbaar, want wegstoppen wat je niet hebt is oneerlijk naar beide kanten
     await page.locator('.wp-story a').click();
     await page.waitForSelector('#werelden button', { timeout: 15000 });
@@ -155,7 +159,7 @@ test('RTG Wereld: de schakelaar, de ene feed, en de sprong naar de berichten-app
     assert.equal(werelden.length, 5, 'er horen vijf werelden te staan: ' + JSON.stringify(werelden));
     const bus = werelden.find(w => w.naam === 'Business');
     assert.ok(bus, 'Business staat niet in de rij');
-    assert.equal(bus.dicht, true, 'Business hoort dicht te zijn voor een gratis pas');
+    assert.equal(bus.dicht, true, 'Business hoort dicht te zijn voor een RTG-pas');
     assert.equal(werelden.find(w => w.naam === 'Lifestyle').dicht, false, 'Lifestyle hoort open te staan');
 
     // 2. de ene feed toont de Salon-post van B, met zijn bron erbij
@@ -349,7 +353,7 @@ test('RTG Wereld: de schakelaar, de ene feed, en de sprong naar de berichten-app
     assert.deepEqual(fouten, [], 'geen JS-fouten tijdens het scherm');
   } finally {
     if (browser) await browser.close();
-    stop(child);
+    await stopHard(child);
     try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
   }
 });

@@ -18,7 +18,7 @@
    slaagt hij in beide. */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, letOpFouten, laadPlaywright, browserOpties, geenBrowser, volgVerzoeken, wachtOpRust } = require('./helper');
+const { startServer, stopHard, maakBetaaldRtgTestaccount, letOpFouten, laadPlaywright, browserOpties, geenBrowser, volgVerzoeken, wachtOpRust } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -95,6 +95,7 @@ test('Van lied naar zaal: zingen, samen maken, uitgeven en horen',
       email: 'za' + n + t + '@e.test', phone: '06' + String(t + n).slice(-8),
       password: 'geheim123', geboortedatum: '1990-02-02', tier: 'rtg' });
     const baas = await maak('Zaal Baas', 1);
+    maakBetaaldRtgTestaccount(TMP, 'za1' + t + '@e.test');
     const maat = await maak('Zaal Maat', 2);
     const maatCode = (await api(base, '/api/state', {}, maat.token)).state.user.codename;
 
@@ -240,7 +241,7 @@ test('Van lied naar zaal: zingen, samen maken, uitgeven en horen',
     assert.deepEqual(fouten, [], 'geen JS-fouten op de pagina');
   } finally {
     if (browser) try { await browser.close(); } catch (e) {}
-    if (child) try { child.kill('SIGKILL'); } catch (e) {}
+    await stopHard(child);
     try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
   }
 });

@@ -12,7 +12,7 @@
    Draai: npm run e2e */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
+const { startServer, stopHard, maakBetaaldRtgTestaccount, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -32,6 +32,7 @@ test('Office-suite: tekstverwerker met zoeken/vervangen en inhoudsopgave, presen
     const t = Date.now();
     const reg = await api(base, '/api/auth/register', { name: 'Suite E2E', email: 'os' + t + '@e.test',
       phone: '06' + String(t).slice(-8), password: 'geheim123', geboortedatum: '1987-05-05', tier: 'rtg' });
+    maakBetaaldRtgTestaccount(TMP, 'os' + t + '@e.test');
 
     browser = await pw.chromium.launch(browserOpties(pw));
     const page = await browser.newPage();
@@ -180,7 +181,7 @@ test('Office-suite: tekstverwerker met zoeken/vervangen en inhoudsopgave, presen
     assert.deepEqual(fouten, [], 'geen JS-fouten op de pagina');
   } finally {
     if (browser) try { await browser.close(); } catch (e) {}
-    if (child) try { child.kill('SIGKILL'); } catch (e) {}
+    await stopHard(child);
     try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
   }
 });

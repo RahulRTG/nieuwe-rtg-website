@@ -81,7 +81,7 @@
            las een lid hier "ai:onderzoeker vraagt toegang" -- een technische
            sleutel waar een naam hoort te staan, en niets dat zegt dat er geen
            mens meekijkt. */
-        z.appendChild(el('i', null, (v.machine ? 'RTG AI' : v.mens) + ' vraagt toegang'));
+        z.appendChild(el('i', null, (v.machine ? 'Rahul AI' : v.mens) + ' vraagt toegang'));
         if (v.machine) z.appendChild(el('p', null, 'Dit is een machine, geen medewerker.'));
         z.appendChild(el('p', null, v.reden));
         z.appendChild(el('p', null, 'Opent: ' + v.capabilities.join(', ') + '. Zaak ' + v.zaak + '.'));
@@ -126,6 +126,13 @@
             rij.replaceWith(el('p', null, (d && d.let) || 'Doorgezet.'));
           }).catch(function () { hulpFout(blok, rij); });
         }));
+        /* MEEKIJKEN IS GEEN STILLE BEVOEGDHEID. De gebruiker opent zelf een
+           zaakgebonden sessie en kiest daarna in de browser welk scherm wordt
+           gedeeld. De sessie is beschikbaar naast schriftelijke hulp en hangt
+           niet aan de betaalde belpas. */
+        rij.appendChild(knop(null, 'Veilig scherm delen', function () {
+          location.href = '/apps/service-bel.html?ondersteuning=1&zaak=' + encodeURIComponent(lopend[0].id);
+        }));
       }
       /* DE BELKNOP, alleen waar hij bestaat (Lifestyle en Business: de ladder,
          geen weglating). Een mens vragen staat er al; dat is een ondergrens
@@ -163,16 +170,6 @@
               : ((d && d.error) || 'Er ging iets mis.');
           }).catch(function () { hulpFout(blok, f); });
       }));
-      /* EN HET ADRES, want een kanaal dat niemand kent bestaat niet. Het komt
-         van de server (kern/service/post.js is de enige plek waar het wordt
-         uitgerekend) en staat er alleen als de servicelaag hem meegeeft -- geen
-         adres in dit bestand overtypen. Het staat ONDER de knop: wie hier al
-         zit, meldt sneller met dit veld dan met zijn mailprogramma. */
-      svc('/api/service/keuzes', null, blok).then(function (k) {
-        if (!k || !k.hulpAdres || !f.isConnected) return;
-        f.appendChild(el('p', null, 'Liever mailen? ' + k.hulpAdres +
-          ' -- dat wordt dezelfde melding. Mail vanaf het adres waarmee u bij RTG bekend bent.'));
-      }).catch(function () {});
       blok.appendChild(f);
       veld.focus();
     }

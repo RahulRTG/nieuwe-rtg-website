@@ -12,7 +12,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer } = require('./helper');
+const { startServer, keurLidGoed } = require('./helper');
 
 let BASE, child;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-tafeluitz-'));
@@ -30,8 +30,15 @@ const morgen = () => new Date(Date.now() + 86400000).toISOString().slice(0, 10);
 
 test('een zaak biedt een andere tijd aan, zet een aanvraag door, en alleen een manager beslist daarna', async () => {
   const t = Date.now() + '';
-  const lid = (await roep('/auth/register', { name: 'T ' + t, email: 't' + t + '@v.test', phone: '06' + t.slice(-8),
-    password: 'geheim123', geboortedatum: '1980-05-05', tier: 'rtg' })).d.token;
+  const reg = await roep('/auth/register', { name: 'T ' + t, email: 't' + t + '@v.test', phone: '06' + t.slice(-8),
+    password: 'geheim123', geboortedatum: '1980-05-05', tier: 'rtg' });
+  assert.equal(reg.status, 200);
+  assert.equal(reg.d.state.user.tier, 'guest');
+  const lid = reg.d.token;
+  const ongekeurd = await roep('/reserveer', { supplierCode: 'KIKUNOI', datum: morgen(), tijd: '20:00', personen: 2 }, lid);
+  assert.equal(ongekeurd.status, 403, 'een gratis account mag niet ongekeurd reserveren');
+  await keurLidGoed(BASE, lid, reg.d.state.user.codename);
+  assert.equal((await roep('/state', {}, lid)).d.state.user.tier, 'guest', 'identiteitskeuring is geen betaalde pas');
   const ro = (await roep('/supplier/roster', { code: 'KIKUNOI' })).d.staff || [];
   const man = ro.find(x => x.role === 'manager');
   const mw = ro.find(x => x.role !== 'manager');

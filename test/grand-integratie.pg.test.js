@@ -35,7 +35,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop, stopNet, stroomAdres } = require('./helper');
+const { startServer, stopNet, stroomAdres } = require('./helper');
 
 const HEEFT_PG = !!(process.env.DATABASE_URL || process.env.PG_URL);
 const HEEFT_REDIS = !!process.env.REDIS_URL;
@@ -120,6 +120,7 @@ async function nieuwLid(base, tier = 'business') {
     password: 'geheim123', geboortedatum: '1990-01-01', tier, pasApp: tier
   });
   assert.ok(reg.body.token, 'registratie geeft een token (status ' + reg.status + ')');
+  assert.equal(reg.body.state.user.tier, 'guest', 'een aangevraagde pas is nog geen betaald recht');
   const token = reg.body.token;
   const st = await tot(() => api(base, '/api/state', {}, token),
     r => r.body && r.body.state && r.body.state.user, { pogingen: 40, wacht: 150 });
@@ -149,8 +150,11 @@ test('GRAND: twee instances op gedeelde Postgres + Redis, volledige gelijktijdig
   // DATABASE_URL en REDIS_URL erven van het proces, zodat A en B echt delen.
   const dirA = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-A-'));
   const dirB = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-B-'));
-  const A = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: dirA, RTG_SERVER: '1' } });
-  const B = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: dirB, RTG_SERVER: '2' } });
+  // Twee echte instances hebben dezelfde synthetische cluster-sleutels nodig:
+  // anders bewijst een account op B alleen zijn eigen lokale inlog, geen failover.
+  const gedeeld = { SMTP_URL: '', RTG_SECRET_KEY: 'grand-cluster-proef-'.repeat(4), RTG_VAULT_KEY: 'd'.repeat(64) };
+  let A = await startServer({ env: { ...gedeeld, RTG_DATA_DIR: dirA, RTG_SERVER: '1' } });
+  let B = await startServer({ env: { ...gedeeld, RTG_DATA_DIR: dirB, RTG_SERVER: '2' } });
   const streams = [];
 
   try {
@@ -211,6 +215,26 @@ test('GRAND: twee instances op gedeelde Postgres + Redis, volledige gelijktijdig
       assert.ok(gevonden.some(r => r.codename === opA.codename),
         'B vindt het op A aangemaakte lid "' + opA.codename + '" via de geindexeerde gids');
     });
+
+    // Alleen de koper heeft voor de volgende proeven een bestaande betaalde
+    // pas nodig. De 24 registraties hierboven blijven echte gratis accounts.
+    // Dit is fixturevoorbereiding in de eigen testdatabase, geen betaalbewijs.
+    // Spoel beide caches en herstart vanuit PG; geen directe lokale rechten.
+    await stopNet(A.child); await stopNet(B.child);
+    const { Pool } = require('../server/pgwire');
+    const personaPool = new Pool({ connectionString: process.env.DATABASE_URL || process.env.PG_URL, max: 1 });
+    try {
+      const betaald = await personaPool.query("UPDATE users SET tier='rtg' WHERE codename=$1 AND tier='guest'",
+        [leden[0].codename]);
+      assert.equal(betaald.rowCount, 1, 'alleen de koper krijgt de expliciete betaalde testpersona');
+    } finally { await personaPool.end(); }
+    A = await startServer({ env: { ...gedeeld, RTG_DATA_DIR: dirA, RTG_SERVER: '1' } });
+    B = await startServer({ env: { ...gedeeld, RTG_DATA_DIR: dirB, RTG_SERVER: '2' } });
+    for (const srv of [A, B]) {
+      const staat = await api(srv.base, '/api/state', {}, leden[0].token);
+      assert.equal(staat.status, 200);
+      assert.equal(staat.body.state.user.tier, 'rtg', 'beide instances lezen de betaalde persona uit PG');
+    }
 
     // Zelfde leverancier (KIKUNOI) op BEIDE instances: het menu zetten we op A
     // (waar de koper bestelt, zodat A het gerecht meteen kent), en de SSE openen

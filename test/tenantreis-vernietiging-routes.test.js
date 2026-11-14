@@ -4,13 +4,15 @@
 const test = require('node:test'), assert = require('node:assert/strict');
 const fs = require('node:fs'), os = require('node:os'), path = require('node:path');
 const { DatabaseSync } = require('node:sqlite');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, maakBetaaldRtgTestaccount } = require('./helper');
 const { maakReisketenFixture, goed } = require('./lib/reisketen-fixture');
 const map = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-tenantreis-lifecycle-'));
 let srv, x, werkruimte, beheerToken, org;
 const env = { RTG_DATA_DIR: map, SMTP_URL: '', OFFICE_CODE: 'RTG-OFFICE' };
 test.before(async () => {
   srv = await startServer({ env }); x = await maakReisketenFixture(srv.base); org = x.bureau.org;
+  // Identiteitskeuring komt al uit de ketenfixture; betaalde toegang is apart.
+  maakBetaaldRtgTestaccount(map, 'reisketen-81@voorbeeld.test');
   goed(await x.api('/api/reisbureau/keten/start', { supplierCode: x.bureau.code,
     titel: 'Bewaarproef', bestemming: 'Lokale contractproef', idem: 'tenantreis-bewaar-start' }, x.reiziger.token), 'reis');
   const w = goed(await x.api('/api/bedrijf/werkruimte/maak', { naam: 'Werkruimte vertrekproef' }), 'werkruimte');

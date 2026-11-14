@@ -94,6 +94,8 @@ module.exports = ({ db, save, schoon, findSupplier, bedrijf }) => {
       return { error: 'Onbekende rol: ' + rol + '.', status: 400 };
     if (t.groepen.some(g => g.werkruimte === code && g.groep === groep && g.rol === rol))
       return { error: 'Die afbeelding staat er al.', status: 409 };
+    const inrichting = contract.magInrichting(t.org);
+    if (!inrichting.ok) return { error: inrichting.reden, status: 402 };
     if (t.groepen.length >= 200) return { error: 'Deze tenant zit aan het maximum aantal groepsafbeeldingen.', status: 400 };
     t.groepen.push({ groep, werkruimte: code, rol, at: new Date().toISOString() });
     save();

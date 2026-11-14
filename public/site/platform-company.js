@@ -44,7 +44,7 @@
   }
   if(card.id==='questions')D.company.cards.filter(function(c){return ['origin','architecture','language','control','foundation'].includes(c.id);}).forEach(function(c){var q=P.node('details');q.append(P.node('summary',c.title));c.paragraphs.forEach(function(k){q.append(P.node('p',k));});el.append(q);});
   if(card.id==='language')el.append(P.button('language',function(){w.RTGi18n.openModal();}));
-  if(card.id==='support')el.append(link('email','mailto:roellie.i@gmail.com?subject=RTG%20enquiry'));
+  if(card.id==='support')el.append(link('RTG Direct','https://app.rahultravelgroup.com/apps/app.html#rtg-direct=organisatie'));
   if(pages[card.id])el.append(link('readMore',pages[card.id]));
   return el;
  }

@@ -9,7 +9,7 @@
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, keurLidGoed } = require('./helper');
 
 let server, base, token;
 const post = async (pad, body, tk) => {
@@ -30,6 +30,8 @@ test.before(async () => {
   });
   token = r.body.token;
   assert.ok(token, 'registratie leverde geen token');
+  assert.equal(r.body.state.user.tier, 'guest');
+  await keurLidGoed(base, token, r.body.state.user.codename, '1990-01-01');
 });
 test.after(() => stop(server && server.child));
 
@@ -108,6 +110,8 @@ test('een tweede lid ziet niets van het eerste', async () => {
     name: 'Tweede Lid', email: 'adaptief2@rtg.test', phone: '0612345679',
     password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg'
   });
+  assert.equal(ander.body.state.user.tier, 'guest');
+  await keurLidGoed(base, ander.body.token, ander.body.state.user.codename, '1990-01-01');
   const g = await post('/api/neiging/geheugen', {}, ander.body.token);
   assert.equal(g.status, 200);
   const eigen = await post('/api/neiging/geheugen', {}, token);
@@ -130,6 +134,8 @@ test('overslaan kan, en daarna komt er geen vraag meer', async () => {
     password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg'
   });
   const tk = derde.body.token;
+  assert.equal(derde.body.state.user.tier, 'guest');
+  await keurLidGoed(base, tk, derde.body.state.user.codename, '1990-01-01');
   assert.equal((await post('/api/neiging/intake', {}, tk)).body.klaar, false);
   assert.equal((await post('/api/neiging/overslaan', {}, tk)).status, 200);
   assert.equal((await post('/api/neiging/intake', {}, tk)).body.klaar, true);

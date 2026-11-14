@@ -89,6 +89,7 @@ const CONTRACTEN = Object.assign({},
   /* Een lid en zijn eigen lidmaatschap: twee lezers en een opzegging. Eigen
      bestand omdat het indelen er een defect uit haalde -- zie de kop. */
   require('./mutatiecontracten-lidabonnement').CONTRACTEN,
+  require('./mutatiecontracten-abonnementen').CONTRACTEN,
   require('./mutatiecontracten-integratie').CONTRACTEN,
   /* RTG Move: drie routes die alle drie lezen, met de BOUW als grond in plaats
      van een meting. Eigen bestand om dat verschil te bewaren -- zie de kop. */

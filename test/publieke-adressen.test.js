@@ -5,7 +5,7 @@ const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const os=require('node:os');
 const path=require('node:path');
-const { startServer }=require('./helper');
+const { startServer, maakBetaaldRtgTestaccount }=require('./helper');
 // de buitenpoorten voor post vragen het gedeelde geheim (server/kern/mailpoort.js, eigenaarsbesluit 19 oktober 2026)
 const { GEHEIM, zetKop } = require('./mailpoort');
 zetKop();
@@ -30,9 +30,12 @@ test.after(() => {
 });
 
 async function lid(naam,n) {
-  return (await json(await post('/api/auth/register',{ name:naam,
+  const account = (await json(await post('/api/auth/register',{ name:naam,
     email:'publiek'+n+'@voorbeeld.test', password:'veilig-geheim',
     geboortedatum:'1990-01-01', tier:'rtg', pasApp:'rtg' }))).body;
+  assert.ok(account.token, 'het mailaccount is geregistreerd');
+  maakBetaaldRtgTestaccount(map, 'publiek'+n+'@voorbeeld.test');
+  return account;
 }
 
 test('lid krijgt voor.achternaam op het server-bewezen pasniveau', async () => {

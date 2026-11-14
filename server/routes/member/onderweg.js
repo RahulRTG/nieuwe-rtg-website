@@ -9,7 +9,11 @@ module.exports = (kern) => {
   const liveSave = () => typeof save.sleutels === 'function' ? save.sleutels(['live']) : save();
 
   app.post('/api/live/start', auth, (req, res) => {
-    if (req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor leden.' });
+    /* Een gratis account is een lid zonder betaalde pas, niet een anonieme
+       bezoeker. Onderweg gaan is geen nieuwe betaalde dienst: de positie blijft
+       van het account zelf en mag daarom niet door de abonnementspoort vallen. */
+    if (req.session.tier === 'guest' && !req.session.account)
+      return res.status(403).json({ error: 'Alleen voor accounts.' });
     const key = req.session.key;
     const destCode = req.body.destCode ? String(req.body.destCode).trim().toUpperCase() : null;
     const dest = destCode ? findSupplier(destCode) : null;

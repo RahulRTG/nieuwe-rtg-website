@@ -17,7 +17,7 @@
 const test = require('node:test');
 const { vereist } = require('./infra');
 const assert = require('node:assert/strict');
-const { startServer, stop, letOpFouten, laadPlaywright, browserOpties, geenBrowser,
+const { startServer, stopHard, maakBetaaldRtgTestaccount, letOpFouten, laadPlaywright, browserOpties, geenBrowser,
   wachtOpTekst, kantoorAlsPersoon, zaakMensOpNaam } = require('./helper');
 const fs = require('fs');
 const os = require('os');
@@ -173,6 +173,7 @@ test('de cel: naamloze herkomst, werkende brug, en een geweigerde machtiging', {
     const lid = (await api(base, '/api/auth/register', { name: 'Cel Lid', email: 'cel@x.nl', phone: '0612345677',
       password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' })).body.token;
     assert.ok(tech && office && sup && lid, 'alle vier de sessies staan');
+    maakBetaaldRtgTestaccount(TMP, 'cel@x.nl');
 
     await api(base, '/api/techniek/tenant', { org: 'O-CEL', naam: 'Cel Uitgeverij' }, tech);
     await api(base, '/api/techniek/tenant/bind', { org: 'O-CEL', soort: 'zaak', code: 'KIKUNOI' }, tech);
@@ -235,7 +236,7 @@ test('de cel: naamloze herkomst, werkende brug, en een geweigerde machtiging', {
     assert.deepEqual(fouten, [], 'de celpagina boot zonder onopgevangen fouten');
   } finally {
     if (browser) await browser.close().catch(() => {});
-    stop(srv && srv.child);
+    await stopHard(srv && srv.child);
     try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
   }
 });
@@ -260,6 +261,7 @@ test('de winkel en het uitgeversbureau openen zonder fouten', { skip: vereist('b
     const sup = await zaakMensOpNaam(base, (await api(base, '/api/supplier/login', { code: 'KIKUNOI', staffId: chef.id, pin: '1234' })).body.token, 'KIKUNOI');
     const lid = (await api(base, '/api/auth/register', { name: 'Winkel Lid', email: 'winkel@x.nl', phone: '0612345676',
       password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' })).body.token;
+    maakBetaaldRtgTestaccount(TMP, 'winkel@x.nl');
     await api(base, '/api/techniek/tenant', { org: 'O-WINKEL', naam: 'Winkel Uitgeverij' }, tech);
     await api(base, '/api/techniek/tenant/bind', { org: 'O-WINKEL', soort: 'zaak', code: 'KIKUNOI' }, tech);
     await api(base, '/api/appstore/uitgever/aanvraag', { naam: 'Winkel Uitgeverij', contact: 'dev@winkel.nl' }, sup);
@@ -387,7 +389,7 @@ test('de winkel en het uitgeversbureau openen zonder fouten', { skip: vereist('b
     assert.deepEqual(f3, [], 'de dossierpagina boot in beide standen zonder onopgevangen fouten');
   } finally {
     if (browser) await browser.close().catch(() => {});
-    stop(srv && srv.child);
+    await stopHard(srv && srv.child);
     try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
   }
 });
@@ -557,7 +559,7 @@ test('de bon, de koop en de keuringskant in een browser', { skip: vereist('brows
     assert.deepEqual(fouten, [], 'ook na het kopen geen onopgevangen fouten');
   } finally {
     if (browser) await browser.close().catch(() => {});
-    stop(srv && srv.child);
+    await stopHard(srv && srv.child);
     try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
   }
 });

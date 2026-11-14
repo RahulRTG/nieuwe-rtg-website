@@ -9,12 +9,12 @@ const map = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-kantoor-tokengrens-'));
 test.before(async () => {
   const pw = h.laadPlaywright({ eigenDriver: false }); assert.ok(pw && pw.chromium, 'Chromium verplicht');
   srv = await h.startServer({ env: { RTG_DATA_DIR: map, SMTP_URL: '', OFFICE_CODE: 'RTG-OFFICE' } });
-  x = await maakReisketenFixture(srv.base); browser = await h.startBrowser(pw);
+  x = await maakReisketenFixture(srv.base, { datamap: map, betaaldeReizigers: ['81'] }); browser = await h.startBrowser(pw);
   reis = goed(await x.api('/api/reisbureau/keten/start', { titel: 'Vertrouwelijke oude kantoorweergave', bestemming: 'Ibiza',
     idem: 'kantoor-token-start' }, x.reiziger.token), 'reis').reis;
   console.log('Kantoortokengrens Chromium ' + browser.version());
 });
-test.after(async () => { if (browser) await browser.close(); if (srv) await h.stop(srv); fs.rmSync(map, { recursive: true, force: true }); });
+test.after(async () => { if (browser) await browser.close(); if (srv) await h.stopHard(srv.child); fs.rmSync(map, { recursive: true, force: true }); });
 for (const status of [200, 401]) test('laat kantoorantwoord ' + status + ' wist nieuwe opgeslagen sessie niet', async () => {
   // Een echte persoonlijke eigenaarslogin mag via de bestaande kantoordeur.
   // Hij kan afzonderlijk worden ingetrokken zonder de nieuwe B-sessie te raken.

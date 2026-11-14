@@ -95,7 +95,7 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const http = require('http');
-const { startServer, stop, kantoorKoppelBody } = require('./helper');
+const { startServer, stop, kantoorKoppelBody, maakBetaaldRtgTestaccount } = require('./helper');
 
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-mn02ai-'));
 const REDEN = 'Controle van het abonnement na een vraag van het lid zelf';
@@ -197,6 +197,8 @@ test.before(async () => {
   const u = Date.now().toString().slice(-8) + Math.random().toString(36).slice(2, 6);
   const regR = await api('/api/auth/register', { name: 'Roos Mn02', email: 'mn02ai-r' + u + '@voorbeeld.test',
     password: 'geheim123', geboortedatum: '1988-04-04', pasApp: 'rtg' });
+  // R gebruikt persoonlijke AI; de kantoorrol en de gratis S blijven apart.
+  maakBetaaldRtgTestaccount(TMP, 'mn02ai-r' + u + '@voorbeeld.test');
   rLid = regR.body.token;
   const rUser = ((regR.body || {}).state || {}).user || {};
   rCodenaam = rUser.codename;

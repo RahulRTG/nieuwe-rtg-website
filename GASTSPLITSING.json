@@ -1,23 +1,23 @@
 {
   "stempel": {
-    "op": "2026-11-12T22:01:06.621Z",
-    "commit": "b99fd4c8ab",
+    "op": "2026-11-14T07:12:47.345Z",
+    "commit": "1c1abb561",
     "boomVuil": false,
-    "boomAnders": 11,
+    "boomAnders": 0,
     "instrument": "scripts/gastsplitsing.js",
-    "node": "v26.12.1"
+    "node": "v24.18.0"
   },
   "graad": "vermoed",
   "grens": "Lexicaal ingedeeld. Dit zegt NIET of een gratis account er werkelijk langs komt (dat meet npm run doelgroepbereik, met een echte gratis-accountsessie), en NIET of een deur voor een gratis account open hoort te staan -- dat is een productvraag (SAMENLEVING.md, de verklaring van de bodem). `leden` is geen fout: het woord is dubbelzinnig omdat een Community-lid ook lid heet. Een toets die het onderscheid via een andere poort maakt dan account of idGeverifieerd, telt hier als weigering.",
   "uitleg": "Per plek in server/ die op de gast toetst: maakt de code het onderscheid tussen bezoeker en gratis account, en wat zegt de weigering dat er nodig is. account-belofte = de tekst zegt dat een account of profiel volstaat, terwijl de code ook het gratis account weigert.",
   "gemeten": {
     "bestanden": 127,
-    "plekken": 139,
+    "plekken": 136,
     "perSoort": {
       "vertakt": 23,
-      "onderscheidt": 27,
+      "onderscheidt": 33,
       "pas-eis": 12,
-      "leden": 77
+      "leden": 68
     },
     "tegenspraak": 0
   },
@@ -34,7 +34,7 @@
       "zegt": null
     },
     {
-      "plek": "server/kern/aanmeldingen/naargast.js:54",
+      "plek": "server/kern/aanmeldingen/naargast.js:59",
       "soort": "onderscheidt",
       "zegt": null
     },
@@ -84,12 +84,17 @@
       "zegt": null
     },
     {
-      "plek": "server/kern/lid.js:80",
+      "plek": "server/kern/lid.js:68",
       "soort": "vertakt",
       "zegt": null
     },
     {
-      "plek": "server/kern/lid.js:123",
+      "plek": "server/kern/lid.js:114",
+      "soort": "onderscheidt",
+      "zegt": null
+    },
+    {
+      "plek": "server/kern/lid.js:116",
       "soort": "vertakt",
       "zegt": null
     },
@@ -155,11 +160,6 @@
     },
     {
       "plek": "server/opzet/kernlaag4.js:16",
-      "soort": "onderscheidt",
-      "zegt": null
-    },
-    {
-      "plek": "server/routes/account.js:18",
       "soort": "onderscheidt",
       "zegt": null
     },
@@ -295,8 +295,8 @@
     },
     {
       "plek": "server/routes/mediaos.js:18",
-      "soort": "leden",
-      "zegt": "De Media OS is voor leden."
+      "soort": "onderscheidt",
+      "zegt": null
     },
     {
       "plek": "server/routes/meet.js:8",
@@ -304,7 +304,7 @@
       "zegt": null
     },
     {
-      "plek": "server/routes/member/assistent.js:14",
+      "plek": "server/routes/member/assistent.js:22",
       "soort": "leden",
       "zegt": "De persoonlijke AI is exclusief voor leden."
     },
@@ -314,24 +314,24 @@
       "zegt": "Alleen voor leden."
     },
     {
-      "plek": "server/routes/member/betalen-munt.js:39",
+      "plek": "server/routes/member/betalen-munt.js:40",
       "soort": "leden",
       "zegt": "Alleen voor leden."
     },
     {
-      "plek": "server/routes/member/betalen.js:24",
-      "soort": "leden",
-      "zegt": "Alleen voor leden."
+      "plek": "server/routes/member/betalen.js:27",
+      "soort": "onderscheidt",
+      "zegt": null
     },
     {
-      "plek": "server/routes/member/betalen.js:91",
-      "soort": "leden",
-      "zegt": "Alleen voor leden."
+      "plek": "server/routes/member/betalen.js:97",
+      "soort": "onderscheidt",
+      "zegt": null
     },
     {
-      "plek": "server/routes/member/betalen.js:102",
-      "soort": "leden",
-      "zegt": "Alleen voor leden."
+      "plek": "server/routes/member/betalen.js:108",
+      "soort": "onderscheidt",
+      "zegt": null
     },
     {
       "plek": "server/routes/member/boeken.js:18",
@@ -339,9 +339,9 @@
       "zegt": "Alleen voor leden."
     },
     {
-      "plek": "server/routes/member/boeken.js:85",
-      "soort": "leden",
-      "zegt": "Alleen voor leden."
+      "plek": "server/routes/member/boeken.js:88",
+      "soort": "onderscheidt",
+      "zegt": null
     },
     {
       "plek": "server/routes/member/cadeaukaart.js:39",
@@ -349,7 +349,7 @@
       "zegt": "Alleen voor leden."
     },
     {
-      "plek": "server/routes/member/cadeaukaart.js:81",
+      "plek": "server/routes/member/cadeaukaart.js:87",
       "soort": "leden",
       "zegt": "Alleen voor leden."
     },
@@ -424,9 +424,9 @@
       "zegt": "Hiervoor heeft u een pas nodig."
     },
     {
-      "plek": "server/routes/member/onderweg.js:12",
-      "soort": "leden",
-      "zegt": "Alleen voor leden."
+      "plek": "server/routes/member/onderweg.js:15",
+      "soort": "onderscheidt",
+      "zegt": null
     },
     {
       "plek": "server/routes/member/overheid.js:15",
@@ -499,11 +499,6 @@
       "zegt": "Alleen voor leden."
     },
     {
-      "plek": "server/routes/member/sessies.js:54",
-      "soort": "leden",
-      "zegt": "Alleen voor leden."
-    },
-    {
       "plek": "server/routes/member/terplaatse.js:28",
       "soort": "leden",
       "zegt": "Alleen voor leden."
@@ -515,11 +510,6 @@
     },
     {
       "plek": "server/routes/member/terplaatse.js:86",
-      "soort": "leden",
-      "zegt": "Alleen voor leden."
-    },
-    {
-      "plek": "server/routes/member/tweefactor.js:23",
       "soort": "leden",
       "zegt": "Alleen voor leden."
     },
@@ -629,9 +619,9 @@
       "zegt": "De plaatslaag is voor leden."
     },
     {
-      "plek": "server/routes/podium.js:18",
-      "soort": "leden",
-      "zegt": "Het Podium is voor leden."
+      "plek": "server/routes/podium.js:20",
+      "soort": "onderscheidt",
+      "zegt": null
     },
     {
       "plek": "server/routes/rtmail-lid.js:98",
@@ -641,11 +631,6 @@
     {
       "plek": "server/routes/samen.js:9",
       "soort": "vertakt",
-      "zegt": null
-    },
-    {
-      "plek": "server/routes/sleutelwoorden.js:12",
-      "soort": "onderscheidt",
       "zegt": null
     },
     {

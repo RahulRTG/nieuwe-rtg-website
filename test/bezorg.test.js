@@ -9,7 +9,7 @@ const { spawn } = require('node:child_process');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer } = require('./helper');
+const { startServer, maakBetaaldRtgTestaccount } = require('./helper');
 
 let BASE;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-bez-'));
@@ -24,10 +24,12 @@ const json = r => r.json();
 
 test.before(async () => {
   ({ child, base: BASE } = await startServer({ env: { RTG_DATA_DIR: TMP, SMTP_URL: '' } }));
-  // lid met business-pas
+  // Bestaand betaald RTG-lid; bezorgen vraagt geen zakelijke pas.
   const reg = await json(await api('/api/auth/register', { name: 'Bezorg Lid', email: 'bezorg@x.nl', phone: '0612345699',
-    password: 'geheim123', geboortedatum: '1990-01-01', tier: 'business', pasApp: 'business' }));
+    password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' }));
   lidToken = reg.token;
+  assert.ok(lidToken);
+  maakBetaaldRtgTestaccount(TMP, 'bezorg@x.nl');
   // manager en bezorger (PDA) bij Sal de Mar (KIKUNOI)
   const roster = await json(await api('/api/supplier/roster', { code: 'KIKUNOI' }));
   const man = roster.staff.find(x => x.role === 'manager');

@@ -24,12 +24,14 @@ async function api(base, route, body, token) {
   return data;
 }
 
-async function member(base) {
+async function member(base, datamap) {
   const unique = Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
   const account = await api(base, '/api/auth/register', {
     name: 'Travel herstelproef', email: 'travel-recovery-' + unique + '@voorbeeld.test',
     phone: '0612345678', password: 'geheim12345', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg'
   });
+  assert.ok(account.token, 'registratie');
+  h.maakBetaaldRtgTestaccount(datamap, 'travel-recovery-' + unique + '@voorbeeld.test');
   const status = await api(base, '/api/onboarding/status', {}, account.token);
   await api(base, '/api/onboarding/teken', {
     naam: 'Travel herstelproef', akkoord: true, contractVersion: status.contract.versie
@@ -43,7 +45,7 @@ test('TravelOS herstelt na antwoordverlies zonder een tweede aanvraag te verstur
     const server = await h.startServer({ env: { SMTP_URL: '', RTG_AI_UIT: '1', RTG_DATA_DIR: dataDir } });
     const browser = await h.startBrowser(pw);
     try {
-      const token = await member(server.base);
+      const token = await member(server.base, dataDir);
       const context = await browser.newContext({
         viewport: { width: 1440, height: 960 }, serviceWorkers: 'block', reducedMotion: 'reduce'
       });
@@ -92,7 +94,7 @@ test('TravelOS herstelt na antwoordverlies zonder een tweede aanvraag te verstur
       await context.close();
     } finally {
       await browser.close().catch(() => {});
-      await h.stop(server.child || server);
+      await h.stopHard(server.child);
       fs.rmSync(dataDir, { recursive: true, force: true });
     }
   });

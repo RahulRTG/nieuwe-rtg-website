@@ -32,7 +32,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, maakBetaaldRtgTestaccount } = require('./helper');
 
 let srv, base, office, lid;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-weefsel-'));
@@ -474,6 +474,8 @@ test('een melder ziet zijn EIGEN tekst, niet die van de buurman op dezelfde zaak
   const maakLid = async (u) => {
     const r = await api('auth/register', { name: 'Buur ' + u, email: 'buur' + u + '@x.nl', phone: '06' + u,
       password: 'geheim123', geboortedatum: '1990-05-05', geslacht: 'v', tier: 'rtg', pasApp: 'rtg' });
+    // Beide melders bereiken dezelfde ledenroute; daarna geldt de tenantgrens.
+    maakBetaaldRtgTestaccount(TMP, 'buur' + u + '@x.nl');
     return r.body.token;
   };
   const melderA = await maakLid('11223344');

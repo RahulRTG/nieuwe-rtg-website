@@ -128,21 +128,17 @@ function zonderNaamOfAdres(body, lid, waar) {
   assert.ok(!uit.includes(lid.achternaam), waar + ': de echte naam van het lid staat in het antwoord');
 }
 
-/* RTG_DEMO=1 zet de demo-inlog aan. Die is hier nodig voor de DERDE deur: een
-   pas-sessie zonder eigen account. eisLid() kent twee weigeringen -- "alleen
-   voor leden" en "dit hoort bij een eigen RTG-account" -- en zonder een sessie
-   die de eerste passeert en op de tweede stukloopt, is die tweede helft van de
-   deur niet te zien. */
+/* RTG_DEMO=1 zet de demo-inlog aan. Die maakt zichtbaar dat een gastsessie
+   noch een betaalde pas-sessie een eigen account vervangt. Beveiliging en
+   toestemming horen juist ook bij een echt gratis account. */
 test.before(async () => { srv = await startServer({ env: { RTG_DEMO: '1' } }); base = srv.base; });
 test.after(() => stop(srv));
 
 test('1. de deur: alle elf routes weigeren zonder sessie, een gast en een pas zonder account', async () => {
-  /* Drie deuren op een rij, en ze zeggen alle drie iets anders -- dat is het
-     hele punt van eisLid(). Zonder token is er geen sessie (401). Een GAST heeft
-     wel een sessie maar hoort hier niet (403, "alleen voor leden"). Een
-     PAS-SESSIE ZONDER EIGEN ACCOUNT komt langs die eerste horde en loopt op de
-     tweede stuk: deze laag hangt aan een account, want een toestel, een tweede
-     factor en een toestemming horen bij een mens en niet bij een pas.
+  /* Zonder token is er geen sessie (401). Een anonieme GAST en een
+     PAS-SESSIE ZONDER EIGEN ACCOUNT hebben wel een sessie, maar geen eigen
+     account (403). Deze laag hangt aan het account: een toestel, een tweede
+     factor en een toestemming horen bij een mens en niet bij een betaalde pas.
 
      Een weigering zonder reden zou hier het ergst zijn: het lid ziet dan een
      dichte deur zonder te weten wat hij eraan kan doen. */
@@ -157,17 +153,24 @@ test('1. de deur: alle elf routes weigeren zonder sessie, een gast en een pas zo
 
     const alsGast = await api(pad, {}, gast.body.token);
     assert.equal(alsGast.status, 403, pad + ' liet een gast binnen');
-    /* De toestelroutes vragen sinds 19 oktober 2026 alleen een eigen account,
-       ook een gratis account (een passkey hoort bij elk account): hun weigering
-       noemt dus het account, niet het lidmaatschap. Een gast komt er net zo
-       min binnen. */
-    assert.match(alsGast.body.error, pad.startsWith('/api/mijn/toestel/') ? /eigen RTG-account/ : /Alleen voor leden/,
+    assert.match(alsGast.body.error, /eigen RTG-account/,
       pad + ': de weigering noemt geen reden');
 
     const alsPas = await api(pad, {}, pas.body.token);
     assert.equal(alsPas.status, 403, pad + ' liet een pas-sessie zonder eigen account binnen');
     assert.match(alsPas.body.error, /eigen RTG-account/, pad + ': de weigering noemt geen reden');
   }
+});
+
+test('1b. een echt gratis account behoudt toegang tot eigen beveiliging en toestemming', async () => {
+  const lid = await nieuwLid();
+  const me = await api('/api/auth/me', {}, lid.token);
+  assert.equal(me.status, 200);
+  assert.equal(me.body.user.tier, 'guest', 'dit bewijs gebruikt bewust geen betaalde testpersona');
+  const factor = await api('/api/mijn/tweefactor', {}, lid.token);
+  assert.equal(factor.status, 200, JSON.stringify(factor.body));
+  const postUit = await api('/api/mijn/post/alles-uit', {}, lid.token);
+  assert.equal(postUit.status, 200, JSON.stringify(postUit.body));
 });
 
 test('2. binden zonder uitdaging bindt niets -- ook niet met een handtekening die klopt', async () => {

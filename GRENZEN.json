@@ -920,6 +920,7 @@
       "PERSONAS",
       "STEMMINGEN",
       "ZZP",
+      "aanmeldingen",
       "aantal",
       "accounts",
       "afhaalcode",
@@ -1379,6 +1380,7 @@
       "weefsel",
       "werkgeversVan",
       "wishlistToggle",
+      "zaakAbonnement",
       "zetOpWachtlijst",
       "zetVoorkeur",
       "zijnVrienden",
@@ -1433,8 +1435,10 @@
       "matchGewichtenZet",
       "mobAanbod",
       "mobAnnuleer",
+      "mobEigenToegang",
       "mobMijn",
       "mobVraag",
+      "mobVraagToegang",
       "modAan",
       "modBord",
       "modStoring",
@@ -1891,6 +1895,7 @@
       "servicePatronen",
       "servicePersoonlijk",
       "servicePost",
+      "serviceRahul",
       "serviceZaken",
       "spraaktekst",
       "supplierAuth"
@@ -1908,7 +1913,10 @@
       "serviceZaken"
     ],
     "service-kantoor-ai": [
-      "serviceOnderzoeker"
+      "serviceLoop",
+      "serviceOnderzoeker",
+      "serviceRahul",
+      "serviceZaken"
     ],
     "service-kantoor-borden": [
       "balieAuth",

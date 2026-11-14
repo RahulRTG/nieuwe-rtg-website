@@ -10,7 +10,7 @@ const map = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-reis-sessiegrens-'));
 test.before(async () => {
   const pw = h.laadPlaywright({ eigenDriver: false }); assert.ok(pw && pw.chromium, 'Chromium verplicht');
   srv = await h.startServer({ env: { RTG_DATA_DIR: map, SMTP_URL: '', OFFICE_CODE: 'RTG-OFFICE' } });
-  x = await maakReisketenFixture(srv.base); browser = await h.startBrowser(pw);
+  x = await maakReisketenFixture(srv.base, { datamap: map, betaaldeReizigers: ['81'] }); browser = await h.startBrowser(pw);
   async function begin(titel, supplierCode) {
     return goed(await x.api('/api/reisbureau/keten/start', { titel, bestemming: 'Ibiza', supplierCode,
       idem: titel.replaceAll(' ', '-') }, x.reiziger.token), 'aanvraag').reis;
@@ -18,7 +18,7 @@ test.before(async () => {
   eigen = await begin('Eigen sessiegrensreis'); partner = await begin('Vertrouwelijke partnersessiegrensreis', x.bureau.code);
   console.log('Sessiegaten Chromium ' + browser.version());
 });
-test.after(async () => { if (browser) await browser.close(); if (srv) await h.stop(srv); fs.rmSync(map, { recursive: true, force: true }); });
+test.after(async () => { if (browser) await browser.close(); if (srv) await h.stopHard(srv.child); fs.rmSync(map, { recursive: true, force: true }); });
 async function open(rol, installeer) {
   const ctx = await browser.newContext({ viewport: { width: 1440, height: 1000 }, serviceWorkers: 'block', reducedMotion: 'reduce' });
   const page = await ctx.newPage(); page.setDefaultTimeout(20000); const fouten = h.letOpFouten(page, []);

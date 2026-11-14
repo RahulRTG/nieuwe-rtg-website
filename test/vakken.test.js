@@ -8,7 +8,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, maakBetaaldRtgTestaccount } = require('./helper');
 
 const NIEUW = ['autogarage', 'schoonmaak', 'hovenier', 'wasserij', 'rijschool',
   'dierenarts', 'tandarts', 'fotograaf', 'verhuizer', 'ithulp'];
@@ -45,6 +45,8 @@ test.before(async () => {
   const reg = await api(base, '/api/auth/register', { name: 'Vakkentest', email: 'v' + u + '@x.nl',
     phone: '06' + u, password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' });
   lid = { token: reg.body.token };
+  assert.ok(lid.token);
+  maakBetaaldRtgTestaccount(TMP, 'v' + u + '@x.nl');
 });
 test.after(() => stop(srv && srv.child));
 

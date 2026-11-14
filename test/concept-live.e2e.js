@@ -26,7 +26,7 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const http = require('http');
-const { startServer, stop, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
+const { startServer, stopHard, maakBetaaldRtgTestaccount, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
 
 const pw = laadPlaywright();
 
@@ -54,7 +54,8 @@ const post = (base, pad, body, token) => fetch(base + pad, { method: 'POST',
 test('het lid past het Rome-concept op het scherm aan; Rahul en de Edge werken met dezelfde waarden',
   { skip: geenBrowser(pw) }, async () => {
   const model = await nepModel();
-  const srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-concept-e2e-')),
+  const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-concept-e2e-'));
+  const srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP,
     LOCAL_AI_URL: model.base, LOCAL_AI_MODEL: 'proefmodel', RTG_EXTERNE_AI_UIT: '1' } });
   const browser = await pw.chromium.launch(browserOpties(pw));
   const ctx = await browser.newContext({ viewport: { width: 1280, height: 900 }, serviceWorkers: 'block', locale: 'nl-NL' });
@@ -62,9 +63,12 @@ test('het lid past het Rome-concept op het scherm aan; Rahul en de Edge werken m
   const fouten = [];
   letOpFouten(page, fouten);
   try {
-    const reg = await post(srv.base, '/api/auth/register', { name: 'Concept Proef', email: 'concepte2e' + Date.now() + '@voorbeeld.test',
+    const email = 'concepte2e' + Date.now() + '@voorbeeld.test';
+    const reg = await post(srv.base, '/api/auth/register', { name: 'Concept Proef', email,
       password: 'geheim12345', geboortedatum: '1990-01-01', phone: '0612345602', tier: 'rtg', pasApp: 'rtg' });
     const token = reg.body.token;
+    assert.ok(token, 'registratie');
+    maakBetaaldRtgTestaccount(TMP, email);
     const st = await post(srv.base, '/api/onboarding/status', {}, token);
     await post(srv.base, '/api/onboarding/teken', { naam: 'Concept Proef', akkoord: true, contractVersion: st.body.contract.versie }, token);
     const reizen = (await post(srv.base, '/api/reisbureau', {}, token)).body.reizen;
@@ -116,10 +120,13 @@ test('het lid past het Rome-concept op het scherm aan; Rahul en de Edge werken m
 
     // het lid past het concept op het scherm aan, zonder iets tegen Rahul te zeggen
     await kaart.locator('input[name="reizigers"]').fill('8');
-    await kaart.locator('input[name="reizigers"]').press('Tab');
+    /* De component bewaart op `change`. Expliciet vervagen is dezelfde
+       browserhandeling als uit het veld tabben, maar laat de uitkomst niet
+       afhangen van welk volgend element onder CI op dat moment focus krijgt. */
+    await kaart.locator('input[name="reizigers"]').blur();
     await page.waitForFunction(() => document.querySelector('.rtg-conceptwerk').getAttribute('data-versie') === '2', null, { timeout: 10000 });
     await kaart.locator('input[name="dagen"]').fill('5');
-    await kaart.locator('input[name="dagen"]').press('Tab');
+    await kaart.locator('input[name="dagen"]').blur();
     await page.waitForFunction(() => document.querySelector('.rtg-conceptwerk').getAttribute('data-versie') === '3', null, { timeout: 10000 });
     assert.match(await kaart.locator('.afgeleid').textContent(), /Groepsbudget: maximaal € 6\.400/);
     assert.equal(await kaart.locator('.rahul').textContent(),
@@ -137,7 +144,7 @@ test('het lid past het Rome-concept op het scherm aan; Rahul en de Edge werken m
 
     // een ongeldige waarde: geweigerd bij het veld, met de reden, en de versie blijft
     await kaart.locator('input[name="reizigers"]').fill('40');
-    await kaart.locator('input[name="reizigers"]').press('Tab');
+    await kaart.locator('input[name="reizigers"]').blur();
     await page.waitForFunction(() => document.querySelector('.rtg-conceptwerk input[name="reizigers"]').getAttribute('aria-invalid') === 'true', null, { timeout: 10000 });
     assert.match(await kaart.locator('#cw-' + obj[0].id + '-reizigers').textContent(), /van 1 tot en met 30/);
     assert.equal(await kaart.getAttribute('data-versie'), '3');
@@ -156,7 +163,8 @@ test('het lid past het Rome-concept op het scherm aan; Rahul en de Edge werken m
     assert.deepEqual(fouten, [], 'geen fouten in de console');
   } finally {
     await browser.close();
-    await stop(srv);
+    await stopHard(srv.child);
+    fs.rmSync(TMP, { recursive: true, force: true });
     model.srv.close();
   }
 });

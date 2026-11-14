@@ -24,7 +24,7 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const crypto = require('crypto');
-const { startServer, elevateTier } = require('./helper');
+const { startServer } = require('./helper');
 
 let BASE;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-bureau-'));
@@ -51,11 +51,10 @@ test.after(() => {
 let teller = 0;
 async function lidMet(tier) {
   const t = Date.now() + '' + (teller++);
-  const regTier = (tier === 'lifestyle' || tier === 'business') ? 'rtg' : tier;
-  const r = await json(await raw('/auth/register', { name: 'Lid ' + t, email: 'b' + t + '@v.test',
-    phone: '06' + String(t).slice(-8), password: 'geheim123', geboortedatum: '1980-05-05', tier: regTier }));
-  if (tier === 'lifestyle' || tier === 'business') await elevateTier(BASE, r.token, tier, await officeTok());
-  return r.token;
+  const email = 'b' + t + '@v.test';
+  require('./lib/historisch-account')(TMP, { name: 'Lid ' + t, email,
+    phone: '06' + String(t).slice(-8), password: 'geheim123', tier });
+  return (await json(await raw('/auth/login', { login: email, password: 'geheim123', pasApp: tier }))).token;
 }
 const tijdzone = require('../server/kern/tijdzone');
 const overDagen = n => tijdzone.plusDagen(tijdzone.datumIn(), n);

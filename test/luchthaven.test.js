@@ -10,7 +10,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, maakBetaaldRtgTestaccount } = require('./helper');
 
 function api(base, pad, body, token) {
   const h = { 'Content-Type': 'application/json' };
@@ -27,6 +27,7 @@ test.before(async () => {
   const u = Date.now().toString().slice(-8);
   lid = (await api(base, '/api/auth/register', { name: 'Reiziger Lucht', email: 'lu' + u + '@x.nl',
     phone: '064' + u.slice(1), password: 'geheim123', geboortedatum: '1988-06-06', tier: 'rtg', pasApp: 'rtg' })).body.token;
+  maakBetaaldRtgTestaccount(TMP, 'lu' + u + '@x.nl');
   const roster = await api(base, '/api/supplier/roster', { code: 'LUCHT' });
   const man = roster.body.staff.find(m => m.role === 'manager');
   ops = (await api(base, '/api/supplier/login', { code: 'LUCHT', staffId: man.id, pin: '1234' })).body.token;

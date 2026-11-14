@@ -26,6 +26,7 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const { startServer, stop, kantoorAlsPersoon } = require('./helper');
+const historischAccount = require('./lib/historisch-account');
 
 const CODE = 'RTG-OFFICE';
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-factuurcorrectie-'));
@@ -41,22 +42,30 @@ const invoicesVan = async () => ((await api('/api/state', {}, lid)).body.state |
 const saldoVan = async () => (await api('/api/pay/overzicht', {}, lid)).body.saldo;
 
 test.before(async () => {
+  // Correctie gaat over een bestaande overeenkomst, niet over de gratis
+  // registratie. Beide facturen zijn expliciete historische precondities.
+  historischAccount(TMP, { name: 'Correctie Lid', email: 'corr@x.nl', phone: '0655544333', tier: 'rtg',
+    memberState: { geboren: '1985-04-04', geslacht: 'm', invoices: ['09', '10'].map(maand => ({
+      id: 'RTG-2026-' + maand + '-CORRECTIEPROEF', desc: 'Historische maandbijdrage lidmaatschap',
+      maand: '2026-' + maand, netto: 0, bijdrage: 78.65, btw: 13.65,
+      status: 'open', date: 'Historische termijn'
+    })) } });
   srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP, OFFICE_CODE: CODE,
     RTG_ENC_KEY: 'test-encryptiesleutel-1234567890' } });
   base = srv.base;
 
-  const reg = await api('/api/auth/register', { name: 'Correctie Lid', email: 'corr@x.nl',
-    phone: '0655544333', password: 'geheim123', geboortedatum: '1985-04-04', geslacht: 'm',
-    tier: 'rtg', pasApp: 'rtg' });
-  lid = reg.body.token;
+  const login = await api('/api/auth/login', { login: 'corr@x.nl', password: 'geheim123', pasApp: 'rtg' });
+  assert.equal(login.status, 200, JSON.stringify(login.body));
+  assert.equal(login.body.state.user.tier, 'rtg');
+  lid = login.body.token;
   assert.ok(lid, 'het lid is ingelogd');
-  /* De account-id komt uit de registratie zelf (`state.user.id`), zoals elke
+  /* De account-id komt uit de eigen sessie (`state.user.id`), zoals elke
      andere kantoortoets hem pakt -- en niet uit een ledenlijst die ik moet
      raden. Een fout id gaf hier eerst een 404 die er als een echte
      weigering uitzag. */
-  userId = reg.body.state && reg.body.state.user && reg.body.state.user.id;
-  assert.ok(userId, 'en zijn account-id staat in de registratie');
-  // de payGate: een gratis lid toont eenmalig zijn paspoort voor het RTG Pay mag
+  userId = login.body.state.user.id;
+  assert.ok(userId, 'en zijn account-id staat in de eigen sessie');
+  // De bestaande betaalde persona toont zijn document voor de payGate.
   const PNG = 'data:image/png;base64,' + Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 1, 2, 3, 4]).toString('base64');
   await api('/api/verify/upload', { image: PNG }, lid);
   await api('/api/verify/selfie', { image: PNG }, lid);
@@ -74,10 +83,11 @@ test.after(() => {
 
 test('1. de heenweg loopt: een open factuur wordt betaald uit saldo', async () => {
   const open = (await invoicesVan()).filter(i => i.status === 'open');
-  assert.ok(open.length >= 1, 'het nieuwe lid heeft een open factuur');
-  factuur = open[0];
+  assert.equal(open.length, 2, 'beide historische termijnen staan nog open');
+  factuur = open.find(i => i.id === 'RTG-2026-09-CORRECTIEPROEF');
+  assert.ok(factuur);
   bedragCenten = Math.round((factuur.bijdrage || 0) * 100);
-  assert.ok(bedragCenten > 0, 'de maandbijdrage is een echt bedrag');
+  assert.equal(bedragCenten, 7865, 'het overeengekomen historische bedrag blijft intact');
 
   const r = await api('/api/pay/saldo', { invoiceId: factuur.id }, lid);
   assert.equal(r.status, 200, JSON.stringify(r.body));
@@ -158,8 +168,9 @@ test('7. een tweede correctie verplaatst geen cent', async () => {
 });
 
 test('8. een openstaande factuur valt niets te corrigeren', async () => {
-  const open = (await invoicesVan()).find(i => i.status === 'open');
-  if (!open) return; // geen tweede factuur in de zaaiset: dan is er niets te meten
+  const open = (await invoicesVan()).find(i => i.id === 'RTG-2026-10-CORRECTIEPROEF');
+  assert.ok(open, 'de tweede historische factuur is verplicht voor deze negatieve proef');
+  assert.equal(open.status, 'open');
   const r = await api('/api/office/pay/factuurcorrectie',
     { userId, invoiceId: open.id, grond: 'coulance', reden: 'te vroeg' }, opNaam);
   assert.equal(r.status, 409, JSON.stringify(r.body));

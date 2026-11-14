@@ -19,7 +19,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
+const { startServer, stopHard, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
 
 const pw = laadPlaywright();
 
@@ -54,6 +54,7 @@ test('de metgezel wijkt voor een venster en komt daarna terug',
       body: JSON.stringify({ name: 'Wijklid', email: 'mw' + u + '@x.nl', phone: '06' + u,
         password: 'geheim12345', geboortedatum: '1990-03-03', tier: 'rtg', pasApp: 'rtg' }) }).then(r => r.json());
     assert.ok(lid.token, 'het lid is ingelogd');
+    require('./helper').maakBetaaldRtgTestaccount(TMP, 'mw' + u + '@x.nl');
     /* Een eigen clip, zodat de feed een kaart heeft met bladen erachter. Zonder
        kaart staat er niets om te openen en toetst de tweede helft niets. */
     const clip = await fetch(base + '/api/clips/maak', { method: 'POST',
@@ -192,7 +193,7 @@ test('de metgezel wijkt voor een venster en komt daarna terug',
     assert.deepEqual(fouten, [], 'geen fout op de pagina');
   } finally {
     if (browser) await browser.close();
-    stop(child);
+    await stopHard(child);
     try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
   }
 });

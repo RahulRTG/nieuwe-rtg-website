@@ -42,11 +42,39 @@ module.exports.KANAAL = KANAAL;
 
 function maakSchrijflanen(ctx, laatsteSchrijf) {
   const { pool, merge3, uitStore, naarStore, toegepast, laatsteJson } = ctx;
+  // Bevestigde commits blijven bij een publicatieconflict apart staan. Eerst
+  // publiceren (of gezaghebbend herladen), nooit dezelfde delta weer schrijven.
+  const tePubliceren = new Map();
+  function publiceer(dataNu) {
+    for (const [k, r] of tePubliceren) {
+      if ((toegepast.get(k) || 0) < r.ver) {
+        if (r.weg) {
+          delete dataNu[k];
+          laatsteJson.delete(k);
+        } else {
+          if (Object.hasOwn(dataNu, k) && r.j !== r.voor) {
+            const hun = JSON.parse(r.j);
+            if (JSON.stringify(dataNu[k]) === r.voor) dataNu[k] = hun;
+            else {
+              const basis = r.voor === undefined ? undefined : JSON.parse(r.voor);
+              const bijzonder = voegBijzonderSamen(k, basis, dataNu[k], hun);
+              dataNu[k] = bijzonder === null ? merge3(basis, dataNu[k], hun) : bijzonder;
+            }
+          }
+          laatsteJson.set(k, r.j);
+          laatsteSchrijf.set(k, Date.now());
+        }
+        toegepast.set(k, r.ver);
+      }
+      tePubliceren.delete(k);
+    }
+  }
 
   /* Geeft terug hoeveel collecties er echt zijn weggeschreven. `gewijzigd` is
      de lijst die sync.js heeft samengesteld en gesorteerd; `alleen` is gezet
      als dit de snelle rijstrook is. */
   async function schrijfLanen(dataNu, gewijzigd, alleen) {
+    publiceer(dataNu);
     let geschreven = 0;
     /* Een collectie schrijven, binnen een al geopende transactie. De advisory
        lock is cruciaal: bij de ALLEREERSTE schrijf bestaat de rij nog niet, en
@@ -69,10 +97,7 @@ function maakSchrijflanen(ctx, laatsteSchrijf) {
          grafsteen zegt "die staat van toen is weg", niet "deze naam mag nooit
          meer". */
       if (huidig.rows.length && huidig.rows[0].weg && Number(huidig.rows[0].ver) > (toegepast.get(k) || 0)) {
-        delete dataNu[k];
-        laatsteJson.delete(k);
-        toegepast.set(k, Number(huidig.rows[0].ver));
-        return null;
+        return { weg: true, ver: Number(huidig.rows[0].ver) };
       }
       /* De lijst `gewijzigd` is vóór het wachten op het slot gemaakt. Een
          directe collectietransactie in DIT proces kan intussen al gecommit en
@@ -85,7 +110,6 @@ function maakSchrijflanen(ctx, laatsteSchrijf) {
         const hun = JSON.parse(uitStore(huidig.rows[0].val));
         const bijzonder = voegBijzonderSamen(k, base, dataNu[k], hun);
         const samen = bijzonder === null ? merge3(base, dataNu[k], hun) : bijzonder;
-        dataNu[k] = samen;
         j = JSON.stringify(samen);
       }
       const nv = await client.query("SELECT nextval('kv_ver_seq') AS v");
@@ -99,10 +123,12 @@ function maakSchrijflanen(ctx, laatsteSchrijf) {
         [k, naarStore(j), ver]
       );
       await client.query(`SELECT pg_notify($1, $2)`, [KANAAL, k]);
-      return { j, ver };
+      return { j, ver, voor: liveJson };
     }
-    // `r` is null als de schrijf is overgeslagen omdat er een verse grafsteen lag.
-    const naCommit = (k, r) => { if (!r) return; laatsteJson.set(k, r.j); laatsteSchrijf.set(k, Date.now()); toegepast.set(k, r.ver); geschreven++; };
+    const naCommit = (resultaten) => {
+      for (const [k, r] of resultaten) { tePubliceren.set(k, r); if (!r.weg) geschreven++; }
+      publiceer(dataNu);
+    };
     /* DE RIJSTROOK IS EEN GEHEEL. paySaldi en payIdem elk in een eigen
        transactie committen liet een venster staan: een kill -9 tussen die twee
        commits gaf een schijf waarop het geld staat en de idem-sleutel niet, en
@@ -127,22 +153,23 @@ function maakSchrijflanen(ctx, laatsteSchrijf) {
       } finally {
         client.release();
       }
-      for (const [k, r] of geslaagd) naCommit(k, r);
+      naCommit(geslaagd);
       return geschreven;
     }
     for (const [k, jOns] of gewijzigd) {
       const client = await pool.connect();
+      let r;
       try {
         await client.query('BEGIN');
-        const r = await schrijfEen(client, k, jOns);
+        r = await schrijfEen(client, k, jOns);
         await client.query('COMMIT');
-        naCommit(k, r);
       } catch (e) {
         try { await client.query('ROLLBACK'); } catch (x) {}
         throw e;
       } finally {
         client.release();
       }
+      naCommit([[k, r]]);
     }
     return geschreven;
   }

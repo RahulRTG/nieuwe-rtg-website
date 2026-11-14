@@ -5,16 +5,21 @@
    Draai: npm run e2e */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
+const { startServer, stopHard, maakBetaaldRtgTestaccount, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
 
 const pw = laadPlaywright();
-const api = async (base, pad, body, token) => (await fetch(base + pad, {
-  method: 'POST', headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: 'Bearer ' + token } : {}) },
-  body: JSON.stringify(body || {})
-})).json();
+const api = async (base, pad, body, token) => {
+  const r = await fetch(base + pad, {
+    method: 'POST', headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: 'Bearer ' + token } : {}) },
+    body: JSON.stringify(body || {})
+  });
+  const data = await r.json();
+  assert.equal(r.status, 200, pad + ' tijdens voorbereiding: ' + JSON.stringify(data));
+  return data;
+};
 
 test('Clips-studio: knippen, geluid, ondertitels en het toegangsfilter',
   { skip: geenBrowser(pw) }, async () => {
@@ -25,6 +30,7 @@ test('Clips-studio: knippen, geluid, ondertitels en het toegangsfilter',
     const t = Date.now();
     const reg = await api(base, '/api/auth/register', { name: 'Clip E2E', email: 'ce' + t + '@e.test',
       phone: '06' + String(t).slice(-8), password: 'geheim123', geboortedatum: '1995-05-05', tier: 'rtg' });
+    maakBetaaldRtgTestaccount(TMP, 'ce' + t + '@e.test');
     // twee clips: een die we bewerken, en een kale om het filter op te toetsen
     const mijn = await api(base, '/api/clips/maak', { titel: 'Kade bij avond', duurS: 30 }, reg.token);
     await api(base, '/api/clips/maak', { titel: 'Zonder ondertitel', duurS: 8 }, reg.token);
@@ -79,6 +85,10 @@ test('Clips-studio: knippen, geluid, ondertitels en het toegangsfilter',
        wat je maakte -- dus is een tweede lid nodig om hem te zien werken. */
     const kijker = await api(base, '/api/auth/register', { name: 'Kijker E2E', email: 'ke' + t + '@e.test',
       phone: '06' + String(t + 1).slice(-8), password: 'geheim123', geboortedatum: '1994-04-04', tier: 'rtg' });
+    assert.equal(kijker.state.user.tier, 'guest', 'registratie verleent nog geen betaalrechten');
+    // Het filter wordt door een afzonderlijk betaald RTG-lid gebruikt, niet door de maker.
+    maakBetaaldRtgTestaccount(TMP, 'ke' + t + '@e.test');
+    await api(base, '/api/clips/feed', {}, kijker.token);
     const pagina2 = await browser.newPage();
     letOpFouten(pagina2, fouten);
     await pagina2.addInitScript((tok) => {
@@ -99,7 +109,7 @@ test('Clips-studio: knippen, geluid, ondertitels en het toegangsfilter',
     assert.deepEqual(fouten, [], 'geen JS-fouten op de pagina');
   } finally {
     if (browser) try { await browser.close(); } catch (e) {}
-    if (child) try { child.kill('SIGKILL'); } catch (e) {}
+    await stopHard(child);
     try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
   }
 });

@@ -1,9 +1,11 @@
 /* Echte lokale HTTP-/SQLite-proef, geen externe leveranciersacceptatie.
    De registercontroles en providerreferenties zijn expliciet testverklaringen.
-   Alleen bestaande partner-, tenant-, account- en Pay-deuren worden gebruikt. */
+   Partner-, tenant-, identiteits- en Pay-deuren blijven echte HTTP-stappen.
+   Betalende reizigers zijn alleen op expliciet verzoek een lokale SQLite-
+   preconditie; dat bewijst geen abonnementbetaling of Business-goedkeuring. */
 'use strict';
 const assert = require('node:assert/strict');
-const { kantoorAlsPersoon, zaakMensOpNaam, keurLidGoed } = require('../helper');
+const { kantoorAlsPersoon, zaakMensOpNaam, keurLidGoed, maakBetaaldRtgTestaccount } = require('../helper');
 
 function maakApi(baseVan) {
   return async (pad, body = {}, token, extraHeaders = {}) => {
@@ -16,7 +18,10 @@ function maakApi(baseVan) {
 }
 function goed(r, naam) { assert.equal(r.status, 200, naam + ': ' + JSON.stringify(r.body)); return r.body; }
 
-async function maakReisketenFixture(baseVan) {
+async function maakReisketenFixture(baseVan, { datamap, betaaldeReizigers = [] } = {}) {
+  assert.ok(Array.isArray(betaaldeReizigers) && betaaldeReizigers.every(n => ['81', '82'].includes(n)),
+    'betaalde reizigers moeten expliciet 81 en/of 82 zijn');
+  assert.ok(!betaaldeReizigers.length || datamap, 'betaalde reizigers vragen de eigen testdatamap');
   const base = typeof baseVan === 'function' ? baseVan() : baseVan;
   const api = maakApi(baseVan);
   const office = await kantoorAlsPersoon(base);
@@ -61,6 +66,7 @@ async function maakReisketenFixture(baseVan) {
     const d = goed(await api('/api/auth/register', { name: 'Reisketen Proef ' + n,
       email: 'reisketen-' + n + '@voorbeeld.test', phone: '06123456' + n, password: 'Geheim123!',
       geboortedatum: '1990-01-01', pasApp: 'rtg' }), 'lidregistratie');
+    if (betaaldeReizigers.includes(n)) maakBetaaldRtgTestaccount(datamap, 'reisketen-' + n + '@voorbeeld.test');
     const codenaam = d.state.user.codename;
     await keurLidGoed(base, d.token, codenaam, '1990-01-01');
     goed(await api('/api/pay/oplaad', { centen: 300000, idem: 'reisketen-fixture-' + n }, d.token), 'testsaldo');

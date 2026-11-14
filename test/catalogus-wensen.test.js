@@ -25,7 +25,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
-const { startServer, stop, elevateTier } = require('./helper');
+const { startServer, stop, elevateTier, maakBetaaldRtgTestaccount } = require('./helper');
 
 const CODE = 'RTG-CW-TEST';
 
@@ -42,13 +42,15 @@ function post(base) {
 let teller = 0;
 const mailBijToken = new Map();
 const leesMail = (token) => mailBijToken.get(token);
-async function versLid(P, naam, tier) {
+async function versLid(P, dataDir, naam, tier) {
   const u = String(Date.now()).slice(-7) + String(++teller).padStart(3, '0');
   const email = naam.toLowerCase() + u + '@x.nl';
   const r = await P('/api/auth/register', Object.assign({
     name: naam, email, password: 'geheim123', geboortedatum: '1990-01-01'
   }, tier === 'guest' ? { tier: 'guest' } : { tier: 'rtg', pasApp: 'rtg' }));
   assert.ok(r.body.token, naam + ' is aangemeld: ' + JSON.stringify(r.body).slice(0, 140));
+  // Gratisje blijft gratis; de overige scenario's beginnen met een RTG-pas.
+  if (tier !== 'guest') maakBetaaldRtgTestaccount(dataDir, email);
   mailBijToken.set(r.body.token, email);
   return r.body.token;
 }
@@ -58,7 +60,7 @@ test('een wens uit de onboarding komt op het kantoor, op codenaam, en een mens b
   const srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP, OFFICE_CODE: CODE } });
   try {
     const P = post(srv.base);
-    const lid = await versLid(P, 'Pieternel');
+    const lid = await versLid(P, TMP, 'Pieternel');
     const kantoor = (await P('/api/office/login', { code: CODE })).body.token;
     assert.ok(kantoor, 'de kantoorcode werkt');
 
@@ -120,7 +122,7 @@ test('afwijzen vraagt een reden, en zonder kantoorinlog beslist niemand iets', a
   const srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP, OFFICE_CODE: CODE } });
   try {
     const P = post(srv.base);
-    const lid = await versLid(P, 'Quirijn');
+    const lid = await versLid(P, TMP, 'Quirijn');
     await P('/api/onboarding/bedrijf', { naam: 'Quirijn Bouw', catalogus: true }, lid);
     const kantoor = (await P('/api/office/login', { code: CODE })).body.token;
     const w = (await P('/api/office/catalogus-wensen', {}, kantoor)).body.wensen[0];
@@ -153,7 +155,7 @@ test('zonder vinkje komt het bedrijf niet op de kantoorlijst', async () => {
   const srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP, OFFICE_CODE: CODE } });
   try {
     const P = post(srv.base);
-    const lid = await versLid(P, 'Rosalie');
+    const lid = await versLid(P, TMP, 'Rosalie');
     const r = await P('/api/onboarding/bedrijf', { naam: 'Rosalie Studio', catalogus: false }, lid);
     assert.equal(r.status, 200);
     const kantoor = (await P('/api/office/login', { code: CODE })).body.token;
@@ -175,7 +177,7 @@ test('de pas van de aanvrager staat erbij, en de gratis laag meldt niets aan', a
     const kantoor = (await P('/api/office/login', { code: CODE })).body.token;
 
     // een gewone RTG Pass komt gewoon op de lijst: de eis is een pas, niet DE pas
-    const gewoon = await versLid(P, 'Renske');
+    const gewoon = await versLid(P, TMP, 'Renske');
     await P('/api/onboarding/bedrijf', { naam: 'Renske Repareert', catalogus: true }, gewoon);
     const rw = ((await P('/api/office/catalogus-wensen', {}, kantoor)).body.wensen || [])
       .find(x => x.naam === 'Renske Repareert');
@@ -187,7 +189,7 @@ test('de pas van de aanvrager staat erbij, en de gratis laag meldt niets aan', a
        'rtg' terug als hij het lid niet kent, dus een veld dat altijd 'rtg' zegt
        ziet er hierboven precies hetzelfde uit. Een lid dat ECHT naar Business is
        getild moet dus 'business' opleveren. */
-    const bazin = await versLid(P, 'Berber');
+    const bazin = await versLid(P, TMP, 'Berber');
     await elevateTier(srv.base, bazin, 'business', kantoor);
     const bzk = (await P('/api/auth/login', { login: leesMail(bazin), password: 'geheim123', pasApp: 'business' })).body;
     assert.equal(bzk.state.user.tier, 'business', 'Berber heeft nu echt een Business Pass');
@@ -200,7 +202,7 @@ test('de pas van de aanvrager staat erbij, en de gratis laag meldt niets aan', a
     /* DE GRATIS LAAG MELDT GEEN BEDRIJF AAN. Dat is de enige grens die overblijft
        nu de Business Pass-eis weg is: er hoort een LID achter een aanvraag. Zijn
        eigen bedrijf op eigen naam zetten mag wel -- dat verlaat het huis niet. */
-    const gast = await versLid(P, 'Gratisje', 'guest');
+    const gast = await versLid(P, TMP, 'Gratisje', 'guest');
     const gastR = await P('/api/onboarding/bedrijf', { naam: 'Klus Gratisje', catalogus: true }, gast);
     assert.equal(gastR.status, 200, 'zijn eigen bedrijf mag hij wel aanmaken');
     assert.equal(gastR.body.catalogusWens, false, 'maar de wens wordt niet vastgelegd');

@@ -11,6 +11,7 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const { startServer, stop } = require('./helper');
+const historischAccount = require('./lib/historisch-account');
 
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-factuursaldo-'));
 let srv, base, lid, factuur, bedragCenten;
@@ -24,13 +25,23 @@ function api(pad, body, token) {
 const invoicesVan = async () => ((await api('/api/state', {}, lid)).body.state || {}).invoices || [];
 
 test.before(async () => {
+  // Deze route vereffent bestaande, historische maandfacturen. Nieuwe
+  // abonnementstermijnen volgen hun eigen gekoppelde betaalroute en een
+  // nieuwe gratis registratie mag dus geen factuur voor deze proef opleveren.
+  historischAccount(TMP, { name: 'Saldo Lid', email: 'saldo@x.nl', phone: '0655544332', tier: 'rtg',
+    memberState: { geboren: '1985-03-03', geslacht: 'm', invoices: [{
+      id: 'RTG-2026-09-SALDOPROEF', desc: 'Historische maandbijdrage lidmaatschap',
+      maand: '2026-09', netto: 0, bijdrage: 78.65, btw: 13.65,
+      status: 'open', date: 'Vervalt 1 oktober 2026'
+    }] } });
   srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP, RTG_ENC_KEY: 'test-encryptiesleutel-1234567890' } });
   base = srv.base;
-  const reg = await api('/api/auth/register', { name: 'Saldo Lid', email: 'saldo@x.nl', phone: '0655544332',
-    password: 'geheim123', geboortedatum: '1985-03-03', geslacht: 'm', tier: 'rtg', pasApp: 'rtg' });
-  lid = reg.body.token;
+  const login = await api('/api/auth/login', { login: 'saldo@x.nl', password: 'geheim123', pasApp: 'rtg' });
+  assert.equal(login.status, 200, JSON.stringify(login.body));
+  assert.equal(login.body.state.user.tier, 'rtg');
+  lid = login.body.token;
   assert.ok(lid, 'het lid is ingelogd');
-  // Een gratis RTG-lid toont eenmalig zijn paspoort voor het RTG Pay gebruikt
+  // De betaalde testpersona toont eenmalig zijn paspoort voor het RTG Pay gebruikt
   // (de payGate). Echte preconditie; de minimale schone PNG passeert de scanner.
   const PNG = 'data:image/png;base64,' + Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 1, 2, 3, 4]).toString('base64');
   await api('/api/verify/upload', { image: PNG }, lid);
@@ -43,10 +54,10 @@ test.after(() => {
 
 test('1. er staat een open maandfactuur klaar', async () => {
   const open = (await invoicesVan()).filter(i => i.status === 'open');
-  assert.ok(open.length >= 1, 'het nieuwe lid heeft een open factuur');
-  factuur = open[0];
+  factuur = open.find(i => i.id === 'RTG-2026-09-SALDOPROEF');
+  assert.ok(factuur, 'het bestaande lid heeft zijn historische open factuur');
   bedragCenten = Math.round((factuur.bijdrage || 0) * 100);
-  assert.ok(bedragCenten > 0, 'de maandbijdrage is een echt bedrag');
+  assert.equal(bedragCenten, 7865, 'het overeengekomen historische bedrag blijft intact');
 });
 
 test('2. betalen uit saldo: lege wallet laadt bij, exact het bedrag gaat eraf', async () => {

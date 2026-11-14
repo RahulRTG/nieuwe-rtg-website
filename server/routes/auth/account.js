@@ -37,11 +37,8 @@ app.post('/api/auth/register', async (req, res) => {
   }
   try {
     const mdNieuw = memberTemplate();
-    /* Een nieuw account begint LEEG (kern/lid.js): geen reis en geen facturen
-       van de demo. Wat er wel bij hoort is de eigen maandbijdrage, hier gemaakt
-       op naam en maand (kern/lid/facturen.js) in plaats van geërfd uit de seed. */
-    const eerste = kern.eersteBijdrageFactuur ? kern.eersteBijdrageFactuur(user.tier, user.id, user.created_at) : null;
-    if (eerste) mdNieuw.invoices = [eerste];
+    // Registreren sluit geen betaald abonnement: geen contributiefactuur
+    // zonder de afzonderlijke overeengekomen prijs en klantondertekening.
     mdNieuw.geboren = geboren;
     // geslacht zoals in het paspoort (v/m/x); pas betrouwbaar na RTG-verificatie.
     // Gebruikt o.a. door Salon-ontmoetingen voor de "naar de vrouw"-regel.

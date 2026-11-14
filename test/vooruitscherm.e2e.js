@@ -21,7 +21,7 @@
    Draai: npm run e2e */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, letOpFouten, laadPlaywright, browserOpties, geenBrowser, pasAppAdres } = require('./helper');
+const { startServer, stopHard, letOpFouten, laadPlaywright, browserOpties, geenBrowser, pasAppAdres } = require('./helper');
 // de buitenpoorten voor post vragen het gedeelde geheim (server/kern/mailpoort.js, eigenaarsbesluit 19 oktober 2026)
 const { GEHEIM, zetKop } = require('./mailpoort');
 zetKop();
@@ -51,6 +51,7 @@ test('Vooruit en Uit uw post: van lege kaart naar een termijn, met EEN klik',
     const t = Date.now();
     const reg = await api(base, '/api/auth/register', { name: 'Vooruit Kijker', email: 'vk' + t + '@e.test',
       phone: '06' + String(t).slice(-8), password: 'geheim123', geboortedatum: '1985-03-03', tier: 'rtg' });
+    require('./helper').maakBetaaldRtgTestaccount(TMP, 'vk' + t + '@e.test');
     const adres = (await api(base, '/api/member/rtmail/adres', {}, reg.token)).adres;
     assert.ok(adres, 'het lid heeft een postadres');
 
@@ -207,7 +208,7 @@ test('Vooruit en Uit uw post: van lege kaart naar een termijn, met EEN klik',
     assert.deepEqual(fouten, [], 'geen paginafouten onderweg');
   } finally {
     if (browser) try { await browser.close(); } catch (e) {}
-    if (child) try { child.kill('SIGKILL'); } catch (e) {}
+    await stopHard(child);
     try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
   }
 });

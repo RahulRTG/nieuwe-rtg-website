@@ -42,7 +42,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop, kantoorKoppelBody } = require('./helper');
+const { startServer, stop, kantoorKoppelBody, maakBetaaldRtgTestaccount } = require('./helper');
 
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-officebank-'));
 const CODE = 'KANTOOR-OFFICEBANK';
@@ -69,6 +69,8 @@ async function nieuwLid(naam) {
   const r = await api('auth/register', { name: naam, email: 'ob' + u + '@x.nl', phone: '06' + u.slice(0, 8),
     password: 'geheim12345', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' });
   assert.ok(r.body.token, 'lid ' + naam + ' geregistreerd');
+  // Alleen rekeninghouders; de twee kantoorwerknemers houden hun eigen rolpad.
+  maakBetaaldRtgTestaccount(TMP, 'ob' + u + '@x.nl');
   return { token: r.body.token, naam };
 }
 

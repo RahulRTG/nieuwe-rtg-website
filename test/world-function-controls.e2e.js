@@ -1,19 +1,20 @@
 'use strict';
 const test = require('node:test'), assert = require('node:assert/strict');
-const { startServer, stop, laadPlaywright, browserOpties, geenBrowser, letOpFouten } = require('./helper');
+const fs = require('node:fs'), os = require('node:os'), path = require('node:path');
+const { startServer, stopHard, maakBetaaldRtgTestaccount, laadPlaywright, browserOpties, geenBrowser, letOpFouten } = require('./helper');
 const pw = laadPlaywright(), skip = geenBrowser(pw);
 const { haalSessies, opslagVoor } = require('../scripts/lib/proefsessies');
-let srv, browser, member, other, conversation;
+let srv, browser, member, other, composer, conversation, TMP;
 async function post(path, body, token) {
   const r = await fetch(srv.base + path, { method: 'POST', headers: { 'Content-Type': 'application/json',
     ...(token ? { Authorization: 'Bearer ' + token } : {}) }, body: JSON.stringify(body || {}) });
   const j = await r.json(); assert.equal(r.status, 200, path + ': ' + JSON.stringify(j)); return j;
 }
-async function pageFor() {
+async function pageFor(token = member.token) {
   const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true,
     reducedMotion: 'reduce', serviceWorkers: 'block' });
   await ctx.addInitScript(token => { localStorage.setItem('rtg_member_token', token);
-    localStorage.setItem('rtg_lang', 'nl'); localStorage.setItem('rtg_cookieinfo_v1', '1'); }, member.token);
+    localStorage.setItem('rtg_lang', 'nl'); localStorage.setItem('rtg_cookieinfo_v1', '1'); }, token);
   const page = await ctx.newPage(); page.setDefaultTimeout(10000); return { ctx, page };
 }
 async function open(page, route) {
@@ -23,19 +24,28 @@ async function open(page, route) {
 async function actions(page) { await page.locator('.rtg-adaptive-bar [data-rtg-adaptive-action="context"]').click(); }
 test.before(async () => {
   if (skip) return;
-  srv = await startServer({ env: { RTG_DEMO: '0', RTG_AI_UIT: '1', SMTP_URL: '' } });
+  TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-world-controls-'));
+  srv = await startServer({ env: { RTG_DEMO: '0', RTG_AI_UIT: '1', SMTP_URL: '', RTG_DATA_DIR: TMP } });
   browser = await pw.chromium.launch(browserOpties(pw, { args: ['--use-fake-ui-for-media-stream', '--use-fake-device-for-media-stream'] }));
   const stamp = Date.now();
   async function register(n) { return post('/api/auth/register', { name: 'Controls test ' + n, email: 'controls-' + stamp + '-' + n + '@e.test',
     phone: '06' + String(stamp + n).slice(-8), password: 'geheim123', geboortedatum: '1985-01-01', tier: 'rtg' }); }
   member = await register(1); other = await register(2);
+  assert.equal(member.state.user.tier, 'guest', 'camera en berichten blijven met een gratis account getest');
+  assert.equal(other.state.user.tier, 'guest', 'de ontvanger van berichten blijft gratis');
+  composer = await register(3);
+  maakBetaaldRtgTestaccount(TMP, 'controls-' + stamp + '-3@e.test');
   const key = 'user-' + (await post('/api/auth/me', {}, member.token)).user.id;
   const otherKey = 'user-' + (await post('/api/auth/me', {}, other.token)).user.id;
   await post('/api/member/connect', { key: otherKey }, member.token);
   await post('/api/member/connect/respond', { key, action: 'accept' }, other.token);
   conversation = (await post('/api/comm/begin', { met: otherKey }, member.token)).gesprek.id;
 });
-test.after(async () => { if (browser) await browser.close(); if (srv) await stop(srv.child); });
+test.after(async () => {
+  if (browser) await browser.close();
+  await stopHard(srv && srv.child);
+  if (TMP) fs.rmSync(TMP, { recursive: true, force: true });
+});
 
 test('mobile camera controls remain reachable through the standard Edge', { skip }, async () => {
   const { ctx, page } = await pageFor();
@@ -56,7 +66,7 @@ test('mobile camera controls remain reachable through the standard Edge', { skip
 });
 
 test('mobile Klankwerk can save a real composition from the Edge', { skip }, async () => {
-  const { ctx, page } = await pageFor();
+  const { ctx, page } = await pageFor(composer.token);
   try {
     await open(page, '/apps/klankwerk.html'); await page.locator('#nieuw').click();
     await page.waitForSelector('#rack .kanaal');
@@ -132,7 +142,8 @@ test('switching worlds reaches their current homes through the visible Edge', { 
 });
 
 test('mobile office screens keep the standard Edge inside the physical viewport', { skip }, async () => {
-  const staff = await startServer({ env: { RTG_MAGNAAT_TEST: '1', RTG_AI_UIT: '1', SMTP_URL: '' } });
+  const staffMap = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-world-staff-controls-'));
+  const staff = await startServer({ env: { RTG_MAGNAAT_TEST: '1', RTG_AI_UIT: '1', SMTP_URL: '', RTG_DATA_DIR: staffMap } });
   let ctx;
   try {
     const auth = await haalSessies(staff.base);
@@ -156,5 +167,5 @@ test('mobile office screens keep the standard Edge inside the physical viewport'
       assert.equal(await page.locator(ds ? '#dsEdgeBlad' : '.rtg-adaptive-controls').isVisible(), true);
       await page.close();
     }
-  } finally { if (ctx) await ctx.close(); await stop(staff.child); }
+  } finally { if (ctx) await ctx.close(); await stopHard(staff.child); fs.rmSync(staffMap, { recursive: true, force: true }); }
 });

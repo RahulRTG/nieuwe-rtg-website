@@ -29,12 +29,31 @@ test('alle vier wereldkaarten krijgen actuele namen, onderdelen en app-routes', 
   assert.match(html, /public\/site\/website-truth\.js/);
   for (const wereld of WERELDEN) {
     assert.match(html, new RegExp('data-app-truth-world="' + wereld + '"'));
+    assert.match(html, new RegExp('data-app-truth-world="' + wereld + '" data-rtg-world="' + wereld + '"'));
   }
   assert.match(runtime, /website-truth\.json/);
   assert.match(runtime, /featureCount/);
   assert.match(runtime, /publicRoute/);
   assert.match(runtime, /textContent/);
   assert.doesNotMatch(runtime, /innerHTML/);
+});
+
+test('www gebruikt per wereld rechtstreeks het actuele app-thema', () => {
+  const data = waarheid.maak();
+  const runtime = lees('public/site/website-truth.js');
+  assert.match(lees('index.html'), /public\/ds\/rtg-ds\.css/);
+  for (const wereld of WERELDEN) {
+    const thema = data.worlds[wereld].theme;
+    assert.equal(data.worlds[wereld].id, wereld);
+    assert.equal(thema.source, 'public/ds/thema/' + wereld + '.css');
+    assert.equal(thema.selector, '[data-rtg-world="' + wereld + '"]');
+    assert.equal(thema.sourceHash.length, 64);
+    assert.match(thema.image, /^\/images\/world-homes\//);
+    assert.ok(fs.existsSync(path.join(ROOT, 'public', thema.image.slice(1))));
+  }
+  assert.match(runtime, /dataset\.rtgWorld = wereld\.id/);
+  assert.match(runtime, /dataset\.appTruthTheme = wereld\.theme\.source/);
+  assert.match(runtime, /naarBeeld\(wereld\.theme\.image\)/);
 });
 
 test('iedere wereld publiceert alle actuele apps uit dezelfde bron', () => {
@@ -104,6 +123,18 @@ test('wereld- en paspagina’s lezen de actuele appwaarheid bij het openen', () 
     assert.match(html, /<body\b[^>]*data-rtg-world="living"/,
       wereld + ' houdt domeinwaarheid en publieke merkkleur uit elkaar');
   }
+});
+
+test('fototekst gebruikt de gedeelde leeslaag en geen wereld-eigen kleurkopieën', () => {
+  const beleving = lees('public/ds/componenten/beleving.css');
+  const landing = lees('public/site/start/experience.css');
+  const wereldstijl = lees('public/site/werelden/world.css');
+  assert.match(beleving, /--ds-beleving-sluier-tekst/);
+  assert.match(beleving, /--ds-beleving-sluier-mobiel/);
+  assert.match(landing, /var\(--ds-beleving-sluier-tekst\)/);
+  assert.match(wereldstijl, /--world:var\(--ds-accent\)/);
+  assert.match(wereldstijl, /var\(--ds-beleving-sluier-mobiel\)/);
+  assert.doesNotMatch(wereldstijl, /--world:#/);
 });
 
 test('productidentiteit blijft appwaarheid; nieuwe beleidsprijzen zijn geen oude runtime-prijzen', () => {

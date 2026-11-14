@@ -65,7 +65,7 @@ test.after(() => {
 });
 
 
-/* Een lid maken. `metAdres` loopt het echte gegevensgesprek af, want de
+/* Een echt gratis account maken, zonder betaalfixture. `metAdres` loopt het echte gegevensgesprek af, want de
    gegevenspoort eist voor een BEZORGING telefoon en adres -- en dat is geen
    formaliteit: een bezorger voor een dichte deur zonder nummer is precies waar
    die poort voor bestaat. De toets hieronder ("bezorgen zonder adres") laat
@@ -74,7 +74,10 @@ async function maakLid(naam, metAdres) {
   const u = String(Date.now()) + Math.floor(Math.random() * 1000);
   const reg = await post('/api/auth/register', { name: naam, email: 'g' + u + '@voorbeeld.nl',
     phone: '06' + u.slice(-8), password: 'geheim123',
-    geboortedatum: '1990-05-05', geslacht: 'v', tier: 'rtg', pasApp: 'rtg' });
+    geboortedatum: '1990-05-05', geslacht: 'v', pasApp: 'rtg' });
+  assert.equal(reg.status, 200, JSON.stringify(reg.body).slice(0, 200));
+  assert.equal(reg.body.state.user.account, true);
+  assert.equal(reg.body.state.user.tier, 'guest', 'een eigen bestelling en nazorg vragen geen betaalde pas');
   const token = reg.body.token;
   assert.ok(token, 'een lid kan zich registreren: ' + JSON.stringify(reg.body).slice(0, 200));
   if (metAdres) {
@@ -252,6 +255,21 @@ test('afhalen geeft een uitspreekbare code, en de zaak ziet dezelfde rekening', 
 
   const lijst = await post('/api/supplier/horeca/rekeningen', { status: 'open', kanaal: 'afhaal' }, ZAAK);
   assert.ok(lijst.body.rekeningen.length >= 1, 'de zaak ziet de afhaalbestelling in zijn eigen lijst');
+
+  const rekeningId = uit.body.rekening.rekeningId;
+  assert.equal((await post('/api/gast/eten/beoordeel', { zaak: 'KIKUNOI', rekeningId, score: 4 }, lid4)).status, 409,
+    'besteld is nog niet opgehaald');
+  for (const status of ['geaccepteerd', 'in-bereiding', 'klaar', 'overgedragen']) {
+    const stap = await post('/api/supplier/eten/status', { rekeningId, status }, ZAAK);
+    assert.equal(stap.status, 200, status + ': ' + JSON.stringify(stap.body).slice(0, 180));
+    if (status === 'overgedragen') assert.equal(stap.body.order.statussen.fulfillment, 'opgehaald');
+  }
+  const review = await post('/api/gast/eten/beoordeel', {
+    zaak: 'KIKUNOI', rekeningId, score: 4, tekst: 'Zelf opgehaald en goed verpakt.'
+  }, lid4);
+  assert.equal(review.status, 200, JSON.stringify(review.body));
+  assert.equal(review.body.ok, true);
+  assert.equal(review.body.review.score, 4);
 });
 
 test('dubbel tikken bij bezorging levert een bestelling, net als aan tafel', async () => {
@@ -382,6 +400,18 @@ test('klant en partner doorlopen dezelfde RTG Eten-order tot hulp en beoordeling
   }, lid);
   assert.equal(bestel.status, 200, JSON.stringify(bestel.body).slice(0, 220));
   const rekeningId = bestel.body.rekening.rekeningId;
+  const eigenaar = await post('/api/auth/me', {}, lid);
+  assert.equal(eigenaar.status, 200);
+  assert.equal(eigenaar.body.user.account, true);
+  assert.equal(eigenaar.body.user.tier, 'guest');
+  const eigenaarDoel = { account: eigenaar.body.user, key: 'user-' + eigenaar.body.user.id,
+    codename: eigenaar.body.user.codename, gastId: eigenaar.body.user.codename };
+  const reviewsVoor = await post('/api/supplier/state', {}, ZAAK);
+  assert.equal(reviewsVoor.status, 200);
+  assert.ok(Array.isArray(reviewsVoor.body.state.reviews.recent));
+  const teVroeg = await post('/api/gast/eten/beoordeel', { zaak: 'KIKUNOI', rekeningId, score: 5 }, lid);
+  assert.equal(teVroeg.status, 409);
+  assert.equal(teVroeg.body.error, 'Beoordelen kan zodra de bestelling is geleverd of opgehaald.');
 
   const probleem = await post('/api/gast/eten/probleem', {
     zaak:'KIKUNOI', rekeningId, tekst:'Controleer alstublieft de verpakking.'
@@ -397,9 +427,59 @@ test('klant en partner doorlopen dezelfde RTG Eten-order tot hulp en beoordeling
           : status === 'geleverd' ? 'geleverd' : status);
   }
 
+  const poging = { zaak: 'KIKUNOI', rekeningId, score: 5, ...eigenaarDoel };
+  assert.equal((await post('/api/gast/eten/beoordeel', poging, null)).status, 401,
+    'een account in de body is geen authenticatie');
+  for (const tier of ['guest', 'rtg']) {
+    const demo = await post('/api/login', { tier, pasApp: 'rtg' });
+    assert.equal(demo.status, 200, JSON.stringify(demo.body));
+    assert.ok(demo.body.token);
+    assert.notEqual(demo.body.state.user.account, true);
+    assert.equal((await post('/api/gast/eten/beoordeel', poging, demo.body.token)).status, 403,
+      'ook een demo-pas geeft geen recht op de bestelling van een account');
+  }
+  const vreemde = await maakLid('Andere beoordelaar', false);
+  const nietVanJou = await post('/api/gast/eten/beoordeel', poging, vreemde);
+  assert.equal(nietVanJou.status, 404);
+  assert.equal(nietVanJou.body.error, 'Deze bestelling is niet van jou.',
+    'de servercodenaam bepaalt eigendom, niet accountvelden in de body');
+  const zaken = await post('/api/gast/eten/ontdekken', {}, lid);
+  assert.equal(zaken.status, 200);
+  const andereZaak = zaken.body.restaurants.find(z => z.code !== 'KIKUNOI');
+  assert.ok(andereZaak, 'de tenant-tegenproef gebruikt een bestaande andere zaak');
+  const verkeerdeZaak = await post('/api/gast/eten/beoordeel', { ...poging, zaak: andereZaak.code }, lid);
+  assert.equal(verkeerdeZaak.status, 404);
+  assert.equal(verkeerdeZaak.body.error, 'Deze bestelling is niet van jou.');
+  for (const score of [0, 6]) {
+    const ongeldig = await post('/api/gast/eten/beoordeel', { zaak: 'KIKUNOI', rekeningId, score }, lid);
+    assert.equal(ongeldig.status, 400);
+    assert.equal(ongeldig.body.error, 'Geef 1 tot 5 sterren.');
+  }
+  const naWeigeringen = await post('/api/supplier/state', {}, ZAAK);
+  assert.equal(naWeigeringen.status, 200);
+  assert.deepEqual(naWeigeringen.body.state.reviews, reviewsVoor.body.state.reviews,
+    'weigeringen veranderen geen review en geen beoordelingsteller');
+
   const beoordeling = await post('/api/gast/eten/beoordeel', {
     zaak:'KIKUNOI', rekeningId, score:5, tekst:'Netjes en warm aangekomen.'
   }, lid);
   assert.equal(beoordeling.status, 200, JSON.stringify(beoordeling.body).slice(0, 180));
+  assert.equal(beoordeling.body.ok, true);
   assert.equal(beoordeling.body.review.score, 5);
+  const naReview = await post('/api/supplier/state', {}, ZAAK);
+  assert.equal(naReview.status, 200);
+  assert.equal(naReview.body.state.reviews.rating.aantal, (reviewsVoor.body.state.reviews.rating?.aantal || 0) + 1);
+  const opgeslagen = naReview.body.state.reviews.recent.filter(r => r.tekst === 'Netjes en warm aangekomen.');
+  assert.equal(opgeslagen.length, 1);
+  assert.equal(opgeslagen[0].codename, eigenaar.body.user.codename);
+  assert.equal(opgeslagen[0].score, 5);
+  const dubbel = await post('/api/gast/eten/beoordeel', {
+    zaak: 'KIKUNOI', rekeningId, score: 1, tekst: 'Tweede beoordeling mag niet tellen.'
+  }, lid);
+  assert.equal(dubbel.status, 409);
+  assert.equal(dubbel.body.error, 'Je hebt deze bestelling al beoordeeld.');
+  const naDubbel = await post('/api/supplier/state', {}, ZAAK);
+  assert.equal(naDubbel.status, 200);
+  assert.deepEqual(naDubbel.body.state.reviews, naReview.body.state.reviews,
+    'de tweede beoordeling wijzigt noch de eerste review noch de statistiek');
 });

@@ -25,7 +25,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, maakBetaaldRtgTestaccount } = require('./helper');
 
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-kijkplicht-'));
 let srv, base, office;
@@ -46,6 +46,8 @@ async function lid(naam) {
   const reg = await api('/api/auth/register', { name: naam, email, phone: '06' + u,
     password: wachtwoord, geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' });
   assert.ok(reg.body.token, naam + ' is aangemeld');
+  // Theater-toegang verleent geen zaakrol: werkBij() bewijst die afzonderlijk.
+  maakBetaaldRtgTestaccount(TMP, email);
   const st = await api('/api/state', {}, reg.body.token);
   return { token: reg.body.token, email, wachtwoord, naam, codenaam: st.body.state.user.codename };
 }

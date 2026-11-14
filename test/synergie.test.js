@@ -7,7 +7,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, maakBetaaldRtgTestaccount } = require('./helper');
 
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-synergie-'));
 let srv, base, kikunoi, sakura, lid, dealId;
@@ -28,11 +28,11 @@ test.before(async () => {
   sakura = (await api('/api/supplier/login', { code: 'SAKURA', staffId: manager.id, pin: '1234' })).body.token;
   const reg = await api('/api/auth/register', { name: 'Pakket Lid', email: 'pakket@x.nl', phone: '0644455566',
     password: 'geheim123', geboortedatum: '1987-07-07', geslacht: 'v', tier: 'rtg', pasApp: 'rtg' });
+  maakBetaaldRtgTestaccount(TMP, 'pakket@x.nl');
   lid = reg.body.token;
   assert.ok(kikunoi && sakura && lid, 'twee zaken en een lid ingelogd');
-  // Een gratis RTG-lid toont eenmalig zijn paspoort voor het RTG Pay gebruikt
-  // (de payGate op opladen/kopen). Echte precondititie; de minimale schone PNG
-  // passeert de malware-scanner.
+  // Het bestaande document- en selfiepad blijft los van de betaalpas; upload
+  // is geen menselijke keuring. De minimale schone PNG passeert de scanner.
   const PNG = 'data:image/png;base64,' + Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 1, 2, 3, 4]).toString('base64');
   await api('/api/verify/upload', { image: PNG }, lid);
   await api('/api/verify/selfie', { image: PNG }, lid);

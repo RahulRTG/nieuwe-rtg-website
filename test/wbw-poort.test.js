@@ -12,6 +12,7 @@ const assert = require('node:assert/strict');
 const crypto = require('crypto');
 const { maakWereld, nieuwLid, geverifieerdLid, gebondenToestel, verbind, KANTOORWERELD } = require('../scripts/lib/voltooiwereld');
 const simulatiebank = require('../server/betaal/synthetisch');
+const { maakBetaaldRtgTestaccount } = require('./helper');
 
 const VERREKEN = '/api/wbw/verreken';
 const bank = simulatiebank({ crypto, env: {}, echteRail: null });
@@ -30,6 +31,9 @@ test.before(async () => { w = await maakWereld('wbwpoort', Object.assign({ RTG_S
 test.after(() => w && w.klaar());
 
 async function schuld(A, B) {
+  // Betaalde WBW-toegang is geen identiteitsbewijs: B blijft in de eerste proef ongeverifieerd.
+  maakBetaaldRtgTestaccount(w.datamap, A.email);
+  maakBetaaldRtgTestaccount(w.datamap, B.email);
   const v = await verbind(w, A, B);
   const g = (await w.post('/api/wbw/maak', { naam: 'Poort', leden: [v.b.key] }, A.token)).data.groep;
   await w.post('/api/wbw/uitgave', { id: g.id, oms: 'Etentje', centen: 4000, voor: [v.a.key, v.b.key] }, A.token);

@@ -14,7 +14,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, maakBetaaldRtgTestaccount } = require('./helper');
 
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-office-enterprise-'));
 let srv, base, eigenaar, schrijver, schrijverCode;
@@ -29,6 +29,8 @@ async function lid(nr) {
   const u = Date.now() + '-' + nr;
   const r = await api('/api/auth/register', { name: 'Office ' + nr, email: 'office-' + u + '@rtg.test',
     phone: '06' + String(Date.now()).slice(-7) + nr, password: 'geheim123', geboortedatum: '1990-05-05', tier: 'rtg' });
+  assert.ok(r.body.token);
+  maakBetaaldRtgTestaccount(TMP, 'office-' + u + '@rtg.test');
   const s = await api('/api/state', {}, r.body.token);
   return { token: r.body.token, code: s.body.state.user.codename };
 }
@@ -58,6 +60,7 @@ test.after(() => {
    stempel". Dat is een TOESTAND, en die kun je aflezen. Meestal is hij na een
    enkele tik al waar. */
 async function naDeStempel(stempel) {
+  assert.ok(Number.isFinite(Date.parse(stempel)), 'open levert een geldige versiestempel');
   while (new Date().toISOString() <= String(stempel)) {
     await new Promise(r => setTimeout(r, 1));
   }
@@ -65,8 +68,11 @@ async function naDeStempel(stempel) {
 
 test('een oud Office-venster overschrijft nooit stil een nieuwere versie', async () => {
   const m = await api('/api/kantoorpakket/maak', { soort: 'tekst', titel: 'Directiestuk' }, eigenaar);
+  assert.equal(m.status, 200, JSON.stringify(m.body));
+  assert.ok(m.body.id);
   await api('/api/kantoorpakket/deel', { id: m.body.id, codenaam: schrijverCode, rechten: 'bewerken' }, eigenaar);
   const oud = await api('/api/kantoorpakket/open', { id: m.body.id }, schrijver);
+  assert.equal(oud.status, 200, JSON.stringify(oud.body));
   await naDeStempel(oud.body.gewijzigd);
   const nieuw = await api('/api/kantoorpakket/bewaar', { id: m.body.id, verwachtGewijzigd: oud.body.gewijzigd,
     inhoud: { tekst: '<p>Besluit van de eigenaar.</p>' } }, eigenaar);
@@ -100,9 +106,12 @@ test('beoordelen en goedkeuren volgen menselijke bevoegdheid', async () => {
 
 test('bewerken na goedkeuring heropent het stuk en laat een auditspoor', async () => {
   const m = await api('/api/kantoorpakket/maak', { soort: 'tekst', titel: 'Go-livebesluit' }, eigenaar);
+  assert.equal(m.status, 200, JSON.stringify(m.body));
+  assert.ok(m.body.id);
   await api('/api/kantoorpakket/fase', { id: m.body.id, naar: 'beoordeling' }, eigenaar);
   await api('/api/kantoorpakket/fase', { id: m.body.id, naar: 'goedgekeurd', mens: true }, eigenaar);
   const voor = await api('/api/kantoorpakket/open', { id: m.body.id }, eigenaar);
+  assert.equal(voor.status, 200, JSON.stringify(voor.body));
   await naDeStempel(voor.body.gewijzigd);
   const wijzig = await api('/api/kantoorpakket/bewaar', { id: m.body.id, verwachtGewijzigd: voor.body.gewijzigd,
     inhoud: { tekst: '<p>Een materiële wijziging.</p>' } }, eigenaar);

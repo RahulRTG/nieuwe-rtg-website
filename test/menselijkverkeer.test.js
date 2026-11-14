@@ -33,7 +33,8 @@
 const { randomUUID } = require('node:crypto');
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, kantoorAlsPersoon } = require('./helper');
+const fs = require('node:fs'), os = require('node:os'), path = require('node:path');
+const { startServer, stopHard, kantoorAlsPersoon, maakBetaaldRtgTestaccount } = require('./helper');
 
 function post(base) {
   return (pad, body, token) => fetch(base + pad, {
@@ -45,23 +46,35 @@ function post(base) {
 }
 
 let teller = 0;
-async function nieuwLid(P, naam, tier) {
+async function nieuwLid(P, naam, datamap) {
   const u = String(Date.now()).slice(-7) + String(++teller).padStart(3, '0');
   const r = await P('/api/auth/register', {
     name: naam, email: naam.toLowerCase() + u + '@x.nl', phone: '06' + u.slice(0, 8),
     password: 'geheim123', geboortedatum: '1990-01-01', geslacht: 'v',
-    tier: tier || 'rtg', pasApp: tier || 'rtg'
+    tier: 'rtg', pasApp: 'rtg'
   });
   assert.ok(r.body.token, 'lid ' + naam + ' aangemeld: ' + JSON.stringify(r.body).slice(0, 140));
+  maakBetaaldRtgTestaccount(datamap, naam.toLowerCase() + u + '@x.nl');
   return r.body.token;
 }
 
-test('De Salon: twee leden vinden elkaar, en niemand ziet een echte naam', async () => {
-  const { child, base } = await startServer({ env: { SMTP_URL: '' } });
+async function ledenServer(t) {
+  const datamap = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-menselijkverkeer-'));
+  let srv;
+  t.after(async () => {
+    await stopHard(srv && srv.child);
+    fs.rmSync(datamap, { recursive: true, force: true });
+  });
+  srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: datamap } });
+  return { ...srv, datamap };
+}
+
+test('De Salon: twee leden vinden elkaar, en niemand ziet een echte naam', async t => {
+  const { child, base, datamap } = await ledenServer(t);
   try {
     const P = post(base);
-    const anna = await nieuwLid(P, 'Annabel', 'rtg');
-    const boris = await nieuwLid(P, 'Borislav', 'rtg');
+    const anna = await nieuwLid(P, 'Annabel', datamap);
+    const boris = await nieuwLid(P, 'Borislav', datamap);
 
     const geplaatst = await P('/api/salon/plaats', { tekst: 'Zonsopgang boven de baai.', onderwerp: 'reizen' }, anna);
     assert.equal(geplaatst.status, 200, 'Anna kan iets plaatsen');
@@ -116,12 +129,12 @@ test('De Salon: twee leden vinden elkaar, en niemand ziet een echte naam', async
   } finally { child.kill('SIGKILL'); }
 });
 
-test('Bellen: twee leden in de residentie bereiken elkaar op codenaam', async () => {
-  const { child, base } = await startServer({ env: { SMTP_URL: '' } });
+test('Bellen: twee leden in de residentie bereiken elkaar op codenaam', async t => {
+  const { child, base, datamap } = await ledenServer(t);
   try {
     const P = post(base);
-    const anna = await nieuwLid(P, 'Anouk', 'rtg');
-    const boris = await nieuwLid(P, 'Bram', 'rtg');
+    const anna = await nieuwLid(P, 'Anouk', datamap);
+    const boris = await nieuwLid(P, 'Bram', datamap);
 
     const binnenA = await P('/api/residentie/betreed', {}, anna);
     const binnenB = await P('/api/residentie/betreed', {}, boris);
@@ -158,11 +171,11 @@ test('Bellen: twee leden in de residentie bereiken elkaar op codenaam', async ()
   } finally { child.kill('SIGKILL'); }
 });
 
-test('De AI pakt iets aan, belooft niets, en spreekt het lid aan zoals zijn pas voorschrijft', async () => {
-  const { child, base } = await startServer({ env: { SMTP_URL: '' } });
+test('De AI pakt iets aan, belooft niets, en spreekt het lid aan zoals zijn pas voorschrijft', async t => {
+  const { child, base, datamap } = await ledenServer(t);
   try {
     const P = post(base);
-    const lid = await nieuwLid(P, 'Carmen', 'rtg');
+    const lid = await nieuwLid(P, 'Carmen', datamap);
 
     const vraag = m => P('/api/ai', { messages: [{ role: 'user', content: m }] }, lid);
 
@@ -192,11 +205,11 @@ test('De AI pakt iets aan, belooft niets, en spreekt het lid aan zoals zijn pas 
   } finally { child.kill('SIGKILL'); }
 });
 
-test('De AI verleent nooit zelf een pas: dat besluit nemen mensen', async () => {
-  const { child, base } = await startServer({ env: { SMTP_URL: '' } });
+test('De AI verleent nooit zelf een pas: dat besluit nemen mensen', async t => {
+  const { child, base, datamap } = await ledenServer(t);
   try {
     const P = post(base);
-    const lid = await nieuwLid(P, 'Diego', 'rtg');
+    const lid = await nieuwLid(P, 'Diego', datamap);
     const vraag = m => P('/api/ai', { messages: [{ role: 'user', content: m }] }, lid);
 
     for (const poging of [

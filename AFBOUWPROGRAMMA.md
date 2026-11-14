@@ -149,7 +149,29 @@ zijn ook tegen hun foutvariant gezien. De afleidings-/communicatiekernproeven
 slagen 75/75. Al deze aantallen zijn lokale deelruns op Node 26, zonder skips
 of todos, geen opgeteld platformtotaal of kandidaatkwalificatie.
 
-Nog open: resterende persona's en echte productfouten uit scherven 2 en 3,
+De tweede gerichte fixturegroep slaagt in deelruns 123/123 en 122/122; de
+derde groep (38 bestanden) 220/220. Identiteitskeuring blijft los van betalen,
+gratis werknemers en negatieve account-/tenantproeven zijn niet opgewaardeerd.
+Historische factuurcorrectie gebruikt een expliciete bestaande factuur en de
+echte HTTP-betaalroute (17/17 met factuursaldo); de gezelschapsproeven slagen
+3/3. PIN-herstel en beoordelingen bij de eigen afgeronde bestelling zijn als
+aparte productreparatie vastgelegd (`d097dafcb`), met 46/46 gerichte
+regressies en 2/2 echte PIN-browserproeven. Eigen privacy-inzage is eveneens
+een accountrecht, geen betaalrecht (`8270f145f`): de oude fout is eerst
+gereproduceerd, een gevulde vreemde kaart blijft ondanks gespoofte IDs dicht.
+De aanvullende inzage-, Leerhuis-, kantoor-, refundmeter- en Experience-groep
+slaagt 45/45. De refundmeter trekt alleen werkelijk gevonden uitzonderingen
+af, met een positieve en negatieve tegenproef; norm en scanner blijven gelijk.
+Dit zijn lokale ontwikkelproeven op de gewijzigde boom, niet de vier volledige
+CI-scherven en niet samen een platformtotaal.
+
+De oude browserfouten zijn op oorzaak gegroepeerd: betaalpersona's, gratis
+identiteitskeuring, inmiddels herstelde eigen accountrechten en afzonderlijke
+werk-/privacy-/UI-fouten. Gedeelde fixtures mogen geen betaalrecht aan gratis
+medewerkers, kijkers of negatieve persona's geven. Schermproeven draaien pas
+na bevriezing van hun tranche, centraal en met begrensde paralleliteit.
+
+Nog open: overige browserfixtures en echte werk-/privacy-/UI-fouten,
 een verse volledige vierdelige suite, PostgreSQL/Redis, schermproeven en
 beschermde remote checks. De uit #725 overgenomen Direct-/Service-start is
 nog niet bewezen tegen een verloren antwoord met herhaling; dat herstelpunt

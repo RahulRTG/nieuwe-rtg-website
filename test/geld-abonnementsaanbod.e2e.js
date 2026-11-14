@@ -126,7 +126,10 @@ test('browser: veilige links en echte herstelmededeling; standaard uit biedt gee
     assert.doesNotMatch(text, /e-mail.*verstuurd/);
     assert.deepEqual(f.fouten, []);
     const dicht = await omgeving(t, { aan: false });
-    await dicht.page.waitForFunction(() => document.getElementById('lmAutomatisch').children.length === 0);
+    await dicht.page.locator('#lmAutoContracten').waitFor({ state: 'attached' });
     assert.equal(await dicht.page.locator('form').count(), 0);
+    assert.equal(await dicht.page.locator('[data-abo-actie=ververs]').count(), 1,
+      'gesloten instroom houdt de bestaande contractbediening beschikbaar');
+    assert.match(await dicht.page.locator('#lmAutomatisch').textContent(), /Nieuwe aanbiedingen en ondertekening zijn gesloten/);
     assert.deepEqual(dicht.db.data, {});
   });

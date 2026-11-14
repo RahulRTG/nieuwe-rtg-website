@@ -5,7 +5,7 @@ const klok = require('../../lib/klok');
 const { termijn } = require('./abonnementstermijn');
 
 module.exports = ({ db, accounts, bewerkCollectie, betaal, betaalWaarheid, provisioneer,
-  nu = () => new Date(klok.nu()).toISOString(), returnUrl, beschikbaar = false }) => {
+  nu = () => new Date(klok.nu()).toISOString(), returnUrl, beschikbaar = false, bedieningBeschikbaar = beschikbaar }) => {
   const context = require('./abonnementscontext')({ db, accounts });
   const aanbod = require('./abonnementsaanbod')({ db, accounts, bewerkCollectie, nu, ...context });
   const betaling = require('./abonnementsbetaling')({ db, accounts, bewerkCollectie, betaal, betaalWaarheid, nu, returnUrl });
@@ -23,8 +23,11 @@ module.exports = ({ db, accounts, bewerkCollectie, betaal, betaalWaarheid, provi
         if (!accounts.setTier(c.accountId, c.pas)) throw Error('De persoonlijke pas kon niet worden geactiveerd.');
       });
     } });
-  const gate = () => beschikbaar === true && !!betaal && !!betaalWaarheid && !!returnUrl;
-  const dicht = () => ({ status: 503, error: 'De nieuwe abonnementsroute is nog niet vrijgegeven; er is niets afgeschreven.', beschikbaar: false });
+  // Inschrijving sluiten trekt geen bestaande betaal- of herstelrechten in.
+  // De opslag-/betaalconfiguratie blijft voor beide wegen verplicht.
+  const gate = () => bedieningBeschikbaar === true && !!betaal && !!betaalWaarheid && /^https:\/\//.test(returnUrl || '');
+  const instroom = () => beschikbaar === true && gate();
+  const dicht = () => ({ status: 503, error: 'Deze abonnementsopdracht is niet beschikbaar; er is niets afgeschreven.', beschikbaar: false });
   const eigen = (id, contractId) => (db.data.contracten || []).find(c => c.id === contractId && c.accountId === id && c.automatischAbonnement);
   const schema = id => (db.data.lidmaatschapBetalingen || []).find(r => r.contractId === id);
   async function betaalZelf(id, input = {}) {
@@ -65,7 +68,7 @@ module.exports = ({ db, accounts, bewerkCollectie, betaal, betaalWaarheid, provi
     if (!gate()) return { ok: true, beschikbaar: false, contracten: [] };
     const r = aanbod.mijn(id);
     if (!r.ok) return r;
-    return { ...r, beschikbaar: true, contracten: r.contracten.map(c => {
+    return { ...r, beschikbaar: true, instroomBeschikbaar: instroom(), contracten: r.contracten.map(c => {
       const rij = schema(c.id), t = rij?.termijnen.find(x => x.status !== 'voldaan') || rij?.termijnen[0];
       const w = t?.betaalWaarheidId && betaalWaarheid.van(t.betaalWaarheidId);
       return { ...c, herstel: eigen(id, c.id)?.herstel || null,
@@ -111,6 +114,6 @@ module.exports = ({ db, accounts, bewerkCollectie, betaal, betaalWaarheid, provi
   }
   return { mijn, betaal: betaalZelf, herstel, ronde, magDienst, afgewikkeld: activering.afgewikkeld,
     intrekken: (id, input) => gate() ? aanbod.intrekken(id, input) : dicht(),
-    aanbod: (id, input) => gate() ? aanbod.aanbod(id, input) : dicht(),
-    teken: (id, input) => gate() ? aanbod.teken(id, input) : dicht() };
+    aanbod: (id, input) => instroom() ? aanbod.aanbod(id, input) : dicht(),
+    teken: (id, input) => instroom() ? aanbod.teken(id, input) : dicht() };
 };

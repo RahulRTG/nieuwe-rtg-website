@@ -129,6 +129,7 @@ Object.assign(kern, require('../kern/aanmeldingen')({ db, save, crypto, schoon, 
   betaal: hulp.betaal, betaalWaarheid: kern.betaalWaarheid,
   abonnementenBeschikbaar: process.env.RTG_ABONNEMENTEN_ZELFSERVICE === '1' &&
     ['sqlite', 'postgres'].includes(require('../db').STORE),
+  abonnementenBedieningBeschikbaar: ['sqlite', 'postgres'].includes(require('../db').STORE),
   abonnementReturnUrl: /^https:\/\//.test(process.env.APP_URL || '')
     ? new URL('/apps/geld.html?abonnement=herstel#lidmaatschap', process.env.APP_URL).toString() : null,
   // laat gebonden: geld-regie en meldingen (naar gast, C5) staan er pas later

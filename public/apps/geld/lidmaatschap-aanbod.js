@@ -6,6 +6,7 @@
   var beeld = w.RTGGeldAbonnementBeeld;
   function start(vak) {
     var eigen = ++generatie, bezig = false, contracten = {}, opslagSleutel = null, opdracht = null, stopIntake = null;
+    var instroomBeschikbaar = false, getoondeInstroom = null, intakeGeneratie = 0;
     function levend() { return eigen === generatie && vak && vak.isConnected; }
     function meld(tekst) {
       if (!levend()) return;
@@ -30,37 +31,63 @@
       }
     }
     function vulOpdracht() {
-      if (!opdracht || !levend()) return;
-      vak.querySelector('#lmAanbodPas').value = opdracht.pas;
-      vak.querySelector('#lmAanbodFrequentie').value = opdracht.frequentie;
-      vak.querySelector('#lmAanbodAanvraag').value = opdracht.aanmeldingId || '';
+      if (!opdracht || !levend() || !instroomBeschikbaar) return;
+      var pas = vak.querySelector('#lmAanbodPas'), frequentie = vak.querySelector('#lmAanbodFrequentie');
+      var aanvraag = vak.querySelector('#lmAanbodAanvraag');
+      if (!pas || !frequentie || !aanvraag) return;
+      pas.value = opdracht.pas; frequentie.value = opdracht.frequentie;
+      aanvraag.value = opdracht.aanmeldingId || '';
+    }
+    function stopNieuweIntake() {
+      intakeGeneratie++;
+      if (stopIntake) stopIntake();
+      stopIntake = null;
     }
     async function laad() {
       var r = await w.Geld.api(BASIS + 'stand');
       if (!levend()) return;
-      if (!r.beschikbaar) { if (stopIntake) stopIntake(); stopIntake = null; vak.innerHTML = ''; return; }
-      if (!vak.querySelector('#lmAutoContracten')) {
-        vak.innerHTML = beeld.formulier(r.intake);
-        if (w.RTGGeldAbonnementIntake) stopIntake = w.RTGGeldAbonnementIntake.start(vak,
-          { sleutel: sleutel, levend: levend, meld: meld, ontvangen: function (id, nieuw) {
-            if (!levend() || opdracht) return;
-            vak.querySelector('#lmAanbodPas').value = 'business-lite';
-            vak.querySelector('#lmAanbodAanvraag').value = id;
+      instroomBeschikbaar = r.beschikbaar === true && r.instroomBeschikbaar === true;
+      if (!r.beschikbaar) {
+        stopNieuweIntake(); getoondeInstroom = null; contracten = {}; vak.innerHTML = ''; return;
+      }
+      var herbouw = !vak.querySelector('#lmAutoContracten') || getoondeInstroom !== instroomBeschikbaar;
+      if (herbouw) {
+        stopNieuweIntake(); getoondeInstroom = instroomBeschikbaar;
+        vak.innerHTML = beeld.formulier(r.intake, instroomBeschikbaar, r.instroomReden);
+        var eigenIntake = intakeGeneratie;
+        function intakeLevend() { return levend() && instroomBeschikbaar && eigenIntake === intakeGeneratie; }
+        if (instroomBeschikbaar && w.RTGGeldAbonnementIntake) stopIntake = w.RTGGeldAbonnementIntake.start(vak,
+          { sleutel: sleutel, levend: intakeLevend, meld: function (tekst) { if (intakeLevend()) meld(tekst); }, ontvangen: function (id, nieuw) {
+            if (!intakeLevend() || opdracht) return;
+            var pas = vak.querySelector('#lmAanbodPas'), aanvraag = vak.querySelector('#lmAanbodAanvraag');
+            if (!pas || !aanvraag) return;
+            pas.value = 'business-lite'; aanvraag.value = id;
             if (nieuw) meld('Uw bedrijfsaanvraag is ontvangen. Kies nu Persoonlijk aanbod lezen; er is nog niets getekend of betaald.');
           } });
       }
       contracten = {};
       var rijen = r.contracten || [];
       rijen.forEach(function (c) { contracten[c.id] = c; });
-      vak.querySelector('#lmAutoContracten').innerHTML = rijen.map(beeld.contract).join('');
+      vak.querySelector('#lmAutoContracten').innerHTML = rijen.map(function (c, n) {
+        return beeld.contract(c, n, instroomBeschikbaar);
+      }).join('');
+      if (herbouw && instroomBeschikbaar) {
+        try { await herstelOpdracht(); }
+        catch (e) { meld(e.message); }
+      }
       vulOpdracht();
     }
+    function eisInstroom() {
+      if (!instroomBeschikbaar) throw Error('Nieuwe aanbiedingen en ondertekening zijn gesloten. Uw bestaande overeenkomst blijft te bedienen.');
+    }
     async function vraag(form) {
+      eisInstroom();
       var inhoud = { pas: form.elements.pas.value, frequentie: form.elements.frequentie.value };
       var aanvraag = form.elements.aanmeldingId.value.trim();
       if (aanvraag) inhoud.aanmeldingId = aanvraag;
       if (inhoud.pas !== 'rtg' && !aanvraag) throw Error('Deze pas vereist de referentie van uw eigen aanvraag. Een paskeuze is geen toelating.');
       if (!opslagSleutel) await herstelOpdracht();
+      eisInstroom();
       if (opdracht && (opdracht.pas !== inhoud.pas || opdracht.frequentie !== inhoud.frequentie ||
           (opdracht.aanmeldingId || '') !== (inhoud.aanmeldingId || '')))
         throw Error('Er staat nog een onzekere opdracht. Herhaal de oorspronkelijke keuze met dezelfde sleutel of laat RTG die controleren.');
@@ -72,6 +99,7 @@
       await laad(); meld('Het persoonlijke aanbod staat klaar. Lees het voordat u tekent.');
     }
     async function teken(form) {
+      eisInstroom();
       var c = contracten[form.dataset.aboTeken];
       if (!c) throw Error('Haal eerst het eigen aanbod opnieuw op.');
       await w.Geld.api(BASIS + 'teken', { contractId: c.id, aanbodHash: c.aanbod.hash,
@@ -122,15 +150,12 @@
     }
     if (!vak) return;
     vak.addEventListener('submit', submit); vak.addEventListener('click', klik);
-    laad().then(function () {
-      if (levend() && vak.querySelector('#lmAanbodVraag'))
-        return herstelOpdracht().then(vulOpdracht).catch(function (e) { meld(e.message); });
-    }).catch(function (e) {
+    laad().catch(function (e) {
       if (levend()) vak.innerHTML = '<p>' + w.Geld.esc(e.message || 'De aanbodbediening kon niet laden.') + '</p>';
     });
     return function () {
       if (eigen === generatie) generatie++;
-      if (stopIntake) stopIntake();
+      stopNieuweIntake();
       if (w.RTGGeldAbonnementKaart) w.RTGGeldAbonnementKaart.stop();
       vak.removeEventListener('submit', submit); vak.removeEventListener('click', klik);
     };

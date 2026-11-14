@@ -2,6 +2,29 @@
 
 ## Actuele uitvoeringsvolgorde — 14 november 2026
 
+### Productrichting: minder schermen mag, minder overzicht of veiligheid niet
+
+Aanvullend eigenaarsbesluit: 316 (of 330) schermen is geen bouwdoel. Bestaande
+overlap mag worden samengevoegd tot minder, heldere plekken met een rustige,
+clean, natuurlijke en high-end magazinebeleving. Cover en Collectie dragen
+de redactionele ervaring; taken, contracten, geld en herstel gebruiken dezelfde
+vormtaal met een compacte, ondubbelzinnige bediening.
+
+De canonieke inventaris blijft alle bestaande routes en verschijningsvormen
+verantwoorden. Per item volgt expliciet: behouden, samenvoegen naar een
+genoemde screenId, redirect/alias, fragment of server-side gesloten. Een
+samengevoegde ingang houdt een veilige bestemming, passende rol-/tenantgrens,
+hervatting en bewijs; functies of gebruikersrechten verdwijnen niet door een
+kleiner schermgetal. Het aantal bereikbare schermen, route-ingangen en
+toestanden wordt apart benoemd en overal uit dezelfde inventaris afgeleid.
+
+De eerdere schatting op basis van 243 losse schermmigraties is geen
+uitvoeringsprognose meer. Eerst consolideren en de informatiearchitectuur
+vaststellen, daarna het werk meten per herbruikbare schermfamilie en journey.
+Geen routes verwijderen of schermen herontwerpen vóór Poort 0 en Poort 1.
+
+### Uitvoering
+
 Het definitieve eigenaarsplan van 14 november vervangt de losse
 vervolgopdrachten. De eigenaar staat een efficiëntere volgorde toe, zonder
 de Definition of Done te verlagen. Oudere voortgangsmetingen hieronder zijn
@@ -48,6 +71,27 @@ historie en geen bewijs voor de huidige kandidaat.
 - Een diagnostische run waarin de werkboom veranderde geldt uitsluitend als
   foutinventaris, nooit als commitgebonden kwalificatiebewijs.
 
+### Goedgekeurde contractbediening — 14 november 2026
+
+De eigenaar heeft expliciet ingestemd met de grens 155 → 159, uitsluitend
+voor `/api/mijn/abonnement/automatisch/betalen`, `/herstel`, `/intrekken` en
+`/stand` onder diezelfde automatische abonnementprefix. Dit zijn vier
+bestaande-contractrechten, geen vier nieuwe schermen. Nieuwe aanbiedingen en
+ondertekening blijven instroom en afzonderlijk uitschakelbaar. Identiteit,
+eigen-contractbinding, veilige betaalconfiguratie en opslagpoorten blijven
+onverkort gelden; een leesactie mag niets innen of rechten toekennen.
+
+De regressiecontrole bewaakt de zes routes uitputtend en houdt voor alle
+andere bedieningsroutes de oude grens 155 aan. Een toekomstige route erft
+de uitzondering niet. Deze expliciete keuze is geen algemene toestemming
+om normen of meetgrenzen te verruimen. De lokale implementatie is gericht
+beproefd: 30 route-/registerproeven, 10 component-/browserproeven en 15
+HTTP-/activeringsproeven slagen zonder skip of todo. Ook na een echte
+serverherstart met gesloten instroom blijven eigen betalen, herstel en
+intrekken werken, zonder dubbele inning; een vreemd account wordt geweigerd.
+Dit gebruikt een lokale providerfixture en is geen bewijs van een live
+betaalrail. De volledige consolidatie en remote checks blijven afzonderlijk.
+
 **Actuele open poort: 0; integrator is eigenaar.** De lokale reparatie van
 het contractleespad voorkomt dat `/api/state` lege aanmeldings-/betaallijsten
 aanmaakt zonder opslagbevestiging. De gerichte contractgroep slaagt 24/24;
@@ -55,11 +99,22 @@ de echte PostgreSQL-ledengidsproef slaagt op een schone testdatabase.
 Negen verdere fixturebestanden slagen gericht met 57/57, nul skips/todos.
 De volledige diagnostische selectie `test:deel -- --deel=4/4
 --zonder-ijkingen --zonder-zware` is afgelopen: 38 bestanden met fouten;
-de negen hierboven zijn daarna gericht groen, 29 bestanden zijn nog te
-behandelen. Dit is uitsluitend scherf 4, niet de totale platformachterstand.
+37 daarvan zijn inmiddels gericht groen, inclusief de hierboven benoemde
+schakelaarcontrole. De 27 volgende bestanden gaven eerst 223/228 groen;
+na herstel van de expliciete historische factuurfixture slaagt die volledige
+betrokken factuursaldogroep 6/6. Dit zijn deelruns, geen nieuwe volledige
+scherfrun. De resterende mutatiesemantiekcontrole vraagt een verse afleiding
+na bronintegratie. Dit is uitsluitend scherf 4, niet de totale
+platformachterstand.
 De machineleesbare foutinventaris staat in `.release/unit-test-fouten.json`
 (14 november, 09:34:46 UTC); de werkboom veranderde tijdens deze diagnose.
-Dit is deelbewijs, geen groene volledige scherf, APPWERKT of Deep Green.
+De twee gerichte PostgreSQL-opslagbestanden slagen 3/3. De tweeserverproef
+GRAND met echte lokale PostgreSQL en Redis slaagt 11/11 na expliciete
+testpersona-/clustersleutelvoorbereiding en herstel van gelijktijdige
+schaduwmetingen. De meetmerge en requestcommitgrenzen slagen samen 41/41;
+beheerwijzigingen blijven conflictgevoelig en het meetvenster verschijnt
+pas na geslaagde opslag. Dit is deelbewijs, geen groene volledige scherf,
+APPWERKT of Deep Green.
 De resterende testfouten, verplichte PostgreSQL/Redis-runs, beschermde remote
 checks en samenvoeging zijn nog open. De inventaris/migratiematrix volgt pas
 na de geverifieerde consolidatie; er wordt nog geen schermmigratie gestart.

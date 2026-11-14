@@ -76,13 +76,22 @@ module.exports = [
      hetzelfde te zeggen. */
   ['/api/mijn/toestel', 'Eigen toestellen', 'Een sessie binden aan dit toestel, het een naam geven, en het weer intrekken.',
     'intrekken is een noodrem die sessies sluit; een schakelaar die dat wegneemt laat een verloren toestel ingelogd'],
-  /* HET EIGEN LIDMAATSCHAP, en het hoort hier om dezelfde grond als de zes
-     hierboven: wie zich mag verbinden, mag zich losmaken. Niet onder `tg-aanmeld`
-     -- die schakelt de INSTROOM, en daaronder zou het sluiten van de inschrijving
-     de bestaande leden opsluiten. Lezen en opzeggen staan onder EEN prefix; de
-     afweging staat in AFSPRAAK.md par. 14.2. */
-  ['/api/mijn/abonnement', 'Eigen lidmaatschap', 'Het lidmaatschap dat dit account heeft: wat er loopt, wat opzeggen gaat doen, en opzeggen.',
-    'wie zich mag verbinden mag zich losmaken; een schakelaar hierop houdt een lid in een contract dat hij niet meer wil'],
+  /* Exact dezelfde zeven rechten als bestuursroutes.js. Aanbod en tekenen
+     vallen onder tg-aanmeld; een nieuw onderpad erft geen uitzondering. */
+  ['/api/mijn/abonnement', 'Eigen lidmaatschap', 'Het lidmaatschap dat dit account heeft.',
+    'een lid moet zijn eigen overeenkomst kunnen blijven inzien', { exact: true }],
+  ['/api/mijn/abonnement/opzegvoorbeeld', 'Eigen opzegvoorbeeld', 'De gevolgen van het opzeggen lezen.',
+    'een lid moet de gevolgen kennen voordat hij zijn overeenkomst opzegt', { exact: true }],
+  ['/api/mijn/abonnement/opzeggen', 'Eigen opzegging', 'De eigen overeenkomst opzeggen.',
+    'wie zich mag verbinden mag zich losmaken', { exact: true }],
+  ['/api/mijn/abonnement/automatisch/betalen', 'Eigen abonnementsbetaling', 'De eigen getekende verplichting betalen.',
+    'gesloten instroom mag een bestaande betaalverplichting niet onbetaalbaar maken', { exact: true }],
+  ['/api/mijn/abonnement/automatisch/herstel', 'Eigen betaalherstel', 'De bestaande betaling controleren en herstellen.',
+    'een onzekere betaling moet ook bij gesloten instroom herstelbaar blijven', { exact: true }],
+  ['/api/mijn/abonnement/automatisch/intrekken', 'Eigen voorstel intrekken', 'Een voorstel zonder betaalstart veilig intrekken.',
+    'gesloten instroom mag een lid niet vasthouden aan een open voorstel', { exact: true }],
+  ['/api/mijn/abonnement/automatisch/stand', 'Eigen contractstand', 'De eigen overeenkomst en betaalstand lezen.',
+    'een lid moet zijn eigen afspraak en betaalbewijs kunnen blijven inzien', { exact: true }],
   /* Van een betaalde pas naar gast, door het lid zelf (besluit C5): dezelfde afweging. */
   ['/api/mijn/pas/gast', 'Zelf gast worden', 'Het lid kiest zelf om gast te worden, nu of aan het eind van zijn periode.',
     'wie zich mag verbinden mag zich losmaken; een schakelaar hierop houdt een lid vast aan een pas die hij niet meer wil']

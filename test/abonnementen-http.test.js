@@ -28,8 +28,9 @@ function inspecteer() {
 }
 test.before(async () => {
   const seed = spawnSync(process.execPath, ['-e', "const a=require('./server/accounts');a.init();" +
-    "const u=a.createUserSync({email:'abonnement-http@example.test',realName:'Synthetisch lid',password:'proefwachtwoord123',tier:'guest'});" +
-    "a.saveMemberState(u.id,{geboren:'1990-01-01',invoices:[]});a.checkpoint();"],
+    "for(const email of ['abonnement-http@example.test','voorstel-http@example.test']){" +
+    "const u=a.createUserSync({email,realName:'Synthetisch lid',password:'proefwachtwoord123',tier:'guest'});" +
+    "a.saveMemberState(u.id,{geboren:'1990-01-01',invoices:[]});}a.checkpoint();"],
   { cwd: path.join(__dirname, '..'), env: { ...process.env, ...env }, encoding: 'utf8' });
   assert.equal(seed.status, 0, seed.stderr);
   provider = http.createServer(async (req, res) => {
@@ -71,7 +72,7 @@ test.after(async () => {
   if (provider) { provider.closeAllConnections(); await new Promise(r => provider.close(r)); }
   fs.rmSync(dir, { recursive: true, force: true });
 });
-test('eigen gratis account kan aanbieden, tekenen, betalen en herstellen via echte routes, zonder dubbele inning', async () => {
+test('echte HTTP-herstart sluit instroom na tekenen, niet eigen betalen, herstel of intrekken; zonder dubbele inning', async () => {
   assert.equal((await eigen('stand', {}, null)).status, 401);
   assert.equal((await eigen('stand')).body.beschikbaar, true);
   const b = { pas: 'rtg', frequentie: 'maand', idempotencyKey: crypto.randomUUID() };
@@ -82,6 +83,32 @@ test('eigen gratis account kan aanbieden, tekenen, betalen en herstellen via ech
   assert.equal((await eigen('teken', { contractId, aanbodHash: c.aanbod.hash,
     naam: 'Synthetisch lid', akkoord: true, doorlopendeBetalingAkkoord: true })).status, 200);
   assert.equal(inspecteer().tier, 'guest');
+  const ander = await api('/api/auth/login', { login: 'voorstel-http@example.test', password: 'proefwachtwoord123', pasApp: 'rtg' }, null);
+  assert.equal(ander.status, 200, JSON.stringify(ander.body));
+  const anderToken = ander.body.token;
+  const open = await eigen('aanbod', { ...b, idempotencyKey: crypto.randomUUID() }, anderToken);
+  assert.equal(open.status, 200, JSON.stringify(open.body));
+  const intrekken = { contractId: open.body.contract.id, aanbodHash: open.body.contract.aanbod.hash };
+
+  // Echte deploygrens: duurzaam getekend, maar nog geen provideropdracht.
+  await stopNet(srv.child);
+  srv = await startServer({ env: { ...env, RTG_ABONNEMENTEN_ZELFSERVICE: '0',
+    STRIPE_BASE_URL: 'http://127.0.0.1:' + provider.address().port } });
+  const voor = inspecteer(), stand = await eigen('stand');
+  assert.equal(stand.status, 200, JSON.stringify(stand.body));
+  assert.equal(stand.body.beschikbaar, true); assert.equal(stand.body.instroomBeschikbaar, false);
+  assert.ok(stand.body.contracten.some(x => x.id === contractId && x.status === 'GEACCEPTEERD'));
+  assert.equal(stand.body.intake, undefined, 'gesloten instroom biedt geen nieuw intakeformulier aan');
+  assert.deepEqual(inspecteer(), voor, 'stand maakt geen factuur, betaling of rechten');
+  assert.equal((await eigen('aanbod', { ...b, idempotencyKey: crypto.randomUUID() })).status, 409);
+  assert.equal((await eigen('teken', { contractId, aanbodHash: c.aanbod.hash,
+    naam: 'Synthetisch lid', akkoord: true, doorlopendeBetalingAkkoord: true })).status, 409);
+  assert.equal((await eigen('betalen', { contractId }, anderToken)).status, 404);
+  assert.equal((await eigen('herstel', { contractId }, anderToken)).status, 404);
+  assert.equal((await eigen('intrekken', intrekken)).status, 404);
+  assert.equal((await eigen('intrekken', intrekken, anderToken)).body.contract.status, 'GEEINDIGD');
+  assert.equal((await eigen('intrekken', intrekken, anderToken)).body.herhaald, true);
+  assert.equal(gemaakt, 0, 'inzage, afwijzingen en intrekken beginnen geen afschrijving');
   const betaald = await eigen('betalen', { contractId });
   assert.equal(betaald.status, 200, JSON.stringify(betaald.body));
   assert.equal(betaald.body.status, 'WACHT_OP_KLANT');

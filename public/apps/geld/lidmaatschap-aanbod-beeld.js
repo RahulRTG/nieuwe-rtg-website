@@ -12,8 +12,8 @@
         u.protocol === 'http:' && u.origin === w.location.origin) ? u.href : null;
     } catch (_) { return null; }
   }
-  function formulier(intake) {
-    return '<h2>Een persoonlijk aanbod</h2><div class="kaart">' +
+  function formulier(intake, instroomBeschikbaar, reden) {
+    var aanbod = instroomBeschikbaar === true ? '<h2>Een persoonlijk aanbod</h2><div class="kaart">' +
       '<p>Gratis blijven kan. Een aanbod opvragen verandert de bestaande afspraak niet. RTG verdient aan een betaald abonnement.</p>' +
       '<form id="lmAanbodVraag"><p><label for="lmAanbodPas">Abonnement</label> ' +
       '<select id="lmAanbodPas" name="pas"><option value="rtg">RTG Pass</option><option value="business-lite">Business Lite · één zaak</option>' +
@@ -26,11 +26,12 @@
       'Business geldt voor de hele bestaande organisatie die RTG bij de menselijke toelating vastlegt; een keuze hier koppelt geen organisatie. Lifestyle vereist ook menselijke toelating. Voor een nieuwe Lite-aanvraag kunt u hieronder uw bedrijfsgegevens indienen.</p>' +
       '<button class="knop" type="submit">Persoonlijk aanbod lezen</button></form>' +
       '<p class="stil">Een voorstel kan alleen worden ingetrokken vóór enige betaalstart. Is er al een betalingsopdracht, laat die eerst herstellen; begin niet opnieuw met een andere sleutel.</p></div>' +
-      (w.RTGGeldAbonnementIntake ? w.RTGGeldAbonnementIntake.html(intake && intake.bedrijfstypes) : '') +
-      '<div id="lmAutoMelding" role="status" aria-live="polite"></div><div id="lmAutoContracten"></div>' +
+      (w.RTGGeldAbonnementIntake ? w.RTGGeldAbonnementIntake.html(intake && intake.bedrijfstypes) : '') :
+      '<h2>Uw abonnementen</h2><p>' + esc(reden || 'Nieuwe aanbiedingen en ondertekening zijn gesloten. Uw bestaande overeenkomst blijft hier te bedienen.') + '</p>';
+    return aanbod + '<div id="lmAutoMelding" role="status" aria-live="polite"></div><div id="lmAutoContracten"></div>' +
       '<p><button class="knop" type="button" data-abo-actie="ververs">Stand opnieuw ophalen</button></p>';
   }
-  function contract(c, n) {
+  function contract(c, n, instroomBeschikbaar) {
     var a = c.aanbod, p = a.prijs, v = a.verrekening, key = 'lmAuto' + n;
     var verlopen = a.geldigTot && Date.parse(a.geldigTot) < Date.now();
     var betaling = c.betaalstand || {}, link = checkoutHref(betaling.checkoutUrl);
@@ -51,13 +52,15 @@
         '. Een late of onzekere betaling vraagt herstel, niet nog een betaling.</p>' : '') +
       '<p><label for="' + key + 'Tekst">Volledige versiegebonden overeenkomst</label></p>' +
       '<textarea id="' + key + 'Tekst" readonly rows="12" wrap="soft">' + esc(a.tekst) + '</textarea>';
-    if (c.status === 'AANGEBODEN' && !verlopen) {
+    if (c.status === 'AANGEBODEN' && !verlopen && instroomBeschikbaar === true) {
       html += '<form data-abo-teken="' + esc(c.id) + '"><p><label for="' + key + 'Naam">Volledige naam</label> ' +
         '<input id="' + key + 'Naam" name="naam" autocomplete="name" required minlength="2" maxlength="80"></p>' +
         '<p><label><input type="checkbox" name="akkoord" required> Ik heb deze individuele overeenkomst gelezen en ga ermee akkoord.</label></p>' +
         '<p><label><input type="checkbox" name="mandaat" required> ' + esc(a.voorwaarden.mandaatTekst) + '</label></p>' +
         '<button class="knop hoofd" type="submit">Overeenkomst ondertekenen</button></form>';
-    } else if (c.status === 'AANGEBODEN') html += '<p>De verrekenofferte is verlopen. Laat RTG het aanbod controleren; er zijn geen nieuwe rechten toegekend.</p>';
+    } else if (c.status === 'AANGEBODEN') html += verlopen ?
+      '<p>De verrekenofferte is verlopen. Laat RTG het aanbod controleren; er zijn geen nieuwe rechten toegekend.</p>' :
+      '<p>Nieuwe ondertekening is gesloten. U kunt dit aanbod blijven lezen of intrekken; er zijn geen nieuwe rechten toegekend.</p>';
     if (c.ondertekening) html += rij('Ondertekening vastgelegd op', c.ondertekening.at);
     if (betaling.status) html += rij('Betaalstand', betaling.status);
     if (typeof betaling.error === 'string') html += '<p>' + esc(betaling.error) + '</p>';

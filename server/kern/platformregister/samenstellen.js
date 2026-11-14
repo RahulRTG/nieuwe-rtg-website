@@ -35,8 +35,8 @@ function padWijzer(paren) {
      schakelkast hem onder Y schakelt. */
   return (pad) => {
     let beste = null, besteLen = 0;
-    for (const [p, w] of paren) {
-      const len = prefixLengte(pad, p);
+    for (const [p, w, opties] of paren) {
+      const len = opties?.exact && pad !== p ? 0 : prefixLengte(pad, p);
       if (len > besteLen) { besteLen = len; beste = w; }
     }
     return beste;
@@ -49,7 +49,8 @@ function padWijzer(paren) {
 function verdeelRoutes(rijen, functies) {
   const paren = [];
   for (const f of functies) for (const p of (f.paden || [])) paren.push([String(p), { soort: 'functie', id: f.id }]);
-  for (const [prefix, naam] of pr.BEDIENING) paren.push([prefix, { soort: 'bediening', id: prefix, naam }]);
+  for (const [prefix, naam, , , opties] of pr.BEDIENING)
+    paren.push([prefix, { soort: 'bediening', id: prefix, naam }, opties]);
   const wijs = padWijzer(paren);
 
   const perDing = new Map();

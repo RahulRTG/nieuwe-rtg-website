@@ -66,12 +66,11 @@ module.exports = [
     uitleg: 'Het gesprek waarin een lid zelf zijn ontbrekende gegevens aanvult, inclusief het opzoeken van een adres bij postcode en huisnummer.',
     paden: ['/api/gegevens', '/api/adres'] },
   { id: 'tg-aanmeld', categorie: 'Toegang en identiteit', naam: 'Aanmelden voor een pas', standaard: true, doelgroepen: ALLE,
-    uitleg: 'Het aanmeldgesprek en de aanmeldingen die daaruit volgen; het besluit blijft mensenwerk.', paden: ['/api/aanmeld', '/api/aanmelding'] },
-  /* De wervingslink: een werkgever nodigt iemand uit die nog geen RTG-account
-     heeft. Dit stond nergens in de kast, dus was hij als enige niet uit te
-     zetten -- terwijl juist een uitnodigingslink iets is dat je wilt kunnen
-     dichtdraaien als er misbruik van wordt gemaakt. Geen recht en geen
-     infrastructuur, dus geen plaats op de BUITEN-lijst. */
+    uitleg: 'Nieuwe aanmeldingen en aanbiedingen; Business en Lifestyle behouden menselijke toelating.',
+    paden: ['/api/aanmeld', '/api/aanmelding', '/api/mijn/abonnement/automatisch/aanbod', '/api/mijn/abonnement/automatisch/teken'] },
+  /* De wervingslink laat een werkgever iemand zonder RTG-account uitnodigen.
+     Misbruik moet af te sluiten zijn; dit is geen recht of infrastructuur en
+     hoort dus niet op de BUITEN-lijst. */
   /* HIER STOND 'tg-werving' MET PAD /api/werving, en die deed niets. De functie
      'werving' (cat-partners) claimt datzelfde pad en staat eerder in de
      catalogus; bij een gelijk lange prefix wint de eerste, dus deze schakelaar

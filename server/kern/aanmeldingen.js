@@ -22,7 +22,8 @@
 const { PASSEN, REIS } = require('./aanmeldingen/catalogus');
 
 module.exports = ({ db, save, crypto, schoon, geldPasprijzen, accounts, meldLid, bewerkCollectie,
-  betaal, betaalWaarheid, abonnementenBeschikbaar = false, abonnementReturnUrl }) => {
+  betaal, betaalWaarheid, abonnementenBeschikbaar = false,
+  abonnementenBedieningBeschikbaar = abonnementenBeschikbaar, abonnementReturnUrl }) => {
   const nu = () => new Date(require('../lib/klok').nu()).toISOString();
   const zelfservice = abonnementenBeschikbaar === true && !!betaal && !!betaalWaarheid && !!abonnementReturnUrl;
   const rid = () => crypto.randomBytes(4).toString('hex');
@@ -60,7 +61,7 @@ module.exports = ({ db, save, crypto, schoon, geldPasprijzen, accounts, meldLid,
   const { beslis } = require('./aanmeldingen/besluit')({ vind, beeld, kap, nu, accounts, save, startBetalingen, PASSEN,
     zelfservice, organisatieVoor: require('./tenant/lezen')({ db }).haal });
   const automatisch = require('./aanmeldingen/abonnementen')({ db, accounts, bewerkCollectie, betaal, betaalWaarheid,
-    beschikbaar: zelfservice, returnUrl: abonnementReturnUrl, nu,
+    beschikbaar: zelfservice, bedieningBeschikbaar: abonnementenBedieningBeschikbaar, returnUrl: abonnementReturnUrl, nu,
     provisioneer: id => bedrijfMod.provisioneerAutomatisch(id) });
 
   /* Seam voor de AI-laag: mag deze PAS automatisch worden toegekend? Nooit, voor

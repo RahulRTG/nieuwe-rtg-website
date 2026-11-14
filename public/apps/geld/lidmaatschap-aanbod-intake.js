@@ -29,6 +29,7 @@
     }
     async function laden() {
       key = (await ctx.sleutel()) + ':lite-intake';
+      if (!ctx.levend()) return;
       var raw = w.sessionStorage.getItem(key);
       if (raw) { opdracht = JSON.parse(raw); vul(); }
       var laatste = w.sessionStorage.getItem(key + ':ontvangst');
@@ -36,10 +37,11 @@
     }
     async function verzend(e) {
       e.preventDefault();
-      if (bezig) return;
+      if (bezig || !ctx.levend()) return;
       bezig = true; var button = form.querySelector('button'); button.disabled = true;
       try {
         if (!key) await laden();
+        if (!ctx.levend()) return;
         var inhoud = { pas: 'business-lite', naam: form.elements.naam.value.trim(), contact: form.elements.contact.value.trim(),
           bedrijf: { naam: form.elements.bedrijf.value.trim(), type: form.elements.type.value,
             plaats: form.elements.plaats.value.trim(), behoeften: form.elements.behoeften.value.split('\n').map(function (s) { return s.trim(); }).filter(Boolean).slice(0, 8) } };
@@ -50,6 +52,9 @@
         } else opdracht = Object.assign({}, inhoud, { idem: w.crypto.randomUUID() });
         w.sessionStorage.setItem(key, JSON.stringify(opdracht));
         var r = await w.Geld.api('/api/aanmelding/aanvraag', opdracht);
+        // Sluiting tijdens de aanvraag bewaart de onzekere opdracht met haar
+        // bestaande UUID; alleen een levende bediening verwerkt de ontvangst.
+        if (!ctx.levend()) return;
         var id = r.ontvangst && r.ontvangst.aanvraagId;
         if (!id) throw Error('Geen aanvraagreferentie bevestigd. Bewaar dezelfde opdracht voor herstel.');
         w.sessionStorage.setItem(key + ':ontvangst', id);

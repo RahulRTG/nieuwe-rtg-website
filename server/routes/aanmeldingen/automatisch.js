@@ -8,8 +8,7 @@ module.exports = ({ app, auth, aanvragerVan, aanmeldingen, env = process.env }) 
         const bron = aanvragerVan(req), id = bron == null ? null : Number(bron);
         if (!Number.isSafeInteger(id) || id < 1)
           return res.status(401).json({ error: 'Log in met uw eigen RTG-account.' });
-        if (env.RTG_ABONNEMENTEN_ZELFSERVICE !== '1') {
-          if (methode === 'mijn') return res.json({ ok: true, beschikbaar: false, contracten: [] });
+        if (['aanbod', 'teken'].includes(methode) && env.RTG_ABONNEMENTEN_ZELFSERVICE !== '1') {
           return res.status(409).json({ error: 'Nieuwe abonnementen via zelfbediening zijn nog niet vrijgegeven.' });
         }
         const motor = aanmeldingen && aanmeldingen.automatisch;
@@ -21,8 +20,12 @@ module.exports = ({ app, auth, aanvragerVan, aanmeldingen, env = process.env }) 
         if (!r || typeof r !== 'object') throw Error('Geen bevestigd abonnementantwoord.');
         const status = Number.isInteger(r.status) && r.status >= 400 && r.status <= 599 ? r.status : 200;
         if (methode === 'mijn' && !r.error && r.beschikbaar !== false) {
+          const instroomBeschikbaar = r.instroomBeschikbaar !== false && env.RTG_ABONNEMENTEN_ZELFSERVICE === '1' &&
+            (!req.routeBeleid || ['aanbod', 'teken'].every(p => !req.routeBeleid('/api/mijn/abonnement/automatisch/' + p)));
+          if (!instroomBeschikbaar) return res.status(status).json({ ...r, beschikbaar: true, instroomBeschikbaar: false,
+            instroomReden: 'Nieuwe aanbiedingen en ondertekening zijn gesloten. Uw bestaande overeenkomst blijft hier te bedienen.' });
           const register = require('../../seed/genres');
-          return res.status(status).json({ ...r, beschikbaar: true, intake: { bedrijfstypes:
+          return res.status(status).json({ ...r, beschikbaar: true, instroomBeschikbaar: true, intake: { bedrijfstypes:
             register.aanvraagbareGenres().map(id => ({ id, label: register.GENRES[id].label })) } });
         }
         return res.status(status).json(r);

@@ -90,8 +90,8 @@ het voorstel voorlopig een oplossing voor een probleem dat niemand heeft.
 
 `scripts/symbolen.js` → `SYMBOLEN.json` (`npm run symbolen`):
 
-**<!--getal:symbolen.gelezen-->5798<!--/getal--> bestanden gelezen, <!--getal:symbolen.totaal-->29236<!--/getal--> benoemde symbolen met een regelnummer,
-<!--getal:symbolen.kanten-->8477<!--/getal--> require-kanten** — heen (waar hang ik van af) én terug (wie hangt van
+**<!--getal:symbolen.gelezen-->5801<!--/getal--> bestanden gelezen, <!--getal:symbolen.totaal-->29265<!--/getal--> benoemde symbolen met een regelnummer,
+<!--getal:symbolen.kanten-->8482<!--/getal--> require-kanten** — heen (waar hang ik van af) én terug (wie hangt van
 mij af). Die tweede richting is de dure kant om met de hand te zoeken, en precies
 wat een impactvraag nodig heeft.
 
@@ -159,7 +159,7 @@ twee betekenissen is precies wat `SEMANTIEK.json` hier 99 keer heeft geteld.
 **Gat 2 — over de schermen wisten de registers niets** (gedragsdekking 6,6%).
 `scripts/schermroutes.js` → `SCHERMROUTES.json` (`npm run schermroutes`) leest
 per bestand in `public/` welke API-paden het noemt: <!--getal:schermroutes.schermen-->497<!--/getal--> schermen,
-<!--getal:schermroutes.paden-->1864<!--/getal--> exacte paden over <!--getal:schermroutes.verwijzingen-->2180<!--/getal--> verwijzingen, plus <!--getal:schermroutes.voorvoegsels-->91<!--/getal--> voorvoegsels.
+<!--getal:schermroutes.paden-->1864<!--/getal--> exacte paden over <!--getal:schermroutes.verwijzingen-->2181<!--/getal--> verwijzingen, plus <!--getal:schermroutes.voorvoegsels-->91<!--/getal--> voorvoegsels.
 Daarmee bestaat de keten **scherm → route** die een impactvraag nodig heeft.
 
 **Correctie op een eerdere versie van deze paragraaf.** Hier stond dat `public/`

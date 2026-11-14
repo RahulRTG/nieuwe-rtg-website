@@ -25,7 +25,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, elevateTier } = require('./helper');
 
 let srv, base, werker, vreemde, werkerMail, baas, taxi, noraId, kantoor;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-zak-'));
@@ -39,14 +39,6 @@ function api(pad, body, token) {
   if (token) h.Authorization = 'Bearer ' + token;
   return fetch(base + pad, { method: 'POST', headers: h, body: JSON.stringify(body || {}) })
     .then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
-}
-let seq = 0;
-async function lid() {
-  const u = (Date.now() + (++seq)).toString().slice(-8);
-  const mail = 'zak' + u + '@x.nl';
-  const reg = await api('/api/auth/register', { name: 'Lid ' + seq, email: mail, phone: '06' + u,
-    password: 'geheim123', geboortedatum: '1990-05-05', geslacht: 'v', tier: 'rtg', pasApp: 'rtg' });
-  return { token: reg.body.token, mail };
 }
 async function managerVan(code) {
   const roster = await api('/api/supplier/roster', { code });
@@ -62,12 +54,29 @@ const beleidZet = (velden) => api('/api/supplier/mob/beleid',
   Object.assign({ zet: true, maxPrijs: 0, goedkeuringVanaf: 0, budgetPerMaand: 0,
     dagen: [], van: null, tot: null, steden: [], kostenplaatsen: [],
     kostenplaatsVerplicht: false, ritsoorten: [] }, velden || {}), baas);
+let seq = 0;
+async function betaaldLid() {
+  const u = (Date.now() + (++seq)).toString().slice(-8);
+  const mail = 'zak' + u + '@x.nl';
+  const reg = await api('/api/auth/register', { name: 'Lid ' + seq, email: mail, phone: '06' + u,
+    password: 'geheim123', geboortedatum: '1990-05-05', geslacht: 'v', tier: 'guest', pasApp: 'rtg' });
+  assert.equal(reg.status, 200, JSON.stringify(reg.body));
+  /* Deze testomgeving draait nog met de afgeschermde oude toelatingsroute:
+     Lifestyle vraagt daarin een menselijk besluit. Na dat expliciete besluit
+     opnieuw inloggen, zodat de sessie de toegekende betaalde pas draagt. */
+  await elevateTier(base, reg.body.token, 'lifestyle');
+  const login = await api('/api/auth/login', { login: mail, password: 'geheim123', pasApp: 'lifestyle' });
+  assert.equal(login.status, 200, JSON.stringify(login.body));
+  return { token: login.body.token, mail };
+}
 
 test.before(async () => {
   srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP, OFFICE_CODE } });
   base = srv.base;
-  const a = await lid(); werker = a.token; werkerMail = a.mail;
-  vreemde = (await lid()).token;
+  /* Registratie blijft gratis. Deze suite boekt vervoer en geeft haar twee
+     testpersonen daarom afzonderlijk en zichtbaar een betaalde pas. */
+  const a = await betaaldLid(); werker = a.token; werkerMail = a.mail;
+  vreemde = (await betaaldLid()).token;
   baas = await managerVan(WERKGEVER);
   taxi = await managerVan('MKKX');
   assert.ok(baas && taxi, 'beide managers loggen in');

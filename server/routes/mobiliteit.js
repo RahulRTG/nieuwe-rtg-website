@@ -22,7 +22,7 @@
    boven wie een rit vraagt, onder wie hem uitvoert. */
 module.exports = (kern) => {
   const { app, auth, supplierAuth, accounts, schoon, gegevensStop,
-    mobAanbod, mobMijn, mobVraag, mobAnnuleer, mobVraagToegang, mobEigenToegang,
+    mobAanbod, mobMijn, mobVraag, mobAnnuleer, mobToegang,
     plekLijst, favZet, favLijst,
     opdrachtMet, opdrachtBeeld, opdrachtNaar, opdrachtPositie,
     dispatchBeeld, pendelReserveer, pendelVoorMedewerker,
@@ -34,7 +34,7 @@ module.exports = (kern) => {
     return false;
   };
   const eigenStop = (req, res) => {
-    const r = mobEigenToegang(req.session);
+    const r = mobToegang.mobEigenToegang(req.session);
     if (r.error) { stuur(res, r); return true; }
     return false;
   };
@@ -56,7 +56,7 @@ module.exports = (kern) => {
      vindt. Dezelfde poort als bij een tafel of een charter ('reservering'
      vraagt om een telefoonnummer). */
   app.post('/api/mob/vraag', auth, (req, res) => {
-    const toegang = mobVraagToegang(req.session, req.body || {});
+    const toegang = mobToegang.mobVraagToegang(req.session, req.body || {});
     if (toegang.error) return stuur(res, toegang);
     if (gegevensStop(req, res, 'reservering')) return;
     stuur(res, mobVraag(req.session, req.body || {}));

@@ -56,8 +56,13 @@ module.exports = function maakContractstand({ kernVoorAuth, lidpoort }) {
            zonder bewaartermijn, en het lid kan hem niet kwijt. De sleutel hierboven is
            alleen de geheugenkaart van dit proces en staat nergens op schijf. */
         lidpoort.weeg(kernVoorAuth.handhavingSchaduw, oordeel);
-        if (contractGezien.size >= CONTRACT_DAK) contractGezien.clear();
-        contractGezien.set(sleutel, { at: nu });
+        const bevestigGezien = () => {
+          if (contractGezien.size >= CONTRACT_DAK) contractGezien.clear();
+          contractGezien.set(sleutel, { at: nu });
+        };
+        // save() registreert in PostgreSQL alleen de intentie. De teller is pas
+        // na request-COMMIT gemeten; een conflict mag geen venster vullen.
+        if (!require('../db/verzoekcontext').haakNaCommit(bevestigGezien)) bevestigGezien();
       }
     } catch (e) {
       console.warn('[contractpoort] de schaduwteller kon niet worden bijgewerkt: ' + (e && e.message || e));

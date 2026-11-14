@@ -89,6 +89,8 @@ beproefd: 30 route-/registerproeven, 10 component-/browserproeven en 15
 HTTP-/activeringsproeven slagen zonder skip of todo. Ook na een echte
 serverherstart met gesloten instroom blijven eigen betalen, herstel en
 intrekken werken, zonder dubbele inning; een vreemd account wordt geweigerd.
+Daarnaast slagen 86 bredere abonnementsregressies voor onder meer menselijke
+toelating, organisatie-/zaakgrenzen, jaarvervolg, verrekening en herstel.
 Dit gebruikt een lokale providerfixture en is geen bewijs van een live
 betaalrail. De volledige consolidatie en remote checks blijven afzonderlijk.
 
@@ -111,10 +113,13 @@ De machineleesbare foutinventaris staat in `.release/unit-test-fouten.json`
 De twee gerichte PostgreSQL-opslagbestanden slagen 3/3. De tweeserverproef
 GRAND met echte lokale PostgreSQL en Redis slaagt 11/11 na expliciete
 testpersona-/clustersleutelvoorbereiding en herstel van gelijktijdige
-schaduwmetingen. De meetmerge en requestcommitgrenzen slagen samen 41/41;
-beheerwijzigingen blijven conflictgevoelig en het meetvenster verschijnt
-pas na geslaagde opslag. Dit is deelbewijs, geen groene volledige scherf,
-APPWERKT of Deep Green.
+schaduwmetingen. De meetmerge, requestcommitgrenzen en flushpublicatie slagen
+samen 56/56; beheerwijzigingen blijven conflictgevoelig en het meetvenster
+verschijnt pas na geslaagde opslag. De alternatieve flushbaan publiceert ook
+pas na COMMIT, bewaart later lokaal werk en blokkeert herschrijven bij een
+onopgelost publicatieconflict. De echte PostgreSQL-adapterproef slaagt 6/6;
+GRAND is na deze verharding opnieuw 11/11 groen. Dit is deelbewijs, geen
+groene volledige scherf, APPWERKT of Deep Green.
 De resterende testfouten, verplichte PostgreSQL/Redis-runs, beschermde remote
 checks en samenvoeging zijn nog open. De inventaris/migratiematrix volgt pas
 na de geverifieerde consolidatie; er wordt nog geen schermmigratie gestart.

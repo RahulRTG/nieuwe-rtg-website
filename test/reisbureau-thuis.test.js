@@ -17,7 +17,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, maakBetaaldRtgTestaccount } = require('./helper');
 
 function api(base, pad, body, token) {
   const h = { 'Content-Type': 'application/json' };
@@ -35,6 +35,7 @@ async function registreer(naam) {
   const r = await api(base, '/api/auth/register', { name: naam, email: 't' + u + '@x.nl', phone: '06' + u.slice(-8),
     password: 'geheim123', geboortedatum: '1990-01-01', tier: 'business', pasApp: 'business' });
   assert.ok(r.body.token, 'registreren lukt');
+  maakBetaaldRtgTestaccount(mappen[0], 't' + u + '@x.nl');
   return r.body.token;
 }
 async function reis(vertrek, bevestig = true) {

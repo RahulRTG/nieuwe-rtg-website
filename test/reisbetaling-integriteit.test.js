@@ -7,7 +7,7 @@ const os = require('node:os');
 const path = require('node:path');
 const { maakReisbureau } = require('../server/kern/reisbureau');
 const { maakReisbetaling } = require('../server/kern/reisbureau-betaling');
-const { startServer, stop, kantoorAlsPersoon, keurLidGoed } = require('./helper');
+const { startServer, stop, kantoorAlsPersoon, keurLidGoed, maakBetaaldRtgTestaccount } = require('./helper');
 
 function opstelling(db, bank) {
   db = db || { writable: true, data: { reisAanvragen: [], partnerTrips: [{ id: 'reis-proef',
@@ -156,12 +156,14 @@ async function post(base, pad, body, token) {
 }
 
 test('echte server: catalogusprijs verandert na aanvraag, klant betaalt geaccepteerde prijs éénmaal', async () => {
-  const srv = await startServer({ env: { SMTP_URL: '', OFFICE_CODE: 'RTG-OFFICE' } });
+  const map = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-reisbetaling-prijsgrond-'));
+  const srv = await startServer({ env: { SMTP_URL: '', OFFICE_CODE: 'RTG-OFFICE', RTG_DATA_DIR: map } });
   try {
     const reg = await post(srv.base, '/api/auth/register', { name: 'Prijsgrond Proef',
       email: 'prijsgrond-proef@x.nl', phone: '0612345881', password: 'geheim123',
       geboortedatum: '1990-01-01', pasApp: 'rtg' });
     assert.equal(reg.status, 200, JSON.stringify(reg.body));
+    maakBetaaldRtgTestaccount(map, 'prijsgrond-proef@x.nl');
     const token = reg.body.token;
     await keurLidGoed(srv.base, token, reg.body.state.user.codename, '1990-01-01');
     assert.equal((await post(srv.base, '/api/pay/oplaad', { centen: 300000, idem: 'prijsgrond-op' }, token)).status, 200);
@@ -182,7 +184,7 @@ test('echte server: catalogusprijs verandert na aanvraag, klant betaalt geaccept
     assert.equal(overzicht.body.saldo, 80000);
     assert.equal(overzicht.body.geschiedenis.filter(r => r.soort === 'reis').length, 1);
     assert.equal((await post(srv.base, '/api/reisbureau/wijzig', { ref, personen: 2 }, token)).status, 409);
-  } finally { await stop(srv); }
+  } finally { await stop(srv); fs.rmSync(map, { recursive: true, force: true }); }
 });
 
 test('twee echte SQLite-serverprocessen innen tegelijk één reis eenmaal en herstellen na herstart', async () => {
@@ -195,6 +197,7 @@ test('twee echte SQLite-serverprocessen innen tegelijk één reis eenmaal en her
       email: 'reis-processen@x.nl', phone: '0612345882', password: 'geheim123',
       geboortedatum: '1990-01-01', pasApp: 'rtg' });
     assert.equal(reg.status, 200);
+    maakBetaaldRtgTestaccount(map, 'reis-processen@x.nl');
     const token = reg.body.token;
     await keurLidGoed(eerste.base, token, reg.body.state.user.codename, '1990-01-01');
     assert.equal((await post(eerste.base, '/api/pay/oplaad', { centen: 300000, idem: 'reis-processen-op' }, token)).status, 200);

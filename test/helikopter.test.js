@@ -9,7 +9,7 @@ const { spawn } = require('node:child_process');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer } = require('./helper');
+const { startServer, maakBetaaldRtgTestaccount } = require('./helper');
 
 let BASE;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-heli-'));
@@ -27,11 +27,14 @@ test.before(async () => {
   const reg = await json(await api('/api/auth/register', { name: 'Heli Lid', email: 'heli@x.nl', phone: '0612345720',
     password: 'geheim123', geboortedatum: '1985-01-01', tier: 'business', pasApp: 'business' }));
   lidToken = reg.token;
+  maakBetaaldRtgTestaccount(TMP, 'heli@x.nl');
   // een jeugdlid (16): moet geweigerd worden voor een helikoptervlucht
   const jong = new Date(Date.now() - 16 * 365.25 * 86400000).toISOString().slice(0, 10);
   const reg2 = await json(await api('/api/auth/register', { name: 'Jong Lid', email: 'jong@x.nl', phone: '0612345721',
     password: 'geheim123', geboortedatum: jong, tier: 'rtg', pasApp: 'rtg' }));
   minderToken = reg2.token;
+  // Betaald lidmaatschap mag de afzonderlijke 18+-grens niet omzeilen.
+  maakBetaaldRtgTestaccount(TMP, 'jong@x.nl');
   const roster = await json(await api('/api/supplier/roster', { code: 'IBIZAIR' }));
   const man = roster.staff.find(x => x.role === 'manager');
   const piloot = roster.staff.find(x => x.role !== 'manager');

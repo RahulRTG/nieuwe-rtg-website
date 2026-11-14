@@ -7,6 +7,7 @@ const { maakProeflid, metToestellen } = require('../scripts/lib/proeftoestel');
 const { maakRolfixtures, FIXTURE_ROUTES } = require('../scripts/lib/rolproeffixtures');
 const { draaiRolproef } = require('../scripts/lib/rolproef');
 const { draaiRolcontrole, rolproefGeslaagd } = require('../scripts/beproeving');
+const { maakBetaaldRtgTestaccount } = require('./helper');
 
 for (const viaE3 of [false, true]) test((viaE3 ? 'E3: ' : '') +
   'standaard-uit deuren en verificatie worden met echte positieve routecontroles gekruist', { timeout: 120000 }, async () => {
@@ -26,7 +27,18 @@ for (const viaE3 of [false, true]) test((viaE3 ? 'E3: ' : '') +
       assert.equal((await vraag(route.methode, route.pad, {}, tokens[route.rol] || tokens.office)).status, 503,
         route.pad + ' is zonder eigenaarbesluit standaard uit');
     }
-    const lid = await maakProeflid({ post, naam: 'Rolfixture HTTP', basis: server.basis });
+    // Alleen dit positieve proeflid heeft een betaalde fixture nodig voor de
+    // website. Verificatie- en aanvallersaccounts blijven gewone gratis accounts.
+    const betaaldProefPost = async (pad, lijf, token, koppen) => {
+      const r = await post(pad, lijf, token, koppen);
+      if (pad === '/api/auth/register') {
+        assert.equal(r.status, 200);
+        assert.equal(r.data.state.user.tier, 'guest');
+        maakBetaaldRtgTestaccount(server.datamap, lijf.email);
+      }
+      return r;
+    };
+    const lid = await maakProeflid({ post: betaaldProefPost, naam: 'Rolfixture HTTP', basis: server.basis });
     assert.ok(lid.klaar?.gekeurd, lid.reden || lid.klaar?.keurReden);
     // De storm kan de gewone sitegrens al bereikt hebben. De domeinproef
     // moet dan een EIGEN bestaand ontwerp gebruiken, niet een dertiende site

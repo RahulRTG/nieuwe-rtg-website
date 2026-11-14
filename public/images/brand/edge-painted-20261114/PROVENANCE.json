@@ -1,0 +1,10 @@
+{
+  "asset": "texture.jpg",
+  "purpose": "Decorative background of the public RTG Edge; controls remain native HTML and SVG.",
+  "created": "2026-11-14",
+  "source": "Built-in image generation, edited from the navigation reference supplied by the owner on 2026-11-14.",
+  "reference": "C7BB4EA1-61A8-4627-9E16-A5629BED1123/1-Foto-1.jpg",
+  "sha256": "5beb75a0b6c163a91d15c8f93fd6ce1c1a644b8d4c0bd6483b70e27a18b08247",
+  "packaging": "JPEG, 1280 pixels wide, quality 85. No icons or text are baked into this asset.",
+  "prompt": "Use case: precise-object-edit. Asset type: production background texture for a real website navigation bar. Input image: reference and edit target, user's original RTG navigation bar. Extract/recreate ONLY its softly brushed painterly material as a full-bleed rectangular wide image. REMOVE every icon, the lips logo, all text, white outside margin, border and drop shadow. No capsule shape: fill the entire image rectangle with the material, edge to edge. Preserve the reference's left-to-right composition: deep ink navy at left (0-20%), forest green (20-35%), luminous pale warm champagne gold in the center (38-58%), burgundy wine (60-80%), antique amber gold at far right (85-100%). Keep the center pale enough for the original burgundy lips icon to be overlaid separately. Preserve the subtle diagonal hand-brushed paint grain and quiet luxurious sheen, not a flat gradient, no glitter. Very wide panoramic horizontal background, around 3:1 aspect ratio or wider. Do not add UI, symbols, letters, logos, objects or people. This is only the painted texture, the real website will draw all functional controls."
+}

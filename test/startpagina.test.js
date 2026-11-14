@@ -34,8 +34,10 @@ test('de nieuwe voordeur draagt het RTG-merk en niet het vervangen scherm', () =
     'de openbare pagina laadt niet stil de ingelogde commandtab vanaf een fout rootpad');
 });
 
-test('de voordeur presenteert RTG eerst als B2B2C-platform', () => {
-  assert.match(HTML, /B2B2C-platform/);
+test('de voordeur zet het reisbureau voorop en houdt de drie platformkanten bereikbaar', () => {
+  assert.match(HTML, /<title>Rahul Travel Group \| Reizen op uw manier<\/title>/);
+  assert.match(HTML, /Het reisbureau voor wie zijn eigen weg kiest/);
+  assert.match(HTML, /class="ds-beleving-app" href="https:\/\/app\.rahultravelgroup\.com\/apps\/app\.html">Open de RTG-app/);
   assert.match(HTML, /organisaties, partners en mensen/);
   assert.match(HTML, /data-scene="Organisatie, partner en gebruiker"/);
   assert.match(HTML, /data-app-truth-screen="organisatie"/);
@@ -205,12 +207,13 @@ test('de lokale klok kiest ochtend, middag, avond en nacht op vaste grenzen', ()
   assert.equal(start.dagdeelVoorUur(23), 'nacht');
 });
 
-test('het dagdeel wisselt de hero; iedere wereld behoudt haar eigen context', () => {
+test('de reishero en de wereldfoto’s behouden hun identiteit in ieder dagdeel', () => {
   const dagdelen = ['ochtend', 'middag', 'avond', 'nacht'];
   const sleutels = ['hero', 'living', 'travel', 'work', 'foundation'];
   for (const sleutel of sleutels) {
     const paden = dagdelen.map(dagdeel => start.beeldsetVoorDagdeel(dagdeel)[sleutel]);
-    assert.equal(new Set(paden).size, sleutel === 'hero' ? 4 : 1, sleutel + ' heeft een eigen beeldcontext');
+    assert.equal(new Set(paden).size, 1, sleutel + ' heeft een vaste beeldcontext');
+    if (sleutel === 'hero') assert.equal(paden[0], 'images/worlds/heritage/travel-heritage-v2.jpg');
     for (const padVanBeeld of paden) {
       assert.ok(fs.existsSync(path.join(ROOT, 'public', padVanBeeld)), padVanBeeld + ' bestaat');
     }
@@ -235,21 +238,31 @@ test('redactionele beelden zijn uniek en komen overeen met hun herkomstregister'
 
 test('alle landingsbeelden hebben aantoonbare lokale herkomst', () => {
   const dagdelen = ['ochtend', 'middag', 'avond', 'nacht'];
-  const herkomst = JSON.parse(fs.readFileSync(path.join(ROOT, 'public/images/editorial/PROVENANCE.json'), 'utf8'));
+  const wereldmap = 'images/worlds/owner-20261114/';
+  const aangeleverd = JSON.parse(fs.readFileSync(path.join(ROOT, 'public', wereldmap, 'PROVENANCE.json'), 'utf8'));
+  assert.equal(aangeleverd.source, 'user-provided');
+  const heritage = JSON.parse(fs.readFileSync(path.join(ROOT, 'public/images/worlds/heritage/HERKOMST.json'), 'utf8'));
+  assert.equal(heritage.generator, 'OpenAI ingebouwde ImageGen');
+  const hero = heritage.assets.find(item => item.bestand === 'travel-heritage-v2.jpg');
+  assert.ok(hero && hero.prompt && hero.bronbestand, 'het eigen AI-reisbeeld heeft generatieherkomst');
+  assert.equal(hero.wereld, 'TravelOS');
+  assert.equal(hero.sha256, '87f0ce2c3f053b497fd38539545da98e2fbfd147c776af987f9a3a0c6f96ddc4');
 
   for (const dagdeel of dagdelen) {
     const set = start.beeldsetVoorDagdeel(dagdeel);
     const naam = path.basename(set.hero);
-    const rij = herkomst.find(item => item.path === naam);
-    assert.ok(rij, naam + ' staat in het herkomstregister');
+    assert.equal(set.hero, 'images/worlds/heritage/' + hero.bestand, 'de entree gebruikt precies het geregistreerde AI-reisbeeld');
     const inhoud = fs.readFileSync(path.join(ROOT, 'public', set.hero));
-    assert.equal(crypto.createHash('sha256').update(inhoud).digest('hex'), rij.sha256,
+    assert.equal(crypto.createHash('sha256').update(inhoud).digest('hex'), hero.sha256,
       naam + ' is byte voor byte het geregistreerde beeld');
 
     for (const rol of ['living', 'travel', 'work', 'foundation']) {
-      const beeld = herkomst.find(item => item.path === path.basename(set[rol]));
-      assert.ok(beeld, rol + ' heeft generatieherkomst');
-      assert.equal(beeld.tool, 'built-in image_gen');
+      const beeld = aangeleverd.images.find(item => item.world === rol);
+      assert.ok(beeld, rol + ' heeft aangeleverde beeldherkomst');
+      assert.equal(beeld.source, 'user-provided');
+      assert.equal(beeld.illustrative, true);
+      assert.equal(beeld.path, rol + '.jpg');
+      assert.equal(set[rol], wereldmap + beeld.path, rol + ' houdt de toegewezen foto in ieder dagdeel');
       assert.equal(crypto.createHash('sha256').update(fs.readFileSync(path.join(ROOT, 'public', set[rol]))).digest('hex'), beeld.sha256);
     }
   }

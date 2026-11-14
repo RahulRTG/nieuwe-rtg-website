@@ -39,6 +39,38 @@
     --ds-p-nachtblauw: #14233A;
     --ds-p-nachtblauw-hover: #1D3250;
 
+    /* Publieke wereldverhalen: eigenaarsbeeld van 14 november 2026.
+       Alleen data-public-world leest deze paletten; de appwerelden en
+       vaste logokleuren blijven ongewijzigd. */
+    --ds-p-public-bg: #100E0B;
+    --ds-p-public-card: #1B1713;
+    --ds-p-public-ink: #F5EFE5;
+    --ds-p-public-muted: #C3B8A9;
+    --ds-p-public-line: #4D4133;
+    --ds-p-public-accent: #DFBD88;
+    --ds-p-public-action: #74263C;
+    --ds-p-public-action-ink: #FFF7ED;
+    --ds-p-public-living-ink: #232C29;
+    --ds-p-public-living-muted: #4B5952;
+    --ds-p-public-living-line: #CAC5B7;
+    --ds-p-public-living-accent: #6D621F;
+    --ds-p-public-living-action: #174F59;
+    --ds-p-public-travel-card: #251318;
+    --ds-p-public-travel-muted: #C8B7AD;
+    --ds-p-public-travel-line: #624447;
+    --ds-p-public-work-bg: #101814;
+    --ds-p-public-work-card: #1D2A23;
+    --ds-p-public-work-muted: #C4C6B7;
+    --ds-p-public-work-line: #4C6052;
+    --ds-p-public-work-accent: #D4BC7A;
+    --ds-p-public-work-action: #28573E;
+    --ds-p-public-foundation-bg: #160F0F;
+    --ds-p-public-foundation-card: #2C181A;
+    --ds-p-public-foundation-muted: #D8BFBC;
+    --ds-p-public-foundation-line: #765051;
+    --ds-p-public-foundation-accent: #F69B8E;
+    --ds-p-public-foundation-action: #B42C40;
+
     --ds-p-sluier: linear-gradient(180deg, rgba(12, 12, 11, 0) 35%, rgba(12, 12, 11, .82) 100%);
     --ds-p-schaduw-systeem: 0 18px 48px rgba(12, 12, 11, .22);
     --ds-p-schaduw-inhoud: 0 1px 2px rgba(12, 12, 11, .06);

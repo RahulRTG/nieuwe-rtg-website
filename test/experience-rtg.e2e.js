@@ -9,9 +9,48 @@ const pw = laadPlaywright();
 const root = path.resolve(__dirname, '..');
 const sourceFaqCount = [...fs.readFileSync(path.join(root, 'index.html'), 'utf8')
  .matchAll(/<details\b[^>]*\bdata-faq=["'][^"']+["']/g)].length;
-async function ready(page){
- await page.waitForSelector('body[data-platform-role="organisatie"]');
+async function ready(page,role='organisatie'){
+ await page.waitForSelector('body[data-platform-role="'+role+'"]');
  await page.waitForSelector('.rtg-experience-edge .rtg-adaptive-bar');
+}
+async function artwork(page, basePath='/'){
+ for(const [selector,file] of [['.pp-feature-photo','worlds/heritage/travel-heritage-v2.jpg'],['.ds-beleving-signatuur img','brand/owner-20261114/brush-orbit.jpg'],['.ds-beleving-penseel','brand/owner-20261114/brush-ribbon.jpg']]){
+  const img=page.locator(selector);
+  assert.equal(await img.count(),1);
+  assert.equal(new URL(await img.getAttribute('src'),page.url()).pathname,basePath+'images/'+file);
+  await img.scrollIntoViewIfNeeded();
+  await page.waitForFunction(selector=>{const img=document.querySelector(selector);return img.complete&&img.naturalWidth>0;},selector);
+ }
+}
+async function paintedEdge(page){
+ const bar=page.locator('.rtg-adaptive-bar');
+ await page.waitForFunction(()=>document.querySelector('.rtg-adaptive-bar .ds-beleving-edgeverf')?.complete);
+ const state=await bar.evaluate(el=>({children:[...el.children].map(n=>({tag:n.tagName,action:n.dataset.rtgAdaptiveAction,texture:n.classList.contains('ds-beleving-edgeverf')})),icons:[...el.querySelectorAll('svg')].map(n=>getComputedStyle(n).color),texture:el.querySelector('.ds-beleving-edgeverf').naturalWidth}));
+ assert.equal(state.children.length,6,'de textuur komt na de vijf bestaande knoppen');
+ assert.ok(state.children.slice(0,5).every(n=>n.tag==='BUTTON'));
+ assert.equal(state.children[2].action,'ai','Rahul blijft de middelste knop');
+ assert.equal(state.children[5].texture,true);
+ assert.ok(state.texture>0,'de geschilderde textuur is geladen');
+ assert.ok(state.icons.length>0);
+ assert.ok(state.icons.every(color=>color==='rgb(255, 255, 255)'),'de iconen op de geschilderde balk zijn wit');
+ assert.equal(await bar.locator('.ds-beleving-edgeverf').isVisible(),true);
+ assert.equal(await bar.locator('.rtg-adaptive-item-copy').count(),0,'visuele labels ontbreken bewust; aria-labels blijven');
+ assert.equal(await bar.locator('button[aria-label]').count(),5);
+ await page.evaluate(()=>window.RTGAdaptiveEdge.setState('peek'));
+ assert.equal(await bar.locator('[data-rtg-adaptive-action="ai"] .ds-beleving-edge-merk').isVisible(),true,'de lippen blijven in de ruststand zichtbaar');
+ await page.evaluate(()=>window.RTGAdaptiveEdge.setState('dock'));
+}
+async function appEntry(page,width){
+ const entry=page.locator('.pp-feature-copy').getByRole('link',{name:'Open de RTG-app',exact:true});
+ assert.equal(await entry.count(),1,'decoratieve pijlen veranderen de toegankelijke naam niet');
+ assert.equal(new URL(await entry.getAttribute('href'),page.url()).pathname,'/apps/app.html');
+ const style=await entry.evaluate(el=>({color:getComputedStyle(el).color,background:getComputedStyle(el).backgroundColor}));
+ assert.deepEqual(style,{color:'rgb(12, 12, 11)',background:'rgb(223, 189, 136)'},'de directe appactie behoudt leesbaar contrast');
+ assert.equal(new URL(await page.locator('.pp-header .ds-beleving-appkort').getAttribute('href'),page.url()).pathname,'/apps/app.html');
+}
+async function moreSections(page){
+ const details=page.locator('[data-public-sections-more]');
+ if(await details.getAttribute('open')===null)await details.locator('summary').click();
 }
 
 test('De publieke B2B2C-ervaring wisselt van kant, zoekt in de echte app en past op ieder scherm',
@@ -30,20 +69,36 @@ test('De publieke B2B2C-ervaring wisselt van kant, zoekt in de echte app en past
    await page.goto(srv.base+'/',{waitUntil:'domcontentloaded'});await ready(page);
    await page.waitForFunction(()=>document.documentElement.dataset.websiteTruth==='actueel');
    assert.equal(await page.locator('.rtg-adaptive-bar').count(),1);
-   assert.match(await page.locator('#platform-story-title').innerText(),/Technologie rondom mensen/i);
+   assert.equal(await page.locator('#platform-story-title').innerText(),'De wereld. Op uw manier.');
    assert.equal(await page.locator('.pp-story[data-public-story]').count(),1);
    assert.equal(await page.locator('.pp-stories').isHidden(),true);
    assert.equal(await page.locator('.pp-library-tools').isHidden(),true);
    assert.equal(new URL(await page.locator('.pp-secure-link').getAttribute('href')).pathname,'/apps/app.html');
+   await appEntry(page,width);
+   await paintedEdge(page);
+   assert.equal(await page.locator('.wd-catalog [data-public-widget]').first().getAttribute('data-public-widget'),'travel','reizen opent de publieke catalogus');
+   await artwork(page);
+   await page.evaluate(()=>window.dispatchEvent(new CustomEvent('rtg-website-truth',{detail:window.RTGWebsiteTruth})));
+   await artwork(page);
+   await page.getByRole('button',{name:'Ontdek onze reizen',exact:true}).click();
+   assert.equal(await page.locator('[data-room="travel"]').isVisible(),true,'de hoofdactie opent TravelOS');
+   assert.equal(await page.locator('body').getAttribute('data-rtg-world'),'travel');
+   await page.locator('.wd-focus-head .wd-text-button').click();
+   assert.equal(await page.locator('.pp-feature').isVisible(),true,'terug brengt de bezoeker naar de reisentree');
+   await page.locator('[data-public-widget="work"] .ds-beleving-hoofdstuk__details summary').click();
    assert.match(await page.locator('[data-public-world-facts="work"]').innerText(),/17 apps.*MAPPEN/i);
-   const dagdeel=await page.locator('html').getAttribute('data-dagdeel'),beelden={ochtend:'morning',middag:'afternoon',avond:'evening',nacht:'night'};
-   assert.match(await page.locator('.pp-feature-photo').getAttribute('src'),new RegExp('public-'+beelden[dagdeel]+'\\.webp$'));
-   await page.getByRole('button',{name:'Vertel Rahul wat u wilt bereiken'}).click();
+   await moreSections(page);
+   await page.locator('.pp-section-index').getByRole('button',{name:'Rahul',exact:true}).click();
    await page.locator('#intent').fill('Ik wil met mijn gezin op reis');
    await page.locator('#intentForm button').click();
    assert.match(await page.locator('#intentFeedback').innerText(),/Amsterdam naar Ibiza/);
    await page.locator('.wd-focus-head .wd-text-button').click();
-   await page.locator('[data-public-widget="work"] .pp-widget-head').click();
+   assert.equal(await page.locator('.pp-itinerary').isHidden(),true,'demoreisgegevens verschijnen niet als een echte reis in de entree');
+   await page.locator('.rtg-adaptive-bar [data-rtg-adaptive-action="context"]').click();
+   await page.getByRole('button',{name:'Wis mijn demokeuzes',exact:true}).click();
+   await artwork(page);
+   assert.equal(await page.locator('#platform-story-title').innerText(),'De wereld. Op uw manier.','reset bewaart de reisentree');
+   await page.locator('[data-public-widget="work"] .ds-beleving-link').click();
    await page.locator('[data-room="work"] .app-truth-detail').click();
    assert.equal(await page.locator('[data-room="work"] .app-truth-groups a').count(),17);
    const eersteApp=page.locator('[data-room="work"] .app-truth-app-detail').first();
@@ -55,7 +110,7 @@ test('De publieke B2B2C-ervaring wisselt van kant, zoekt in de echte app en past
    assert.equal(await page.locator('.arrival-interface img').count(),3);
    assert.equal(await page.locator('[data-stage-screen] img').count(),3);
    assert.equal(await page.locator('.wd-catalog [data-public-widget]').count(),4);
-   await page.locator('[data-public-sections-more] summary').click();
+   await moreSections(page);
    assert.equal(await page.evaluate(()=>{const r=document.querySelector('.rtg-adaptive-bar').getBoundingClientRect();return r.left>=0&&r.right<=innerWidth&&r.bottom<=innerHeight}),true);
    assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),true);
    await page.locator('.pp-section-index button', {hasText:'Organisatie, partner en gebruiker'}).click();
@@ -79,6 +134,11 @@ test('De publieke B2B2C-ervaring wisselt van kant, zoekt in de echte app en past
    await page.keyboard.press('Escape');
    assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),true);
    assert.deepEqual(mutations,[]);assert.deepEqual(errors,[]);assert.deepEqual(failed,[]);
+   await page.goto(srv.base+'/',{waitUntil:'domcontentloaded'});await ready(page,'gebruiker');
+   const appHref=new URL(await page.locator('.pp-secure-link').getAttribute('href'),page.url()).href;
+   await context.route(appHref,route=>route.fulfill({status:200,contentType:'text/html',body:'<!doctype html><title>Afgeschermde appbestemming</title>'}));
+   await Promise.all([page.waitForURL(appHref),page.locator('.pp-feature-copy').getByRole('link',{name:'Open de RTG-app',exact:true}).click()]);
+   assert.equal(page.url(),appHref,'de echte klik navigeert naar de bedoelde app; de app zelf is in deze proef gestubd');
    await context.close();
   });
  }finally{if(browser)await browser.close();await stop(srv);}
@@ -110,8 +170,22 @@ test('static project path and JavaScript-disabled visitors retain content and re
       await page.goto('http://127.0.0.1:' + server.address().port + prefix, { waitUntil: 'networkidle' });
       if (javaScriptEnabled) {
         await ready(page);
+        const brandImage = page.locator('.pp-header .ds-beleving-merk img');
+        assert.match(await brandImage.getAttribute('src'), /brand\/owner-20261114\/lips\.jpg$/);
+        assert.equal(await brandImage.getAttribute('alt'), 'RTG');
+        assert.equal(await brandImage.evaluate(img => img.complete && img.naturalWidth > 0), true);
+        await artwork(page, prefix + 'public/');
+        assert.equal(await page.locator('.pp-feature-copy').evaluate(el => getComputedStyle(el).textAlign), 'start');
         assert.equal(await page.locator('#roleCta').getAttribute('href'), 'https://app.rahultravelgroup.com/apps/werk.html');
-        assert.equal(await page.evaluate(() => getComputedStyle(document.querySelector('.rtg-adaptive-bar')).getPropertyValue('--edge-bar-bg').trim()), '#1b1713');
+        await appEntry(page,390);
+        await paintedEdge(page);
+        const publicLayout = await page.evaluate(() => {
+          const hero = document.querySelector('.pp-feature'), shell = document.querySelector('.pp-shell');
+          return [hero, shell].map(el => { const r = el.getBoundingClientRect(); return { left: r.left, right: r.right, viewport: innerWidth }; });
+        });
+        for (const frame of publicLayout) {
+          assert.ok(Math.abs(frame.left) < 1 && Math.abs(frame.right - frame.viewport) < 1, 'de publieke compositie loopt tot beide schermranden');
+        }
         assert.match(await page.locator('.pp-footer a[href$="/apps/juridisch/voorwaarden.html"]').innerText(), /bestaand/i,
           'ook de door JavaScript opgebouwde footer wijst herkenbaar naar bestaande voorwaarden');
         await page.locator('.pp-section-index button', { hasText: 'Wat wilt u weten?' }).click();
@@ -129,6 +203,9 @@ test('static project path and JavaScript-disabled visitors retain content and re
         await page.waitForFunction(() => document.querySelector('.pp-detail-content #commissie')?.open === true);
         assert.equal(await page.locator('#commissie table').isVisible(), true, 'een rechtstreeks geopend nested fragment blijft bereikbaar');
       } else {
+        const hero = page.locator('#heroPhotoA');
+        assert.equal(new URL(await hero.getAttribute('src'), page.url()).pathname, prefix + 'public/images/worlds/heritage/travel-heritage-v2.jpg');
+        assert.equal(await hero.evaluate(img => img.complete && img.naturalWidth > 0), true, 'ook zonder JavaScript laadt het geregistreerde reisbeeld');
         assert.equal(await page.locator('[data-room]:visible').count(), 4);
         assert.ok(sourceFaqCount > 0, 'de broninventaris bevat werkelijk veelgestelde vragen');
         assert.equal(await page.locator('[data-faq]:visible').count(), sourceFaqCount,
@@ -195,6 +272,26 @@ test('omhoog vegen op de landing en een sitepagina opent het paneel van de host'
     site.kern.length ? ['Nu','Rahul','Connect','Media','Account'] : [],
     'ook een sitepagina toont uitsluitend de vijf functionele Edge-schermen');
   assert.ok(site.rijen.includes('Stel uw vraag over RTG'),'de rijen van de pagina: '+site.rijen.join(', '));
+  for(const world of ['travel','living','work','foundation']){
+   await page.goto(srv.base+'/site/werelden/'+world+'os.html');
+   await page.waitForSelector('body[data-rtg-adaptive-ready="true"]');
+   assert.equal(await page.locator('.ds-reiscover').count(),1,world+' heeft één eigen cover');
+   assert.notEqual((await page.locator('.ds-reiscover h1').innerText()).trim(),'');
+   const worldPhoto=page.locator('.ds-reiscover__beeld img');
+   assert.equal(await worldPhoto.count(),1,world+' krijgt geen tweede geïnjecteerde foto');
+   assert.equal(new URL(await worldPhoto.getAttribute('src'),page.url()).pathname,'/images/worlds/owner-20261114/'+world+'.jpg');
+   await worldPhoto.scrollIntoViewIfNeeded();
+   await page.waitForFunction(()=>{const img=document.querySelector('.ds-reiscover__beeld img');return img.complete&&img.naturalWidth>0;});
+   assert.equal(await page.locator('body').getAttribute('data-public-world'),world);
+   for(const selector of ['.ds-reiscover','main#verhaal']){
+    const theme=await page.locator(selector).getAttribute('data-public-world');
+    assert.ok(theme===null||theme===world,world+' erft geen geforceerd ander wereldpalet');
+   }
+   if(world==='travel'){
+    assert.equal(await page.locator('.ds-reiscover h1').innerText(),'TravelOS');
+    assert.equal(new URL(await page.locator('.pp-header .ds-beleving-appkort').getAttribute('href'),page.url()).pathname,'/apps/reizen.html');
+   }
+  }
   assert.deepEqual(errors,[]);
   await context.close();
  }finally{if(browser)await browser.close();await stop(srv);}

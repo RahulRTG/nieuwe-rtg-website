@@ -149,7 +149,15 @@
     "--ds-cover-metaal",
     "--ds-cover-sluier",
     "--ds-focus",
-    "--ds-beeld-positie"
+    "--ds-beeld-positie",
+    "--ds-public-bg",
+    "--ds-public-card",
+    "--ds-public-ink",
+    "--ds-public-muted",
+    "--ds-public-line",
+    "--ds-public-accent",
+    "--ds-public-action",
+    "--ds-public-action-ink"
   ],
   "talen": [
     "nl",

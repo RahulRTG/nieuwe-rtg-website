@@ -48,6 +48,61 @@ bruikbaarheid.
 | WorkOS | precies, kalm, beheerst | grafiet, zwartgroen, teal, messing, rookglas en steen | kort en exact |
 | FoundationOS | waardig, toegankelijk | nachtblauw, civiel goud, steenblauw, zacht wit, hout en daglicht | rustig samenvoegend |
 
+### Publieke website — beeldbesluit 14 november 2026
+
+De eigenaar koppelt vier eigen foto's aan de marketingwerelden: de rode
+groepsfoto aan FoundationOS, het roodleren auto-interieur aan TravelOS, het
+Griekse terras aan LivingOS en het warme kantoor aan WorkOS. De originelen en
+hun herkomst staan in `public/images/worlds/owner-20261114/`. Het zijn
+sfeerbeelden, geen bewijs van partners, begunstigden of geleverde diensten.
+LivingOS geeft de overige publieke pagina's de lichte zand/ivoor- en
+zeegroene basis; TravelOS, WorkOS en FoundationOS behouden hun eigen publieke
+accenten. `public/ds/thema/public-worlds.css` beheert dit publieke palet.
+De publieke compositie loopt tot beide schermranden: geen decoratieve
+scheidingslijnen of omlijnde kaarten, maar afwisselende kleurvlakken en foto's.
+Binnen die vlakken blijft de tekst ruim ingesprongen. Focusmarkeringen en
+functionele formulierfeedback blijven zichtbaar voor toetsenbordbediening.
+Dit verandert geen toegangsrechten of identiteit van de ingelogde appwerelden.
+
+De aansluitende merkkeuze van de eigenaar maakt de bordeauxrode penseellippen
+het primaire publieke RTG-beeldmerk. Het onbewerkte aangeleverde beeld staat
+met herkomst in `public/images/brand/owner-20261114/lips.jpg` en vervangt het
+tekstmonogram in de publieke navigatie en het favicon. De gedeelde lichte
+navigatie houdt dit beeldmerk in alle werelden herkenbaar. De Apple-referenties
+gaven het eerste presentatieritme: rustige bediening en beeld- en kleurvlakken
+over de volle breedte. De eigenaar verfijnt dit naar een kunstzinnige,
+eigenzinnige lifestyle-community: meer rust en luxe, minder productcatalogus.
+De aansluitende layoutreferenties geven fotografie opnieuw de hoofdrol:
+het bestaande filmische TravelOS-avondbeeld draagt de entree, met leesbare
+tekst over beeld en een echte app-ingang. De herkomst staat bij
+`public/images/worlds/heritage/HERKOMST.json`; de aangeleverde handfoto blijft
+het eigen detailbeeld van TravelOS. Het orbit-penseelwerk krijgt een eigen
+kunstsectie, het horizontale penseelwerk de overgang naar de werelden.
+De kunstwerken blijven volledig zichtbaar, zonder decoratieve animaties. De
+wereldfoto's staan in afwisselende redactionele hoofdstukken met korte koppen,
+ruimte en tekstlinks. App-aantallen blijven opvraagbaar in native details;
+bewijs, functies en toegangsgrenzen blijven bij hun bestaande eigenaar.
+Het reisbureau blijft de kern: TravelOS staat vooraan, de hoofdtekst benoemt
+reizen en de primaire actie opent rechtstreeks de bestaande RTG-app. Ook de
+navigatie draagt die echte app-link. LivingOS, WorkOS en FoundationOS zijn de
+werelden eromheen, geen vervanging van die reisbelofte.
+
+De eigenaar kiest vervolgens uitdrukkelijk voor een eigen kleur per wereld,
+niet voor een overal licht of donker thema. De vier detailcovers delen de
+compositie: grote wereldnaam, korte belofte, eigen fotografie en echte
+app-ingang. LivingOS blijft licht en zeegroen, TravelOS wijn- en nachtkleur,
+WorkOS bosgroen en FoundationOS warm bordeaux. Hun bestaande verhalen,
+demonstraties en toegangsgrenzen blijven intact.
+
+De publieke Edge volgt op uitdrukkelijk verzoek weer de geschilderde referentie:
+navy, groen, champagne, bordeaux en goud, witte iconen en de originele lippen
+in het midden. Alleen de achtergrondtextuur is met beeldgeneratie afgeleid;
+de vijf knoppen, hun toegankelijke namen, gebaren en panelen blijven de
+canonieke Edge. De textuur en herkomst staan onder
+`public/images/brand/edge-painted-20261114/`. De besloten app verandert niet.
+RTG behoudt zijn eigen foto's,
+kleuren en Bodoni Moda/Inter; Apple-beeldmerken en productbeelden horen hier niet.
+
 De wereldidentiteit is informatiearchitectuur en geen door de gebruiker vrij
 te kiezen thema. De publieke vier-wereldenlanding is de neutrale RTG-hal;
 ieder blijvend appscherm, ook toegang, veiligheid en instellingen, is door het

@@ -3,10 +3,10 @@
   'use strict';
   var C = w.RTGExperienceCore;
   var scenes = {
-    travel: { photo: 'worlds/heritage/travel-heritage-v2.jpg', people: ['Uw reisgezelschap', 'Uw collega’s', 'Uw vervoer'], note: 'Een ander vertrekmoment verandert ook de rest van uw dag.' },
-    dinner: { photo: 'worlds/heritage/living-heritage-v2.jpg', people: ['Uw gezelschap', 'De tafel voor acht', 'Wie er meekomen'], note: 'Een andere menukeuze loopt mee in hetzelfde voorstel.' },
-    work: { photo: 'worlds/heritage/work-heritage-v2.jpg', people: ['Uw team', 'Uw gasten', 'Een mogelijke vervanger'], note: 'Een open dienst vraagt om overleg. Een voorstel wijzigt geen rooster.' },
-    family: { photo: 'worlds/heritage/foundation-heritage-v2.jpg', people: ['Uw gezin', 'Het schoolmoment', 'Wie kan meegaan'], note: 'De gezinsomgeving blijft altijd 100% gratis.' }
+    travel: { photo: 'worlds/owner-20261114/travel.jpg', people: ['Uw reisgezelschap', 'Uw collega’s', 'Uw vervoer'], note: 'Een ander vertrekmoment verandert ook de rest van uw dag.' },
+    dinner: { photo: 'worlds/owner-20261114/living.jpg', people: ['Uw gezelschap', 'De tafel voor acht', 'Wie er meekomen'], note: 'Een andere menukeuze loopt mee in hetzelfde voorstel.' },
+    work: { photo: 'worlds/owner-20261114/work.jpg', people: ['Uw team', 'Uw gasten', 'Een mogelijke vervanger'], note: 'Een open dienst vraagt om overleg. Een voorstel wijzigt geen rooster.' },
+    family: { photo: 'worlds/owner-20261114/foundation.jpg', people: ['Uw gezin', 'Het schoolmoment', 'Wie kan meegaan'], note: 'De gezinsomgeving blijft altijd 100% gratis.' }
   };
   function node(tag, value, cls) { var n = d.createElement(tag); if (value) n.textContent = value; if (cls) n.className = cls; return n; }
   function icon(name) {

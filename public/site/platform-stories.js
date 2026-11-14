@@ -9,7 +9,7 @@
   story('opportunity',['Besturing','Governance'],'Slim waar het helpt. Begrensd waar het moet.','Intelligent where it helps. Bounded where it matters.','Identiteit, bevoegdheid, toestemming en bewijs bepalen wat een functie daadwerkelijk mag doen.','Identity, authority, consent and evidence determine what a capability may actually do.','editorial/company-control','foundation','control')
  ];
  var appStories=[
-  story('overview',['Rahul Travel Group','Rahul Travel Group'],'Technologie rondom mensen.','Technology built around people.','Vier werelden brengen leven, reizen, werk en bijdragen samen rond de persoon.','Four worlds bring life, travel, work and contribution together around the person.','editorial/public-evening','living','rahul')
+  story('overview',['Rahul Travel Group · Reisbureau','Rahul Travel Group · Travel agency'],'De wereld. Op uw manier.','The world. Your way.','Bijzondere reizen. Persoonlijke aandacht. En één app die uw wereld bij elkaar brengt.','Distinctive journeys. Personal attention. And one app that brings your world together.','worlds/heritage/travel-heritage-v2.jpg','travel','rahul')
  ];
  w.RTGPublicContent.company.stories=companyStories;w.RTGPublicContent.app.stories=appStories;
 })(window);

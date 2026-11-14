@@ -5,6 +5,377 @@
    van het instrument een marketingscherm te maken. Bestaande hosts mogen de
    variabelen hieronder lezen terwijl zij naar het Design System migreren. */
 @layer rtg.component {
+  .ds-beleving-website {
+    --ds-beleving-inzet: clamp(1.5rem, 4vw, 4.5rem);
+  }
+  .ds-beleving-kop {
+    --rtg-world-ink: var(--ds-public-ink);
+    --rtg-world-muted: var(--ds-public-muted);
+    --rtg-world-card: var(--ds-public-card);
+  }
+  .ds-beleving-merk {
+    display: inline-flex;
+    align-items: center;
+    flex-shrink: 0;
+    min-block-size: 44px;
+    mix-blend-mode: multiply;
+  }
+  .ds-beleving-merk img {
+    display: block;
+    inline-size: 4rem;
+    block-size: auto;
+    mix-blend-mode: multiply;
+  }
+  .ds-beleving-bediening {
+    --rtg-world-card: var(--ds-public-card);
+    --rtg-world-ink: var(--ds-public-ink);
+    --rtg-world-muted: var(--ds-public-muted);
+    --rtg-world-metal: var(--ds-public-accent);
+    --rtg-world-line: transparent;
+    --wh-ink: var(--rtg-world-ink);
+    --wh-soft: var(--rtg-world-muted);
+    --story-ink: var(--rtg-world-ink);
+    --story-soft: var(--rtg-world-muted);
+    --story-gold: var(--rtg-world-metal);
+  }
+  .ds-beleving-edge-merk {
+    display: block;
+    inline-size: 46px;
+    block-size: auto;
+    mix-blend-mode: multiply;
+  }
+  .ds-beleving-edgebar {
+    --edge-bar-copy: var(--ds-cover-inkt);
+    --edge-bar-dim: var(--ds-cover-inkt);
+    --edge-bar-accent: var(--ds-cover-inkt);
+  }
+  .ds-beleving-edgeverf {
+    position: absolute;
+    z-index: -1;
+    inset: 0;
+    inline-size: 100%;
+    block-size: 100%;
+    border-radius: var(--ds-radius-capsule);
+    object-fit: fill;
+    pointer-events: none;
+  }
+  @media (forced-colors: active) {
+    .ds-beleving-edgeverf { display: none; }
+  }
+  .ds-beleving-intro {
+    display: grid;
+    margin: 0;
+    overflow: hidden;
+    background: var(--ds-public-card);
+    color: var(--ds-public-ink);
+    text-align: center;
+  }
+  .ds-beleving-intro__inhoud {
+    display: grid;
+    justify-items: center;
+    padding: clamp(3rem, 7vw, 6rem) 1.5rem 3rem;
+  }
+  .ds-beleving-intro__inhoud h1 {
+    max-inline-size: 15ch;
+    margin: .75rem 0;
+    font: 400 clamp(3rem, 5.5vw, 5.5rem)/1.02 var(--ds-letter-display);
+    text-wrap: balance;
+  }
+  .ds-beleving-intro__inhoud p {
+    max-inline-size: 46ch;
+    margin: .75rem 0 1.5rem;
+    color: var(--ds-public-muted);
+    font-size: clamp(1rem, 1.5vw, 1.2rem);
+  }
+  .ds-beleving-intro__inhoud a { color: var(--ds-public-action); }
+  .ds-beleving-intro__beeld img {
+    display: block;
+    inline-size: 100%;
+    block-size: clamp(22rem, 46vw, 42rem);
+    object-fit: cover;
+    object-position: center;
+  }
+  .ds-beleving-intro--reis {
+    --wh-ink: var(--ds-public-ink);
+    --wh-gold: var(--ds-public-accent);
+    position: relative;
+    isolation: isolate;
+    grid-template-columns: 1fr;
+    align-items: stretch;
+    min-block-size: calc(100svh - 4rem);
+    text-align: start;
+  }
+  .ds-beleving-intro--reis .ds-beleving-intro__inhoud {
+    position: relative;
+    z-index: 1;
+    align-content: center;
+    justify-items: start;
+    padding: 5rem clamp(1.5rem, 7vw, 8rem) 8rem;
+    background: linear-gradient(90deg, color-mix(in srgb, var(--ds-cover-grond) 85%, transparent), color-mix(in srgb, var(--ds-cover-grond) 55%, transparent) 42%, transparent 75%);
+  }
+  .ds-beleving-intro--reis h1 {
+    max-inline-size: 11ch;
+    margin-block: 1.5rem;
+    font-size: clamp(3.5rem, 6vw, 6.5rem);
+    line-height: 1.04;
+  }
+  .ds-beleving-intro--reis p {
+    max-inline-size: 33ch;
+    margin-block: 1rem 2rem;
+    font-size: 1rem;
+  }
+  .ds-beleving-intro--reis .ds-beleving-intro__beeld {
+    position: absolute;
+    inset: 0;
+  }
+  .ds-beleving-intro--reis .ds-beleving-intro__beeld img {
+    position: absolute;
+    inset: 0;
+    block-size: 100%;
+    object-fit: cover;
+    object-position: center;
+  }
+  .ds-beleving-kunstbijschrift {
+    display: block;
+    margin-block-start: 2rem;
+    color: var(--ds-public-muted);
+    font: 400 .75rem/1.5 var(--ds-letter-tekst);
+    letter-spacing: .08em;
+  }
+  .ds-beleving-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: start;
+    gap: 1.5rem;
+    min-block-size: 48px;
+    padding: .5rem 0;
+    border: 0;
+    background: transparent;
+    color: var(--ds-public-ink);
+    font: 500 .875rem/1.5 var(--ds-letter-tekst);
+    text-decoration: none;
+    cursor: pointer;
+  }
+  .ds-beleving-pijl { font-size: 1.2em; }
+  .ds-beleving-link:hover { text-decoration: underline; text-underline-offset: .4em; }
+  .ds-beleving-link:focus-visible { outline: 2px solid var(--ds-public-accent); outline-offset: 6px; }
+  .ds-beleving-intro__inhoud .ds-beleving-app {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 2rem;
+    min-block-size: 52px;
+    margin-block: .5rem 1rem;
+    padding: .875rem 1.75rem;
+    border-radius: var(--ds-radius-capsule);
+    background: var(--ds-public-ink);
+    color: var(--ds-public-card);
+    font: 500 .875rem/1.5 var(--ds-letter-tekst);
+    text-decoration: none;
+  }
+  .ds-beleving-intro--reis .ds-beleving-app { background: var(--ds-public-accent); color: var(--ds-cover-grond); }
+  .ds-beleving-appkort {
+    display: inline-flex;
+    align-items: center;
+    gap: .5rem;
+    min-block-size: 44px;
+    color: var(--ds-public-ink);
+    font: 500 .75rem/1.4 var(--ds-letter-tekst);
+    white-space: nowrap;
+    text-decoration: none;
+  }
+  .ds-beleving-app:hover, .ds-beleving-appkort:hover { text-decoration: underline; text-underline-offset: .3em; }
+  .ds-beleving-app:focus-visible, .ds-beleving-appkort:focus-visible { outline: 2px solid var(--ds-public-accent); outline-offset: 6px; }
+  .ds-beleving-sectiekop.ds-beleving-manifest {
+    display: grid;
+    justify-items: center;
+    padding: clamp(4rem, 9vw, 8rem) 1.5rem;
+    text-align: center;
+    background: var(--ds-public-bg);
+  }
+  .ds-beleving-manifest h2 {
+    max-inline-size: 18ch;
+    margin: 2rem auto 1.5rem;
+    font-size: clamp(2.5rem, 4.5vw, 4.5rem);
+    line-height: 1.15;
+    scroll-margin-block-start: 7rem;
+  }
+  .ds-beleving-manifest p {
+    max-inline-size: 47ch;
+    margin: 0 auto;
+    font-size: 1rem;
+    color: var(--ds-public-muted);
+  }
+  .ds-beleving-penseel {
+    inline-size: min(34rem, 80%);
+    block-size: auto;
+    mix-blend-mode: multiply;
+  }
+  .ds-beleving-signatuur {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: center;
+    gap: 4rem;
+    padding: clamp(4rem, 8vw, 8rem);
+    background: var(--ds-public-card);
+    color: var(--ds-public-ink);
+  }
+  .ds-beleving-signatuur img { inline-size: min(100%, 25rem); block-size: auto; justify-self: center; mix-blend-mode: multiply; }
+  .ds-beleving-signatuur h2 { max-inline-size: 15ch; font: 400 clamp(2.5rem, 4vw, 4.5rem)/1.15 var(--ds-letter-display); }
+  .ds-beleving-signatuur p { max-inline-size: 38ch; line-height: 1.8; color: var(--ds-public-muted); }
+  .ds-reiscover {
+    --pm: var(--ds-public-muted); --story-gold: var(--ds-public-accent);
+    position: relative;
+    display: grid;
+    grid-template-columns: 1fr 1.1fr;
+    min-block-size: min(48rem, 85svh);
+    background: var(--ds-public-card);
+    color: var(--ds-public-ink);
+    isolation: isolate;
+  }
+  .ds-reiscover > .world-header { grid-column: 1 / -1; }
+  .ds-reiscover__inhoud { display: grid; align-content: center; padding: 5rem clamp(1.5rem, 5vw, 6rem); }
+  .ds-reiscover .world-label { color: var(--ds-metaal); font: 500 .65rem/1.6 var(--ds-letter-tekst); letter-spacing: .18em; }
+  .ds-reiscover h1 { margin: 1.2rem 0 1rem; font: 400 clamp(3.5rem, 6vw, 6rem)/1.1 var(--ds-letter-display); letter-spacing: -.04em; }
+  .ds-reiscover__belofte { max-inline-size: 26ch; margin: 0 0 2rem; font: 400 clamp(1.5rem, 2vw, 2rem)/1.3 var(--ds-letter-display); }
+  .ds-reiscover__categorieen { max-inline-size: 30rem; font: 500 .65rem/2 var(--ds-letter-tekst); letter-spacing: .14em; text-transform: uppercase; }
+  .ds-reiscover__intro { max-inline-size: 34ch; margin-block: 1.5rem 2rem; font: 400 .9rem/1.8 var(--ds-letter-tekst); color: var(--ds-public-muted); }
+  .ds-reiscover__beeld { position: relative; min-block-size: 36rem; }
+  .ds-reiscover__beeld img { position: absolute; inset: 0; inline-size: 100%; block-size: 100%; object-fit: cover; object-position: center; }
+  .ds-reiscover__actie {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-block-size: 48px;
+    padding: .75rem 1.5rem;
+    border-radius: var(--ds-radius-capsule);
+    background: var(--ds-public-action);
+    color: var(--ds-public-action-ink);
+    font: 500 .8rem/1.5 var(--ds-letter-tekst);
+    text-decoration: none;
+  }
+  .ds-reiscover__actie--secundair { background: transparent; color: var(--ds-public-ink); padding-inline: 0; }
+  .ds-reiscover__actie:hover { text-decoration: underline; text-underline-offset: .3em; }
+  .ds-reiscover__actie:focus-visible { outline: 2px solid var(--ds-focus); outline-offset: 4px; }
+  .ds-reiscover + main {
+    --pb: var(--ds-public-bg); --pi: var(--ds-public-ink); --pm: var(--ds-public-muted); --pl: transparent; --world: var(--ds-public-accent);
+    --story-ink: var(--ds-public-ink); --story-soft: var(--ds-public-muted); --story-gold: var(--ds-public-accent);
+    --wh-ink: var(--ds-public-ink); --wh-soft: var(--ds-public-muted); --wh-gold: var(--ds-public-accent);
+    color: var(--ds-public-ink); background: var(--ds-public-bg);
+  }
+  .ds-beleving-hoofdstuk {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    grid-column: 1 / -1;
+    align-items: stretch;
+  }
+  .ds-beleving-hoofdstuk:nth-child(even) .ds-beleving-wereld__beeld { order: 2; }
+  .ds-beleving-hoofdstuk__tekst {
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+    justify-content: center;
+    padding: clamp(3rem, 6vw, 7rem);
+  }
+  .ds-beleving-hoofdstuk__naam {
+    margin: 0 0 2rem;
+    font: 400 .875rem/1.5 var(--ds-letter-tekst);
+    letter-spacing: .12em;
+  }
+  .ds-beleving-hoofdstuk__verhaal {
+    max-inline-size: 19ch;
+    margin: 0 0 2rem;
+    font: 400 clamp(2.3rem, 3.5vw, 4rem)/1.2 var(--ds-letter-display);
+    text-wrap: balance;
+  }
+  .ds-beleving-hoofdstuk__details {
+    margin-block-start: 2.5rem;
+    color: var(--ds-public-muted);
+    font: 400 .75rem/1.6 var(--ds-letter-tekst);
+  }
+  .ds-beleving-hoofdstuk__uitleg { max-inline-size: 34ch; margin: 0 0 2rem; color: var(--ds-public-muted); font-size: 1rem; }
+  .ds-beleving-hoofdstuk__details summary { min-block-size: 44px; padding-block: .75rem; cursor: pointer; }
+  .ds-beleving-hoofdstuk__details p { max-inline-size: 35ch; }
+  @media (max-width: 760px) {
+    .ds-beleving-merk img { inline-size: 3rem; }
+    .ds-beleving-intro--reis { grid-template-columns: 1fr; min-block-size: calc(100svh - 4rem); background: var(--ds-cover-grond); }
+    .ds-beleving-intro--reis .ds-beleving-intro__inhoud { --wh-ink: var(--ds-cover-inkt); --wh-gold: var(--ds-cover-inkt); position: relative; z-index: 1; align-content: start; padding: 5rem 1.5rem 7rem; background: linear-gradient(180deg, color-mix(in srgb, var(--ds-cover-grond) 45%, transparent), color-mix(in srgb, var(--ds-cover-grond) 15%, transparent) 55%, color-mix(in srgb, var(--ds-cover-grond) 50%, transparent)); }
+    .ds-beleving-intro--reis h1 { font-size: clamp(3.2rem, 13vw, 5rem); }
+    .ds-beleving-intro--reis :is(h1,p,.pp-overline,.ds-beleving-link) { color: var(--ds-cover-inkt); }
+    .ds-beleving-intro--reis .ds-beleving-app { background: var(--ds-public-accent); color: var(--ds-cover-grond); }
+    .ds-beleving-intro--reis .ds-beleving-intro__beeld { position: absolute; inset: 0; }
+    .ds-beleving-signatuur { grid-template-columns: 1fr; gap: 2rem; padding: 4rem 1.5rem; }
+    .ds-reiscover { grid-template-columns: 1fr; min-block-size: 0; }
+    .ds-beleving-intro--reis .ds-beleving-intro__beeld img { object-position: 66% center; }
+    .ds-reiscover__inhoud { padding: 2.5rem 1.5rem; }
+    .ds-reiscover__beeld { min-block-size: 28rem; }
+    .ds-reiscover h1 { font-size: clamp(2.9rem, 12vw, 4.8rem); }
+    .ds-beleving-hoofdstuk { grid-template-columns: 1fr; }
+    .ds-beleving-hoofdstuk:nth-child(even) .ds-beleving-wereld__beeld { order: 0; }
+    .ds-beleving-hoofdstuk__tekst { padding: 3rem 1.5rem; }
+  }
+  .ds-beleving-sectiekop {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: end;
+    gap: 1rem;
+    margin: 0;
+    padding: var(--ds-beleving-inzet);
+    background: color-mix(in srgb, var(--ds-public-action) 10%, var(--ds-public-bg));
+  }
+  .ds-beleving-navigatie {
+    padding: var(--ds-beleving-inzet);
+    background: var(--ds-public-card);
+  }
+  .ds-beleving-vlak {
+    min-inline-size: 0;
+    border: 0;
+    border-radius: 0;
+    background: var(--ds-public-card);
+  }
+  /* De openbare wereldkaart leest dezelfde identiteit als de wereldpagina.
+     De brugvariabelen houden bestaande bediening bij haar huidige eigenaar. */
+  .ds-beleving-wereld {
+    --wh-ink: var(--ds-public-ink);
+    --wh-soft: var(--ds-public-muted);
+    --wh-gold: var(--ds-public-accent);
+    --wd-line: var(--ds-public-line);
+    --rtg-world-card: var(--ds-public-card);
+    --rtg-world-ink: var(--ds-public-ink);
+    --rtg-world-muted: var(--ds-public-muted);
+    --rtg-world-metal: var(--ds-public-accent);
+    color: var(--ds-public-ink);
+  }
+  .ds-beleving-wereld[data-room] {
+    --wh-ink: var(--ds-cover-inkt);
+    --wh-soft: var(--ds-cover-inkt);
+    --wh-gold: var(--ds-cover-metaal);
+    color: var(--ds-cover-inkt);
+  }
+  .ds-beleving-wereld .app-truth-detail {
+    --wh-ink: var(--ds-public-ink);
+    --wh-soft: var(--ds-public-muted);
+    --wh-gold: var(--ds-public-accent);
+  }
+  .ds-beleving-wereld__beeld {
+    display: block;
+    inline-size: 100%;
+    block-size: auto;
+    aspect-ratio: 3 / 4;
+    object-fit: cover;
+    object-position: center;
+    border-radius: var(--ds-radius-inhoud);
+  }
+  .ds-beleving-wereld__achtergrond {
+    position: absolute;
+    z-index: -1;
+    inset: 0;
+    inline-size: 100%;
+    block-size: 100%;
+    object-fit: cover;
+    object-position: center 30%;
+    opacity: .28;
+  }
   .ds-beleving {
     --ds-beleving-breedte: var(--ds-breedte-cinema);
     --ds-beleving-leesbreedte: var(--ds-breedte-lees);

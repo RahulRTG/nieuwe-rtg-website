@@ -1,0 +1,44 @@
+{
+  "version": 1,
+  "date": "2026-11-14",
+  "source": "user-provided",
+  "description": "De vier aangeleverde foto's, ongewijzigd bewaard en gekoppeld volgens de expliciete wereldkeuze van de gebruiker.",
+  "images": [
+    {
+      "path": "foundation.jpg",
+      "world": "foundation",
+      "worldName": "FoundationOS",
+      "originalFilename": "1-Foto-1.jpg",
+      "source": "user-provided",
+      "illustrative": true,
+      "sha256": "193c81ac447d4cd70d984b6c5f0872b8f95202ece91f2092000c0dbe91f249ea"
+    },
+    {
+      "path": "travel.jpg",
+      "world": "travel",
+      "worldName": "TravelOS",
+      "originalFilename": "2-Foto-2.jpg",
+      "source": "user-provided",
+      "illustrative": true,
+      "sha256": "952bd3e4b34b5076a331c816e9a73f3c8b01abfeb768070308db1e70bd48f3e2"
+    },
+    {
+      "path": "living.jpg",
+      "world": "living",
+      "worldName": "LivingOS",
+      "originalFilename": "3-Foto-3.jpg",
+      "source": "user-provided",
+      "illustrative": true,
+      "sha256": "24ddf1f10a39c50b3894cc59f52997b228c1159d195268495bddb2562137d233"
+    },
+    {
+      "path": "work.jpg",
+      "world": "work",
+      "worldName": "WorkOS",
+      "originalFilename": "4-Foto-4.jpg",
+      "source": "user-provided",
+      "illustrative": true,
+      "sha256": "cb36205e899f0c35cb550142cb25fa784ca2c58e379e1eec8264cf2dbf497914"
+    }
+  ]
+}

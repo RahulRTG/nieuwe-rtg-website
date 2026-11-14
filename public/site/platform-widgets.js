@@ -4,12 +4,21 @@
   var P=w.RTGPublicPlatform,node=P.node,button=P.button,icon=P.icon,photo=P.photo,lips=P.lips;
   var {o,data,company,favorites}=v;
   function refresh(){v.refresh();}
+  function worldChapter(card){
+   var article=node('article',null,'ds-beleving-vlak ds-beleving-wereld ds-beleving-hoofdstuk');article.dataset.publicWidget=card.id;article.dataset.world=card.world;article.dataset.publicWorld=card.world;
+   var image=photo(card.photo,'ds-beleving-wereld__beeld');image.width=card.world==='foundation'?960:720;image.height=1280;
+   var text=node('div',null,'ds-beleving-hoofdstuk__tekst'),name=node('span',card.title,'ds-beleving-hoofdstuk__naam'),title=node('h3',card.id+'Mood','ds-beleving-hoofdstuk__verhaal'),body=node('p',card.body,'ds-beleving-hoofdstuk__uitleg');
+   var action=button(card.action,function(){o.open(card.target);},'ds-beleving-link');
+   var details=node('details',null,'ds-beleving-hoofdstuk__details'),facts=node('p');facts.dataset.publicWorldFacts=card.world;facts.textContent='Actuele productkaart wordt geladen.';details.append(node('summary','worldDetails'),facts);
+   text.append(name,title,body,action,details);article.append(image,text);return article;
+  }
   function widget(card){
-   var article=node('article',null,'wd-widget pp-widget');article.dataset.publicWidget=card.id;article.dataset.world=card.world;
-   var head=button(null,function(){o.open(card.target);},'pp-widget-head');head.append(icon(card.icon),node('span',card.title),icon('next'));
+   if(card.target.indexOf('world:')===0)return worldChapter(card);
+   var article=node('article',null,'pp-widget ds-beleving-vlak');article.dataset.publicWidget=card.id;article.dataset.world=card.world;
+   var head=button(null,function(){o.open(card.target);},'pp-widget-head');
+   head.append(icon(card.icon),node('span',card.title),icon('next'));
    var inside=node('div',null,'pp-widget-body');
    if(card.photo)inside.append(photo(card.photo,'pp-widget-photo'));
-   if(card.target.indexOf('world:')===0){var facts=node('p',null,'pp-world-facts');facts.dataset.publicWorldFacts=card.world;facts.textContent='Actuele productkaart wordt geladen.';inside.append(facts);}
    if(card.type==='worlds'){var row=node('div',null,'pp-world-mini');['living','travel','work','foundation'].forEach(function(world){var b=button(null,function(){o.open(company?'worlds':'world:'+world);},'pp-mini-world');b.dataset.world=world;b.append(icon({living:'home',travel:'plane',work:'brief',foundation:'heart'}[world]));var label=node('span');label.textContent={living:'LivingOS',travel:'TravelOS',work:'WorkOS',foundation:'FoundationOS'}[world];b.append(label);row.append(b);});inside.append(row);}
    if(card.type==='chain'){var chain=node('div',null,'pp-chain');['wish','proposal','decision'].forEach(function(k,i){var el=node('span');el.append(icon(['people','list','shield'][i]),node('span',k));chain.append(el);});inside.append(chain);}
    if(card.type==='rahul'){inside.append(lips(),node('p',company?'controlBody':'whyBody','pp-widget-note'));}

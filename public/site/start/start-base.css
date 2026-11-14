@@ -35,8 +35,7 @@
 *{box-sizing:border-box}
 html{max-width:100%;scroll-behavior:smooth;background:var(--ink)}
 body{width:100%;max-width:100%;margin:0;overflow-x:hidden;background:var(--ivory);color:#171411;font-family:var(--sans);line-height:1.55}
-body.menu-open{overflow:hidden}
-a{color:inherit}
+a:where(:not([class*=ds-])){color:inherit}
 button,a{-webkit-tap-highlight-color:transparent}
 button{font:inherit}
 img{display:block;max-width:100%}

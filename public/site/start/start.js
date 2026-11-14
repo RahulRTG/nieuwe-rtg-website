@@ -9,32 +9,32 @@
   var DAGDELEN = ['ochtend', 'middag', 'avond', 'nacht'];
   var BEELDEN = {
     ochtend: {
-      hero: 'images/editorial/public-morning.webp',
-      living: 'images/editorial/discover-living.webp',
-      travel: 'images/editorial/discover-travel.webp',
-      work: 'images/editorial/discover-work.webp',
-      foundation: 'images/editorial/discover-foundation.webp'
+      hero: 'images/worlds/heritage/travel-heritage-v2.jpg',
+      living: 'images/worlds/owner-20261114/living.jpg',
+      travel: 'images/worlds/owner-20261114/travel.jpg',
+      work: 'images/worlds/owner-20261114/work.jpg',
+      foundation: 'images/worlds/owner-20261114/foundation.jpg'
     },
     middag: {
-      hero: 'images/editorial/public-afternoon.webp',
-      living: 'images/editorial/discover-living.webp',
-      travel: 'images/editorial/discover-travel.webp',
-      work: 'images/editorial/discover-work.webp',
-      foundation: 'images/editorial/discover-foundation.webp'
+      hero: 'images/worlds/heritage/travel-heritage-v2.jpg',
+      living: 'images/worlds/owner-20261114/living.jpg',
+      travel: 'images/worlds/owner-20261114/travel.jpg',
+      work: 'images/worlds/owner-20261114/work.jpg',
+      foundation: 'images/worlds/owner-20261114/foundation.jpg'
     },
     avond: {
-      hero: 'images/editorial/public-evening.webp',
-      living: 'images/editorial/discover-living.webp',
-      travel: 'images/editorial/discover-travel.webp',
-      work: 'images/editorial/discover-work.webp',
-      foundation: 'images/editorial/discover-foundation.webp'
+      hero: 'images/worlds/heritage/travel-heritage-v2.jpg',
+      living: 'images/worlds/owner-20261114/living.jpg',
+      travel: 'images/worlds/owner-20261114/travel.jpg',
+      work: 'images/worlds/owner-20261114/work.jpg',
+      foundation: 'images/worlds/owner-20261114/foundation.jpg'
     },
     nacht: {
-      hero: 'images/editorial/public-night.webp',
-      living: 'images/editorial/discover-living.webp',
-      travel: 'images/editorial/discover-travel.webp',
-      work: 'images/editorial/discover-work.webp',
-      foundation: 'images/editorial/discover-foundation.webp'
+      hero: 'images/worlds/heritage/travel-heritage-v2.jpg',
+      living: 'images/worlds/owner-20261114/living.jpg',
+      travel: 'images/worlds/owner-20261114/travel.jpg',
+      work: 'images/worlds/owner-20261114/work.jpg',
+      foundation: 'images/worlds/owner-20261114/foundation.jpg'
     }
   };
 

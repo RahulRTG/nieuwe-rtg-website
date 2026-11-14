@@ -14,6 +14,12 @@ const { fout } = require('./transactie');
 
 async function buitenVerzoek(fn) {
   if (!require('./duurzaamheid').gesloten()) return fn();
+  // Een providerwebhook of herstelroute zit al binnen de gezamenlijke
+  // PostgreSQL-responsecommit. Blijf daar: collectie- en accountbewijs moeten
+  // dezelfde snapshot zien en in één commit landen. Alleen een echte timer of
+  // veegronde zonder verzoek krijgt hieronder een eigen accounttransactie.
+  const bestaand = verzoekcontext.huidige();
+  if (bestaand && bestaand.open) return fn();
   const ctx = verzoekcontext.nieuw(null);
   let uit;
   try {

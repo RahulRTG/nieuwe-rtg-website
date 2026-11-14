@@ -53,6 +53,12 @@ function maakVerplichting({ LOPEND, VERLENGING, STATUS, rij, tijd }) {
     const d = new Date(datumIso);
     if (d < new Date(c.startAt)) return { verschuldigd: false, reden: 'voor de startdatum' };
     if (c.eindigtOp && d >= new Date(c.eindigtOp)) return { verschuldigd: false, reden: 'na de einddatum' };
+    if (c.automatischAbonnement) {
+      const t = require('./abonnement').tussen(c, datumIso, plusMaanden(datumIso, 1))
+        .find(t => t.vervalt === datumIso);
+      return t ? { ...t, verschuldigd: true, maandCenten: c.aanbod.prijs.maand.nettoCenten }
+        : { verschuldigd: false, reden: 'geen termijndatum' };
+    }
 
     /* DE GRENS VAN DE VERBINTENIS. Zonder deze regel zegt de billing engine ook
        ja tegen maand 13 van een contract dat nooit is verlengd -- en dan is dit
@@ -83,6 +89,7 @@ function maakVerplichting({ LOPEND, VERLENGING, STATUS, rij, tijd }) {
   function termijnenTussen(c, vanIso, totIso) {
     const uit = [];
     if (!c || !Number.isFinite(c.afgesprokenCenten)) return uit;
+    if (c.automatischAbonnement) return require('./abonnement').tussen(c, vanIso, totIso);
     const stap = perMaand(c.frequentie);
     const grens = new Date(totIso);
     for (let n = 0, i = 1; i <= 600; n += stap, i++) {

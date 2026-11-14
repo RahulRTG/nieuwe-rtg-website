@@ -79,6 +79,12 @@ module.exports = (ctx) => {
     if (!titel) return { status: 400, error: 'Waarmee kunnen wij u van dienst zijn?' };
     const soort = SOORTEN.includes(b.soort) ? b.soort : 'regulier';
     const domein = schoon(b.domein, 40) || 'huishouden';
+    // Een incident gaat naar mensen; besloten dossiers bestellen niets buiten
+    // de eigen kamer. Alleen een nieuwe reguliere kantooropdracht is betaald werk.
+    const dienst = soort === 'warroom' || BESLOTEN_DOMEIN.has(domein)
+      ? { basisrecht: 'nazorg' } : { nieuweBetaaldeDienst: true };
+    if (ctx.magDienst && ctx.magDienst(key, dienst) === false)
+      return require('../aanmeldingen/abonnementsdiensten').fout();
     const cases = C(key);
     if (cases.filter(openCase).length >= 60)
       return { status: 400, error: 'Er lopen veel zaken voor u. Wij ronden er graag eerst een paar met u af.' };

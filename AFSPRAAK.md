@@ -761,8 +761,9 @@ Door de eigenaar expliciet gekozen:
 
 Er is geen incassokostenregeling of bevoegdheid voor ongelimiteerd opnieuw
 innen vastgesteld. Deze mogen niet stilzwijgend in een worker worden ingevuld.
-De 31 dagen moeten nog aan contract, aantoonbare aankondiging en de
-betaalherstelketen worden aangesloten; dit beleidsbesluit activeert geen worker.
+De nieuwe lokale route verbindt de 31 dagen aan de individuele afspraak,
+de duurzaam opgeslagen persoonlijke inboxmelding en de betaalherstelketen.
+Dit beleidsbesluit activeert de standaard uitgeschakelde route niet.
 Het oude `naarGast.onbetaald`, dat alleen geplande
 termijnen telde, mag deze beleidskeuze niet omzeilen. Vrijwillig stoppen en
 daadwerkelijk einde van een overeenkomst zijn afzonderlijke gebeurtenissen.
@@ -807,9 +808,33 @@ De prijsbasis staat in `PRIJZEN.md` §7.3, de begrotingsregel in §7.7, inclusie
 de maatschappelijke reservering na omzetcorrecties. Nieuwe servicecapaciteiten,
 live-ingangsdatum en migratie van bestaande leden zijn hiermee niet vastgesteld.
 
-### 17.5 Wat nog aangesloten en bewezen moet worden
+### 17.5 Vervolg na het eerste vooruitbetaalde jaar
 
-Broninspectie op 13 november 2026 toont nog deze concrete aansluitgaten:
+De eigenaar koos op 13 november 2026 expliciet: na de eerste twaalf maanden
+gaat een jaarvooruitbetaler **maandelijks** verder tegen de afgesproken,
+versiegebonden maandprijs. Er ontstaat geen nieuwe vaste jaartermijn en geen
+automatische tweede jaarafschrijving. Opnieuw een jaar vooruitbetalen vereist
+een nieuwe keuze en een daarop afgestemd aanbod. De eerste jaartermijn blijft
+11,5 maandprijzen; de maandtermijnen daarna kennen die vooruitbetaalkorting niet.
+Dit staat vóór ondertekening in nieuwe aanbiedingen. Bestaande ondertekende
+afspraken zonder dit vervolgbeleid worden niet automatisch aangepast.
+Nieuwe aanbiedingen benoemen ook dat een laatste gedeeltelijke maand naar rato
+tot de vastgelegde einddatum wordt berekend. De berekening raakt alleen nieuw
+te maken verplichtingen; eerder gestarte facturen en betaalopdrachten worden
+niet achteraf herprijsd. De regel geldt uitsluitend als hij in het getekende
+aanbod staat.
+
+### 17.6 Aansluiting en bewijsgrenzen
+
+Broninspectie vóór de implementatie op 13 november 2026 toonde de onderstaande
+aansluitgaten. Die historische lijst is geen actuele kwalificatie: de nieuwe
+route is inmiddels lokaal aangesloten achter `RTG_ABONNEMENTEN_ZELFSERVICE`,
+standaard uit. Gerichte tests beproeven aanbod, ondertekening, Stripe-protocol,
+factuur/afdracht, activering, herhaling, 31-dagenmelding en SQLite-herstel.
+Gesimuleerde providerantwoorden zijn geen echte provideracceptatie. Volledige
+route-, opslag-, browser- en releasekwalificatie blijven afzonderlijk vereist.
+
+De oorspronkelijke controlelijst:
 
 - `aanmeldingen/betaalschema.js` plant termijnen en activeert na een
   kantoorbesluit; het is geen klantondertekening of terugkerende incasso.
@@ -844,3 +869,52 @@ en pestgrens zijn noodzakelijke onderbouw;
 ze maken deze ontbrekende keten niet vanzelf verkoopklaar. Geen kwalificatie
 "Deep Green", uitrol, echte inning of wijziging van bestaande leden afleiden
 uit deze beleidsvastlegging of uit losse lokale toetsen.
+
+### 17.7 Uitrolvoorbereiding van de lokale implementatie
+
+De nieuwe keten wordt alleen aangeboden met
+`RTG_ABONNEMENTEN_ZELFSERVICE=1`, een ondersteunde SQLite-/PostgreSQL-opslag,
+een aangesloten betaalwaarheid/Stripe-adapter en een HTTPS-`APP_URL`.
+De voorbeeldconfiguratie laat de vlag op **0**. `STRIPE_PUBLIC_KEY` wordt alleen
+bij een eigen, actuele kaart-herstelactie afgegeven; client secrets worden niet
+in contracten, termijnen, algemene standantwoorden of de browseropslag bewaard.
+De terugkeer uit checkout gaat naar RTG Geld, stand Lidmaatschap. Alleen die
+terugkeer is nooit een betaalbewijs of aanleiding voor een nieuwe afschrijving.
+
+Bij een onbekend Stripe-antwoord zonder providerreferentie stopt automatisch
+opnieuw versturen na 23 uur vanaf de **eerste** providerstart. Een latere retry
+verschuift die grens niet. Een bekende providerbetaling blijft opvraagbaar;
+een onbekende oude uitkomst vraagt afstemming, geen nieuwe sleutel.
+
+De lokale proeven omvatten echte HTTP-routes, browserbediening, SQLite-herstart,
+twee-processen-eigenaarprovisioning in SQLite en PostgreSQL, en gesimuleerde
+Stripe-protocolantwoorden. Zij bewijzen geen live provideracceptatie, productie-
+credentials, infrastructuuruitrol of stroomuitvalbestendigheid. De volledige
+releaseketen moet bij de uiteindelijke commit opnieuw worden beoordeeld.
+
+Gerichte dienstgrenzen gebruiken dezelfde betaalherstelprojectie bij nieuwe
+kassaverkoop, cadeaukaartuitgifte, personeelsuitnodiging, bureau-/concierge-intake,
+betaalde persoonlijke AI en een nieuw zakelijk roostervoorstel. Bewezen replays,
+bestaande afrekening, dossierinzage, betalen, opzeggen, intrekken en noodzakelijke
+nazorg blijven bereikbaar. Gratis fluister-/servicefunctionaliteit en het
+uitzetten of herstellen van veiligheidsbeleid worden niet stil als betaalde
+nieuwe dienst aangemerkt.
+
+### 17.8 Zakelijke reikwijdte
+
+De eigenaar koos op 13 november 2026: **Business Lite per afzonderlijke zaak;
+Business voor de hele organisatie**. Nieuwe Business-aanbiedingen binden aan
+de bestaande, door de tenant-eigenaar beheerde organisatie. Het menselijke
+toelatingsbesluit legt die organisatie en de werkelijk afgesproken prijs vast;
+een browserveld of de persoonlijke pas van een medewerker bepaalt dit niet.
+Na ondertekening en bewezen betaling projecteert één contract de productrechten
+op de bij die organisatie behorende zaken en werkomgevingen. Er ontstaat geen
+extra abonnement of factuur per vestiging en geen automatische beheerdersrol.
+
+Bestaande pakketquota, rollen, servicegrenzen en getekende afspraken blijven
+leidend; organisatiebreed betekent niet onbeperkt gebruik of onbeperkte
+menselijke dienstverlening. Afzonderlijke bestaande zaakabonnementen worden
+niet stil vervangen: een exacte overeengekomen upgrade of menselijke controle
+is nodig om overlappende betaling te voorkomen. Nieuwe betaalde inrichting
+volgt de organisatieovereenkomst en de aangekondigde 31-dagenhersteltermijn.
+Dagelijks WerkOS-werk, beveiliging, uitvoer en noodzakelijke nazorg blijven open.

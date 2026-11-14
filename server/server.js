@@ -185,7 +185,7 @@ const { trustPlane, bewijsHospitalityBesluit, markeerHospitalityRequest } =
     vindReservering: id => (db.data.reserveringen || []).find(r => r.id === id) });
 
 const { betaalWaarheid, betaalRegie } = require('./opzet/betaalketen')({
-  db, save, crypto, betaal, nu: () => systeemKlok.datum().toISOString(), log, env: process.env
+  db, save, bewerkCollectie, crypto, betaal, nu: () => systeemKlok.datum().toISOString(), log, env: process.env
 });
 
 /* Het inzagejournaal (wie keek in wiens identiteitskluis) leeft in dezelfde
@@ -1660,6 +1660,7 @@ const { maakSettlement } = require('./kern/settlement');
    (kernlaag), maar deze functie draait pas als er een webhook binnenkomt -- dan
    staat hij er. Sinds MONEY-012 alleen nog voor oude kaartWachtend-rijen. */
 const settleFactuur = maakSettlement({ db, save, accounts, fonds, log, dpRegistreerMunt, dpRegistreerBevestigd,
+  naAbonnementsbetaling: (ctx) => kern.aanmeldingen.automatisch.afgewikkeld(ctx.accountId, ctx.contractId, ctx.termijn),
   payOplaadAfronden: (a) => (kern.pay && kern.pay.oplaadAfronden ? kern.pay.oplaadAfronden(a) : null),
   // bevestigt het IBAN waarvandaan is opgeladen, zodat de wachttijd op DIE rekening vervalt
   payIbanBevestigd: (a) => (kern.pay && kern.pay.ibanBevestigd ? kern.pay.ibanBevestigd(a) : null) });

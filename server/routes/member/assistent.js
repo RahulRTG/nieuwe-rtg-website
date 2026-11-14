@@ -7,6 +7,12 @@ module.exports = (kern) => {
     memberSays, accounts, ledenInhoudVan } = kern;
   const aiStatus = () => require('../../ai-stand').beschikbaarheid(anthropic);
   const meting = require('../../kern/ai/routermeting');
+  const capaciteiten = require('../../kern/commercie/capaciteiten');
+  const aiDienst = Object.freeze({ capability: 'can_use_ai', nieuweBetaaldeDienst: true });
+  // Alleen deze betaalde uitvoering; status, geschiedenis en menselijke nazorg
+  // blijven bereikbaar. Het account komt uit auth, nooit uit de vraagbody.
+  const magAi = session => !capaciteiten.mag(session.tier, aiDienst.capability) || !session.account ||
+    kern.aanmeldingen?.automatisch?.magDienst?.(session.account.id, aiDienst) !== false;
   const chatMode = tier => tier === 'rtg' ? 'rahul'
     : tier === 'lifestyle' || tier === 'business' ? 'concierge' : 'service';
 
@@ -26,6 +32,10 @@ module.exports = (kern) => {
     while (history.length && history[0].role !== 'user') history.shift();
     if (!history.length || history[history.length - 1].role !== 'user') {
       return res.status(400).json({ error: 'Geen vraag ontvangen.' });
+    }
+    if (!magAi(req.session)) {
+      const r = require('../../kern/aanmeldingen/abonnementsdiensten').fout();
+      return res.status(r.status).json({ error: r.error });
     }
 
     /* De vraag en de reis staan hier al klaar, want de schaduwmeting onderaan
@@ -76,7 +86,7 @@ module.exports = (kern) => {
     // het lid leest alles (ook concierge-antwoorden) in de eigen taal
     trChat(convOf(req.session.account.id), talen.taalVan(req.body.lang)).then(messages => res.json({
       messages,
-      mode: chatMode(req.session.tier),
+      mode: req.session.tier === 'rtg' && !magAi(req.session) ? 'service' : chatMode(req.session.tier),
       phone: accounts.phoneOf(req.session.account)
     }));
   });
@@ -87,8 +97,11 @@ module.exports = (kern) => {
     if (!text) return res.status(400).json({ error: 'Leeg bericht.' });
     const taal = talen.taalVan(req.body.lang);
     // De effectieve sessiepas kan beperkter zijn dan de opgeslagen oude pas.
-    await memberSays({ ...req.session.account, tier: req.session.tier }, text, 'app', taal);
+    // Een herstelbeperking verandert die identiteit niet; alleen de nieuwe
+    // modelbeurt valt terug op dezelfde service als account-/betaalnazorg.
+    const betaaldeAi = req.session.tier !== 'rtg' || magAi(req.session);
+    await memberSays({ ...req.session.account, tier: req.session.tier }, text, 'app', taal, { betaaldeAi });
     const messages = await trChat(convOf(req.session.account.id), taal);
-    res.json({ ok: true, messages, mode: chatMode(req.session.tier) });
+    res.json({ ok: true, messages, mode: req.session.tier === 'rtg' && !betaaldeAi ? 'service' : chatMode(req.session.tier) });
   });
 };

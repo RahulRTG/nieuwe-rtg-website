@@ -27,7 +27,7 @@ module.exports = function naslag({ crypto, stripe, mollie, adyen, stripeGehost, 
     return value;
   };
 
-  async function haalBetaling(aanbieder, id) {
+  async function haalBetaling(aanbieder, id, opdracht) {
     weigerUit();
     if (aanbieder === 'mollie' && mollie) {
       const p = await mollie.payments.retrieve(id);
@@ -42,9 +42,21 @@ module.exports = function naslag({ crypto, stripe, mollie, adyen, stripeGehost, 
       const isSessie = String(id).startsWith('cs_');
       if (isSessie) return verified(await stripeGehost.haal(id), 'stripe');
       const p = await stripe.paymentIntents.retrieve(id);
+      if (opdracht?.terugkerend) {
+        const r = require('./terugkerend').normaliseer(opdracht.terugkerend);
+        const customer = typeof p.customer === 'string' ? p.customer : p.customer?.id;
+        if (r.modus !== 'innen' || p.id !== id || customer !== r.customerId ||
+            p.metadata?.referentie !== opdracht.referentie || p.metadata?.toestemmingRef !== r.toestemmingRef ||
+            p.amount !== opdracht.bedrag || p.currency !== opdracht.valuta ||
+            p.status === 'succeeded' && p.amount_received !== opdracht.bedrag)
+          throw Object.assign(Error('De opgehaalde termijnbetaling wijkt af van de oorspronkelijke opdracht.'),
+            { code: 'BETAALAFSPRAAK_CONFLICT' });
+      }
       return verified({ id: p.id, status: p.status, aanbieder: 'stripe',
         referentie: p.metadata && p.metadata.referentie,
-        bedrag: Math.round(Number(p.amount_received != null ? p.amount_received : p.amount) || 0),
+        // Een nog te bevestigen PI heeft amount_received=0. Dat is geen
+        // tegenstrijdig opdrachtbedrag; alleen succeeded bewijst ontvangst.
+        bedrag: Math.round(Number(p.status === 'succeeded' ? p.amount_received : p.amount) || 0),
         valuta: p.currency, clientSecret: p.client_secret }, 'stripe');
     }
     if (aanbieder === 'adyen' && adyen) {

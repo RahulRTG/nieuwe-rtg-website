@@ -38,7 +38,7 @@ function nieuw(req) {
   return {
     req: req || null, open: true, opslaan: false, stroom: false,
     bron: null, wortel: null, vakken: new Map(), proxies: new Map(), handlers: new Map(),
-    voorCommit: [], naCommit: [], commitEigen: new Set(), deelnemers: new Map()
+    voorCommit: [], naCommit: [], deelnemers: new Map()
   };
 }
 
@@ -179,7 +179,6 @@ function verzamelWijzigingen(ctx) {
   if (!ctx) return [];
   const uit = [];
   for (const vak of ctx.vakken.values()) {
-    if (ctx.commitEigen.has(vak.sleutel)) continue;
     const na = vak.bestaat ? JSON.stringify(vak.waarde) : null;
     if (vak.basisBestaat === vak.bestaat && vak.basisJson === na) continue;
     uit.push({ sleutel: vak.sleutel, basisBestaat: vak.basisBestaat,
@@ -192,9 +191,12 @@ function onbevestigdeWijzigingen(ctx) { return verzamelWijzigingen(ctx); }
 
 function eigenCommit(sleutels) {
   const ctx = huidige(); if (!ctx || !ctx.open) return;
-  for (const k of [].concat(sleutels || [])) {
-    ctx.commitEigen.add(String(k)); ctx.vakken.delete(String(k));
-  }
+  /* De vroege collectiepoort heeft de actuele waarde al gepubliceerd. Laat de
+     oude werkkopie daarom los en bouw een volgende mutatie vanaf die commit.
+     De sleutel mag niet blijvend van de responsecommit worden uitgesloten:
+     betaalwaarheid muteert dezelfde collectie na een vroege startcontrole en
+     die latere providerstatus moet juist nog vóór het antwoord vaststaan. */
+  for (const k of [].concat(sleutels || [])) ctx.vakken.delete(String(k));
 }
 
 function beginAchtergrond() {

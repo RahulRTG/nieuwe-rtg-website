@@ -41,6 +41,27 @@ test('requestbeeld is copy-on-write en bewaart objectidentiteit bij arraymutatie
   });
 });
 
+test('een mutatie na een vroege collectiecommit gaat mee in de responsecommit', () => {
+  state.setRuweData({ betaalWaarheid: { een: { status: 'AANGEMAAKT' } } });
+  const ctx = context.nieuw();
+  context.voer(ctx, () => {
+    // De collectietransactie publiceert haar autoritatieve uitkomst midden in
+    // het verzoek en herbaseert daarna deze sleutel.
+    state.getRuweData().betaalWaarheid = { een: { status: 'WACHT_OP_KLANT' } };
+    context.eigenCommit(['betaalWaarheid']);
+
+    // De provider antwoordt pas daarna. Dit is nieuw requestwerk, niet een
+    // herhaling van de vroege commit, en mag dus nooit worden weggefilterd.
+    state.db.data.betaalWaarheid.een.status = 'BEVESTIGD';
+    context.noteerSave();
+    const wijzigingen = context.wijzigingen(ctx);
+    assert.equal(wijzigingen.length, 1);
+    assert.equal(wijzigingen[0].sleutel, 'betaalWaarheid');
+    assert.deepEqual(JSON.parse(wijzigingen[0].waardeJson), { een: { status: 'BEVESTIGD' } });
+    assert.deepEqual(JSON.parse(wijzigingen[0].basisJson), { een: { status: 'WACHT_OP_KLANT' } });
+  });
+});
+
 test('writeHead en flushHeaders blijven dicht tot COMMIT en publiceren pas daarna', async () => {
   state.setRuweData({ bewijs: [] });
   let laatLos, gebeurtenissen = 0;

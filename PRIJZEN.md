@@ -550,9 +550,23 @@ Voor Business wordt 11,5 maal de **overeengekomen** maandbasis gebruikt, niet
 automatisch 11,5 maal de bodem. Eventuele upgrades zijn nog niet geprijsd en
 vallen niet stilzwijgend onder deze basistarieven of kortingsafspraak.
 
+**Vervolgkeuze, bevestigd op 13 november 2026:** na het eerste vooruitbetaalde
+jaar volgt automatisch maandbetaling tegen de afgesproken maandprijs, met de
+afgesproken maandelijkse opzegbaarheid. Geen automatische tweede jaarbetaling
+of nieuwe vaste jaartermijn. Opnieuw een jaar vooruitbetalen vraagt een nieuwe
+expliciete keuze en passend aanbod; bestaande ondertekende afspraken blijven
+leidend. Zie `AFSPRAAK.md` §17.5.
+
 De consumentenpas is persoonsgebonden. Huishoudelijke reisdekking staat in §7.5;
-een gezin krijgt niet automatisch meerdere concierge-abonnementen. Voor zakelijke
-passen worden entiteiten, gebruikers, integraties en verantwoordelijkheden vooraf
+een gezin krijgt niet automatisch meerdere concierge-abonnementen.
+**Zakelijke reikwijdte, bevestigd op 13 november 2026: Business Lite geldt per
+afzonderlijke zaak; Business voor de hele organisatie**, inclusief de bestaande
+bevoegd gekoppelde zaken en werkomgevingen. Voor Business wordt niet opnieuw
+per vestiging een basisabonnement gerekend. Dit verleent geen persoonlijke
+Business-passen of beheerdersrollen aan medewerkers. Bestaande getekende
+afspraken worden niet stil gemigreerd; overlap met losse zaakabonnementen
+vereist een exact overeengekomen upgrade of menselijke controle.
+Voor zakelijke passen worden entiteiten, gebruikers, integraties en verantwoordelijkheden vooraf
 in het aanbod benoemd. Het eerdere voorstel van maximaal 50 gebruikers is niet
 vastgesteld en wordt niet stilzwijgend onderdeel van dit prijsbesluit.
 

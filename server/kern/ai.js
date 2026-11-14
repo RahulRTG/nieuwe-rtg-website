@@ -89,18 +89,19 @@ function maakAi({ db, save, PERSONAS, anthropic, accounts, broadcastSync, sseToO
 
   function convOf(userId) { const md = accounts.getMemberState(userId) || {}; return md.conversation || []; }
 
-  async function memberSays(user, text, channel, lang) {
+  async function memberSays(user, text, channel, lang, opties = {}) {
     const md = accounts.getMemberState(user.id) || {};
     md.conversation = md.conversation || [];
     md.conversation.push({ from: 'member', text: String(text).slice(0, 1000), lang: lang || 'nl', at: new Date().toISOString(), channel });
     const concierge = user.tier === 'lifestyle' || user.tier === 'business';
     if (!concierge) {
       // Gratis/nazorg krijgt service, niet stilzwijgend een betaald AI-model.
-      const reply = user.tier === 'rtg'
+      const metAi = user.tier === 'rtg' && opties.betaaldeAi !== false;
+      const reply = metAi
         ? await generateAiReply(user.tier, md.conversation, lang, 'user-' + user.id)
         : { text: 'Voor hulp bij uw account, betaling of nazorg kunt u een medewerker vragen. Bekijk uw hulpvragen via Hulp in de app.', lang: 'nl' };
-      md.conversation.push({ from: user.tier === 'rtg' ? 'rahul' : 'service', text: reply.text,
-        lang: reply.lang, at: new Date().toISOString(), channel: user.tier === 'rtg' ? 'rahul' : 'service' });
+      md.conversation.push({ from: metAi ? 'rahul' : 'service', text: reply.text,
+        lang: reply.lang, at: new Date().toISOString(), channel: metAi ? 'rahul' : 'service' });
 
       // Een mens is een ondergrens; concierge-uitvoering blijft van B/L.
       // Zonder servicehaak niet doen alsof het verzoek is aangekomen.

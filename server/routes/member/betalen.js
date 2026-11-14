@@ -54,6 +54,9 @@ module.exports = (kern) => {
        DE ROUTE SCHRIJFT DE LEDENSTAAT NIET MEER. getMemberState geeft een kopie;
        de afwikkeling bewaart haar eigen verse kopie, en een save van de oude
        kopie hier zou "betaald" weer overschrijven. */
+    if (targets.some(i => i.abonnement)) return res.status(409).json({
+      error: 'Rond deze abonnementstermijn af via Lidmaatschap. Daar blijven contract, verrekening en betaaltoestemming gekoppeld.',
+      code: 'abonnement-eigen-betaalroute' });
     if (!betaalWaarheid) return res.status(503).json({ error: 'De betaalwaarheid is niet aangesloten; er is niets afgeschreven.' });
     const wie = principalVoorSession(req.session);
     let foundation = 0;

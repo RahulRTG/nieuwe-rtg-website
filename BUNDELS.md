@@ -127,7 +127,7 @@ omlaag.
 
 ## `apps/backoffice.js`
 
-`public/apps/backoffice/` -- 10 delen, 1162 regels in de delen
+`public/apps/backoffice/` -- 10 delen, 1169 regels in de delen
 
 | deel | onderwerp |
 |---|---|

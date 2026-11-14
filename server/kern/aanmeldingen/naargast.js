@@ -62,41 +62,51 @@ module.exports = ({ db, save, A, B, contracten, accounts, zegOpZelf, meldLid, nu
     return { ok: true, van: u.tier, naar: 'guest', bron };
   }
 
-  const lopendContract = (aanmelding) => {
-    const rij = B().find(r => r.aanmeldingId === String(aanmelding.id));
+  const lopendContract = (aanmelding, contractId) => {
+    const rijen = B().filter(r => r.aanmeldingId === String(aanmelding.id) && (!contractId || r.contractId === contractId));
+    const rij = rijen.length === 1 ? rijen[0] : null;
     const c = rij && rij.contractId ? contracten.vind(rij.contractId) : null;
     return { rij, c };
   };
-  const mijnAanmelding = (accountId) => A().find(a => Number(a.accountId) === Number(accountId) && a.status === 'geaccepteerd'
-    && (() => { const { c } = lopendContract(a); return c && (contracten.LOPEND.has(c.status) || c.status === contracten.STATUS.OPZEGGEND); })());
+  const mijnAanmelding = (accountId, contractId) => A().find(a => Number(a.accountId) === Number(accountId) && a.status === 'geaccepteerd'
+    && (() => { const { c } = lopendContract(a, contractId); return c && (!c.aanbod || c.aanbod.scope.soort === 'persoon') && contracten.LOPEND.has(c.status); })());
+  const daarna = (r, werk) => r && typeof r.then === 'function' ? r.then(werk) : werk(r);
+  const anderPersoonlijk = (accountId, contractId) => (db.data.contracten || []).some(c => c.id !== contractId &&
+    (!c.aanbod || c.aanbod.scope.soort === 'persoon') && contracten.LOPEND.has(c.status) && A().some(a => a.id === c.aanmeldingId && Number(a.accountId) === Number(accountId)));
 
   /* 1a. Het lid: nu. Een lopend contract wordt opgezegd (de verplichting loopt tot
      de einddatum), en de pas gaat meteen. */
   function lidNu(accountId, bevestiging) {
-    const a = mijnAanmelding(accountId);
-    let eindigtOp = null;
-    if (a) { const z = zegOpZelf(accountId, bevestiging); if (z.error) return z; eindigtOp = z.eindigtOp; }
-    else if (bevestiging && bevestiging.contractId)
+    const a = mijnAanmelding(accountId, bevestiging?.contractId);
+    if (!a && bevestiging && bevestiging.contractId)
       return { status: 409, error: 'Deze afspraak loopt niet meer. Bekijk je huidige lidmaatschap opnieuw.' };
-    const r = naarGast(accountId, 'lid-nu');
-    if (r.error) return r;
-    delete kaart().gepland[String(accountId)]; save();
-    return Object.assign(r, { betalingLooptTot: eindigtOp,
-      let: eindigtOp ? 'Je bent nu gast. Je afspraak loopt tot ' + eindigtOp.slice(0, 10) + '; tot dan blijven de termijnen staan.'
-        : 'Je bent nu gast.' });
+    return daarna(a ? zegOpZelf(accountId, bevestiging) : { eindigtOp: null }, z => {
+      if (z.error) return z;
+      if (anderPersoonlijk(accountId, bevestiging?.contractId))
+        return { status: 409, error: 'Een andere persoonlijke overeenkomst loopt nog. De accountpas wordt niet verlaagd.' };
+      const r = naarGast(accountId, 'lid-nu');
+      if (r.error) return r;
+      delete kaart().gepland[String(accountId)]; save();
+      return Object.assign(r, { betalingLooptTot: z.eindigtOp,
+        let: z.eindigtOp ? 'Je bent nu gast. Je afspraak loopt tot ' + z.eindigtOp.slice(0, 10) + '; tot dan blijven de termijnen staan.'
+          : 'Je bent nu gast.' });
+    });
   }
 
   /* 1b. Het lid: aan het eind van zijn periode. Zonder afspraak is er geen eind. */
   function lidEinde(accountId, bevestiging) {
-    const a = mijnAanmelding(accountId);
+    const a = mijnAanmelding(accountId, bevestiging?.contractId);
     if (!a) return { status: 409, error: 'Er is geen afspraak met een einddatum. Wil je gast worden, kies dan voor nu.' };
-    const z = zegOpZelf(accountId, bevestiging);
-    if (z.error) return z;
-    const { c } = lopendContract(a);
-    kaart().gepland[String(accountId)] = { op: z.eindigtOp, sinds: new Date(klok()).toISOString(),
-      contractId: c.id, aanmeldingId: String(a.id) };
-    save();
-    return { ok: true, gepland: true, gastOp: z.eindigtOp, let: 'Je blijft lid tot ' + String(z.eindigtOp).slice(0, 10) + ' en wordt daarna gast.' };
+    return daarna(zegOpZelf(accountId, bevestiging), z => {
+      if (z.error) return z;
+      const { c } = lopendContract(a, bevestiging?.contractId);
+      if (!c || c.status !== contracten.STATUS.OPZEGGEND || c.eindigtOp !== z.eindigtOp)
+        return { status: 409, error: 'De afspraak is intussen gewijzigd; de gastplanning is niet vastgelegd.' };
+      kaart().gepland[String(accountId)] = { op: z.eindigtOp, sinds: new Date(klok()).toISOString(),
+        contractId: c.id, aanmeldingId: String(a.id) };
+      save();
+      return { ok: true, gepland: true, gastOp: z.eindigtOp, let: 'Je blijft lid tot ' + String(z.eindigtOp).slice(0, 10) + ' en wordt daarna gast.' };
+    });
   }
 
   /* 2. Het kantoor, op naam en met een reden. */

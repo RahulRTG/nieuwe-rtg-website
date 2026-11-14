@@ -17,9 +17,11 @@
    Draai los: node --test test/geldgraaf.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
+const fs = require('node:fs'), os = require('node:os'), path = require('node:path');
 const { startServer, stop } = require('./helper');
 
 let srv, base;
+const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-geldgraaf-'));
 
 const api = (pad, body, token) => fetch(base + pad, {
   method: 'POST',
@@ -37,11 +39,11 @@ const MINI_PNG = 'data:image/png;base64,' +
 let teller = 0;
 async function versLid() {
   const t = Date.now() + '-' + (teller++);
-  const r = await api('/api/auth/register', {
-    name: 'Graaf Toets', email: 'geldgraaf-' + t + '@toets.example',
-    password: 'geheim123', geboortedatum: '1985-05-05', tier: 'rtg'
-  });
-  assert.ok(r.body.token, 'registreren hoort een token te geven, kreeg: ' + JSON.stringify(r.body).slice(0, 160));
+  const email = 'geldgraaf-' + t + '@toets.example';
+  require('./lib/historisch-account')(TMP, { name: 'Graaf Toets', email,
+    password: 'geheim123', tier: 'rtg' });
+  const r = await api('/api/auth/login', { login: email, password: 'geheim123', pasApp: 'rtg' });
+  assert.ok(r.body.token, 'het historische regressielid hoort een token te geven, kreeg: ' + JSON.stringify(r.body).slice(0, 160));
   const kyc = await api('/api/verify/upload', { image: MINI_PNG }, r.body.token);
   assert.equal(kyc.status, 200, 'het paspoort hoort aangenomen te worden: ' + JSON.stringify(kyc.body).slice(0, 160));
   return r.body.token;
@@ -51,10 +53,11 @@ async function versLid() {
    terugvalpad, en met een sleutel uit de omgeving zou hij stil een
    modelantwoord toetsen in plaats van de som. */
 test.before(async () => {
-  srv = await startServer({ env: { SMTP_URL: '', ANTHROPIC_API_KEY: '', OPENAI_API_KEY: '', GEMINI_API_KEY: '', GOOGLE_API_KEY: '' } });
+  srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP,
+    ANTHROPIC_API_KEY: '', OPENAI_API_KEY: '', GEMINI_API_KEY: '', GOOGLE_API_KEY: '' } });
   base = srv.base;
 });
-test.after(() => stop(srv));
+test.after(() => { stop(srv); try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {} });
 
 /* 2a. Een vers lid krijgt een staande cockpit in exact de contractvorm.
    Bronnen mogen stil melden (dat is eerlijkheid, geen fout), maar de cockpit

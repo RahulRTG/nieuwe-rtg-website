@@ -53,6 +53,10 @@ function Stripe(apiKey, opts) {
       create(params, extra) { return post('/v1/payment_intents', params, extra); },
       retrieve(id) { return get('/v1/payment_intents/' + encodeURIComponent(String(id))); }
     },
+    setupIntents: { retrieve(id) { return get('/v1/setup_intents/' + encodeURIComponent(String(id))); } },
+    paymentMethods: { retrieve(id) { return get('/v1/payment_methods/' + encodeURIComponent(String(id))); } },
+    charges: { retrieve(id) { return get('/v1/charges/' + encodeURIComponent(String(id))); } },
+    mandates: { retrieve(id) { return get('/v1/mandates/' + encodeURIComponent(String(id))); } },
     checkout: { sessions: {
       create(params, extra) { return post('/v1/checkout/sessions', params, extra); },
       retrieve(id) { return get('/v1/checkout/sessions/' + encodeURIComponent(String(id))); }

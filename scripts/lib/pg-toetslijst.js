@@ -59,7 +59,9 @@ const TOETSEN = Object.freeze([
   'test/auditspoor-atomair.pg.test.js',
   'test/collectie-meervoudig.pg.test.js',
   'test/aanmelding-workers.pg.test.js',
-  'test/aanmelding-crash.pg.test.js'
+  'test/aanmelding-crash.pg.test.js',
+  'test/bedrijf-eigenaar-account.pg.test.js',
+  'test/abonnementen-keten.pg.test.js'
 ]);
 
 const toetslijstSha256 = crypto.createHash('sha256').update(TOETSEN.join('\n') + '\n').digest('hex');

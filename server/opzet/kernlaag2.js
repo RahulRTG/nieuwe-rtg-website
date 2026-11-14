@@ -126,6 +126,11 @@ Object.assign(kern, require('../kern/werkplek')({ db, save, bewerkCollectie: hul
    alleen het accepteren of afwijzen blijft mensenwerk. De AI kent nooit zelf
    Lifestyle/Business toe. */
 Object.assign(kern, require('../kern/aanmeldingen')({ db, save, crypto, schoon, accounts, bewerkCollectie: hulp.bewerkCollectie,
+  betaal: hulp.betaal, betaalWaarheid: kern.betaalWaarheid,
+  abonnementenBeschikbaar: process.env.RTG_ABONNEMENTEN_ZELFSERVICE === '1' &&
+    ['sqlite', 'postgres'].includes(require('../db').STORE),
+  abonnementReturnUrl: /^https:\/\//.test(process.env.APP_URL || '')
+    ? new URL('/apps/geld.html?abonnement=herstel#lidmaatschap', process.env.APP_URL).toString() : null,
   // laat gebonden: geld-regie en meldingen (naar gast, C5) staan er pas later
   geldPasprijzen: () => (kern.geldPasprijzen ? kern.geldPasprijzen() : null),
   meldLid: (...a) => kern.meldLid && kern.meldLid(...a) }));

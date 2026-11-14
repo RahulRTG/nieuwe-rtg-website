@@ -13,6 +13,8 @@ module.exports = function ontvangst({ crypto, stripe, mollie, adyen, standaard, 
   const weigerUit = () => {
     if (uit) throw new Error('Betalen staat bewust uitgeschakeld. Er is niets afgeschreven.');
   };
+  const terugkerendOpties = require('./terugkerend');
+  const afspraken = require('./stripe-afspraak')({ stripe, weigerUit, get, set, crypto });
   function mogelijkheden() {
     if (uit) return { standaard: 'uit', rails: [], uit: true,
       uitleg: 'Betalen staat bewust uitgeschakeld; er is geen betaalrail actief.' };
@@ -62,20 +64,31 @@ module.exports = function ontvangst({ crypto, stripe, mollie, adyen, standaard, 
     const { bedrag, valuta = 'eur', referentie, idempotentieSleutel, omschrijving,
       returnUrl, webhookUrl, methode, bestemming } = opdracht || {};
     if (!Number.isFinite(bedrag) || bedrag <= 0) throw new Error('Bedrag moet een positief bedrag in centen zijn.');
+    const terugkerend = terugkerendOpties.normaliseer(opdracht.terugkerend);
+    const rail = kiesAanbieder(opdracht);
+    if (terugkerend && (rail !== 'stripe' || bestemming ||
+        (terugkerend.modus === 'vastleggen') !== (String(methode || '').toLowerCase() === 'hosted')))
+      throw terugkerendOpties.ongeldig('Terugkerend betalen vereist de passende Stripe-flow zonder partnerbestemming.');
+    const terugkerendAfdruk = terugkerend ? crypto.createHash('sha256').update(JSON.stringify([
+      Math.round(bedrag), valuta, referentie, terugkerend])).digest('hex') : null;
     const sleutel = idempotentieSleutel || (referentie ? 'ref:' + referentie : crypto.randomUUID());
     const bestaand = get(sleutel);
-    if (bestaand) return Object.assign({}, bestaand, { herhaald: true });
+    if (bestaand) {
+      if ((bestaand.terugkerendAfdruk || null) !== terugkerendAfdruk)
+        throw terugkerendOpties.ongeldig('Deze betaalsleutel hoort bij andere terugkerende betaalopties.');
+      return Object.assign({}, bestaand, { herhaald: true });
+    }
 
-    const rail = kiesAanbieder(opdracht);
     let res;
     if (rail === 'stripe' && String(methode || '').toLowerCase() === 'hosted') {
       res = await stripeGehost.maak({ bedrag, valuta, referentie, omschrijving,
-        returnUrl, bestemming, sleutel });
+        returnUrl, bestemming, sleutel, terugkerend: terugkerend || undefined });
     } else if (rail === 'stripe') {
       const parameters = { amount: Math.round(bedrag), currency: valuta, description: omschrijving,
         metadata: { referentie: referentie || '' } };
       if (bestemming) parameters.transfer_data = { destination: bestemming };
-      const p = await stripe.paymentIntents.create(parameters, { idempotencyKey: sleutel });
+      const p = terugkerend ? await afspraken.innen(parameters, { idempotencyKey: sleutel }, terugkerend)
+        : await stripe.paymentIntents.create(parameters, { idempotencyKey: sleutel });
       res = { id: p.id, status: p.status, clientSecret: p.client_secret, aanbieder: 'stripe',
         bedrag: Math.round(bedrag), valuta, referentie };
     } else if (rail === 'mollie') {
@@ -120,7 +133,12 @@ module.exports = function ontvangst({ crypto, stripe, mollie, adyen, standaard, 
     if (['stripe', 'mollie', 'adyen'].includes(rail) && typeof markProviderEvidence === 'function')
       markProviderEvidence(res, rail, ['api', 'create', rail, res.id, res.status].join(':'),
         rail + '-authenticated-api');
-    set(sleutel, res);
+    if (terugkerend) res.terugkerendAfdruk = terugkerendAfdruk;
+    // Klantactie voor een termijn wordt vers en alleen voor de eigenaar
+    // opgehaald. De duurzame idemring heeft daarvoor geen client secret nodig.
+    const cache = { ...res };
+    if (terugkerend) delete cache.clientSecret;
+    set(sleutel, cache);
     return res;
   }
 
@@ -130,5 +148,7 @@ module.exports = function ontvangst({ crypto, stripe, mollie, adyen, standaard, 
     crypto, stripe, mollie, adyen, stripeGehost, weigerUit, mollieBedrag, markProviderEvidence, vrijgave,
     simulatie: simAan ? simulatie : null });
 
-  return { mogelijkheden, kiesAanbieder, maakBetaling, haalBetaling, maakTerugbetaling, haalTerugbetaling };
+  return { mogelijkheden, kiesAanbieder, maakBetaling, haalBetaling, maakTerugbetaling, haalTerugbetaling,
+    haalKlantactie: require('./stripe-klantactie')({ stripe, weigerUit, env }),
+    maakBetaalafspraak: afspraken.maakBetaalafspraak, haalBetaalafspraak: afspraken.haalBetaalafspraak };
 };

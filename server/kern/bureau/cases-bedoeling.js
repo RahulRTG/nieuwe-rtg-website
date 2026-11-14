@@ -23,7 +23,7 @@ module.exports = ({ bewerkCollectie, schoon, maakCases }) => async (key, b = {})
   const afdruk = hash(JSON.stringify(inhoud));
   return bewerkCollectie('lifestyle', bron => {
     const levens = require('../levensdossier').opCollectie(bron).voor('bureau');
-    const ontvangsten = levens.veld(key, 'caseOntvangsten');
+    const ontvangsten = levens.leesVeld(key, 'caseOntvangsten');
     const oud = ontvangsten[opdracht];
     if (oud) {
       if (oud.afdruk !== afdruk) return { status: 409, error: 'Deze opdrachtsleutel hoort bij andere inhoud. Begin bewust een nieuwe opdracht.' };
@@ -32,7 +32,7 @@ module.exports = ({ bewerkCollectie, schoon, maakCases }) => async (key, b = {})
       return { status: 200, ok: true, herhaald: true, zaak };
     }
     const r = maakCases(levens).caseOpen(key, inhoud);
-    if (r.ok) ontvangsten[opdracht] = { id: r.zaak.id, afdruk };
+    if (r.ok) levens.veld(key, 'caseOntvangsten')[opdracht] = { id: r.zaak.id, afdruk };
     return r;
   });
 };

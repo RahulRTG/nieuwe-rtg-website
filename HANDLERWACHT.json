@@ -1,9 +1,9 @@
 {
  "stempel": {
-  "op": "2026-11-13T17:22:56.080Z",
-  "commit": "d04711b74",
+  "op": "2026-11-13T20:00:50.067Z",
+  "commit": "efa89d06f",
   "boomVuil": true,
-  "boomAnders": 3,
+  "boomAnders": 16,
   "instrument": "scripts/handlerwacht.js",
   "node": "v24.18.0"
  },
@@ -331,7 +331,7 @@
   },
   {
    "sleutel": "POST /api/aanmelding/bewijs",
-   "bestand": "server/routes/aanmeldingen.js:115",
+   "bestand": "server/routes/aanmeldingen.js:116",
    "staat": "openbaar",
    "reden": "hoort bij de aanvraag zelf; de aanvrager heeft nog geen sessie, en aftekenen zit wel achter het kantoor"
   },
@@ -359,7 +359,7 @@
   },
   {
    "sleutel": "POST /api/auth/tweede",
-   "bestand": "server/routes/member/tweefactor.js:129",
+   "bestand": "server/routes/member/tweefactor.js:130",
    "staat": "eigenControle"
   },
   {

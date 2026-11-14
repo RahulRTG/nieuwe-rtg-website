@@ -48,7 +48,13 @@ module.exports = (kern) => {
     const idem = schoon(req.body.idem, 60) || null;
     const betaald = await pay.partnerIn({
       supplierCode: s.code, codenaam: codename, centen: bedrag * 100,
-      soort: 'cadeaukaart', oms: 'Cadeaukaart ' + s.name, idem
+      soort: 'cadeaukaart', oms: 'Cadeaukaart ' + s.name, idem,
+      magNieuweDienst: () => {
+        const id = /^user-([1-9][0-9]*)$/.exec(req.session.key);
+        const dienst = { nieuweBetaaldeDienst: true };
+        return (!id || kern.aanmeldingen?.automatisch?.magDienst(Number(id[1]), dienst) !== false)
+          && kern.zaakAbonnement?.magDienst?.(s.code, dienst) !== false;
+      }
     });
     if (betaald.error) return res.status(betaald.status || 400).json({ error: betaald.error });
     /* DE BETALING WAS IDEMPOTENT, DE KAART NIET -- en dat is precies de

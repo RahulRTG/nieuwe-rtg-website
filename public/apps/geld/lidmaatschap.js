@@ -24,6 +24,7 @@
   var $ = function (s) { return d.querySelector(s); };
   var ABO = null;
   var VOORBEELD = null;
+  var stopAanbod = null;
 
   function esc(s) { return w.Geld.esc(s); }
   /* DE STEM VAN DE PAS (CLAUDE.md): "je" bij de RTG Pass, "u" bij Lifestyle en
@@ -159,6 +160,7 @@
       '<div id="lmWrap">' +
         '<div id="lmUitslag"></div>' +
         '<div id="lmHoofd"><p class="stil">Laden...</p></div>' +
+        '<div id="lmAutomatisch"></div>' +
         '<h2>Wat hier niet kan</h2>' +
         '<div class="kaart"><p class="stil">Verlengen staat hier niet: de afgesproken prijs verandert alleen bij een ' +
           'verlenging die het kantoor van RTG vastlegt, en niet met een knop in deze app.</p></div>' +
@@ -167,6 +169,8 @@
       ABO = null;
       $('#lmWrap').addEventListener('click', klik);
       laad();
-    }
+      if (w.RTGGeldAbonnement) stopAanbod = w.RTGGeldAbonnement.start($('#lmAutomatisch'));
+    },
+    stop: function () { if (stopAanbod) stopAanbod(); stopAanbod = null; }
   });
 })(window, document);

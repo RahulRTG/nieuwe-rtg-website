@@ -344,10 +344,16 @@ async function lidMetContract(pas = 'rtg') {
 }
 
 test('14. dezelfde bearer na een verstreken afspraak: de betaalde capability weigert, zonder nieuwe login', async () => {
+  // Toets 13 liet de server op +400d staan. Een daar nieuw gesloten contract
+  // is na opnieuw +400d niet verstreken: eerst expliciet terug naar de basis.
+  stop(srv);
+  srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP, RTG_KLOK: '' } }); base = srv.base;
   const lid = await lidMetContract();
   const voor = await api(BETAALD, {}, lid.token);
   assert.ok(!isBetaaldGeweigerd(voor), 'met een lopende afspraak is de capability open: ' + JSON.stringify(voor.body));
   const opzeg = (await api('/api/mijn/abonnement/opzegvoorbeeld', {}, lid.token)).body;
+  assert.ok(Date.parse(opzeg.eindigtOp) > Date.now(), 'positieve controle: de opzegging loopt nu nog');
+  assert.ok(Date.parse(opzeg.eindigtOp) < Date.now() + 400 * 86400000, 'de gekozen testklok ligt echt voorbij deze einddatum');
   assert.equal((await api('/api/mijn/abonnement/opzeggen', opzeg, lid.token)).status, 200);
   stop(srv);
   srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP, RTG_KLOK: '+400d' } }); base = srv.base;

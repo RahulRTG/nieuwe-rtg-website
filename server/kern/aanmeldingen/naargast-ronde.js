@@ -2,6 +2,7 @@
    register: plannen blijven bij pasNaarGast, afspraken bij contracten. */
 'use strict';
 const DAG = 86400000;
+const persoonlijk = c => c && (!c.aanbod || c.aanbod.scope.soort === 'persoon');
 
 module.exports = ({ A, B, contracten, eigen, kaart, save, klok, regels, naarGast, meldLid }) => {
   function eigenContracten() {
@@ -26,6 +27,7 @@ module.exports = ({ A, B, contracten, eigen, kaart, save, klok, regels, naarGast
   function anderRecht(rijen, doel, t) {
     return rijen.some(({ c }) => {
       if (!c) return true; // gebroken binding is geen bewijs dat rechten ontbreken
+      if (!persoonlijk(c)) return false;
       if (c.id === doel.id || !contracten.LOPEND.has(c.status)) return false;
       const start = Date.parse(c.startAt), eind = c.eindigtOp == null ? Infinity : Date.parse(c.eindigtOp);
       if (!Number.isFinite(start) || Number.isNaN(eind)) return true;
@@ -50,7 +52,7 @@ module.exports = ({ A, B, contracten, eigen, kaart, save, klok, regels, naarGast
         c.id === g.contractId && String(a.id) === g.aanmeldingId) : rijen.filter(({ c }) => c &&
           [contracten.STATUS.OPZEGGEND, contracten.STATUS.GEEINDIGD].includes(c.status) && Date.parse(c.eindigtOp) === op);
       const doel = kandidaten.length === 1 && kandidaten[0].c;
-      if ((!gebonden && rijen.some(x => !x.c)) || !doel || ![contracten.STATUS.OPZEGGEND, contracten.STATUS.GEEINDIGD].includes(doel.status)
+      if ((!gebonden && rijen.some(x => !x.c)) || !persoonlijk(doel) || ![contracten.STATUS.OPZEGGEND, contracten.STATUS.GEEINDIGD].includes(doel.status)
         || Date.parse(doel.eindigtOp) !== op) { uit.tegengehouden++; continue; }
       if (!gebonden) {
         Object.assign(kaart().gepland[id], { contractId: doel.id, aanmeldingId: String(kandidaten[0].a.id) });
@@ -66,7 +68,7 @@ module.exports = ({ A, B, contracten, eigen, kaart, save, klok, regels, naarGast
     const wacht = r.wacht.aan, dagen = r.wacht.dagen;
     for (const { a, c } of [...perAccount.values()].flat()) {
       const rijen = perAccount.get(Number(a.accountId));
-      if (!c || !(wacht || r.afgelopen.aan) || c.status !== contracten.STATUS.OPZEGGEND
+      if (!persoonlijk(c) || !(wacht || r.afgelopen.aan) || c.status !== contracten.STATUS.OPZEGGEND
         || !Number.isFinite(Date.parse(c.eindigtOp)) || Date.parse(c.eindigtOp) > t) continue;
       // Ook de automatische lus mag een nieuwe afspraak niet intrekken of
       // daarvoor een onterecht 'binnenkort gast'-bericht uitsturen.

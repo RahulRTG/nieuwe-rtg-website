@@ -16,12 +16,21 @@ module.exports = function stripeGehost(stripe) {
   }
   async function maak(o) {
     if (!o.returnUrl) throw new Error('Stripe Checkout heeft een vaste terugkeer-URL nodig. Er is niets afgeschreven.');
+    const terugkerend = require('./terugkerend').normaliseer(o.terugkerend);
     const parameters = { mode: 'payment', success_url: String(o.returnUrl), cancel_url: String(o.returnUrl),
       client_reference_id: String(o.referentie || ''), metadata: { referentie: o.referentie || '' },
       payment_intent_data: { metadata: { referentie: o.referentie || '' } },
       line_items: [{ quantity: 1, price_data: { currency: String(o.valuta).toLowerCase(),
         unit_amount: Math.round(o.bedrag), product_data: {
           name: String(o.omschrijving || o.referentie || 'RTG-betaling').slice(0, 120) } } }] };
+    if (terugkerend) {
+      if (terugkerend.modus !== 'vastleggen') throw new Error('Off-sessioninning gebruikt geen nieuwe Checkout Session.');
+      parameters.customer_creation = 'always';
+      parameters.payment_method_types = [...require('./stripe-afspraak').METHODEN];
+      parameters.metadata.toestemmingRef = terugkerend.toestemmingRef;
+      parameters.payment_intent_data.metadata.toestemmingRef = terugkerend.toestemmingRef;
+      parameters.payment_intent_data.setup_future_usage = 'off_session';
+    }
     if (o.bestemming) parameters.payment_intent_data.transfer_data = { destination: o.bestemming };
     const p = await stripe.checkout.sessions.create(parameters, { idempotencyKey: o.sleutel });
     return { id: p.id, status: status(p), checkoutUrl: p.url, betaalId: betaalId(p), aanbieder: 'stripe',

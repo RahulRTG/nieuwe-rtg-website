@@ -51,7 +51,8 @@ module.exports = (kern) => {
   }
 
   const eisLid = (req, res) => {
-    if (req.session.tier === 'guest') { res.status(403).json({ error: 'Alleen voor leden.' }); return false; }
+    // Eigen sessies inzien en intrekken is accountbeveiliging, ook gratis
+    // en nadat een betaalde overeenkomst eindigt.
     if (!req.session.account) { res.status(403).json({ error: 'Dit hoort bij een eigen RTG-account.' }); return false; }
     return true;
   };

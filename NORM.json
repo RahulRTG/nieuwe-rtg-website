@@ -1512,9 +1512,18 @@
       "soort": "schuld",
       "sleutel": "toetsenNietGemeten",
       "van": 170,
+      "naar": 250,
       "vervalt": "2026-10-01",
       "meter": "toetsenNietGemeten 170 -> 250 (VERHOOGD, gemeten over de verzameling)",
-      "reden": "De tweede samenvoegronde (PR #83): 23 PR-takken bijeen. Tachtig toetsbestanden extra waar de mutatiemotor nog niet langs is geweest. Die motor draait uren en is in deze ronde niet gedraaid; MUTATIES.json is samengevoegd uit twee runs en niet opnieuw gemeten. Aflossen is een volle ronde npm run mutatie."
+      "reden": "De tweede samenvoegronde (PR #83): 23 PR-takken bijeen. Tachtig toetsbestanden extra waar de mutatiemotor nog niet langs is geweest. Die motor draait uren en is in deze ronde niet gedraaid; MUTATIES.json is samengevoegd uit twee runs en niet opnieuw gemeten. Aflossen is een volle ronde npm run mutatie.",
+      "aflossingsbewijs": {
+        "datum": "2026-10-06",
+        "van": 674,
+        "naar": 129,
+        "bewijs": "De latere schone mutatieronde bracht de gemeten achterstand van 674 naar 129; 545 punten verbetering betaalt deze tranche van 80. Nieuwe, later ontstane toetsbestanden blijven hun eigen tranche dragen.",
+        "bronVan": "toetsenNietGemeten 672 -> 674",
+        "bronNaar": "toetsenNietGemeten 129 -> 130"
+      }
     },
     {
       "datum": "2026-08-21",
@@ -2303,8 +2312,17 @@
       "soort": "schuld",
       "sleutel": "toetsenNietGemeten",
       "van": 165,
+      "naar": 305,
       "vervalt": "2026-10-31",
-      "reden": "Samenvoeging van 24 takken (tak samenvoeging-negen-2026-08-18). Toetsen waar de mutatiemotor nog niet langs is geweest; de suite groeide met 1169 bestanden mee. Bewust genoteerd als schuld en niet stil verlaagd; de meter hoort terug naar 165."
+      "reden": "Samenvoeging van 24 takken (tak samenvoeging-negen-2026-08-18). Toetsen waar de mutatiemotor nog niet langs is geweest; de suite groeide met 1169 bestanden mee. Bewust genoteerd als schuld en niet stil verlaagd; de meter hoort terug naar 165.",
+      "aflossingsbewijs": {
+        "datum": "2026-10-06",
+        "van": 674,
+        "naar": 129,
+        "bewijs": "De latere schone mutatieronde bracht de gemeten achterstand van 674 naar 129; 545 punten verbetering betaalt deze tranche van 140. Nieuwe, later ontstane toetsbestanden blijven hun eigen tranche dragen.",
+        "bronVan": "toetsenNietGemeten 672 -> 674",
+        "bronNaar": "toetsenNietGemeten 129 -> 130"
+      }
     },
     {
       "datum": "2026-08-27",

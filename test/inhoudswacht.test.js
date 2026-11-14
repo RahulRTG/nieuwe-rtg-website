@@ -20,7 +20,7 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const { startServer, stopHard, kantoorAlsPersoon } = require('./helper');
-const { profielVan } = require('../scripts/inhoudskaart');
+const { profielVan, MEETOMGEVING } = require('../scripts/inhoudskaart');
 const { accountRolVoor } = require('../scripts/lib/accountroutes');
 const { MUNTERS } = require('../scripts/lib/proefsleutels');
 
@@ -40,7 +40,7 @@ async function doe(methode, pad, lijf, tok) {
 
 test.before(async () => {
   ({ child, base: BASE } = await startServer({ env: {
-    RTG_DATA_DIR: TMP, RTG_DEMO: '1', SMTP_URL: '', OFFICE_CODE: 'RTG-OFFICE-PROEF' } }));
+    ...MEETOMGEVING, RTG_DATA_DIR: TMP, SMTP_URL: '' } }));
   tokens.member = (await doe('POST', '/api/login', { tier: 'rtg' })).data.token;
   tokens.office = (await doe('POST', '/api/office/login', { code: 'RTG-OFFICE-PROEF' })).data.token;
   tokens.supplier = (await doe('POST', '/api/supplier/login', { username: 'rahul', password: 'Imran' })).data.token;

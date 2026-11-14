@@ -242,6 +242,49 @@ test('inhoudskaart: standaard meet blind/onbeslist, hermeten ook bestaande waarn
   assert.equal(JSON.stringify({ output, kaart }), voor, 'hermeten wijzigt geen bewijsstatus of profiel');
 });
 
+test('inhoudskaart: de vormproef gebruikt expliciet ongebonden meetsessies, niet de productie-default', () => {
+  const { MEETOMGEVING } = require('../scripts/inhoudskaart');
+  const { gereedschapsomgeving } = require('../scripts/lib/wegwerpserver');
+  const voor = process.env.RTG_BEZITSBEWIJS;
+  assert.equal(MEETOMGEVING.RTG_BEZITSBEWIJS, 'aanbevolen');
+  assert.equal(Object.isFrozen(MEETOMGEVING), true);
+  const env = gereedschapsomgeving({ poort: 12345, datamap: '/tmp/inhoudskaart-pure-proef' }, MEETOMGEVING);
+  assert.equal(env.RTG_BEZITSBEWIJS, 'aanbevolen');
+  assert.equal(env.RTG_MAGNAAT_TEST, '1');
+  assert.equal(env.RTG_BIND, '127.0.0.1');
+  assert.equal(process.env.RTG_BEZITSBEWIJS, voor, 'de meetopstelling wijzigt geen proces- of productieomgeving');
+});
+
+test('inhoudskaart: aanbevolen laat alleen de ongebonden proef door, nooit een ontbrekend gebonden bewijs', async () => {
+  const { MEETOMGEVING } = require('../scripts/inhoudskaart');
+  const { maakBezitsbewijs } = require('../server/kern/identiteit/bezitsbewijs');
+  const poort = maakBezitsbewijs({ db: { data: {} }, save() {} });
+  const vraag = { sess: { account: 'synthetisch' }, methode: 'POST', pad: '/api/pay/graaf',
+    stand: MEETOMGEVING.RTG_BEZITSBEWIJS };
+  assert.equal((await poort.controleer(vraag)).stand, 'onbeschermd');
+  const gebonden = await poort.controleer({ ...vraag,
+    sess: { account: 'synthetisch', sessieContext: { sleutelbinding: { keyRef: 'toestel' } } } });
+  assert.equal(gebonden.stand, 'geweigerd');
+  assert.equal(gebonden.code, 401);
+  const verplicht = await poort.controleer({ ...vraag, stand: 'verplicht' });
+  assert.equal(verplicht.stand, 'geweigerd');
+  assert.equal(verplicht.code, 403);
+});
+
+test('inhoudskaart: uitsluitend de intern bewaakte push-sleutel krijgt de expliciete ledensessie', () => {
+  const { meetRolVoor, eisMeetsleutels } = require('../scripts/inhoudskaart');
+  const route = { methode: 'GET', pad: '/api/push/key', bewakers: [] };
+  assert.equal(meetRolVoor(route), 'member');
+  assert.equal(meetRolVoor({ ...route, methode: 'POST' }), null);
+  assert.equal(meetRolVoor({ ...route, pad: '/api/push/key/anders' }), null);
+  assert.equal(meetRolVoor({ ...route, pad: '/api/andere-interne-poort' }), null);
+  assert.equal(meetRolVoor({ ...route, bewakers: ['officeAuth'] }), 'office');
+  assert.equal(meetRolVoor({ ...route, bewakers: ['supplierAuth'] }), 'supplier');
+  assert.equal(meetRolVoor({ ...route, bewakers: ['nieuweOnbekendePoort'] }), null);
+  assert.throws(() => eisMeetsleutels([{ rol: meetRolVoor(route) }], {}), /member/,
+    'een ontbrekende ledensleutel wordt geen anonieme meting');
+});
+
 test('inhoudskaart: elke geselecteerde rol vereist zijn eigen sleutel, zonder demo-terugval', () => {
   const { eisMeetsleutels } = require('../scripts/inhoudskaart');
   const routes = [{ rol: 'publiek' }, { rol: 'member-account' }, { rol: 'office' }];

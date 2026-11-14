@@ -65,6 +65,24 @@ const WORTEL = path.join(__dirname, '..');
 const UITSLAG = path.join(WORTEL, 'INHOUDSKAART.json');
 const OUTPUT = path.join(WORTEL, 'OUTPUTPROEF.json');
 
+/* De generator en inhoudswacht meten dezelfde ongebonden synthetische sessies.
+   Dit is antwoordVORM, geen bewijs van de productie-toestelpoort. Aanbevolen
+   weigert nog steeds een gebonden sessie zonder bewijs; verplicht blijft de
+   productiestandaard. Alleen deze eigen wegwerpserver krijgt de meetstand. */
+const MEETOMGEVING = Object.freeze({ RTG_DEMO: '1', RTG_MAGNAAT_TEST: '1',
+  OFFICE_CODE: 'RTG-OFFICE-PROEF', RTG_BEZITSBEWIJS: 'aanbevolen' });
+
+function meetRolVoor(route) {
+  const rol = rolVan(route.bewakers);
+  if (rol) return rol;
+  /* Deze ene route bewaakt de sessie IN de handler met elke.magSessie, niet
+     met benoemde middleware (server/routes/social.js; publieke-rand.test.js).
+     De vormproef houdt zijn positieve ledensessie; geen anonieme 401 als nieuw
+     contract. Een nieuwe benoemde poort mag deze fixture niet passeren. */
+  if (!(route.bewakers || []).length && route.methode === 'GET' && route.pad === '/api/push/key') return 'member';
+  return null;
+}
+
 /* Het profiel van een antwoord: pure functie, los toetsbaar. */
 function profielVan(data) {
   if (!data || typeof data !== 'object' || Array.isArray(data)) {
@@ -136,7 +154,8 @@ async function ruimMeetserverOp({ kind, klaar }) {
   await klaar();
 }
 
-module.exports = { profielVan, onwaarneembaar, grondVan, kiesMeetdoel, eisMeetsleutels, ruimMeetserverOp };
+module.exports = { profielVan, onwaarneembaar, grondVan, kiesMeetdoel, eisMeetsleutels, ruimMeetserverOp,
+  MEETOMGEVING, meetRolVoor };
 if (require.main !== module) return;
 
 (async () => {
@@ -156,8 +175,8 @@ if (require.main !== module) return;
   const doel = kiesMeetdoel(reg.perRoute || {}, oud, inventaris, DEUREN, hermeetKaart);
   if (!doel.size) { console.log('geen te meten routes binnen de huidige bron en selectie'); return; }
 
-  /* De rolverdeling, met de PUBLIEKE routes erbij: rolVan() geeft daar niets
-     terug en verdeelOpRol zou ze wegleggen, maar een route zonder poort is
+  /* De rolverdeling, met de PUBLIEKE routes erbij: meetRolVoor() behoudt ook
+     de expliciete intern bewaakte sessiefixture. Een route zonder poort is
      juist de makkelijkste om in kaart te brengen -- gewoon aankloppen zonder
      token. Eigenrollen (boardroom, scim, webauthn, werkplekbaas) blijven
      erbuiten met hun reden: dit instrument heeft er geen sleutel voor. */
@@ -173,7 +192,7 @@ if (require.main !== module) return;
   for (const r of inventaris) {
     const s = r.methode + ' ' + r.pad;
     if (!doel.has(s)) continue;
-    const rol = rolVan(r.bewakers);
+    const rol = meetRolVoor(r);
     if (!rol) routes.push({ methode: r.methode, pad: r.pad, rol: 'publiek' });
     else if (KENT.has(rol)) routes.push({ methode: r.methode, pad: r.pad,
       rol: accountRolVoor(rol, r.pad).rol || rol });
@@ -185,7 +204,8 @@ if (require.main !== module) return;
     (hermeetKaart ? ' (inclusief bestaande waarneembare kaart)' : ' (blind/onbeslist)'));
   console.log('  bereikbaar (publiek of bekende rol)   : ' + verdeling.metRol.length);
 
-  const server = await start({ naam: 'inhoudskaart', env: { RTG_DEMO: '1', RTG_MAGNAAT_TEST: '1', OFFICE_CODE: 'RTG-OFFICE-PROEF' } });
+  console.log('  bezitsbewijs meetopstelling            : ' + MEETOMGEVING.RTG_BEZITSBEWIJS + ' (ongebonden synthetische sessies)');
+  const server = await start({ naam: 'inhoudskaart', env: MEETOMGEVING });
   const { basis } = server;
   const nuOp = new Date().toISOString();
   const vers = {};
@@ -276,6 +296,9 @@ if (require.main !== module) return;
     grens: 'Een profiel borgt de VORM van het antwoord, niet de waarheid van de waarden -- dit is de ' +
       'vloer, geen plafond. Routes met onwaarneembaar:true zijn eerlijk niet te bewaken op vorm en ' +
       'blijven blind. En de kaart kent alleen rollen waarvoor dit instrument een token heeft.',
+    opstellingDezeRun: { bezitsbewijs: MEETOMGEVING.RTG_BEZITSBEWIJS,
+      sessies: 'synthetisch, zonder toestelbinding',
+      grens: 'Geldt voor versDezeRun, niet voor overgenomen profielen. Antwoordvormbewijs, geen bewijs van de productie-toestelpoort.' },
     gemeten: { doelRoutes: doel.size, inKaart: Object.keys(perRoute).length,
       waarneembaar: Object.values(perRoute).filter(p => !p.onwaarneembaar).length,
       onwaarneembaar: Object.values(perRoute).filter(p => p.onwaarneembaar).length,

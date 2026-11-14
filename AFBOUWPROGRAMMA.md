@@ -197,8 +197,39 @@ na deze oorzaakreparatie in de gezamenlijke mobiliteitsgroep van 64/64.
 Iedere oorzaak is eerst rood gereproduceerd. Deze deelruns zijn niet op te
 tellen tot een actuele integrale kwalificatie of Deep Green.
 
-Nog open: een verse volledige vierdelige suite, PostgreSQL/Redis, schermproeven en
-beschermde remote checks. De uit #725 overgenomen Direct-/Service-start is
+De volledige lokale PostgreSQL/Redis-groep is daarna geslaagd: 60 bestanden,
+180 tests, nul fail/skip/todo. Ook de volledige statische controle en build
+sloten groen. Deze lokale ontwikkelronde liep tijdens het afronden van
+metadata-/buildcommits en is geen immutable eindkwalificatie.
+
+**CI-vervolg op `dc85cfc48`.** De gepushte consolidatie startte een volledige
+remote ronde. De statische huisregels slagen, maar de deltapoort weigert vier
+registers die vóór de broncommit waren gemeten. Daardoor draaide de remote
+PostgreSQL-stap nog niet. De norm meldt bovendien een omvangsbandoverschrijding,
+één extra globale kernnaam, zeven te veel ongemeten toetsbestanden en twaalf
+nieuwe vermoedens van lege-verzamelingbewijs (twee pasten nog onder de oude
+norm). De adversarial-groep meldt geen rollek, maar drie onbekende
+503-antwoorden voor bestaande abonnementsbediening. Deze uitslagen blijven
+rood totdat de oorzaak en de bijbehorende volledige controle zijn hersteld.
+
+De rolwereld is nu expliciet geïsoleerd op SQLite, met een test-terugkeer-URL,
+gesloten nieuwe instroom en zonder geërfde provider-, mail- of databaseverbinding.
+De nieuwe regressie is eerst rood gezien; de gerichte rolproeven slagen 21/21.
+Dit bewijst de actuele account-/rolpoort en gecontroleerde domeinweigeringen,
+niet een echte betaling. Positieve controles versterken de nieuwe lege-lijst-
+asserties zonder de meter of norm te veranderen: de zes HTTP-/browserbestanden
+slagen 38/38. De pure contact-/mobiliteits-/domeingrensgroep slaagt 32/32.
+Contactlijnresolutie heeft een eigen samenhangende module; gedeelde
+accountcontrole hoeft geen globale kernexport meer te zijn. Bron wordt eerst
+vastgelegd, daarna pas opnieuw gemeten.
+
+Automatisch samenvoegen op #727 is uitgezet: de vier beschermde checks alleen
+wachten niet op alle aanvullende scherm- en dekkingsuitslagen. De integrator
+controleert de volledige ronde en kandidaatboom vóór een normale beschermde
+merge. Geen productie-uitrol is gestart.
+
+Nog open: een verse volledige vierdelige suite, remote PostgreSQL/Redis,
+schermproeven en beschermde remote checks. De uit #725 overgenomen Direct-/Service-start is
 nog niet bewezen tegen een verloren antwoord met herhaling; dat herstelpunt
 blijft zichtbaar en wordt niet als idempotent afgevinkt. De systeemvervanging
 van Node 24 wacht apart op macOS-beheerdersgoedkeuring; dit blokkeert de

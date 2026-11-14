@@ -3,7 +3,7 @@
    oormerken; geen geldprovider en uitsluitend een eigen tijdelijke database. */
 const test = require('node:test'), assert = require('node:assert/strict');
 const fs = require('node:fs'), os = require('node:os'), path = require('node:path');
-const { startServer, stopHard } = require('./helper');
+const { startServer, stopHard, stopNet } = require('./helper');
 const { vereist } = require('./infra');
 const bron = process.env.DATABASE_URL || process.env.PG_URL;
 const skip = vereist('pg', !!bron, 'geldbeleid-opslag vereist echte PostgreSQL');
@@ -31,6 +31,16 @@ test('PG bevestigt pot en log vóór antwoord, behoudt retry na herstart en weig
       phone: '0612345678', password: 'ProefGeheim123!', geboortedatum: '1990-05-05',
       geslacht: 'v', tier: 'rtg', pasApp: 'rtg' });
     assert.equal(reg.status, 200, JSON.stringify(reg)); token = reg.body.token; assert.ok(token);
+    assert.equal(reg.body.state.user.tier, 'guest');
+    // Alleen de persona van deze opslagproef: een historisch betaald lid in
+    // de hierboven aangemaakte wegwerpdatabase. Geen toelatings- of betaalbewijs.
+    // Spoel de registratie in teststand en stop de worker; een verse worker
+    // moet de echte PG-waarheid lezen. De crashproeven hieronder blijven hard.
+    await stopNet(srv.child); srv = null;
+    const betaald = await pool.query("UPDATE users SET tier='rtg' WHERE codename=$1 AND tier='guest'",
+      [reg.body.state.user.codename]);
+    assert.equal(betaald.rowCount, 1, 'precies de geregistreerde testpersona krijgt bestaande betaalrechten');
+    srv = await startServer({ env });
     const body = { naam: 'Reis', doelCenten: 10000, idem: 'vaste-pot' };
     const eerste = await api('geld/pot/zet', body); assert.equal(eerste.status, 200, JSON.stringify(eerste));
     const vast = await lees(), lid = Object.values(vast.perLid).find(r => r.potten.some(p => p.id === eerste.body.pot.id));

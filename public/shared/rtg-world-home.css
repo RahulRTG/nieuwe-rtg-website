@@ -79,7 +79,7 @@ body[data-world-home] [hidden]{display:none!important}
 /* Living keeps the real social projection and uses the same editorial role. */
 body.rtg-social-experience[data-world-home="living"] :is(#feed .kaart,.living-welcome,.living-load-error,.living-nearby){border-radius:var(--rtg-radius-editorial)}
 body[data-world-home="living"] .living-nearby>img{border-radius:var(--rtg-radius-editorial)}
-body.rtg-social-experience[data-world-home="living"][data-rtg-skin="heritage"] .rtg-edge-top{background:transparent!important;backdrop-filter:none;-webkit-backdrop-filter:none;border-bottom:0;box-shadow:none!important}
+body.rtg-social-experience[data-world-home="living"][data-rtg-skin="heritage"] .rtg-edge-top{background:var(--ds-public-card,transparent)!important;backdrop-filter:none;-webkit-backdrop-filter:none;border-bottom:0;box-shadow:none!important}
 body[data-world-home="living"] .rtg-edge-top::after{display:none}
 body[data-world-home="living"] .rtg-adaptive-bar{border-color:color-mix(in srgb,var(--wh-gold) 28%,transparent)}
 

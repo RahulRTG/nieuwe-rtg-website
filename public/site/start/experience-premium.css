@@ -34,8 +34,8 @@
 .graph-section{min-height:0;background:var(--rtg-paper)}.graph-section .scene-heading{margin-bottom:36px}.rtg-graph{height:500px;background:linear-gradient(90deg,rgba(30,26,20,.035) 1px,transparent 1px),linear-gradient(rgba(30,26,20,.035) 1px,transparent 1px),radial-gradient(circle at center,#a68f5721,transparent 42%);background-size:72px 72px,72px 72px,100% 100%}.rtg-graph>span{box-shadow:0 8px 28px rgba(40,30,17,.08)}
 .explore-section{min-height:0;background:#2a0913}.explore-map{height:460px}.explore-map>button{background:rgba(30,7,13,.84)}.explore-core{box-shadow:0 0 0 22px rgba(255,255,255,.035)}.explore-detail{border-color:rgba(255,255,255,.2)}
 
-.fragmentation,.playground,.rahul-section,.yours,.worlds-section,.permissions,.access,.questions{background:var(--rtg-paper)}
-.origin,.create-section{background:#2a0913}.human{background:var(--rtg-ink-2)}
+.fragmentation,.playground,.rahul-section,.yours,.worlds-section,.permissions,.access,.questions{background:var(--ds-public-bg,var(--rtg-paper))}
+.human{background:var(--rtg-ink-2)}
 .entry-grid article,.platform-chain article{min-width:0}
 .experience-footer{padding-inline:max(5vw,calc((100vw - var(--rtg-max))/2));background:#0d0e0c}
 .pass-table-wrap{margin-right:0!important;padding-right:0!important}

@@ -44,6 +44,7 @@
     return true;
   } });
   edge.continueWith({ title: title, copy: 'Ontdek. Probeer. Kies zelf.' });
+  if (w.RTGPublicPlatform) w.RTGPublicPlatform.brandEdge(root);
   var progress = d.createElement('div'); progress.className = 'story-progress'; progress.setAttribute('aria-hidden', 'true'); d.body.appendChild(progress);
   var pending = false;
   function measure() { pending = false; var range = d.documentElement.scrollHeight - w.innerHeight;

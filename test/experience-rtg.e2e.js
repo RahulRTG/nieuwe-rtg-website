@@ -110,6 +110,11 @@ test('static project path and JavaScript-disabled visitors retain content and re
       await page.goto('http://127.0.0.1:' + server.address().port + prefix, { waitUntil: 'networkidle' });
       if (javaScriptEnabled) {
         await ready(page);
+        const brandImage = page.locator('.pp-header .ds-beleving-merk img');
+        assert.match(await brandImage.getAttribute('src'), /brand\/owner-20261114\/lips\.jpg$/);
+        assert.equal(await brandImage.getAttribute('alt'), 'RTG');
+        assert.equal(await brandImage.evaluate(img => img.complete && img.naturalWidth > 0), true);
+        assert.equal(await page.locator('.pp-feature-copy').evaluate(el => getComputedStyle(el).textAlign), 'center');
         assert.equal(await page.locator('#roleCta').getAttribute('href'), 'https://app.rahultravelgroup.com/apps/werk.html');
         assert.equal(await page.evaluate(() => getComputedStyle(document.querySelector('.rtg-adaptive-bar')).getPropertyValue('--edge-bar-bg').trim()), '#FAF7F2', 'de publieke navigatie erft het lichte LivingOS-palet');
         const publicLayout = await page.evaluate(() => {

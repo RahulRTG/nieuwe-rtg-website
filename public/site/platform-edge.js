@@ -24,6 +24,7 @@
    return true;
   }};
   E.start(d,w,host);
+  P.brandEdge(root);
   /* Public navigation does not evaluate a member mandate. Keep the native surface without a false verification badge. */
   root.querySelector('.rtg-adaptive-guard').remove();
   function labels(){

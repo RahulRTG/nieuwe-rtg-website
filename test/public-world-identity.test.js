@@ -41,6 +41,30 @@ test('de vier wereldfoto’s bewaren de originele bytes en de expliciete fotokeu
     fingerprints.add(expected.hash);
   }
   assert.equal(fingerprints.size, 4, 'iedere wereld heeft zijn eigen aangeleverde foto');
+  const brandRoot = path.join(ROOT, 'public/images/brand/owner-20261114');
+  const brand = JSON.parse(fs.readFileSync(path.join(brandRoot, 'PROVENANCE.json'), 'utf8'));
+  const originals = [
+    ['lips-wide.jpg', '4-Foto-4.jpg', 'ace5d40c5ff56aacf3dc23b7028cb382d7d64c7317201db8594f0325134e083f'],
+    ['lips.jpg', '5-Foto-5.jpg', 'd33206f0bf3d0e624c0d3438db8cebba50d336bf4912e1ddec56ba5cb1b0f363'],
+    ['brush-orbit.jpg', '6-Foto-6.jpg', '1872351f57dd9b4dcab2ddf4fcccaf93c62ec536b573102b59b199766718e9f7'],
+    ['brush-ribbon.jpg', '7-Foto-7.jpg', '07b77eb8c2559d63dbb8ff22ba8e61b504726916344dc3d7d7a96bdbd665c2ab']
+  ];
+  assert.equal(brand.source, 'user-provided');
+  assert.equal(brand.suppliedBy, 'owner');
+  assert.equal(brand.primaryBrandMark, 'lips.jpg');
+  assert.equal(brand.images.length, originals.length);
+  for (const [file, original, hash] of originals) {
+    const image = brand.images.find(item => item.path === file);
+    assert.ok(image, file + ' heeft een herkomstvermelding');
+    assert.equal(image.originalFilename, original);
+    assert.equal(image.source, 'user-provided');
+    assert.equal(image.suppliedBy, 'owner');
+    assert.ok(image.role);
+    assert.equal(image.sha256, hash);
+    assert.equal(crypto.createHash('sha256').update(fs.readFileSync(path.join(brandRoot, file))).digest('hex'), hash, file + ' behoudt de originele bytes');
+  }
+  const landing = fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8');
+  assert.match(landing, /<link rel="icon" href="\.\/public\/images\/brand\/owner-20261114\/lips\.jpg" type="image\/jpeg">/);
 });
 
 test('de vier wereldpanelen op de publieke voordeur tonen de toegewezen foto', () => {
@@ -180,7 +204,7 @@ function projectDetail(html) {
   source.querySelectorAll = () => [];
   const document = { body, title: '', createElement: element, querySelector: () => source };
   vm.runInNewContext(fs.readFileSync(path.join(ROOT, 'public/site/platform-detail.js'), 'utf8'), {
-    window: { RTGPublicPlatform: { asset: () => 'https://example.test/project/public/' } },
+    window: { RTGPublicPlatform: { asset: () => 'https://example.test/project/public/', brand: element } },
     document, URL, getComputedStyle: () => ({ getPropertyValue: () => '' })
   });
   return { image: hero?.children[0]?.children[0]?.src, world: body.dataset.publicWorld };

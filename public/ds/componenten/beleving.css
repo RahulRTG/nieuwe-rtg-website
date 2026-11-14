@@ -8,6 +8,70 @@
   .ds-beleving-website {
     --ds-beleving-inzet: clamp(1.5rem, 4vw, 4.5rem);
   }
+  .ds-beleving-merk {
+    display: inline-flex;
+    align-items: center;
+    flex-shrink: 0;
+    min-block-size: 44px;
+    mix-blend-mode: multiply;
+  }
+  .ds-beleving-merk img {
+    display: block;
+    inline-size: 4rem;
+    block-size: auto;
+    mix-blend-mode: multiply;
+  }
+  .ds-beleving-bediening {
+    --rtg-world-card: var(--ds-public-card);
+    --rtg-world-ink: var(--ds-public-ink);
+    --rtg-world-muted: var(--ds-public-muted);
+    --rtg-world-metal: var(--ds-public-accent);
+    --rtg-world-line: transparent;
+    --wh-ink: var(--rtg-world-ink);
+    --wh-soft: var(--rtg-world-muted);
+    --story-ink: var(--rtg-world-ink);
+    --story-soft: var(--rtg-world-muted);
+    --story-gold: var(--rtg-world-metal);
+  }
+  .ds-beleving-edge-merk {
+    display: block;
+    inline-size: 46px;
+    block-size: auto;
+    mix-blend-mode: multiply;
+  }
+  .ds-beleving-intro {
+    display: grid;
+    margin: 0;
+    overflow: hidden;
+    background: var(--ds-public-card);
+    color: var(--ds-public-ink);
+    text-align: center;
+  }
+  .ds-beleving-intro__inhoud {
+    display: grid;
+    justify-items: center;
+    padding: clamp(3rem, 7vw, 6rem) 1.5rem 3rem;
+  }
+  .ds-beleving-intro__inhoud h1 {
+    max-inline-size: 15ch;
+    margin: .75rem 0;
+    font: 400 clamp(3rem, 5.5vw, 5.5rem)/1.02 var(--ds-letter-display);
+    text-wrap: balance;
+  }
+  .ds-beleving-intro__inhoud p {
+    max-inline-size: 46ch;
+    margin: .75rem 0 1.5rem;
+    color: var(--ds-public-muted);
+    font-size: clamp(1rem, 1.5vw, 1.2rem);
+  }
+  .ds-beleving-intro__inhoud a { color: var(--ds-public-action); }
+  .ds-beleving-intro__beeld img {
+    display: block;
+    inline-size: 100%;
+    block-size: clamp(22rem, 46vw, 42rem);
+    object-fit: cover;
+    object-position: center;
+  }
   .ds-beleving-sectiekop {
     display: flex;
     flex-wrap: wrap;
@@ -59,6 +123,12 @@
     object-fit: cover;
     object-position: center;
     border-radius: var(--ds-radius-inhoud);
+  }
+  .ds-beleving-wereld__titel {
+    display: block;
+    inline-size: 100%;
+    text-align: center;
+    font: 400 clamp(2.5rem, 4vw, 4rem)/1.1 var(--ds-letter-display);
   }
   .ds-beleving-wereld__achtergrond {
     position: absolute;

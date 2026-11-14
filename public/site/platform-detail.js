@@ -10,7 +10,7 @@
   if(publicWorld)d.body.dataset.publicWorld=world;
   var root=node('div','wd-shell pp-detail-shell ds-beleving'), head=node('header','rtg-edge-top pp-header pp-detail-header');
   root.dataset.dsBeleving='publiek';
-  head.append(link('RTG',new URL('../',base).href));head.firstChild.className='rtg-edge-mark pp-brand';
+  var brand=P.brand();brand.href=new URL('../',base).href;head.dataset.publicWorld='living';head.append(brand);
   /* De taalknop van de pagina VERHUIST naar de nieuwe kop in plaats van te worden
      nagebouwd: .world-header staat hier op display:none, en een kopie zonder
      data-language-picker liet de echte (door i18n.js gebonden) knop onbereikbaar achter. */

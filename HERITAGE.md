@@ -64,6 +64,15 @@ Binnen die vlakken blijft de tekst ruim ingesprongen. Focusmarkeringen en
 functionele formulierfeedback blijven zichtbaar voor toetsenbordbediening.
 Dit verandert geen toegangsrechten of identiteit van de ingelogde appwerelden.
 
+De aansluitende merkkeuze van de eigenaar maakt de bordeauxrode penseellippen
+het primaire publieke RTG-beeldmerk. Het onbewerkte aangeleverde beeld staat
+met herkomst in `public/images/brand/owner-20261114/lips.jpg` en vervangt het
+tekstmonogram in de publieke navigatie en het favicon. De gedeelde lichte
+navigatie houdt dit beeldmerk in alle werelden herkenbaar. De Apple-referenties
+geven het presentatieritme: grote gecentreerde koppen, rustige bediening en
+beeld- en kleurvlakken over de volle breedte. RTG behoudt zijn eigen foto's,
+kleuren en Bodoni Moda/Inter; Apple-beeldmerken en productbeelden horen hier niet.
+
 De wereldidentiteit is informatiearchitectuur en geen door de gebruiker vrij
 te kiezen thema. De publieke vier-wereldenlanding is de neutrale RTG-hal;
 ieder blijvend appscherm, ook toegang, veiligheid en instellingen, is door het

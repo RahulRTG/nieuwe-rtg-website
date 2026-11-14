@@ -1,0 +1,42 @@
+{
+  "version": 1,
+  "date": "2026-11-14",
+  "source": "user-provided",
+  "suppliedBy": "owner",
+  "primaryBrandMark": "lips.jpg",
+  "description": "De vier door de eigenaar aangeleverde merkbeelden, ongewijzigd bewaard. Foto 5 is het primaire lippenbeeldmerk en publieke favicon.",
+  "images": [
+    {
+      "path": "lips-wide.jpg",
+      "originalFilename": "4-Foto-4.jpg",
+      "source": "user-provided",
+      "suppliedBy": "owner",
+      "role": "alternate-wide-brand-mark",
+      "sha256": "ace5d40c5ff56aacf3dc23b7028cb382d7d64c7317201db8594f0325134e083f"
+    },
+    {
+      "path": "lips.jpg",
+      "originalFilename": "5-Foto-5.jpg",
+      "source": "user-provided",
+      "suppliedBy": "owner",
+      "role": "primary-brand-mark-and-public-favicon",
+      "sha256": "d33206f0bf3d0e624c0d3438db8cebba50d336bf4912e1ddec56ba5cb1b0f363"
+    },
+    {
+      "path": "brush-orbit.jpg",
+      "originalFilename": "6-Foto-6.jpg",
+      "source": "user-provided",
+      "suppliedBy": "owner",
+      "role": "orbital-brush-artwork",
+      "sha256": "1872351f57dd9b4dcab2ddf4fcccaf93c62ec536b573102b59b199766718e9f7"
+    },
+    {
+      "path": "brush-ribbon.jpg",
+      "originalFilename": "7-Foto-7.jpg",
+      "source": "user-provided",
+      "suppliedBy": "owner",
+      "role": "horizontal-brush-artwork",
+      "sha256": "07b77eb8c2559d63dbb8ff22ba8e61b504726916344dc3d7d7a96bdbd665c2ab"
+    }
+  ]
+}

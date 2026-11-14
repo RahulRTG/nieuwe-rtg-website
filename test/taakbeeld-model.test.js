@@ -35,7 +35,7 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const http = require('http');
-const { startServer, stop } = require('./helper');
+const { startServer, stopHard, maakBetaaldRtgTestaccount } = require('./helper');
 
 const STIL = 'zeg-niets-proef';
 const LEES = 'alleen-lezen-proef';
@@ -75,6 +75,7 @@ function nepModel() {
 }
 
 let model, server, base, A, B;
+const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-taak-'));
 const api = (pad, body, token) => fetch(base + pad, { method: 'POST',
   headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: 'Bearer ' + token } : {}) },
   body: JSON.stringify(body || {}) }).then(async (r) => ({ status: r.status, body: await r.json().catch(() => ({})) }));
@@ -92,7 +93,7 @@ async function vraag(lid, q, context) {
 
 test.before(async () => {
   model = await nepModel();
-  server = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-taak-')),
+  server = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP,
     LOCAL_AI_URL: model.base, LOCAL_AI_MODEL: 'proefmodel', RTG_EXTERNE_AI_UIT: '1' } });
   base = server.base;
   const u = Date.now().toString(36);
@@ -100,6 +101,8 @@ test.before(async () => {
     const reg = await api('/api/auth/register', { name: 'Taak ' + n, email: 'taak-' + n + u + '@voorbeeld.test',
       password: 'geheim-' + n + '-123', geboortedatum: '1988-04-04', phone: tel, pasApp: 'rtg' });
     assert.equal(reg.status, 200);
+    // Beide reizigers bezitten een eigen aanvraag; de vreemde-objectgrens blijft de echte tegenproef.
+    maakBetaaldRtgTestaccount(TMP, 'taak-' + n + u + '@voorbeeld.test');
     return { token: reg.body.token };
   };
   A = await lid('a', '0612340001'); B = await lid('b', '0612340002');
@@ -110,7 +113,11 @@ test.before(async () => {
     L.ref = b.body.aanvraag.ref;
   }
 });
-test.after(async () => { await stop(server); model.srv.close(); });
+test.after(async () => {
+  await stopHard(server && server.child);
+  if (model) await new Promise(resolve => model.srv.close(resolve));
+  fs.rmSync(TMP, { recursive: true, force: true });
+});
 
 test('1. een aangewezen eigen aanvraag gaat eerst naar de stuurlus, en de Edge krijgt een taakbeeld uit serverbronnen', async () => {
   /* Een vraag OVER de aangewezen aanvraag: alleen die gaat eerst naar de

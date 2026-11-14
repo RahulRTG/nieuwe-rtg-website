@@ -23,7 +23,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { startServer, stopHard, maakBetaaldRtgTestaccount } = require('./helper');
 
 function api(base, pad, body, token) {
   const h = { 'Content-Type': 'application/json' };
@@ -34,6 +34,7 @@ function api(base, pad, body, token) {
 const overNdagen = (n) => new Date(Date.now() + n * 86400000).toISOString().slice(0, 10);
 
 let srv, base, lidToken, office;
+const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-nazorg-'));
 
 /* Een verse bevestigde reis per toets: deze toetsen veranderen allemaal de
    stand, dus ze mogen elkaars aanvraag niet erven. */
@@ -53,18 +54,23 @@ const mijne = async (ref) => (await api(base, '/api/reisbureau/mijn', {}, lidTok
   .body.aanvragen.find(a => a.ref === ref);
 
 test.before(async () => {
-  const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-nazorg-'));
   srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   base = srv.base;
   const u = Date.now().toString().slice(-8);
   const reg = await api(base, '/api/auth/register', { name: 'Reiziger', email: 'n' + u + '@x.nl',
-    phone: '06' + u, password: 'geheim123', geboortedatum: '1990-01-01', tier: 'business', pasApp: 'business' });
+    phone: '06' + u, password: 'geheim123', geboortedatum: '1990-01-01', pasApp: 'rtg' });
+  assert.equal(reg.status, 200, JSON.stringify(reg.body));
+  // De nazorg begint bij een reis van een reeds betalende RTG-reiziger; geen Businessrechten.
+  maakBetaaldRtgTestaccount(TMP, 'n' + u + '@x.nl');
   lidToken = reg.body.token;
   const kantoor = await api(base, '/api/auth/login', { login: 'roellie.i@gmail.com', password: 'Imran', pasApp: 'business' });
   office = kantoor.body.token;
   assert.ok(lidToken && office, 'lid en kantoor zijn er');
 });
-test.after(() => stop(srv && srv.child));
+test.after(async () => {
+  await stopHard(srv && srv.child);
+  fs.rmSync(TMP, { recursive: true, force: true });
+});
 
 test('1. een lid VRAAGT een wijziging; hij voert hem niet zelf uit', async () => {
   const { ref } = await bevestigdeReis();

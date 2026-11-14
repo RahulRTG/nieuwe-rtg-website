@@ -445,11 +445,14 @@ test('9. de stand uit de omgeving: leeg en onbekend zijn verplicht, schaduw niet
 
 test('9b. in verplicht krijgt wie niet KAN binden de accountweg, niet de toestelweg', async () => {
   const { b } = maak({});
-  for (const sess of [null, undefined, {}, { account: 'a', tier: 'guest' }, { tier: 'rtg' }, { sessieContext: { sleutelbinding: {} } }]) {
+  for (const sess of [null, undefined, {}, { tier: 'guest' }, { tier: 'rtg' }, { sessieContext: { sleutelbinding: {} } }]) {
     const r = await b.controleer({ sess, methode: 'POST', pad: PAD, stand: 'verplicht' });
     assert.deepEqual([r.stand, r.code], ['geweigerd', 403]);
     assert.match(r.reden, /eigen RTG-account/, JSON.stringify(sess));
   }
-  const lid = await b.controleer({ sess: { account: 'a', tier: 'rtg', sessieContext: { sleutelbinding: { keyRef: '' } } }, methode: 'POST', pad: PAD, stand: 'verplicht' });
-  assert.match(lid.reden, /Waar ben ik aanwezig/);
+  for (const tier of ['guest', 'rtg']) {
+    const lid = await b.controleer({ sess: { account: 'a', tier, sessieContext: { sleutelbinding: { keyRef: '' } } }, methode: 'POST', pad: PAD, stand: 'verplicht' });
+    assert.deepEqual([lid.stand, lid.code], ['geweigerd', 403]);
+    assert.match(lid.reden, /Waar ben ik aanwezig/, tier + ': een eigen account kan zijn toestel binden');
+  }
 });

@@ -1,7 +1,7 @@
 /* DE WEBSITE VERTELT DE APPWAARHEID. Deze toets bewaakt de hele verbinding:
    de gegenereerde momentopname moet exact uit de wereld- en pasbronnen komen,
    iedere openbare pagina moet haar laden en alle pagina's moeten dezelfde
-   Heritage-wereldstijl gebruiken. */
+   centrale publieke LivingOS-stijl gebruiken zonder domeinidentiteit te verliezen. */
 'use strict';
 
 const test = require('node:test');
@@ -97,13 +97,17 @@ test('de B2B2C-schermen komen uit bestaande app-routes en een gecontroleerd echt
   assert.match(lees('public/site/website-truth.js'), /bindPlatformScreen/);
 });
 
-test('alle openbare verhaalpagina’s gebruiken dezelfde wereldstijl', () => {
+test('alle openbare verhaalpagina’s gebruiken uitsluitend de centrale publieke LivingOS-stijl', () => {
   for (const bestand of PAGINAS) {
     const html = lees(bestand);
-    assert.match(html, /rtg-heritage\.css/, bestand + ' mist de vaste Heritage-stijl');
-    assert.match(html, /rtg-world-home\.css/, bestand + ' mist de gedeelde wereldstijl');
-    assert.match(html, /website-truth\.css/, bestand + ' mist de websitewaarheid-stijl');
-    if (bestand.includes('/werelden/')) assert.match(html, /ds\/rtg-ds\.css/, bestand + ' mist de app-thema’s');
+    const bladen = [...html.matchAll(/<link\b[^>]*rel="stylesheet"[^>]*href="([^"]+)"[^>]*>/g)]
+      .map(match => match[1]);
+    assert.deepEqual(bladen, ['../../fonts/fonts.css', '../../ds/rtg-ds.css'],
+      bestand + ' gebruikt geen legacy-stijllaag naast de DS-root');
+    assert.match(html, /<html\b[^>]*\bdata-ds(?:\s|>)/, bestand + ' activeert de DS-poort');
+    assert.match(html, /<body\b[^>]*class="[^"]*\bds-public-story\b/, bestand + ' gebruikt de publieke presentatie');
+    assert.match(html, /<body\b[^>]*data-rtg-world="living"/, bestand + ' behoudt de publieke merkkleur');
+    assert.doesNotMatch(html, /<style\b|\sstyle="/i, bestand + ' heeft geen inline stijllaag');
     assert.match(html, /data-rtg-skin="heritage"/, bestand + ' activeert de vaste stijl niet');
   }
 });
@@ -116,8 +120,8 @@ test('wereld- en paspagina’s lezen de actuele appwaarheid bij het openen', () 
     const bestand = 'public/site/werelden/' + (wereld === 'foundation' ? 'foundationos' : wereld + 'os') + '.html';
     const html = lees(bestand);
     assert.match(html, new RegExp('data-world="' + wereld + '"'));
-    assert.match(html, new RegExp('data-rtg-world="' + wereld + '"'));
-    assert.match(html, /data-ds-beleving="publiek"/);
+    assert.match(html, /<body\b[^>]*data-rtg-world="living"/,
+      wereld + ' houdt domeinwaarheid en publieke merkkleur uit elkaar');
   }
 });
 

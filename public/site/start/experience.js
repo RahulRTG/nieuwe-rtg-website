@@ -51,9 +51,10 @@
   }
   function renderWorld() {
     d.querySelectorAll('[data-room]').forEach(function (room) { room.hidden = room.dataset.room !== currentWorld; });
+    d.querySelectorAll('.ds-public-world-choices [data-select-world]').forEach(function (button) { button.setAttribute('aria-pressed', String(button.dataset.selectWorld === currentWorld)); });
     var index = Object.keys(C.WORLDS).indexOf(currentWorld);
     $('worldPosition').textContent = '0' + (index + 1) + ' / 04 ' + C.WORLDS[currentWorld].name;
-    if ($('werelden').getBoundingClientRect().top < innerHeight && $('werelden').getBoundingClientRect().bottom > 0) d.body.dataset.rtgWorld = currentWorld;
+    if (!d.body.classList.contains('ds-magazine-page') && $('werelden').getBoundingClientRect().top < innerHeight && $('werelden').getBoundingClientRect().bottom > 0) d.body.dataset.rtgWorld = currentWorld;
   }
   function permissions() {
     [['calendar', 'allowCalendar'], ['work', 'allowWork'], ['location', 'allowLocation']].forEach(function (row) { C.permission(s, row[0], $(row[1]).checked); });

@@ -1,5 +1,19 @@
 [
   {
+    "name": "rtg-discover-salon",
+    "prompt": "Use case: stylized-concept. Asset type: a single original painterly panorama for the Ontdek RTG navigation gallery in a high-end online travel, art and lifestyle magazine. Input image 1 is MOOD REFERENCE ONLY: take its curated museum-salon atmosphere, figurative surrealism, jewel-like painted color and sophisticated juxtaposition of paintings and sculpture. Do not reproduce any particular artwork, person or exact composition from it. Create one coherent original oil-painted salon: arched Mediterranean windows open onto a deep blue sea; a small group of elegantly dressed adult travelers converse around a table; a sculptural golden bird curves between lush oversized flowers and an abstract framed painting. Graceful imaginative proportions, painterly faces kept small, original art rather than photoreal people or a collage of photographs. The human, travel and creative-business worlds meet naturally. Rich tactile brushwork, matte pigment, visible canvas-like paint, deep burgundy, forest green, warm ochre gold and luminous soft blue/ivory. Joyful sophisticated color with quiet breathing room, no neon. Landscape 3:2 composition, whole scene composed to read at 350px wide. Full-bleed painted artwork, no exterior frame, no lettering, no words, no logo, no heart emoji, no watermark, no phone or UI. This is decorative fictional editorial art, not a depiction of a real museum, actual members or a confirmed destination. Render as a finished museum-quality original painting, not a digital 3D render.",
+    "path": "rtg-discover-salon.webp",
+    "source": "exec-a4df63d4-3b19-4acd-9135-2ce01f6f32a9.png",
+    "width": 1200,
+    "height": 800,
+    "bytes": 337970,
+    "sha256": "9b5115bd17b11811eef827df105c97278025a8b28c6d609df50051a7ae983752",
+    "tool": "built-in image_gen",
+    "illustrative": true,
+    "reference": "Owner-supplied museum collage, atmosphere only; no artwork copied",
+    "optimization": "Proportional 1536 x 1024 to 1200 x 800, WebP quality 84. No crop, recolouring or added text."
+  },
+  {
     "name": "company-vision",
     "prompt": "Use case: photorealistic-natural. One standalone editorial photograph for RTG company story company-vision. An elevated view of a welcoming contemporary European pedestrian square, people of different generations crossing paths, caf\u00e9, bicycle, tram in distance, beautifully composed real architecture. Gentle morning light, human scale, calm coherent urban life. No corporate offices. Landscape 4:3. Premium contemporary human magazine photography, warm nuanced daylight, charcoal shadows, ivory and champagne highlights with restrained burgundy or blue details, credible anatomy and fine natural material textures. Distinct subject and composition. No lettering, UI, logo, watermark, border, collage or abstract AI brain. This is an illustrative mood image, not a real office, employee, customer or RTG result.",
     "path": "company-vision.webp",

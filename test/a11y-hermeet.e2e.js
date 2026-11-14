@@ -57,10 +57,10 @@ const telContrast = (r) => r.contrast.reduce((n, v) => n + v.aantal, 0);
    een scherm waar altijd iets loopt mag deze toets niet laten zakken. */
 const stilNaLaden = async (p) => {
   await wachtOpNetstilte(p);
-  /* De universele presentatielaag komt via basis.js. Wacht op haar expliciete
-     gereedtoestand; anders kan een snelle cache-herlaad precies tussen de
-     oorspronkelijke en de uiteindelijke kleuren worden gemeten. */
-  await p.waitForSelector('body[data-rtg-editorial-v4="true"]');
+  /* De echte publieke 404 gebruikt nu de centrale DS met de publieke Edge.
+     Meet haar voltooide eigenaar, niet de verwijderde legacy-presentatielaag. */
+  await p.waitForSelector('html[data-ds] body[data-public-edge-ready="true"]');
+  await p.evaluate(() => document.fonts.ready);
   try {
     await wachtTot(p, () => !document.getAnimations ||
       document.getAnimations().every((a) => a.playState !== 'running'),

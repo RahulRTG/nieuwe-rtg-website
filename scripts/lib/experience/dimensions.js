@@ -4,8 +4,9 @@ const artifact=require('./artifact');
 const {sha}=require('./evidence');
 const {stable}=artifact;
 const configurations=require('./configurations');
+const planning=require('./qualification-planning');
 const DIMENSION_ORDER=['identity','composition','continuity','restraint','adaptability','accessibility','fluidity','human-quality'];
-function requirements(contract, profile, dimension, signature) {
+function baseRequirements(contract, profile, dimension, signature) {
   /* Een signature mag de grondwet uitbreiden, nooit de noemer verkleinen. */
   const additionalStates=Array.isArray(signature?.value?.additionalStates)?signature.value.additionalStates:[];
   const additionalDevices=Array.isArray(signature?.value?.additionalDevices)?signature.value.additionalDevices:[];
@@ -24,6 +25,14 @@ function requirements(contract, profile, dimension, signature) {
     return (tasks.length ? tasks.flatMap((task,index)=>['task:'+index+'@mobile','task:'+index+'@desktop']) : ['signature:human-task@mobile','signature:human-task@desktop']).concat(interactions.map(id=>'interaction:'+id));
   }
   return [];
+}
+
+// Het vijfde argument is optioneel voor bestaande protocollen. Bij een echt
+// onderwerp vergroot de afbouwbinding de bestaande bewijslast; zij kan geen
+// toestand, interactie of configuratie uit de oorspronkelijke noemer halen.
+function requirements(contract, profile, dimension, signature, subject) {
+  return [...new Set(baseRequirements(contract,profile,dimension,signature)
+    .concat(planning.requirements(contract,dimension,subject,profile)))];
 }
 
 const evidenceStatus = artifact.status;
@@ -84,7 +93,7 @@ function dimensionRows(root, contract, profileName, subject, kind, signature, ev
       const decision = profile.notApplicable && profile.notApplicable[dimension];
       return {id:dimension,applicable:false,status:'NOT_APPLICABLE',decision:decision?.decision || null,reason:decision?.reason || null,requirementCount:0,provenCount:0};
     }
-    const required = requirements(contract, profileName, dimension, signature);
+    const required = requirements(contract, profileName, dimension, signature, subject);
     const configurationCoverage=[];
     const records = required.map(requirement => {
       const matches = (evidence.records || []).filter(item => item && item.subjectType === kind && item.subjectId === subject.id && item.dimension === dimension && item.requirement === requirement);

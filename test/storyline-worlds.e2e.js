@@ -12,6 +12,11 @@ test('world stories explain consequences locally, retain choices across language
     const ctx = await browser.newContext({ viewport: { width: 1440, height: 1050 }, reducedMotion: 'reduce', serviceWorkers: 'block' });
     await ctx.addInitScript(() => localStorage.setItem('rtg_lang', 'nl'));
     const page = await ctx.newPage(), errors = [], writes = [];
+    const openActions = async () => {
+      const door = page.locator('.ds-public-edge-toggle');
+      if (await door.getAttribute('aria-expanded') === 'false') await door.click();
+      await page.locator('.rtg-adaptive-bar [data-rtg-adaptive-action="context"]').click();
+    };
     letOpFouten(page, errors);
     page.on('request', r => {
       const url = new URL(r.url());
@@ -23,13 +28,16 @@ test('world stories explain consequences locally, retain choices across language
       ['work', 'covered', 'vervanger beschikbaar'], ['foundation', 'evening', 'na de werkdag']
     ]) {
       await page.goto(srv.base + '/site/werelden/' + world + 'os.html');
-      await page.waitForSelector('[data-story-stage="ready"]');
-      await page.waitForSelector('body[data-rtg-adaptive-ready="true"]');
+      await page.waitForSelector('body[data-public-edge-ready="true"]');
+      await page.locator('[data-story-stage="ready"]').waitFor({ state: 'attached' });
       assert.equal(await page.locator('.rtg-adaptive-bar').count(), 1);
-      assert.equal(await page.locator('.rtg-adaptive-bar').isVisible(), true);
+      assert.equal(await page.locator('.rtg-adaptive-bar').isVisible(), false, 'de Edge begint gesloten');
+      await openActions();
+      await page.getByRole('button', { name: 'Verander het voorbeeld', exact: true }).click();
+      await page.locator('[data-story-stage="ready"]').waitFor({ state: 'visible' });
       await page.locator('.demo-choice select').selectOption(option);
-      assert.equal(await page.locator('.rtg-adaptive-bar').evaluate(el => {
-        const r = el.getBoundingClientRect(); return r.top >= 0 && r.bottom <= innerHeight && r.left >= 0 && r.right <= innerWidth;
+      assert.equal(await page.locator('.ds-public-edge-toggle').evaluate(el => {
+        const r = el.getBoundingClientRect(); return r.top >= 0 && r.bottom <= innerHeight && r.left >= 0 && r.right <= innerWidth && el.contains(document.elementFromPoint(r.x+r.width/2,r.y+r.height/2));
       }), true, 'Edge remains available while reading a world story');
       assert.match(await page.locator('.connection-steps').innerText(), new RegExp(expected, 'i'));
       await page.locator('.connection-steps summary').first().click();
@@ -37,7 +45,7 @@ test('world stories explain consequences locally, retain choices across language
       await page.locator('.story-permission input').uncheck();
       assert.match(await page.locator('.connection-steps').innerText(), /[Gg]een.*agenda|Agenda niet|geen gezinsagenda/);
       assert.equal(await page.locator('.connection-steps details[open]').count(), 1, 'expanded widget stays open after a choice');
-      await page.locator('.rtg-adaptive-bar [data-rtg-adaptive-action="context"]').click();
+      await openActions();
       await page.getByRole('button', { name: 'Begin het voorbeeld opnieuw', exact: true }).click();
       assert.equal(await page.locator('.story-permission input').isChecked(), true);
       await page.locator('.demo-choice select').selectOption(option);

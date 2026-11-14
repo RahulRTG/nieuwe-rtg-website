@@ -37,6 +37,12 @@ async function smoke(a) {
 }
 async function activate(root, commit) {
   if (process.platform !== 'darwin' || process.arch !== 'arm64') throw Error('Native host is niet macOS arm64.');
+  // Deze functie wijzigt de actieve pointer en herstart de echte service.
+  // Kwalificeer daarom vóór lock, staging of pointerwijziging. Het bestaande
+  // geautoriseerde rollbackpad blijft onafhankelijk van een defecte kandidaat.
+  const next = require('./lib/experience/qualification-gates').assess(root, {gate:'G4'});
+  if (next.status !== 'PROVEN' || next.candidateCommit !== commit)
+    throw Error('RTG NEXT G4 blokkeert native activatie: ' + next.blockers.join('; '));
   const a = host.authorized(root, commit, 'candidate');
   const lock = path.join(a.config.store, '.activation-lock');
   fs.mkdirSync(lock, { mode:0o700 });

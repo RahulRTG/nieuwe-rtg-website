@@ -396,7 +396,7 @@ const KAART = [
   ['public/site/platform-app.js', 'schil', 'wereld:s', [
     ['schrijft', 'wereld:s', 'de publieke apppagina kiest haar wereld', 'd.body.dataset.rtgWorld']]],
   ['public/site/website-truth.js', 'afnemer', 'wereld:s', [
-    ['schrijft', 'wereld:s', 'de openbare wereldpagina volgt dezelfde wereldbron als de app', 'document.body.dataset.rtgWorld = wereld.id;']]],
+    ['schrijft', 'wereld:s', 'de appkaart draagt haar bronwereld; de publieke paginakleur blijft bij de DS-presentatie', 'kaart.dataset.rtgWorld = wereld.id;']]],
   ['public/site/start/experience-edge.js', 'afnemer', 'wereld:s', [
     ['schrijft', 'wereld:s', 'wereld op body per scene', "d.body.dataset.rtgWorld = active.id === 'werelden' ? X.currentWorld() : active.dataset.tone;"]]],
   ['public/site/start/experience.js', 'afnemer', 'wereld:s', [
@@ -409,7 +409,9 @@ const KAART = [
     ['schrijft', 'wereld:s', 'wereld op body per verhaal', 'd.body.dataset.rtgWorld=story.world;'],
     ['schrijft', 'wereld:s', 'wereld op body bij een keuze', 'd.body.dataset.rtgWorld=selected.world;']]],
   ['public/site/platform-app.js', 'afnemer', 'wereld:s', [
-    ['schrijft', 'wereld:s', 'wereld op body in de werelden-scene', "if(id==='werelden'){d.body.dataset.rtgWorld=X.currentWorld();"]]]
+    ['schrijft', 'wereld:s', 'wereld op body in de werelden-scene, buiten de magazine-eigenaar', "if(!d.body.classList.contains('ds-magazine-page'))d.body.dataset.rtgWorld=X.currentWorld();"]]],
+  ['public/site/platform-magazine.js', 'afnemer', 'wereld:s', [
+    ['schrijft', 'wereld:s', 'terug naar het openbare magazine herstelt de living-wereld', "d.body.dataset.rtgWorld='living';"]]]
 ];
 
 /* Waarom een dubbele eigenaar dubbel is. Afgeleid wordt WIE; dit zegt WAAROM.

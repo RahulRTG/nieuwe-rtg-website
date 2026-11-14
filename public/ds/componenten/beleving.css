@@ -11,6 +11,16 @@
     --ds-beleving-coverhoogte: var(--ds-hoogte-cinema);
     --ds-beleving-lucht: var(--ds-lucht-cinema);
     --ds-beleving-sluier: var(--ds-cover-sluier);
+    --ds-beleving-sluier-tekst: linear-gradient(90deg,
+      color-mix(in srgb,var(--ds-cover-grond) 97%,transparent) 0%,
+      color-mix(in srgb,var(--ds-cover-grond) 88%,transparent) 48%,
+      color-mix(in srgb,var(--ds-cover-grond) 54%,transparent) 100%);
+    --ds-beleving-sluier-mobiel: linear-gradient(0deg,
+      color-mix(in srgb,var(--ds-cover-grond) 98%,transparent) 0%,
+      color-mix(in srgb,var(--ds-cover-grond) 82%,transparent) 60%,
+      color-mix(in srgb,var(--ds-cover-grond) 48%,transparent) 100%);
+    --ds-beleving-wereldgloed: radial-gradient(circle at 88% 18%,
+      color-mix(in srgb,var(--ds-accent) 30%,transparent),transparent 46%);
     --ds-beleving-overgang: var(--ds-duur-vol) var(--ds-curve);
     container-type: inline-size;
   }
@@ -26,6 +36,14 @@
     --ds-beleving-inkt: var(--ds-cover-inkt);
     --ds-beleving-metaal: var(--ds-cover-metaal);
     --ds-beleving-coverhoogte: auto;
+  }
+
+  /* Een publieke pagina kan alle vier werelden naast elkaar tonen. Bereken de
+     gloed daarom opnieuw op het wereldvlak zelf, nadat dat vlak zijn eigen
+     thema-accent heeft gekregen. */
+  .ds-beleving [data-rtg-world] {
+    --ds-beleving-wereldgloed: radial-gradient(circle at 88% 18%,
+      color-mix(in srgb,var(--ds-accent) 30%,transparent),transparent 46%);
   }
 
   .ds-beleving__kader { inline-size: min(100%,var(--ds-beleving-breedte)); margin-inline: auto; }

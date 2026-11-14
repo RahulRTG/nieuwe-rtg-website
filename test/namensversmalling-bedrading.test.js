@@ -22,7 +22,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop, kantoorAlsPersoon, zaakMensOpNaam } = require('./helper');
+const { startServer, stopHard, kantoorAlsPersoon, zaakMensOpNaam, maakBetaaldRtgTestaccount } = require('./helper');
 const V = require('../server/kern/namens/versmalling');
 const { maakMandaat } = require('../server/kern/fiscaal/gateway/mandaat');
 
@@ -65,6 +65,11 @@ test.before(async () => {
   base = srv.base;
   lid = (await api('/api/auth/register', { name: 'Versmal Een', email: 'v1@x.nl', phone: '0612350001',
     password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' })).body.token;
+  assert.ok(lid);
+  assert.equal((await api('/api/state', {}, lid)).body.state.user.tier, 'guest');
+  // Installeren vereist een pas, maar GEEN KYC toevoegen: arena.meedoen moet versmald blijven.
+  maakBetaaldRtgTestaccount(TMP, 'v1@x.nl');
+  assert.equal((await api('/api/state', {}, lid)).body.state.user.tier, 'rtg');
   office = (await api('/api/office/login', { code: 'RTG-OFFICE' })).body.token;
   /* DE TEKENAAR IS EEN MENS OP NAAM: de gedeelde code met een getypte naam
      tekent geen app meer af (kern/appstore/vierogen.js, 11 oktober 2026). */
@@ -93,7 +98,10 @@ test.before(async () => {
   assert.equal((await api('/api/appstore/kantoor/besluit',
     { versieId: inz.body.versie.id, besluit: 'gepubliceerd', door: 'Sam van RTG' }, tekenaar)).status, 200);
 });
-test.after(() => stop(srv));
+test.after(async () => {
+  if (srv) await stopHard(srv.child);
+  fs.rmSync(TMP, { recursive: true, force: true });
+});
 
 /* ==========================================================================
    APP-MACHTIGING, over HTTP en tegen een echte server.

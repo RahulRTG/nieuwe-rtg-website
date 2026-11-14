@@ -24,7 +24,7 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const http = require('http');
-const { startServer, stop } = require('./helper');
+const { startServer, stopHard, maakBetaaldRtgTestaccount } = require('./helper');
 
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-office-ai-'));
 const MERK = 'Overnamebod-Zilverreiger-7731';
@@ -69,14 +69,19 @@ test.before(async () => {
     LOCAL_AI_URL: model.base, LOCAL_AI_MODEL: 'proefmodel', RTG_EXTERNE_AI_UIT: '1' } });
   base = srv.base;
   const u = Date.now().toString().slice(-8);
+  const email = 'ai' + u + '@x.nl';
   const reg = await fetch(base + '/api/auth/register', { method: 'POST', headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ name: 'Lid AI', email: 'ai' + u + '@x.nl', phone: '06' + u, password: 'geheim123',
+    body: JSON.stringify({ name: 'Lid AI', email, phone: '06' + u, password: 'geheim123',
       geboortedatum: '1990-05-05', geslacht: 'v', tier: 'rtg', pasApp: 'rtg' }) }).then(r => r.json());
   token = reg.token;
   assert.ok(token, 'lid ingelogd');
+  assert.equal((await api('/api/state', {})).body.state.user.tier, 'guest');
+  // Bereik de echte classificatiegrens met een bevoegde persoonlijke Office-gebruiker.
+  maakBetaaldRtgTestaccount(TMP, email);
+  assert.equal((await api('/api/state', {})).body.state.user.tier, 'rtg');
 });
-test.after(() => {
-  stop(srv && srv.child);
+test.after(async () => {
+  if (srv) await stopHard(srv.child);
   try { model.srv.close(); } catch (e) {}
   try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
 });

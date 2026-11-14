@@ -17,7 +17,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { startServer, stopHard, maakBetaaldRtgTestaccount } = require('./helper');
 
 let srv, base;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-bugjacht-'));
@@ -42,9 +42,14 @@ test.before(async () => {
   srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP, DEMO_SUPPLIER: 'MERCABIZA' } });
   base = srv.base;
   const u = Date.now().toString().slice(-8);
-  lid = (await api('/api/auth/register', { name: 'Bug Jager', email: 'bj' + u + '@x.nl',
+  const email = 'bj' + u + '@x.nl';
+  lid = (await api('/api/auth/register', { name: 'Bug Jager', email,
     phone: '064' + u.slice(1), password: 'geheim123', geboortedatum: '1985-03-03', tier: 'rtg', pasApp: 'rtg' })).body.token;
   assert.ok(lid, 'het testlid is aangemeld');
+  assert.equal((await api('/api/state', {}, lid)).body.state.user.tier, 'guest');
+  // Alleen de bedoelde reiziger is een bestaand betaald lid; geen leeftijdsbewijs toevoegen.
+  maakBetaaldRtgTestaccount(TMP, email);
+  assert.equal((await api('/api/state', {}, lid)).body.state.user.tier, 'rtg');
   /* Een ECHT account zonder geboortedatum. Aanmelden via het formulier vraagt
      er altijd om, maar createUserSync in de opstart doet dat niet: het
      demo-eigenaarsaccount heeft geen `geboren` in zijn ledenstaat. Dat is
@@ -54,8 +59,8 @@ test.before(async () => {
     password: process.env.DEMO_PASS || 'Imran', pasApp: 'business' })).body.token;
   assert.ok(jong, 'het account zonder geboortedatum is ingelogd');
 });
-test.after(() => {
-  stop(srv && srv.child);
+test.after(async () => {
+  if (srv) await stopHard(srv.child);
   try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
 });
 
@@ -545,7 +550,7 @@ test('het eigenaarsadres is niet via de openbare registratie te claimen', async 
     assert.equal(gewoon.status, 200, JSON.stringify(gewoon.body).slice(0, 160));
     assert.ok(gewoon.body.token);
   } finally {
-    stop(eigen && eigen.child);
+    if (eigen) await stopHard(eigen.child);
     try { fs.rmSync(TMP2, { recursive: true, force: true }); } catch (e) {}
   }
 });

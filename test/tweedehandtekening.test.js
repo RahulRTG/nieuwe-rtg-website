@@ -31,7 +31,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop, kantoorKoppelBody } = require('./helper');
+const { startServer, stopHard, kantoorKoppelBody, maakBetaaldRtgTestaccount } = require('./helper');
 const { kantoorPasskey } = require('./kantoorpasskey');
 
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-tweehand-'));
@@ -58,6 +58,8 @@ async function medewerker(merk) {
     phone: '06' + String(10000000 + Math.floor(Math.random() * 8e7)),
     password: 'Geheim123!', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' });
   assert.ok(reg.body.token, 'medewerker ' + merk + ' geregistreerd');
+  assert.equal((await api('/api/state', {}, reg.body.token)).body.state.user.tier, 'guest',
+    'de kantoorrol vraagt een echte identiteit, geen betaalde consumentenpas');
   const kop = await api('/api/account/koppel', await kantoorKoppelBody(base, reg.body.token), reg.body.token);
   assert.equal(kop.status, 200, 'medewerker ' + merk + ' koppelt de kantoorrol: ' + JSON.stringify(kop.body).slice(0, 120));
   const start = await api('/api/account/start', { rol: 'kantoor' }, reg.body.token);
@@ -96,15 +98,21 @@ test.before(async () => {
   sleutelB = await pk.zet(lidB, 'Geheim123!');
 
   const u = Date.now().toString(36);
-  lid = (await api('/api/auth/register', { name: 'Rekeninghouder', email: 'rh' + u + '@voorbeeld.test',
+  const email = 'rh' + u + '@voorbeeld.test';
+  lid = (await api('/api/auth/register', { name: 'Rekeninghouder', email,
     phone: '06' + String(10000000 + Math.floor(Math.random() * 8e7)), password: 'Geheim123!',
     geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' })).body.token;
+  assert.ok(lid);
+  assert.equal((await api('/api/state', {}, lid)).body.state.user.tier, 'guest');
+  // Alleen rekeninghouders krijgen de ledenfixture, nooit de drie kantooractoren.
+  maakBetaaldRtgTestaccount(TMP, email);
+  assert.equal((await api('/api/state', {}, lid)).body.state.user.tier, 'rtg');
   const akk = await api('/api/bank/akkoord', {}, lid);
   assert.equal(akk.status, 200, 'het lid opent een rekening: ' + JSON.stringify(akk.body).slice(0, 140));
   iban = akk.body.rekening.iban;
 });
-test.after(() => {
-  stop(srv && srv.child);
+test.after(async () => {
+  if (srv) await stopHard(srv.child);
   try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
 });
 
@@ -201,9 +209,14 @@ test('6. de incassoronde vraagt dezelfde twee mensen, en loopt de hele gouden we
      beweegt -- dit is de enige toets in dit huis waar een euro de hele machine
      doorloopt. */
   const u2 = (Date.now() + 991).toString(36);
-  const lid2 = (await api('/api/auth/register', { name: 'Ontvanger', email: 'ov' + u2 + '@voorbeeld.test',
+  const email2 = 'ov' + u2 + '@voorbeeld.test';
+  const lid2 = (await api('/api/auth/register', { name: 'Ontvanger', email: email2,
     phone: '06' + String(10000000 + Math.floor(Math.random() * 8e7)), password: 'Geheim123!',
     geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' })).body.token;
+  assert.ok(lid2);
+  assert.equal((await api('/api/state', {}, lid2)).body.state.user.tier, 'guest');
+  maakBetaaldRtgTestaccount(TMP, email2);
+  assert.equal((await api('/api/state', {}, lid2)).body.state.user.tier, 'rtg');
   const akk2 = await api('/api/bank/akkoord', {}, lid2);
   assert.equal(akk2.status, 200, 'de tweede rekening: ' + JSON.stringify(akk2.body).slice(0, 140));
   const naarIban = akk2.body.rekening.iban;
@@ -404,9 +417,14 @@ test('12. een incassoronde boven de grens: eerst een risicogoedkeuring van een a
   const eenC = await medewerker(3);
   const sleutelC = await pk.zet(medewerker.lid, 'Geheim123!');   // een passkey toevoegen vraagt het wachtwoord (P1-2, #523)
   const u3 = (Date.now() + 3331).toString(36);
-  const lid3 = (await api('/api/auth/register', { name: 'Verhuurder', email: 'vh' + u3 + '@voorbeeld.test',
+  const email3 = 'vh' + u3 + '@voorbeeld.test';
+  const lid3 = (await api('/api/auth/register', { name: 'Verhuurder', email: email3,
     phone: '06' + String(10000000 + Math.floor(Math.random() * 8e7)), password: 'Geheim123!',
     geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' })).body.token;
+  assert.ok(lid3);
+  assert.equal((await api('/api/state', {}, lid3)).body.state.user.tier, 'guest');
+  maakBetaaldRtgTestaccount(TMP, email3);
+  assert.equal((await api('/api/state', {}, lid3)).body.state.user.tier, 'rtg');
   const naarIban = (await api('/api/bank/akkoord', {}, lid3)).body.rekening.iban;
   const vast = await api('/api/bank/terugkerend/zet', { vanIban: iban, naarIban, centen: 300000, interval: 'maand',
     oms: 'Huur (proef 2C)', idem: 'proef-2c-' + u3 }, lid);

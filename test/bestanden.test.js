@@ -6,7 +6,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { startServer, stopHard, maakBetaaldRtgTestaccount } = require('./helper');
 
 let srv, base, lidA, lidB, codeB;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-bestanden-'));
@@ -25,22 +25,28 @@ const b64 = t => Buffer.from(t).toString('base64');
 const alsTekst = t => 'data:text/plain;base64,' + b64(t);
 
 let seq = 0;
-async function lid() {
+async function lid(betaald = false) {
   const u = (Date.now() + (++seq)).toString().slice(-8);
-  const reg = await api('/api/auth/register', { name: 'Kluislid ' + seq, email: 'bf' + u + '@x.nl',
+  const email = 'bf' + u + '@x.nl';
+  const reg = await api('/api/auth/register', { name: 'Kluislid ' + seq, email,
     phone: '06' + u, password: 'geheim123', geboortedatum: '1988-03-03', geslacht: 'm', tier: 'rtg', pasApp: 'rtg' });
+  assert.equal(reg.status, 200); assert.ok(reg.body.token);
+  assert.equal((await api('/api/state', {}, reg.body.token)).body.state.user.tier, 'guest');
+  // Alleen A maakt persoonlijk Office-werk. B deelt als echte gratis accounthouder mee.
+  if (betaald) maakBetaaldRtgTestaccount(TMP, email);
   const st = await api('/api/state', {}, reg.body.token);
+  assert.equal(st.body.state.user.tier, betaald ? 'rtg' : 'guest');
   return { token: reg.body.token, codenaam: st.body.state.user.codename };
 }
 
 test.before(async () => {
   srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   base = srv.base;
-  const a = await lid(); const b = await lid();
+  const a = await lid(true); const b = await lid();
   lidA = a.token; lidB = b.token; codeB = b.codenaam;
 });
-test.after(() => {
-  stop(srv && srv.child);
+test.after(async () => {
+  if (srv) await stopHard(srv.child);
   try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
 });
 

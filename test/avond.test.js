@@ -22,7 +22,7 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs'); const os = require('os'); const path = require('path');
-const { startServer } = require('./helper');
+const { startServer, maakBetaaldRtgTestaccount } = require('./helper');
 const { registreerGratis } = require('../scripts/lib/gratisaccount');
 
 let BASE, child, LID;
@@ -52,6 +52,8 @@ test.before(async () => {
     geboortedatum: '1990-05-05', geslacht: 'v', tier: 'rtg', pasApp: 'rtg' });
   LID = reg.body.token;
   assert.ok(LID, 'een lid kan zich registreren: ' + JSON.stringify(reg.body).slice(0, 160));
+  // De terugreis gebruikt betaald vervoer; de aparte QR-gasten blijven gratis.
+  maakBetaaldRtgTestaccount(TMP, 'av' + u + '@voorbeeld.nl');
 });
 test.after(() => {
   if (child) try { child.kill('SIGKILL'); } catch (e) {}

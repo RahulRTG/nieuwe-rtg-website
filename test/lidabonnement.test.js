@@ -119,13 +119,13 @@ test('3. de sleutel komt uit de sessie: lid A komt niet bij lid B', () => {
     w.contracten.lijst({ aanmeldingId: 'aanm-a' })[0].id, 'lid 42 krijgt zijn eigen contract');
   assert.equal(w.lezer.mijn(77).abonnement.maandBedrag, 5000, 'en lid 77 het zijne');
 
-  /* De hele functie neemt GEEN aanmeldingId aan. Dat is de grendel: er is geen
-     parameter waarmee lid 42 naar aanm-b kan wijzen. */
+  /* De bevestiging selecteert nooit een andere eigenaar. */
   assert.equal(w.lezer.mijn.length, 1, 'mijn() neemt precies een argument: het accountId');
-  assert.equal(w.opzeg.zegOpZelf.length, 1, 'en zegOpZelf ook');
+  assert.equal(w.opzeg.zegOpZelf(42, w.opzeg.opzegVoorbeeld(77)).status, 409);
+  assert.equal(w.lezer.mijn(42).abonnement.stand, 'ACTIEF');
 
   // en opzeggen raakt alleen het eigen contract
-  w.opzeg.zegOpZelf(42);
+  w.opzeg.zegOpZelf(42, w.opzeg.opzegVoorbeeld(42));
   assert.equal(w.lezer.mijn(77).abonnement.stand, 'ACTIEF', 'het contract van lid 77 is niet geraakt');
 });
 
@@ -149,11 +149,12 @@ test('5. twee tikken zijn geen twee opzeggingen', () => {
   const w = wereld();
   w.lid(42, 'aanm-a', 'rtg', 6500);
 
-  const een = w.opzeg.zegOpZelf(42);
+  const referentie = w.opzeg.opzegVoorbeeld(42);
+  const een = w.opzeg.zegOpZelf(42, referentie);
   assert.equal(een.ok, true);
   assert.equal(een.alOpgezegd, false);
 
-  const twee = w.opzeg.zegOpZelf(42);
+  const twee = w.opzeg.zegOpZelf(42, referentie);
   assert.equal(twee.ok, true, 'de tweede is geen fout');
   assert.equal(twee.alOpgezegd, true, 'maar hij zegt wel dat er al was opgezegd');
   assert.equal(twee.eindigtOp, een.eindigtOp, 'en dezelfde einddatum -- niet opnieuw gerekend');
@@ -164,7 +165,7 @@ test('6. het voorbeeld en de echte opzegging geven dezelfde einddatum', () => {
   w.lid(42, 'aanm-a', 'rtg', 6500);
 
   const voorbeeld = w.opzeg.opzegVoorbeeld(42);
-  const echt = w.opzeg.zegOpZelf(42);
+  const echt = w.opzeg.zegOpZelf(42, voorbeeld);
   assert.equal(echt.eindigtOp, voorbeeld.eindigtOp,
     'wat het lid vooraf leest, is de afspraak die hij krijgt');
   assert.equal(echt.vervallenTermijnen, voorbeeld.vervallenTermijnen,
@@ -177,7 +178,7 @@ test('7. opzeggen in maand twee heft de verbintenis van twaalf maanden niet op',
   const w = wereld(() => Date.parse('2026-02-20T10:00:00.000Z'));
   w.lid(42, 'aanm-a', 'rtg', 6500);
 
-  const r = w.opzeg.zegOpZelf(42);
+  const r = w.opzeg.zegOpZelf(42, w.opzeg.opzegVoorbeeld(42));
   const eind = new Date(r.eindigtOp);
   assert.ok(eind >= new Date('2027-01-15T00:00:00.000Z'),
     'de einddatum ligt op of na het einde van de minimumtermijn, niet een maand na nu');
@@ -236,6 +237,57 @@ test('10. het opzegvoorbeeld schrijft niets -- ook niet naar schijf', () => {
   assert.equal(w.saves.n, na, 'mijn() doet geen save()');
 
   // het echte opzeggen WEL -- anders meet deze toets niets
-  w.opzeg.zegOpZelf(42);
+  w.opzeg.zegOpZelf(42, w.opzeg.opzegVoorbeeld(42));
   assert.ok(w.saves.n > na, 'opzeggen schrijft wel, anders bewijst deze toets niets');
+});
+
+test('een oud opzegvoorbeeld en een ontbrekende referentie raken geen nieuw contract', () => {
+  const w = wereld();
+  const oud = w.lid(42, 'oud', 'rtg', 6500);
+  const voorbeeld = w.opzeg.opzegVoorbeeld(42);
+  const nieuw = w.lid(42, 'nieuw', 'rtg', 25000);
+  const saves = w.saves.n;
+  assert.equal(w.opzeg.zegOpZelf(42, voorbeeld).status, 409);
+  assert.equal(w.opzeg.zegOpZelf(42).status, 409);
+  assert.equal(w.saves.n, saves);
+  assert.equal(nieuw.status, 'ACTIEF');
+  assert.equal(oud.status, 'ACTIEF');
+  assert.equal(w.opzeg.zegOpZelf(42, w.opzeg.opzegVoorbeeld(42)).ok, true);
+});
+
+test('gewijzigde prijs of termijn verlangt een nieuw voorbeeld zonder onbedoelde opzegging', () => {
+  for (const [veld, waarde] of [['afgesprokenCenten', 9999], ['minimumMaanden', 24], ['btwProfiel', 'nl-0']]) {
+    const w = wereld(), c = w.lid(42, 'eigen', 'rtg', 6500);
+    const voorbeeld = w.opzeg.opzegVoorbeeld(42), saves = w.saves.n;
+    c[veld] = waarde;
+    assert.equal(w.opzeg.zegOpZelf(42, voorbeeld).status, 409, veld);
+    assert.equal(c.status, 'ACTIEF');
+    assert.equal(w.saves.n, saves);
+  }
+});
+
+test('een verouderde opzegdatum wordt niet stil verplaatst; een vastgelegde retry blijft geldig', () => {
+  let klok = Date.parse('2027-06-01T10:00:00Z');
+  const w = wereld(() => klok);
+  const c = w.lid(42, 'eigen', 'rtg', 6500);
+  const oud = w.opzeg.opzegVoorbeeld(42);
+  klok = Date.parse('2027-06-15T10:00:00Z');
+  assert.equal(w.opzeg.zegOpZelf(42, oud).status, 409);
+  assert.equal(c.status, 'ACTIEF');
+  const huidig = w.opzeg.opzegVoorbeeld(42);
+  const een = w.opzeg.zegOpZelf(42, huidig);
+  klok = Date.parse('2027-06-30T10:00:00Z');
+  const twee = w.opzeg.zegOpZelf(42, huidig);
+  assert.equal(twee.ok, true);
+  assert.equal(twee.eindigtOp, een.eindigtOp);
+});
+
+test('de datumreferentie volgt de getoonde huisdatum over lokale middernacht', () => {
+  let klok = Date.parse('2027-06-01T20:00:00Z');
+  const w = wereld(() => klok), c = w.lid(42, 'eigen', 'rtg', 6500);
+  const voorbeeld = w.opzeg.opzegVoorbeeld(42);
+  klok = Date.parse('2027-06-01T23:00:00Z');
+  assert.notEqual(voorbeeld.eindigtOpTekst, w.opzeg.opzegVoorbeeld(42).eindigtOpTekst);
+  assert.equal(w.opzeg.zegOpZelf(42, voorbeeld).status, 409);
+  assert.equal(c.status, 'ACTIEF');
 });

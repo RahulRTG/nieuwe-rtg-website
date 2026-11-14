@@ -12,7 +12,8 @@
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, maakBetaaldRtgTestaccount } = require('./helper');
+const fs = require('node:fs'), os = require('node:os'), path = require('node:path');
 
 const post = (base) => async (pad, body, tok) => {
   const r = await fetch(base + pad, {
@@ -24,13 +25,15 @@ const post = (base) => async (pad, body, tok) => {
 };
 
 test('een vergeten pin is te herstellen via het eigen adres, en de sleutel werkt maar een keer', async () => {
-  const srv = await startServer({ env: { SMTP_URL: '' } });
+  const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-pinvergeten-'));
+  const srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   const p = post(srv.base);
   try {
     const reg = await p('/api/auth/register', { name: 'Pin Lid', email: 'pinvergeten@x.nl', phone: '0612345788',
       password: 'geheim123', geboortedatum: '1990-01-01', pasApp: 'rtg' });
     const tok = reg.body.token;
     assert.ok(tok, 'registreren lukte: ' + JSON.stringify(reg.body).slice(0, 140));
+    maakBetaaldRtgTestaccount(TMP, 'pinvergeten@x.nl');
 
     // een pin zetten, en hem daarna "vergeten"
     const gezet = await p('/api/pin/zet', { pin: '4321' }, tok);
@@ -69,7 +72,10 @@ test('een vergeten pin is te herstellen via het eigen adres, en de sleutel werkt
     assert.equal(check.status, 200, 'de nieuwe pin wordt aangenomen');
     const oud = await p('/api/pin/check', { pin: '4321' }, tok);
     assert.equal(oud.status, 401, 'de oude pin doet het niet meer');
-  } finally { stop(srv.child); }
+  } finally {
+    await stop(srv.child);
+    fs.rmSync(TMP, { recursive: true, force: true });
+  }
 });
 
 test('een gast heeft geen algemene pin en dus ook niets te herstellen', async () => {

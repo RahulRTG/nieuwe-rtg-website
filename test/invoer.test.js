@@ -54,11 +54,10 @@ const post = (pad, body, token, nieuw) => fetch(base + pad, {
 test.before(async () => {
   srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   base = srv.base;
-  const u = Date.now().toString().slice(-8);
-  const reg = await post('/api/auth/register', { name: 'Reiziger', email: 'in' + u + '@x.nl',
-    phone: '06' + u, password: 'geheim123', geboortedatum: '1990-01-01', tier: 'business', pasApp: 'business' });
-  lid = reg.body.token;
-  assert.ok(lid, 'het lid staat ingeschreven');
+  /* De laatste proef boekt bij RTG en vraagt daarom een betaalde pas. Een
+     registratie is identiteit, geen aankoop; gebruik de expliciete persona. */
+  lid = (await post('/api/login', { tier: 'rtg', pasApp: 'rtg' })).body.token;
+  assert.ok(lid, 'de betaalde testreiziger is ingelogd');
 });
 test.after(() => { stop(srv && srv.child); try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {} });
 

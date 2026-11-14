@@ -20,7 +20,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, maakBetaaldRtgTestaccount } = require('./helper');
 
 let srv, base, lidA, lidB, pda, baas, kantoor;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-kaart-'));
@@ -44,6 +44,7 @@ async function lid() {
   const reg = await api('/api/auth/register', { name: 'Reiziger ' + seq, email: 'kt' + u + '@x.nl',
     phone: '06' + u, password: 'geheim123', geboortedatum: '1990-05-05', geslacht: 'v',
     tier: 'rtg', pasApp: 'rtg' });
+  maakBetaaldRtgTestaccount(TMP, 'kt' + u + '@x.nl');
   return reg.body.token;
 }
 // de standaardovereenkomst waar de meeste toetsen op leunen

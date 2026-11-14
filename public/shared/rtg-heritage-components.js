@@ -3,7 +3,7 @@
 (function (w, d) {
   'use strict';
   if (w.RTGHeritageComponents) return;
-  var EXCLUDE = '.rtg-edge-chrome,[contenteditable="true"],.monaco-editor,.cm-editor,.leaflet-container,.maplibregl-map,[data-rtg-native-canvas]';
+  var EXCLUDE = '.rtg-edge-chrome,.rtg-rahul-page,[contenteditable="true"],.monaco-editor,.cm-editor,.leaflet-container,.maplibregl-map,[data-rtg-native-canvas]';
   var SCOPE = 'main,[role="main"],dialog,[role="dialog"]';
   function mark(el, name, value) { if (el && !el.hasAttribute(name)) el.setAttribute(name, value); }
   function guarded(el, guard) {
@@ -36,7 +36,7 @@
        klassen als .wrap, .werk, .app of .blad. Geneste mains tellen niet als
        tweede pagina en een kaart/editor/camera blijft een vrij canvas. */
     var roots = Array.from(d.querySelectorAll('main,[role="main"]')).filter(function (el) {
-      if (el.closest('.rtg-edge-chrome,dialog,[role="dialog"]')) return;
+      if (el.closest('.rtg-edge-chrome,.rtg-rahul-page,dialog,[role="dialog"]')) return;
       var parent = el.parentElement && el.parentElement.closest('main,[role="main"]');
       if (parent) return false;
       /* Command and the standalone workspace are the workspace shells, not
@@ -57,7 +57,7 @@
     });
     if (!visibleRoot) {
       var candidates = Array.from(d.body.children).filter(function (el) {
-        if (el.matches('script,style,link,nav,header,footer,dialog,[role="dialog"],[role="alertdialog"],.rtg-edge-chrome,.rtg-world-start,.os-switcher')) return false;
+        if (el.matches('script,style,link,nav,header,footer,dialog,[role="dialog"],[role="alertdialog"],.rtg-edge-chrome,.rtg-rahul-page,.rtg-world-start,.os-switcher')) return false;
         var rect = el.getBoundingClientRect(), style = getComputedStyle(el);
         return style.display !== 'none' && style.visibility !== 'hidden' && rect.width > 240 && rect.height > 160;
       }).sort(function (a, b) {

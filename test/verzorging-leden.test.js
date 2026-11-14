@@ -10,7 +10,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, maakBetaaldRtgTestaccount } = require('./helper');
 
 let srv, base, lid, lid2, gast, echteCodenaam;
 const ECHTE_NAAM = 'Verzorging Lid';
@@ -33,7 +33,8 @@ test.before(async () => {
      kunnen bewijzen. */
   const u = Date.now().toString().slice(-8);
   const reg = await api('auth/register', { name: ECHTE_NAAM, email: 'v' + u + '@x.nl', phone: '06' + u,
-    password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' }, '');
+    password: 'geheim123', geboortedatum: '1990-01-01', pasApp: 'rtg' }, '');
+  maakBetaaldRtgTestaccount(TMP, 'v' + u + '@x.nl');
   lid = reg.body.token;
   echteCodenaam = reg.body.state && reg.body.state.user && reg.body.state.user.codename;
   assert.ok(lid, 'het lid is geregistreerd');

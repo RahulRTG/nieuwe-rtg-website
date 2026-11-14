@@ -8,13 +8,19 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, maakBetaaldRtgTestaccount } = require('./helper');
 const { maakReisketenFixture, goed } = require('./lib/reisketen-fixture');
 const { registreerGratis } = require('../scripts/lib/gratisaccount');
 const map = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-reisketen-http-'));
 let srv, x, rtgReis, partnerReis;
 const env = { RTG_DATA_DIR: map, SMTP_URL: '', OFFICE_CODE: 'RTG-OFFICE' };
-test.before(async () => { srv = await startServer({ env }); x = await maakReisketenFixture(() => srv.base); });
+test.before(async () => {
+  srv = await startServer({ env });
+  x = await maakReisketenFixture(() => srv.base);
+  // De twee leden uit reisketen-fixture zijn hier al betalende RTG-persona's.
+  // De aparte Community-proef hieronder blijft onbetaald.
+  for (const n of ['81', '82']) maakBetaaldRtgTestaccount(map, 'reisketen-' + n + '@voorbeeld.test');
+});
 test.after(async () => { await stop(srv); fs.rmSync(map, { recursive: true, force: true }); });
 const MP = '/api/reisbureau/keten';
 const OP = '/api/office/reisbureau/keten';

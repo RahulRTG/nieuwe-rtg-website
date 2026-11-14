@@ -20,7 +20,10 @@
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop, laadPlaywright, browserOpties, geenBrowser, letOpFouten } = require('./helper');
+const fs = require('node:fs');
+const os = require('node:os');
+const path = require('node:path');
+const { startServer, stop, stopHard, maakBetaaldRtgTestaccount, laadPlaywright, browserOpties, geenBrowser, letOpFouten } = require('./helper');
 
 const pw = laadPlaywright();
 const SCHERM = '/apps/move.html';
@@ -35,11 +38,12 @@ async function post(base, pad, lijf, tok) {
 
 /* Een ECHT lid langs de echte registratieroute; een nagebouwd token meet je
    eigen aanname en niet de deur. */
-async function proeflid(base) {
+async function proeflid(base, datamap) {
   const u = Date.now().toString().slice(-8) + Math.floor(Math.random() * 90 + 10);
   const r = await post(base, '/api/auth/register', { name: 'Proeflid', email: 'mve' + u + '@voorbeeld.nl',
     phone: '06' + u.slice(0, 8), password: 'geheim12345', geboortedatum: '1985-05-05', tier: 'rtg' });
   assert.equal(r.status, 200, 'proeflid: ' + JSON.stringify(r.data));
+  maakBetaaldRtgTestaccount(datamap, 'mve' + u + '@voorbeeld.nl');
   return r.data.token;
 }
 
@@ -56,11 +60,12 @@ async function blad(browser, token) {
 
 test('RTG Move weegt twee echte boekingen tot een oordeel en brengt de reiziger naar Navigatie',
   { skip: geenBrowser(pw) }, async () => {
-  const srv = await startServer({ env: { SMTP_URL: '', NODE_ENV: 'test', RTG_DEMO: '1' } });
+  const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-move-e2e-'));
+  const srv = await startServer({ env: { SMTP_URL: '', NODE_ENV: 'test', RTG_DEMO: '1', RTG_DATA_DIR: TMP } });
   let browser;
   try {
     const base = srv.base;
-    const tok = await proeflid(base);
+    const tok = await proeflid(base, TMP);
 
     /* Een afspraak van 08:00 en een charter van 09:30: twee onderdelen op twee
        plekken, en de tweede is een vlucht. Eerst moet de reiziger naar de afspraak,
@@ -104,7 +109,7 @@ test('RTG Move weegt twee echte boekingen tot een oordeel en brengt de reiziger 
 
     // Een afzonderlijke reis begint met een charter: dan is de luchthaven
     // de eerstvolgende plek. De afspraak hierboven mag niet worden overgeslagen.
-    const vliegTok = await proeflid(base);
+    const vliegTok = await proeflid(base, TMP);
     assert.equal((await post(base, '/api/member/vluchten/charter',
       { soort: 'privejet', bestemming: 'Parijs Le Bourget', datum: d, tijd: '09:30' }, vliegTok)).status, 200);
     const vlucht = await blad(browser, vliegTok);
@@ -122,7 +127,8 @@ test('RTG Move weegt twee echte boekingen tot een oordeel en brengt de reiziger 
     await vlucht.ctx.close();
   } finally {
     if (browser) await browser.close();
-    stop(srv);
+    await stopHard(srv.child);
+    fs.rmSync(TMP, { recursive: true, force: true });
   }
 });
 

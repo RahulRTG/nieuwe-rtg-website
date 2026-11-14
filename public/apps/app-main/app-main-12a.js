@@ -4,11 +4,12 @@
        aannemen dat een element bestaat. Viel er een om, dan kwam de rest van
        renderAll niet eens op gang en hielp het afschermen van de stappen
        hieronder niets. */
-    // gratis gebruiker (zonder pas): reizen, betalen en AI zijn voor leden
+    // Gratis account: betaalde diensten blijven apart, eigen facturen bereikbaar.
     const guest = user.tier === 'guest';
     stap('scherm-aanloop', () => {
     $('#codeChipTxt').textContent = user.codename;
-    ['reizen','betalen','ai','assets'].forEach(t => { const b = document.querySelector('.tabbar button[data-tab="'+t+'"]'); if (b) b.style.display = guest ? 'none' : ''; });
+    ['reizen','ai','assets'].forEach(t => { const b = document.querySelector('.tabbar button[data-tab="'+t+'"]'); if (b) b.style.display = guest ? 'none' : ''; });
+    { const b = document.querySelector('.tabbar button[data-tab="betalen"]'); if (b) b.style.display = (guest && !user.account) ? 'none' : ''; }
     // zorg hoort bij FoundationOS: open voor elk eigen account, ook gratis
     { const b = document.querySelector('.tabbar button[data-tab="zorg"]'); if (b) b.style.display = (guest && !user.account) ? 'none' : ''; }
     // het OS-beginscherm leest dit: zonder pas geen wallet-tegel en geen balk

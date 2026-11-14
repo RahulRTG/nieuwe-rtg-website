@@ -26,7 +26,10 @@
    Draait alleen waar een browser is. */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
+const fs = require('node:fs');
+const os = require('node:os');
+const path = require('node:path');
+const { startServer, stopHard, maakBetaaldRtgTestaccount, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
 
 const pw = laadPlaywright();
 
@@ -40,12 +43,13 @@ async function post(base, pad, body, token) {
     .then(r => r.json()).catch(() => ({}));
 }
 
-async function nieuwLid(base) {
+async function nieuwLid(base, datamap) {
   const u = Date.now().toString().slice(-8) + Math.floor(Math.random() * 90 + 10);
   const reg = await post(base, '/api/auth/register', { name: 'Reiziger', email: 'mb' + u + '@x.nl',
     phone: '06' + u.slice(0, 8), password: 'geheim123', geboortedatum: '1990-01-01',
     geslacht: 'v', tier: 'rtg', pasApp: 'rtg' });
   assert.ok(reg.token, 'het lid is aangemeld: ' + JSON.stringify(reg).slice(0, 160));
+  maakBetaaldRtgTestaccount(datamap, 'mb' + u + '@x.nl');
   return reg.token;
 }
 
@@ -74,10 +78,11 @@ async function open(base, url, sleutel, token) {
 
 test('de reizigersapp plant een reis, toont de opties en boekt er een',
   { skip: geenBrowser(pw) }, async () => {
-  const { child, base } = await startServer({ env: { SMTP_URL: '' } });
+  const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-mobiliteitscherm-reis-'));
+  const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   let browser;
   try {
-    const token = await nieuwLid(base);
+    const token = await nieuwLid(base, TMP);
     const s = await open(base, '/apps/ov.html', 'rtg_member_token', token);
     browser = s.browser;
     const page = s.page;
@@ -172,16 +177,18 @@ test('de reizigersapp plant een reis, toont de opties en boekt er een',
     assert.deepEqual(s.fouten, [], 'paginafouten: ' + s.fouten.join(' | '));
   } finally {
     if (browser) await browser.close();
-    child.kill();
+    await stopHard(child);
+    fs.rmSync(TMP, { recursive: true, force: true });
   }
 });
 
 test('het OV-tabblad zegt eerlijk dat er geen kaartje te koop is, en verkoopt er wel een als het mag',
   { skip: geenBrowser(pw) }, async () => {
-  const { child, base } = await startServer({ env: { SMTP_URL: '', OFFICE_CODE: 'KANTOOR-SCHERM-1' } });
+  const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-mobiliteitscherm-ov-'));
+  const { child, base } = await startServer({ env: { SMTP_URL: '', OFFICE_CODE: 'KANTOOR-SCHERM-1', RTG_DATA_DIR: TMP } });
   let browser;
   try {
-    const token = await nieuwLid(base);
+    const token = await nieuwLid(base, TMP);
     const s = await open(base, '/apps/ov.html', 'rtg_member_token', token);
     browser = s.browser;
     const page = s.page;
@@ -236,16 +243,18 @@ test('het OV-tabblad zegt eerlijk dat er geen kaartje te koop is, en verkoopt er
     assert.deepEqual(s.fouten, [], 'paginafouten: ' + s.fouten.join(' | '));
   } finally {
     if (browser) await browser.close();
-    child.kill();
+    await stopHard(child);
+    fs.rmSync(TMP, { recursive: true, force: true });
   }
 });
 
 test('het dispatchscherm toont de openstaande rit met de rekensom van de matcher',
   { skip: geenBrowser(pw) }, async () => {
-  const { child, base } = await startServer({ env: { SMTP_URL: '' } });
+  const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-mobiliteitscherm-dispatch-'));
+  const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   let browser;
   try {
-    const lid = await nieuwLid(base);
+    const lid = await nieuwLid(base, TMP);
     const zaak = await zaakToken(base);
 
     // een wagen die mag rijden, en een die dat niet mag: allebei moeten ze in beeld
@@ -298,7 +307,8 @@ test('het dispatchscherm toont de openstaande rit met de rekensom van de matcher
     assert.deepEqual(s.fouten, [], 'paginafouten: ' + s.fouten.join(' | '));
   } finally {
     if (browser) await browser.close();
-    child.kill();
+    await stopHard(child);
+    fs.rmSync(TMP, { recursive: true, force: true });
   }
 });
 
@@ -308,11 +318,12 @@ test('het dispatchscherm toont de openstaande rit met de rekensom van de matcher
    een leesbare QR staan en moet een tweede scherm er een oordeel over geven. */
 test('het lid toont zijn kaartje als QR en de conducteur keurt hem op de PDA',
   { skip: geenBrowser(pw) }, async () => {
-  const { child, base } = await startServer({ env: { SMTP_URL: '', OFFICE_CODE: 'KANTOOR-QR-1' } });
+  const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-mobiliteitscherm-qr-'));
+  const { child, base } = await startServer({ env: { SMTP_URL: '', OFFICE_CODE: 'KANTOOR-QR-1', RTG_DATA_DIR: TMP } });
   let browser;
   try {
     // kaartverkoop mogelijk maken en een kaartje kopen
-    const token = await nieuwLid(base);
+    const token = await nieuwLid(base, TMP);
     const kantoor = (await post(base, '/api/office/login', { code: 'KANTOOR-QR-1' })).token;
     for (const m of ['partner_contracts', 'public_transport_ticketing'])
       await post(base, '/api/office/mob/module/zet', { id: m, aan: true }, kantoor);
@@ -395,7 +406,8 @@ test('het lid toont zijn kaartje als QR en de conducteur keurt hem op de PDA',
     assert.deepEqual(s.fouten, [], 'paginafouten in de leden-app: ' + s.fouten.join(' | '));
   } finally {
     if (browser) await browser.close();
-    child.kill();
+    await stopHard(child);
+    fs.rmSync(TMP, { recursive: true, force: true });
   }
 });
 

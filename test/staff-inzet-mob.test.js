@@ -36,7 +36,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, maakBetaaldRtgTestaccount } = require('./helper');
 
 let srv, base, reiziger, taxiPda, taxiBaas, ovPda, ovBaas;
 let ref, wagenGoed, wagenKaal, prikPositie;
@@ -58,7 +58,8 @@ test.before(async () => {
   const u = Date.now().toString().slice(-8);
   const reg = await api('/api/auth/register', { name: 'Reiziger Prik', email: 'prik' + u + '@x.nl',
     phone: '06' + u, password: 'geheim123', geboortedatum: '1990-05-05', geslacht: 'v',
-    tier: 'rtg', pasApp: 'rtg' });
+    pasApp: 'rtg' });
+  maakBetaaldRtgTestaccount(TMP, 'prik' + u + '@x.nl');
   reiziger = reg.body.token;
 
   const taxi = await api('/api/supplier/roster', { code: 'MKKX' });

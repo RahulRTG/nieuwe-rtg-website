@@ -10,7 +10,7 @@
    Draai: npm run e2e */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop, letOpFouten, laadPlaywright, browserOpties, geenBrowser, edgeActies } = require('./helper');
+const { startServer, stopHard, letOpFouten, laadPlaywright, browserOpties, geenBrowser, edgeActies } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -37,12 +37,15 @@ test('Voeding: een plan in je eigen woorden, zonder cijfer en zonder oordeel',
         password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' })
     }).then(r => r.json());
     assert.ok(reg.token, 'lid-registratie geeft een token');
+    require('./helper').maakBetaaldRtgTestaccount(TMP, 'voedscherm@x.nl');
     const api = (pad, body) => fetch(base + '/api/' + pad, {
       method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + reg.token },
       body: JSON.stringify(body || {}) }).then(r => r.json());
 
     // een allergeen in het zorgprofiel, via de eigen deur van dat profiel
-    await api('zorgprofiel/zet', { allergenen: ['noten'], dieet: 'vegetarisch', medisch: '', delen: false });
+    const profiel = await api('zorgprofiel/zet', { allergenen: ['noten'], dieet: 'vegetarisch', medisch: '', delen: false });
+    assert.equal(profiel.ok, true, JSON.stringify(profiel));
+    assert.equal(profiel.zorg.delen, false, 'voedingsvoorkeuren delen geen medische context');
 
     browser = await pw.chromium.launch(browserOpties(pw));
     const page = await browser.newPage();
@@ -98,7 +101,7 @@ test('Voeding: een plan in je eigen woorden, zonder cijfer en zonder oordeel',
     assert.deepEqual(paginaFouten, [], 'geen JS-fouten tijdens het scherm');
   } finally {
     if (browser) await browser.close();
-    stop(child);
+    await stopHard(child);
     try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
   }
 });

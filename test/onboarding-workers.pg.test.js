@@ -89,7 +89,17 @@ test('RTF ondertekening: twee workers, onveranderlijke versies en procescrashher
       const { rows } = await pool.query('SELECT sessies_vanaf FROM users WHERE id=$1', [Number(id)]);
       assert.equal(rows.length, 1);
       if (Number(rows[0].sessies_vanaf || 0) > Number(uitgegeven)) {
-        assert.equal((await api(a, 'auth/me', {}, owner)).status, 401, 'demo-wachtwoordreset trekt oude beheersessie werkelijk in');
+        // PostgreSQL is hier al bijgewerkt; worker a ontvangt die wijziging via
+        // LISTEN/NOTIFY. Die levering is bewust asynchroon en kan op een drukke
+        // runner net na de SELECT vallen. Eis de intrekking nog steeds hard,
+        // maar geef de andere worker een korte, begrensde observatiewacht.
+        let ingetrokken;
+        for (let poging = 0; poging < 100; poging++) {
+          ingetrokken = await api(a, 'auth/me', {}, owner);
+          if (ingetrokken.status === 401) break;
+          await new Promise(r => setTimeout(r, 25));
+        }
+        assert.equal(ingetrokken.status, 401, 'demo-wachtwoordreset trekt oude beheersessie werkelijk in');
         owner = await ownerLogin();
       }
       const r = await api(a, 'onboarding/config/zet', { voorstel: { contract: {

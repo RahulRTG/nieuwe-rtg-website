@@ -35,7 +35,7 @@ const router = require('./router');
    voornaam: wie een machine een mensennaam geeft, laat een lid iets bevestigen
    in de veronderstelling dat er een mens meekijkt. */
 const NAAM = AI_VOOR + 'onderzoeker';
-const TOONNAAM = 'RTG AI (onderzoeker)';
+const TOONNAAM = 'Rahul AI (onderzoeker)';
 
 module.exports = function maakOnderzoeker({ zaken, loop, machtigingen, bevestiging, save }) {
 
@@ -84,9 +84,9 @@ module.exports = function maakOnderzoeker({ zaken, loop, machtigingen, bevestigi
     }
     const r = String(reden || '').trim();
     const v = bevestiging.vraag({
-      zaakId, mens: NAAM, doel: 'Onderzoek door RTG AI',
+      zaakId, mens: NAAM, doel: 'Onderzoek door Rahul AI',
       capabilities: k.teVragen,
-      reden: 'RTG AI wil dit inzien om uw vraag te beantwoorden: ' + r
+      reden: 'Rahul AI wil dit inzien om uw vraag te beantwoorden: ' + r
     });
     if (v.error) return v;
     /* Op de tijdlijn, en niet alleen in het bevestigingsregister: een lid dat
@@ -101,7 +101,7 @@ module.exports = function maakOnderzoeker({ zaken, loop, machtigingen, bevestigi
     try {
       const z = zaken.vind(zaakId);
       if (z) loop.noteer(z, { soort: 'notitie', van: 'systeem', wie: TOONNAAM,
-        tekst: 'RTG AI heeft om toegang gevraagd (' + k.teVragen.join(', ') + '). Het lid beslist.' });
+        tekst: 'Rahul AI heeft om toegang gevraagd (' + k.teVragen.join(', ') + '). Het lid beslist.' });
       if (z) save();
     } catch (e) { console.warn('[service] de tijdlijnnotitie van het toegangsverzoek niet vastgelegd:', e && e.message); }
     return Object.assign({}, v, { aanvrager: TOONNAAM, machine: true, nietGevraagd: k.uitkomst.filter(u => !u.kan) });

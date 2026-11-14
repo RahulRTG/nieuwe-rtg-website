@@ -13,6 +13,12 @@
     return new URL(pad.replace(/^\//, ''), appUrl).href;
   }
 
+  function naarBeeld(route) {
+    var pad = String(route || '');
+    if (!/^\/images\/[A-Za-z0-9_./-]+\.(?:jpe?g|webp|png|avif)$/.test(pad)) return '';
+    return new URL(pad.replace(/^\//, ''), middelenBasis).href;
+  }
+
   function zetTekst(element, tekst) {
     if (element) element.textContent = tekst;
   }
@@ -28,6 +34,11 @@
   }
 
   function bindWereld(kaart, wereld) {
+    kaart.dataset.rtgWorld = wereld.id;
+    kaart.dataset.appTruthTheme = wereld.theme.source;
+    var beeld = kaart.querySelector(':scope > img');
+    var beeldUrl = naarBeeld(wereld.theme.image);
+    if (beeld && beeldUrl) beeld.setAttribute('src', beeldUrl);
     zetTekst(kaart.querySelector('[data-app-truth-name]'), wereld.name);
     vulLijst(kaart.querySelector('[data-app-truth-tools]'), wereld.tools.slice(0, 3).map(function (tool) { return tool.name; }));
     var link = kaart.querySelector('[data-app-truth-link]');

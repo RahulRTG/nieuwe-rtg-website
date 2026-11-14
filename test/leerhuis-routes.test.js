@@ -31,6 +31,7 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const { startServer, kantoorAlsPersoon, keurLidGoed } = require('./helper');
+const historischAccount = require('./lib/historisch-account');
 
 let BASE, child, E, N, X, office, eId, nId;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-leerhuis-'));
@@ -50,9 +51,23 @@ async function schakel(aan) {
 }
 
 test.before(async () => {
+  // Alleen de betaal-/correctieproef heeft een bestaande factuur nodig.
+  // Leerhuis-eigenaar, collega's en buitenstaanders blijven gratis accounts.
+  historischAccount(TMP, { name: 'Schaduw Lid', email: 'lh-s@x.nl', phone: '0612348009',
+    password: 'geheim12345', tier: 'rtg', memberState: { geboren: '1985-04-04', invoices: [{
+      id: 'RTG-2026-09-LEERHUISPROEF', desc: 'Historische maandbijdrage lidmaatschap',
+      maand: '2026-09', netto: 0, bijdrage: 78.65, btw: 13.65,
+      status: 'open', date: 'Historische termijn'
+    }] } });
   ({ child, base: BASE } = await startServer({ env: { RTG_DATA_DIR: TMP, SMTP_URL: '' } }));
-  const lid = async (naam, mail, tel, geboren) => (await post('/api/auth/register', { name: naam, email: mail,
-    phone: tel, password: 'geheim12345', geboortedatum: geboren, tier: 'rtg' })).body.token;
+  const lid = async (naam, mail, tel, geboren) => {
+    const reg = await post('/api/auth/register', { name: naam, email: mail,
+      phone: tel, password: 'geheim12345', geboortedatum: geboren, tier: 'rtg' });
+    assert.equal(reg.status, 200, JSON.stringify(reg.body));
+    assert.equal(reg.body.state.user.tier, 'guest', 'werken en leren vragen geen betaalde persoonlijke pas');
+    assert.ok(reg.body.token);
+    return reg.body.token;
+  };
   E = await lid('Eigenaar Leerhuis', 'lh-e@x.nl', '0612348001', '1980-02-02');
   N = await lid('Nieuwe Collega', 'lh-n@x.nl', '0612348002', '1995-05-05');
   X = await lid('Buiten Staander', 'lh-x@x.nl', '0612348003', '1990-09-09');
@@ -149,16 +164,24 @@ test('7. B1 in de schaduw: een echte terugboeking wordt meegelezen en niemand wo
   const open = await post('/api/office/leerhuis/open', { id: 'RTG', soort: 'RTG', naam: 'RTG', eigenaar: 'user-' + eigId }, office);
   assert.equal(open.status, 200, JSON.stringify(open.body));
 
-  const reg = await post('/api/auth/register', { name: 'Schaduw Lid', email: 'lh-s@x.nl', phone: '0612348009',
-    password: 'geheim12345', geboortedatum: '1985-04-04', tier: 'rtg', pasApp: 'rtg' });
-  const lid = reg.body.token;
-  const userId = reg.body.state.user.id;
+  const login = await post('/api/auth/login', { login: 'lh-s@x.nl', password: 'geheim12345', pasApp: 'rtg' });
+  assert.equal(login.status, 200, JSON.stringify(login.body));
+  assert.equal(login.body.state.user.tier, 'rtg');
+  const lid = login.body.token;
+  const userId = login.body.state.user.id;
+  assert.ok(lid && userId, 'de correctie raakt het ingelogde historische account');
   const PNG = 'data:image/png;base64,' + Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 1, 2, 3, 4]).toString('base64');
   await post('/api/verify/upload', { image: PNG }, lid);
   await post('/api/verify/selfie', { image: PNG }, lid);
-  const factuur = ((await post('/api/state', {}, lid)).body.state.invoices || []).find(i => i.status === 'open');
-  assert.ok(factuur, 'het nieuwe lid heeft een open factuur');
-  assert.equal((await post('/api/pay/saldo', { invoiceId: factuur.id }, lid)).status, 200);
+  const staat = await post('/api/state', {}, lid);
+  assert.equal(staat.status, 200);
+  const factuur = staat.body.state.invoices.find(i => i.id === 'RTG-2026-09-LEERHUISPROEF');
+  assert.ok(factuur, 'de historische factuur is een expliciete preconditie, geen registratiebijwerking');
+  assert.equal(factuur.status, 'open');
+  assert.equal(factuur.bijdrage, 78.65, 'deze proef gebruikt de bestaande afspraak, niet een actuele abonnementsprijs');
+  const betaald = await post('/api/pay/saldo', { invoiceId: factuur.id }, lid);
+  assert.equal(betaald.status, 200, JSON.stringify(betaald.body));
+  assert.equal(betaald.body.betaald, 7865);
 
   const voor = (await lees(eig, 'schaduw', { org: 'RTG' })).body.antwoord.routes[0];
   const r = await post('/api/office/pay/factuurcorrectie',
@@ -246,8 +269,12 @@ test('11. fase B-UI werkscherm: het werk van assessor en kenniseigenaar komt ove
 });
 
 test('12. de eigenaar wijst een nieuwe collega aan op codenaam, met reden, en dat staat op de inzagekaart van die collega', async () => {
-  const Z = (await post('/api/auth/register', { name: 'Zonder Sleutel', email: 'lh-z@x.nl', phone: '0612348009',
-    password: 'geheim12345', geboortedatum: '1992-02-02', tier: 'rtg' })).body.token;
+  const reg = await post('/api/auth/register', { name: 'Zonder Sleutel', email: 'lh-z@x.nl', phone: '0612348009',
+    password: 'geheim12345', geboortedatum: '1992-02-02', tier: 'rtg' });
+  assert.equal(reg.status, 200, JSON.stringify(reg.body));
+  assert.equal(reg.body.state.user.tier, 'guest', 'de eigen inzagekaart blijft een gratis accountrecht');
+  const Z = reg.body.token;
+  assert.ok(Z);
   const code = await codeVan(Z);
   assert.equal((await lees(Z, 'mijn')).status, 403, 'nog geen relatie');
   const zet = (tok, invoer, sleutel) => doe(tok, 'relatieZet', Object.assign({ codenaam: code, soort: 'EMPLOYEE' }, invoer), sleutel);
@@ -257,7 +284,14 @@ test('12. de eigenaar wijst een nieuwe collega aan op codenaam, met reden, en da
   const r = await zet(E, { reden: 'nieuwe collega bij Operations' }, 'aanw-z');
   assert.equal(r.status, 200, JSON.stringify(r.body));
   assert.equal((await lees(Z, 'mijn')).status, 200, 'de relatie staat, op de sleutel die de server erbij zocht');
-  const kaart = (await post('/api/inzagekaart', {}, Z)).body;
+  const inzage = await post('/api/inzagekaart', {}, Z);
+  assert.equal(inzage.status, 200, JSON.stringify(inzage.body));
+  const kaart = inzage.body;
   assert.ok(JSON.stringify(kaart).includes('nieuwe collega bij Operations'), 'de collega ziet wie hem opzocht en waarom: ' + JSON.stringify(kaart).slice(0, 400));
+  const vreemdeKaart = await post('/api/inzagekaart', { key: 'user-' + reg.body.state.user.id,
+    account: reg.body.state.user.id, lidId: reg.body.state.user.id }, X);
+  assert.equal(vreemdeKaart.status, 200, 'ook een ander gratis account mag zijn EIGEN kaart lezen');
+  assert.doesNotMatch(JSON.stringify(vreemdeKaart.body), /nieuwe collega bij Operations/,
+    'een sleutel of account in het verzoek geeft nooit toegang tot de aantoonbaar gevulde kaart van de collega');
   assert.doesNotMatch(JSON.stringify(r.body), /Zonder Sleutel/, 'de echte naam komt nergens in het antwoord');
 });

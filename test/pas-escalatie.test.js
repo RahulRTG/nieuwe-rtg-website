@@ -2,7 +2,7 @@
    menselijk besluit. Zelf-registreren mag ze nooit geven -- eerder gaf het
    tier-veld bij /api/auth/register direct een Business Pass (gevonden met
    scripts/aanval.js). Deze test bewaakt beide kanten van de poort:
-     1. zelf-registreren als Business/Lifestyle levert gewoon een RTG Pass;
+     1. zelf-registreren als Business/Lifestyle levert een gratis account;
      2. het menselijke akkoord op een aanvraag tilt het gekoppelde account op.
 
    EN WIE IS DIE MENS? Deze toets liet het akkoord geven met de GEDEELDE
@@ -51,28 +51,28 @@ async function nieuwLid(tier, pasApp) {
   return { r, token: r.body.token, u };
 }
 
-test('1. zelf-registreren als Business levert een RTG Pass, geen Business', async () => {
+test('1. zelf-registreren als Business levert een gratis account, geen Business', async () => {
   const { r, token } = await nieuwLid('business', 'business');
   assert.equal(r.status, 200, 'de registratie zelf slaagt (geen weigering)');
   assert.ok(token, 'er komt een token terug');
-  assert.equal(await tierVan(token), 'rtg', 'de pas is RTG, niet business');
+  assert.equal(await tierVan(token), 'guest', 'zelfregistratie geeft geen betaalde pas');
 });
 
-test('2. ook als Lifestyle: zelf-registreren geeft nooit meer dan RTG', async () => {
+test('2. ook als Lifestyle: zelf-registreren geeft een gratis account', async () => {
   const { token } = await nieuwLid('lifestyle', 'lifestyle');
-  assert.equal(await tierVan(token), 'rtg', 'de pas is RTG, niet lifestyle');
+  assert.equal(await tierVan(token), 'guest', 'zelfregistratie geeft geen betaalde pas');
 });
 
-test('3. in de gewone RTG-app blijft RTG gewoon RTG', async () => {
+test('3. ook in de RTG-app start zelfregistratie gratis', async () => {
   const { token } = await nieuwLid('rtg', 'rtg');
-  assert.equal(await tierVan(token), 'rtg');
+  assert.equal(await tierVan(token), 'guest');
 });
 
 test('4. het menselijke akkoord tilt het gekoppelde account op naar Business', async () => {
-  // een gewoon lid (RTG), daarna een Business-aanvraag MET zijn token: dat
+  // een gratis account, daarna een Business-aanvraag MET zijn token: dat
   // koppelt zijn account aan de aanvraag.
   const { token } = await nieuwLid('rtg', 'rtg');
-  assert.equal(await tierVan(token), 'rtg', 'begint als RTG');
+  assert.equal(await tierVan(token), 'guest', 'begint met een gratis account');
   const aanvraag = await api('/api/aanmelding/aanvraag',
     { idem: randomUUID(), pas: 'business', naam: 'Zaak Proef', contact: 'zaak@proef.test' }, token);
   assert.equal(aanvraag.status, 200);

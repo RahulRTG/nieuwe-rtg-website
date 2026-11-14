@@ -15,7 +15,10 @@ module.exports = (kern) => {
       ...(r.code ? { code: r.code } : {}), ...(r.bevestigingNodig ? { bevestigingNodig: true, actie: r.actie, bevestiging: r.bevestiging } : {}) })
     : res.json(r);
   const echtAccount = (req, res) => {
-    if (req.session.tier === 'guest' || !req.session.account) {
+    /* `guest` is zowel de anonieme demosessie als het echte gratis account.
+       De sleutelbos hoort bij de accountidentiteit, niet bij een betaalde pas:
+       werken mag dus met gratis, een bezoeker zonder account niet. */
+    if (!req.session.account) {
       res.status(403).json({ error: 'Maak eerst een (gratis) RTG-account; dat ene account is daarna uw sleutel tot alles.' });
       return false;
     }

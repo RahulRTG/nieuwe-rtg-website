@@ -59,6 +59,7 @@ function maakFactuurSaldo({ db, accounts, settleFactuur, payVan, broadcastSync, 
     const inv = md && (md.invoices || []).find(i => i.id === String(invoiceId || ''));
     if (!inv) return { status: 404, error: 'Factuur niet gevonden.' };
     if (inv.status === 'paid') return { status: 409, error: 'Deze factuur is al betaald.' };
+    if (inv.abonnement) return { status: 409, error: 'Gebruik voor deze termijn de gekoppelde betaalroute bij Lidmaatschap.' };
     // wat er nog openstaat: het gevraagde bedrag min wat er al als
     // deelbetaling binnenkwam (de muntweg kan een factuur half vullen)
     const centen = Math.round((inv.bijdrage || 0) * 100) - Math.round(inv.deelbetaald || 0);

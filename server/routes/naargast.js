@@ -18,12 +18,14 @@ module.exports = (kern) => {
     } catch (e) { return null; }
   };
 
-  app.post('/api/mijn/pas/gast', auth, (req, res) => {
+  app.post('/api/mijn/pas/gast', auth, async (req, res) => {
     const id = ikBen(req);
     if (id == null) return res.status(404).json({ error: 'Deze sessie hangt niet aan een RTG-account.' });
     const wanneer = String((req.body || {}).wanneer || '');
-    if (wanneer === 'nu') return stuur(res, ng().lidNu(id));
-    if (wanneer === 'einde') return stuur(res, ng().lidEinde(id));
+    try {
+      if (wanneer === 'nu') return stuur(res, await ng().lidNu(id, req.body));
+      if (wanneer === 'einde') return stuur(res, await ng().lidEinde(id, req.body));
+    } catch (_) { return res.status(503).json({ error: 'De overgang is niet bevestigd. Controleer de bestaande afspraak en herhaal dezelfde bevestiging.' }); }
     res.status(400).json({ error: 'Kies nu, of aan het eind van je periode (einde).' });
   });
 

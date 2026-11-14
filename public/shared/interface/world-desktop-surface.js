@@ -2,7 +2,7 @@
    Embedded apps use their parent's frame; only the outer document owns Edge. */
 (function (w, d) {
   'use strict';
-  var overlays = 'script,style,link,template,dialog,[role="dialog"],.scrim,.palet,.melding,.toast,.skip,.skip-link,.vis-verborgen,.rtg-edge-chrome,.rtg-adaptive-shell,.rtg-adaptive-bar,.rnd-toets,.rnd-hint,.ios-thuis,.rtg-spring,#rtfOnb';
+  var overlays = 'script,style,link,template,dialog,[role="dialog"],.scrim,.palet,.melding,.toast,.skip,.skip-link,.vis-verborgen,.rtg-rahul-page,.rtg-edge-chrome,.rtg-adaptive-shell,.rtg-adaptive-bar,.rnd-toets,.rnd-hint,.ios-thuis,.rtg-spring,#rtfOnb';
   function prepare() {
     if (d.body.dataset.worldHome) return d.querySelector('main');
     var surface = d.createElement('div');

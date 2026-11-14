@@ -2,8 +2,8 @@
  "soort": "meting",
  "uitleg": "Wat een scherm in public/ via de API kan veroorzaken: schrijft het, welke rol vraagt het, wat is het bewijs waard, en wat doet een tweede aanroep. Samengesteld uit bestaande metingen -- hier wordt niets nieuws gemeten en niets geraden.",
  "stempel": {
-  "op": "2026-11-12",
-  "commit": "b99fd4c8ab"
+  "op": "2026-11-14",
+  "commit": "01319f65b"
  },
  "grond": [
   "SCHERMROUTES.json",
@@ -15,23 +15,23 @@
  "grens": "AFGELEID gedrag: wat het scherm via de API kan veroorzaken. NIET wat het scherm zelf doet (localStorage, DOM, een berekening). `schrijft: nee` betekent dus \"verandert niets aan de serverkant\" en niet \"verandert niets\".",
  "samenstelregel": "schrijven: de ZWAARSTE uitkomst wint (een van de tien routes schrijft = dit scherm kan iets veranderen). Bewijs: het ZWAKSTE telt, want een keten is zo sterk als zijn zwakste schakel. Onbekend is in beide gevallen niet de gunstige uitkomst.",
  "gemeten": {
-  "schermen": 495,
-  "metGrond": 418,
+  "schermen": 497,
+  "metGrond": 420,
   "zonderGrond": 77,
-  "schrijftJa": 123,
+  "schrijftJa": 121,
   "schrijftNee": 1,
-  "schrijftOnbekend": 273,
-  "schrijftNietVastTeStellen": 98,
+  "schrijftOnbekend": 276,
+  "schrijftNietVastTeStellen": 99,
   "bewijsVerdeling": {
-   "verzwakt": 383,
-   "niet vast te stellen": 111,
+   "verzwakt": 384,
+   "niet vast te stellen": 112,
    "ongemeten": 1
   },
   "bewijsBewezen": 0,
-  "bewijsVerzwakt": 383,
-  "bewijsNietVastTeStellen": 111,
+  "bewijsVerzwakt": 384,
+  "bewijsNietVastTeStellen": 112,
   "onbekendeBewijswaarden": [],
-  "zonderRol": 68
+  "zonderRol": 69
  },
  "zonderUitspraak": [
   "public/apps/backoffice/backoffice-01a.js",
@@ -332,22 +332,6 @@
    "bewijs": "verzwakt",
    "rollen": [
     "member"
-   ],
-   "herhaling": [
-    "beschermd",
-    "ongemeten"
-   ],
-   "reden": null
-  },
-  {
-   "bestand": "public/apps/service.html",
-   "padenGenoemd": 20,
-   "voorvoegsels": 0,
-   "routesGeraakt": 20,
-   "schrijft": "ja",
-   "bewijs": "verzwakt",
-   "rollen": [
-    "kantoor-op-naam"
    ],
    "herhaling": [
     "beschermd",
@@ -973,22 +957,6 @@
    "reden": null
   },
   {
-   "bestand": "public/shared/basis/basis-02b.js",
-   "padenGenoemd": 10,
-   "voorvoegsels": 0,
-   "routesGeraakt": 10,
-   "schrijft": "ja",
-   "bewijs": "verzwakt",
-   "rollen": [
-    "member"
-   ],
-   "herhaling": [
-    "beschermd",
-    "ongemeten"
-   ],
-   "reden": null
-  },
-  {
    "bestand": "public/apps/commerce.html",
    "padenGenoemd": 9,
    "voorvoegsels": 0,
@@ -1055,6 +1023,22 @@
   },
   {
    "bestand": "public/apps/maison.html",
+   "padenGenoemd": 9,
+   "voorvoegsels": 0,
+   "routesGeraakt": 9,
+   "schrijft": "onbekend",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "member"
+   ],
+   "herhaling": [
+    "beschermd",
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
+   "bestand": "public/shared/basis/basis-02b.js",
    "padenGenoemd": 9,
    "voorvoegsels": 0,
    "routesGeraakt": 9,
@@ -4359,6 +4343,21 @@
    "reden": null
   },
   {
+   "bestand": "public/apps/geld/lidmaatschap-aanbod.js",
+   "padenGenoemd": 2,
+   "voorvoegsels": 1,
+   "routesGeraakt": 2,
+   "schrijft": "onbekend",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "member"
+   ],
+   "herhaling": [
+    "ongemeten"
+   ],
+   "reden": null
+  },
+  {
    "bestand": "public/apps/geld/overzichtb.js",
    "padenGenoemd": 2,
    "voorvoegsels": 0,
@@ -5410,6 +5409,21 @@
    "reden": null
   },
   {
+   "bestand": "public/apps/geld/lidmaatschap-aanbod-intake.js",
+   "padenGenoemd": 1,
+   "voorvoegsels": 0,
+   "routesGeraakt": 1,
+   "schrijft": "onbekend",
+   "bewijs": "verzwakt",
+   "rollen": [
+    "openbaar"
+   ],
+   "herhaling": [
+    "beschermd"
+   ],
+   "reden": null
+  },
+  {
    "bestand": "public/apps/geld/rtgcode.js",
    "padenGenoemd": 1,
    "voorvoegsels": 0,
@@ -5957,6 +5971,17 @@
     "beschermd"
    ],
    "reden": null
+  },
+  {
+   "bestand": "public/apps/service.html",
+   "padenGenoemd": 1,
+   "voorvoegsels": 1,
+   "routesGeraakt": 1,
+   "schrijft": "niet vast te stellen",
+   "bewijs": "niet vast te stellen",
+   "rollen": [],
+   "herhaling": [],
+   "reden": "de routes van dit scherm staan niet in SCHRIJFANALYSE.json, dus over schrijven is hier niets bekend"
   },
   {
    "bestand": "public/apps/techniek/techniek-02b.js",
@@ -7201,7 +7226,7 @@
   {
    "bestand": "public/shared/kantoorgesprek.js",
    "padenGenoemd": 0,
-   "voorvoegsels": 2,
+   "voorvoegsels": 1,
    "routesGeraakt": 0,
    "schrijft": "niet vast te stellen",
    "bewijs": "niet vast te stellen",

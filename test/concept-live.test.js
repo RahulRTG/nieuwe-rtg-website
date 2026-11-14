@@ -38,7 +38,7 @@ const os = require('os');
 const path = require('path');
 const http = require('http');
 const { performance } = require('perf_hooks');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, maakBetaaldRtgTestaccount } = require('./helper');
 
 const MISLEID = 'Wat kost deze reis in totaal';
 
@@ -64,6 +64,7 @@ function nepModel() {
 }
 
 let model, server, base, A, B;
+const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-concept-'));
 const ROME = 'Ik wil met zes vrienden vier dagen naar Rome, maximaal €800 per persoon.';
 const api = (pad, body, token, extra) => fetch(base + pad, { method: 'POST',
   headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: 'Bearer ' + token } : {}), ...(extra || {}) },
@@ -83,14 +84,16 @@ async function rome(lid) {
 
 test.before(async () => {
   model = await nepModel();
-  server = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-concept-')),
+  server = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP,
     LOCAL_AI_URL: model.base, LOCAL_AI_MODEL: 'proefmodel', RTG_EXTERNE_AI_UIT: '1', RTG_DEMO: '1' } });
   base = server.base;
   const u = Date.now().toString(36);
   const lid = async (n, tel) => {
-    const reg = await api('/api/auth/register', { name: 'Concept ' + n, email: 'concept-' + n + u + '@voorbeeld.test',
+    const email = 'concept-' + n + u + '@voorbeeld.test';
+    const reg = await api('/api/auth/register', { name: 'Concept ' + n, email,
       password: 'geheim-' + n + '-123', geboortedatum: '1988-04-04', phone: tel, pasApp: 'rtg' });
     assert.equal(reg.status, 200);
+    maakBetaaldRtgTestaccount(TMP, email); // Beide reizigers hebben dezelfde pas; objectbezit en bevestiging blijven vereist.
     return { token: reg.body.token };
   };
   A = await lid('a', '0612340201'); B = await lid('b', '0612340202');

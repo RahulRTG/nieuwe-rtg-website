@@ -7,7 +7,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, keurLidGoed, maakBetaaldRtgTestaccount } = require('./helper');
 
 function api(base, pad, body, token) {
   const h = { 'Content-Type': 'application/json' };
@@ -19,18 +19,22 @@ const morgen = () => new Date(Date.now() + 86400000).toISOString().slice(0, 10);
 const overWeek = () => new Date(Date.now() + 7 * 86400000).toISOString().slice(0, 10);
 
 let srv, base, sup, lidA, lidB;
+const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-erv-'));
 let seq = 0;
 async function nieuwLid(naam) {
   const u = (Date.now() + (++seq)).toString().slice(-8);
   const reg = await api(base, '/api/auth/register', { name: naam, email: naam.toLowerCase() + u + '@x.nl',
-    phone: '06' + u, password: 'geheim123', geboortedatum: '1990-01-01', tier: 'business', pasApp: 'business' });
+    phone: '06' + u, password: 'geheim123', geboortedatum: '1990-01-01' });
   assert.ok(reg.body.token, 'registratie ' + naam);
   const st = await api(base, '/api/state', {}, reg.body.token);
+  // Eerst de echte keuring voor boeken/betalen. Reviews, splitsen en de
+  // wachtlijst vragen daarnaast een ledenpas; de bonnen zijn zonder gastopslag.
+  await keurLidGoed(base, reg.body.token, st.body.state.user.codename, '1990-01-01');
+  maakBetaaldRtgTestaccount(TMP, naam.toLowerCase() + u + '@x.nl');
   return { token: reg.body.token, codename: st.body.state.user.codename };
 }
 
 test.before(async () => {
-  const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-erv-'));
   srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   base = srv.base;
   // leverancier (KIKUNOI, manager-demo) met een vaste kaart

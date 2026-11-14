@@ -39,7 +39,7 @@
  sections.append(overig);
  (d.getElementById('magazineDirectory')||d.querySelector('.wd-library')).append(P.node('h3','moreRtg','pp-section-title'),sections);
  var footer=d.querySelector('.pp-footer'),nav=P.node('nav',null,'pp-footer-links');
- if(!d.getElementById('magazineHome')){[['support','mailto:roellie.i@gmail.com'],['privacy','https://app.rahultravelgroup.com/apps/juridisch/privacy.html'],['existingTerms','https://app.rahultravelgroup.com/apps/juridisch/voorwaarden.html']].forEach(function(row){var a=P.node('a',row[0],'pp-button');a.href=row[1];nav.append(a);});footer.append(nav);}
+ if(!d.getElementById('magazineHome')){[['support','https://app.rahultravelgroup.com/apps/app.html#rtg-direct=algemeen'],['privacy','https://app.rahultravelgroup.com/apps/juridisch/privacy.html'],['existingTerms','https://app.rahultravelgroup.com/apps/juridisch/voorwaarden.html']].forEach(function(row){var a=P.node('a',row[0],'pp-button');a.href=row[1];nav.append(a);});footer.append(nav);}
  X.permission('calendar',false);
  d.addEventListener('rtg-public-state',shell.refresh);
  w.RTGPublicApp.edge=w.RTGPublicEdge({kind:'app',shell:shell,open:open,proposal:X.proposal,reset:function(){X.reset();shell.select('overview',false);shell.collapse();}});

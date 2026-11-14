@@ -7,8 +7,10 @@ async function api(route,body={},token){const r=await fetch(srv.base+route,{meth
 test.before(async()=>{assert.ok(pw,'Travel Proof vereist een echte browser.');srv=await h.startServer({env:{SMTP_URL:'',RTG_AI_UIT:'1'}});office=await h.kantoorAlsPersoon(srv.base);assert.ok(office);});
 test.after(async()=>{if(srv)await h.stop(srv.child);});
 for(const width of [390,1440])test(width+'px: Travel bewaart context, herstelt antwoordverlies en toont de bevestigde reis',async()=>{
- const token=(await api('/api/auth/register',{name:'Reisproef',email:'travel-browser-'+width+'-'+Date.now()+'@example.test',phone:'0612345678',password:'geheim12345',geboortedatum:'1980-01-01',tier:'rtg',pasApp:'rtg'})).token;
- const onboarding=await api('/api/onboarding/status',{},token);await api('/api/onboarding/teken',{naam:'Reisproef',akkoord:true,contractVersion:onboarding.contract.versie},token);
+ /* Deze proef meet Travel, niet de betaalprovider. Gebruik daarom de expliciete
+    betaalde testpersona; registratie alleen levert terecht een gratis account. */
+ const token=(await api('/api/login',{tier:'rtg',pasApp:'rtg'})).token;
+ const bestaandeRefs=new Set((await api('/api/reisbureau/mijn',{},token)).aanvragen.map(x=>x.ref));
  const browser=await h.startBrowser(pw);
  try{
   const ctx=await browser.newContext({viewport:{width,height:900},serviceWorkers:'block',reducedMotion:'reduce'});
@@ -53,7 +55,7 @@ for(const width of [390,1440])test(width+'px: Travel bewaart context, herstelt a
   assert.equal(sends,1);await page.unroute('**/api/reisbureau/mijn');
   await druk('#rCheck');await app.waitForSelector('#rTrips:not([hidden])');
   assert.match(await app.locator('#rStatus').textContent(),/nog niet bevestigd/);
-  const rows=(await api('/api/reisbureau/mijn',{},token)).aanvragen;assert.equal(rows.length,1);const ref=rows[0].ref;
+  const rows=(await api('/api/reisbureau/mijn',{},token)).aanvragen.filter(x=>!bestaandeRefs.has(x.ref));assert.equal(rows.length,1);const ref=rows[0].ref;
   assert.equal(rows[0].personen,3);assert.equal(rows[0].vertrek,date);
   await app.waitForSelector('[data-aanvraag="'+ref+'"]',{state:'attached'});
   assert.equal(await app.evaluate(()=>JSON.parse(sessionStorage.getItem('rtg.intent.v1')).rows.filter(r=>r.purpose==='travel'&&r.status==='ACTIVE').length),0);

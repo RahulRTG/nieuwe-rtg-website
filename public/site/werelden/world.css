@@ -1,18 +1,18 @@
 :root{
-  --world:#7f1634;
-  --world-soft:rgba(127,22,52,.2);
+  --world:var(--ds-accent);
+  --world-soft:color-mix(in srgb,var(--ds-accent) 22%,transparent);
   --world-image:url("../../campagne/kyoto-suite.jpg");
   --moment-image:url("../../images/editorial/moment-dinner.webp");
 }
 
-body[data-world="travel"]{--moment-image:url("../../images/editorial/moment-travel-change.webp");--world:#941b43;--world-soft:rgba(148,27,67,.2);--world-image:url("../../campagne/kaiseki.jpg")}
-body[data-world="work"]{--moment-image:url("../../images/editorial/moment-work-event.webp");--world:#183252;--world-soft:rgba(24,50,82,.25);--world-image:url("../../campagne/jet.jpg")}
-body[data-world="foundation"]{--moment-image:url("../../images/editorial/moment-family-support.webp");--world:#0b5277;--world-soft:rgba(11,82,119,.22);--world-image:url("../../campagne/bamboe.jpg")}
+body[data-world="travel"]{--moment-image:url("../../images/editorial/moment-travel-change.webp");--world-image:url("../../campagne/kaiseki.jpg")}
+body[data-world="work"]{--moment-image:url("../../images/editorial/moment-work-event.webp");--world-image:url("../../campagne/jet.jpg")}
+body[data-world="foundation"]{--moment-image:url("../../images/editorial/moment-family-support.webp");--world-image:url("../../campagne/bamboe.jpg")}
 
-body.world-story{max-width:100%;overflow-x:clip;background:#0b0908;color:var(--ivory)}
+body.world-story{max-width:100%;overflow-x:clip;background:var(--ds-cover-grond);color:var(--ds-cover-inkt)}
 .world-shell{max-width:100%;overflow:clip}
 .world-shell :is(header,main,footer,section,article,div){min-width:0}
-.world-header{position:relative;z-index:10;width:var(--page);min-height:102px;margin:0 auto;display:flex;align-items:center;gap:2rem;border-bottom:1px solid rgba(255,255,255,.16)}
+.world-header{position:relative;z-index:10;width:var(--page);min-height:102px;margin:0 auto;display:flex;align-items:center;gap:2rem;border-bottom:1px solid color-mix(in srgb,var(--world) 45%,transparent)}
 .world-header-actions{display:flex;flex:0 0 auto;align-items:center;gap:1.4rem;margin-left:0;margin-inline-start:auto;direction:ltr}
 .world-header-actions>*{direction:inherit}
 [dir="rtl"] .world-header-actions>*{direction:rtl}
@@ -20,15 +20,15 @@ body.world-story{max-width:100%;overflow-x:clip;background:#0b0908;color:var(--i
 .world-back:hover{color:var(--gold)}
 .language-link{background:transparent;font-family:inherit;cursor:pointer}
 
-.world-hero{position:relative;isolation:isolate;min-height:760px;background:#0b0908}
+.world-hero{position:relative;isolation:isolate;min-height:760px;background:var(--ds-cover-grond)}
 .world-hero::before{position:absolute;z-index:-2;inset:0;background:var(--world-image) center/cover no-repeat;content:""}
-.world-hero::after{position:absolute;z-index:-1;inset:0;background:linear-gradient(90deg,rgba(5,5,5,.94) 0%,rgba(5,5,5,.72) 47%,rgba(5,5,5,.24) 76%,rgba(5,5,5,.5)),linear-gradient(0deg,#0b0908 0%,transparent 42%);content:""}
+.world-hero::after{position:absolute;z-index:-1;inset:0;background:var(--ds-beleving-wereldgloed),var(--ds-beleving-sluier-tekst);content:""}
 .world-hero-inner{width:var(--page);min-height:650px;margin:0 auto;display:flex;align-items:center;padding:5rem 0 7rem}
 .world-hero-copy{width:100%;max-width:790px;min-width:0}
 .world-label{margin-bottom:1.3rem;color:var(--gold);font-size:.7rem;font-weight:700;letter-spacing:.32em;text-transform:uppercase}
 .world-label span{margin-left:.8rem;color:rgba(255,255,255,.42);font-family:var(--serif);font-size:1rem;letter-spacing:.08em}
 .world-hero h1{max-width:780px;margin:0;font-family:var(--serif);font-size:clamp(4rem,7.4vw,7.7rem);font-weight:450;letter-spacing:-.048em;line-height:.9;overflow-wrap:anywhere;hyphens:auto;text-wrap:balance}
-.world-lead{max-width:660px;margin:2rem 0 0;color:rgba(255,255,255,.76);font-family:var(--serif);font-size:clamp(1.12rem,1.7vw,1.48rem);line-height:1.55}
+.world-lead{max-width:660px;margin:2rem 0 0;color:color-mix(in srgb,var(--ds-cover-inkt) 88%,transparent);font-family:var(--serif);font-size:clamp(1.12rem,1.7vw,1.48rem);line-height:1.55}
 .world-actions{display:flex;flex-wrap:wrap;gap:.8rem;margin-top:2rem}
 
 .story-section{padding:clamp(5rem,9vw,9rem) 0;background:var(--ivory);color:#181411}
@@ -63,7 +63,7 @@ body.world-story{max-width:100%;overflow-x:clip;background:#0b0908;color:var(--i
 .capability p{margin:0;color:#665c54;font-size:.9rem;line-height:1.75}
 .capability .proof-detail{margin-top:1.2rem}
 
-.principle{padding:clamp(5rem,9vw,9rem) 5vw;background:radial-gradient(circle at 80% 20%,var(--world-soft),transparent 42%),#0b0908;text-align:center}
+.principle{padding:clamp(5rem,9vw,9rem) 5vw;background:radial-gradient(circle at 80% 20%,var(--world-soft),transparent 42%),var(--ds-cover-grond);text-align:center}
 .principle h2{max-width:970px;margin:1rem auto 1.7rem;color:var(--ivory)}
 .principle>p:not(.story-kicker){max-width:700px;margin:0 auto;color:rgba(244,240,233,.66);line-height:1.85}
 .principle .world-actions{justify-content:center}
@@ -86,7 +86,7 @@ body.world-story{max-width:100%;overflow-x:clip;background:#0b0908;color:var(--i
 @media(max-width:600px){
   .world-header{min-height:80px}.world-header-actions{gap:.5rem}.world-header .login-link{border:0;padding:.35rem .2rem;font-size:.6rem;letter-spacing:.06em}
   .world-header .brand-slogan{display:none}.world-header .brand-name{padding:.35rem .55rem .42rem;font-size:0}.world-header .brand-name::after{content:"RTG";font-size:1.15rem}
-  .world-hero{min-height:650px}.world-hero::after{background:linear-gradient(90deg,rgba(5,5,5,.88),rgba(5,5,5,.4)),linear-gradient(0deg,#0b0908 0%,transparent 48%)}
+  .world-hero{min-height:650px}.world-hero::after{background:var(--ds-beleving-wereldgloed),var(--ds-beleving-sluier-mobiel)}
   .world-hero-inner{min-height:570px;align-items:flex-end;padding:3rem 0 5rem}
   .world-hero h1{font-size:clamp(3rem,14vw,4.8rem)}
   .world-lead{font-size:1.05rem}.world-actions .button{width:100%}

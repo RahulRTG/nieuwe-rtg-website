@@ -20,13 +20,14 @@
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop, laadPlaywright, browserOpties, geenBrowser, letOpFouten, wachtOpRust } = require('./helper');
+const { startServer, stopHard, maakBetaaldRtgTestaccount, laadPlaywright, browserOpties, geenBrowser, letOpFouten, wachtOpRust } = require('./helper');
+const fs = require('node:fs'), os = require('node:os'), path = require('node:path');
 const { alleenDs, edgeLabels, geenOverloop, beeld } = require('./lib/ds-toets');
 
 const pw = laadPlaywright(), skip = geenBrowser(pw);
 /* Het eigen demonstratienet ligt rond Ibiza-stad (kern/navigatie.js REF). */
 const IBIZA = { latitude: 38.91, longitude: 1.43 };
-let srv, browser, token;
+let srv, browser, token, tmp;
 
 async function post(url, data, auth = token) {
   const r = await fetch(srv.base + url, { method: 'POST', headers: { 'Content-Type': 'application/json',
@@ -48,13 +49,15 @@ const badge = page => page.locator('#liveBadge').textContent();
 
 test.before(async () => {
   if (skip) return;
-  srv = await startServer({ env: { SMTP_URL: '', RTG_AI_UIT: '1' } });
+  tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-navigatie-ds-'));
+  srv = await startServer({ env: { SMTP_URL: '', RTG_AI_UIT: '1', RTG_DATA_DIR: tmp } });
   browser = await pw.chromium.launch(browserOpties(pw));
   const now = Date.now();
   token = (await post('/api/auth/register', { name: 'Nav Lid', email: 'nav-' + now + '@e.test',
     phone: '06' + String(now).slice(-8), password: 'geheim123', geboortedatum: '1980-01-01', tier: 'rtg', pasApp: 'rtg' }, null)).token;
+  maakBetaaldRtgTestaccount(tmp, 'nav-' + now + '@e.test');
 });
-test.after(async () => { if (browser) await browser.close(); if (srv) await stop(srv.child); });
+test.after(async () => { if (browser) await browser.close(); if (srv) await stopHard(srv.child); if (tmp) fs.rmSync(tmp, { recursive: true, force: true }); });
 
 test('alleen het Design System: een Canvas, geen erfenisblad, de Edge staat', { skip }, async () => {
   const { ctx, page, fouten } = await open(390, 844);

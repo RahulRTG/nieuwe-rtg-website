@@ -23,7 +23,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, maakBetaaldRtgTestaccount } = require('./helper');
 
 let srv, base, lidA, lidB, zaak, kantoor;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-mob-'));
@@ -39,8 +39,11 @@ function api(pad, body, token) {
 let seq = 0;
 async function lid() {
   const u = (Date.now() + (++seq)).toString().slice(-8);
-  const reg = await api('/api/auth/register', { name: 'Lid ' + seq, email: 'mob' + u + '@x.nl', phone: '06' + u,
-    password: 'geheim123', geboortedatum: '1990-05-05', geslacht: 'v', tier: 'rtg', pasApp: 'rtg' });
+  const email = 'mob' + u + '@x.nl';
+  const reg = await api('/api/auth/register', { name: 'Lid ' + seq, email, phone: '06' + u,
+    password: 'geheim123', geboortedatum: '1990-05-05', geslacht: 'v' });
+  assert.equal(reg.status, 200);
+  maakBetaaldRtgTestaccount(TMP, email); // Twee betaalde reizigers houden de rit- en werkgeversgrenzen betekenisvol.
   return reg.body.token;
 }
 // een voertuig met alle papieren op orde, tenzij anders gevraagd

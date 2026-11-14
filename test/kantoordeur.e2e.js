@@ -13,13 +13,13 @@
    de Kantoren", "Meld u eerst aan bij het kantoor met uw eigen RTG-account" --
    die laatste zei precies wat er moest gebeuren en gaf er geen knop bij).
 
-   De deur staat nu op een plek (shared/kantoorgesprek.js) en probeert de
-   sleutelbos voordat hij iets vraagt. Deze toets legt de drie wegen vast, want
-   ze kunnen alle drie los sneuvelen:
+   De deur staat nu op een plek (shared/kantoorgesprek.js) en gebruikt alleen
+   de sleutelbos van het gewone RTG-account. Deze toets legt de drie wegen vast,
+   want ze kunnen alle drie los sneuvelen:
 
      1. MET de kantoorsleutel: geen vraag, het scherm gaat open.
-     2. ZONDER lid-token: gewoon de kantoorcode -- de deur is geen achterdeur.
-     3. MET een lid-token zonder kantoorsleutel: ook gewoon de kantoorcode.
+     2. ZONDER lid-token: aanmelden met het gewone RTG-account, nooit een code.
+     3. MET een lid-token zonder kantoorsleutel: geen toegang, nooit een code.
 
    Nummer 2 en 3 zijn de belangrijkste. Een deur die opengaat is een gemak; een
    deur die opengaat voor wie de sleutel niet heeft, is een gat.
@@ -71,6 +71,7 @@ const SCHERMEN = [
    zet een .kg met daarin de zin van Rahul in .kg-zegt. Er wordt dus gemeten of
    DIE er staat en waar hij naar vraagt. */
 function vraagtCode(deur) { return !!deur && /kantoorcode/i.test(deur); }
+function vraagtAccount(deur) { return !!deur && /RTG-account|kantoorrol/i.test(deur); }
 
 async function opstelling() {
   const browser = await startBrowser(pw);
@@ -336,28 +337,33 @@ test('de eigenaar komt op elk kantoorscherm binnen met zijn eigen RTG-account ('
     assert.deepEqual(mis1, [], 'deze schermen zijn niet bezocht, dus er is niets over te zeggen:\n  ' + mis1.join('\n  '));
     assert.deepEqual(dicht, [], 'de eigenaar hoort overal binnen te komen zonder code:\n  ' + dicht.join('\n  '));
 
-    /* 2) zonder lid-token: de code, en niets anders. Zou een scherm hier
-       opengaan, dan had de deur iets weggegeven aan wie geen sleutel heeft. */
+    /* 2) zonder lid-token: aanmelden met het gewone account, zonder gedeelde
+       terugvalcode. Zou een scherm hier opengaan, dan had de deur iets
+       weggegeven aan wie geen sleutel heeft. */
     await alsLid(o, base, null);
     const lek = [], mis = [];
     for (const s of SCHERMEN) {
       const r = await bezoek(o, base, s.app);
       if (!r.gemeten) { mis.push(nietGemeten(r)); continue; }
-      if (!vraagtCode(r.deur)) lek.push(s.app + ': vraagt geen code -- ' + (r.deur || r.tekst.slice(0, 140)));
+      if (vraagtCode(r.deur)) lek.push(s.app + ': vraagt nog om een gedeelde kantoorcode');
+      if (!vraagtAccount(r.deur)) lek.push(s.app + ': verwijst niet naar het gewone RTG-account -- ' +
+        (r.deur || r.tekst.slice(0, 140)));
     }
     assert.deepEqual(mis, [], 'deze schermen zijn niet bezocht, dus er is niets over te zeggen:\n  ' + mis.join('\n  '));
-    assert.deepEqual(lek, [], 'zonder sleutel hoort elk scherm de kantoorcode te vragen:\n  ' + lek.join('\n  '));
+    assert.deepEqual(lek, [], 'zonder account hoort elk scherm gesloten te blijven zonder gedeelde code:\n  ' + lek.join('\n  '));
 
-    // 3) een lid ZONDER kantoorsleutel: ook gewoon de code
+    // 3) een lid ZONDER kantoorsleutel: gesloten, zonder gedeelde code
     await alsLid(o, base, lid);
     const lek2 = [], mis2 = [];
     for (const s of SCHERMEN) {
       const r = await bezoek(o, base, s.app);
       if (!r.gemeten) { mis2.push(nietGemeten(r)); continue; }
-      if (!vraagtCode(r.deur)) lek2.push(s.app + ': vraagt geen code -- ' + (r.deur || r.tekst.slice(0, 140)));
+      if (vraagtCode(r.deur)) lek2.push(s.app + ': vraagt nog om een gedeelde kantoorcode');
+      if (!vraagtAccount(r.deur)) lek2.push(s.app + ': legt de ontbrekende accountrol niet uit -- ' +
+        (r.deur || r.tekst.slice(0, 140)));
     }
     assert.deepEqual(mis2, [], 'deze schermen zijn niet bezocht, dus er is niets over te zeggen:\n  ' + mis2.join('\n  '));
-    assert.deepEqual(lek2, [], 'een lid zonder kantoorsleutel hoort de kantoorcode te krijgen:\n  ' + lek2.join('\n  '));
+    assert.deepEqual(lek2, [], 'een lid zonder kantoorrol hoort gesloten te blijven zonder gedeelde code:\n  ' + lek2.join('\n  '));
   } finally {
     if (browser) await browser.close();
     child.kill();

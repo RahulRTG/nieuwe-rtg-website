@@ -9,7 +9,10 @@
     --ds-kg-focus: var(--ds-focus, var(--gold, goldenrod));
     --ds-kg-accent: var(--ds-accent, var(--gold, goldenrod));
     --ds-kg-accent-inkt: var(--ds-accent-inkt, black);
-    --ds-kg-fout: var(--ds-status-fout, var(--burgundy-on-dark, crimson));
+    /* Een fout blijft ook zonder kleur herkenbaar via role=alert en het
+       zwaardere gewicht. De scherminkt volgt bovendien zowel lichte als
+       donkere werkvlakken; het bordeaux haalde op Website Studio 3,08:1. */
+    --ds-kg-fout: var(--ink, var(--txt, currentColor));
     --ds-radius-kantoorgesprek: var(--ds-radius-systeem, 0px);
     max-width: 26rem; margin: 3rem auto; padding: 0 1.2rem;
     font-family: var(--ds-letter-tekst, Inter, system-ui, sans-serif);
@@ -48,5 +51,5 @@
      wereld erachter; op twee kantoorschermen bleef daar slechts 1,25:1 van
      over. De disabled-eigenschap en cursor dragen de toestand al semantisch. */
   .ds-kantoorgesprek .kg-rij button:disabled { opacity: 1; cursor: default; }
-  .ds-kantoorgesprek .kg-fout { font-size: .86rem; line-height: 1.5; color: var(--ds-kg-fout); margin: .8rem 0 0; min-height: 1.2rem; }
+  .ds-kantoorgesprek .kg-fout { font-size: .86rem; font-weight: 600; line-height: 1.5; color: var(--ds-kg-fout); margin: .8rem 0 0; min-height: 1.2rem; }
 }

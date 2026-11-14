@@ -18,7 +18,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, maakBetaaldRtgTestaccount } = require('./helper');
 
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-mediadelen-'));
 let srv, base, maker, vriend, office;
@@ -36,6 +36,7 @@ async function lid(naam) {
   const reg = await api('/api/auth/register', { name: naam, email: 'md' + u + '@x.nl', phone: '06' + u,
     password: 'geheim123', geboortedatum: '1990-04-04', geslacht: 'x', tier: 'rtg', pasApp: 'rtg' });
   assert.ok(reg.body.token, naam + ' is aangemeld');
+  maakBetaaldRtgTestaccount(TMP, 'md' + u + '@x.nl');
   const st = await api('/api/state', {}, reg.body.token);
   return { token: reg.body.token, codenaam: st.body.state.user.codename };
 }

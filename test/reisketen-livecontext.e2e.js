@@ -10,7 +10,7 @@ test('echte wijziging van tenantbinding wist oud reisconcept ook bij geautorisee
   const srv = await h.startServer({ env: { RTG_DATA_DIR: map, SMTP_URL: '', OFFICE_CODE: 'RTG-OFFICE' } });
   let browser, vrij = () => {};
   try {
-    const x = await maakReisketenFixture(srv.base);
+    const x = await maakReisketenFixture(srv.base, { datamap: map, betaaldeReizigers: ['81'] });
     const reis = goed(await x.api('/api/reisbureau/keten/start', { titel: 'Reis onder eerdere tenantbinding', bestemming: 'Ibiza',
       supplierCode: x.bureau.code, idem: 'livecontext-start' }, x.reiziger.token), 'aanvraag').reis;
     browser = await h.startBrowser(pw); t.diagnostic('Chromium ' + browser.version());
@@ -54,5 +54,5 @@ test('echte wijziging van tenantbinding wist oud reisconcept ook bij geautorisee
     const bron = goed(await x.api('/api/reisbureau/keten', { ref: reis.ref }, x.reiziger.token), 'eigen bron').reizen[0];
     assert.equal(bron.versie, reis.versie); assert.equal(bron.offerte, null);
     assert.deepEqual(fouten, []); await ctx.close();
-  } finally { vrij(); if (browser) await browser.close(); await h.stop(srv); fs.rmSync(map, { recursive: true, force: true }); }
+  } finally { vrij(); if (browser) await browser.close(); await h.stopHard(srv.child); fs.rmSync(map, { recursive: true, force: true }); }
 });

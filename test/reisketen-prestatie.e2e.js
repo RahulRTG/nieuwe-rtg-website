@@ -21,7 +21,7 @@ test.before(async () => {
   const pw = h.laadPlaywright({ eigenDriver: false }); assert.ok(pw && pw.chromium, 'echte Chromium verplicht');
   bronVoor = bron(); map = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-reis-prestatie-'));
   srv = await h.startServer({ env: { RTG_DATA_DIR: map, SMTP_URL: '', OFFICE_CODE: 'RTG-OFFICE', RTG_AI_UIT: '1' } });
-  x = await maakReisketenFixture(srv.base); browser = await h.startBrowser(pw);
+  x = await maakReisketenFixture(srv.base, { datamap: map, betaaldeReizigers: ['81', '82'] }); browser = await h.startBrowser(pw);
 });
 test.after(async () => {
   try {
@@ -44,7 +44,7 @@ test.after(async () => {
     fs.writeFileSync(out, JSON.stringify(rapport, null, 2) + '\n');
     console.log('Reisketen prestatieartefact: artifacts/experience/reisketen-prestatie.json; bronGewijzigd=' + rapport.bronGewijzigd);
   } finally {
-    if (browser) await browser.close(); if (srv) await h.stop(srv);
+    if (browser) await browser.close(); if (srv) await h.stopHard(srv.child);
     if (map) fs.rmSync(map, { recursive: true, force: true });
   }
 });

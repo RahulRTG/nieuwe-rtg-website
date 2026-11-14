@@ -7,7 +7,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, keurLidGoed } = require('./helper');
 
 function api(base, pad, body, token) {
   const h = { 'Content-Type': 'application/json' };
@@ -22,17 +22,26 @@ test.before(async () => {
   srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   base = srv.base;
   const u = Date.now().toString().slice(-8);
-  lid = (await api(base, '/api/auth/register', { name: 'Inwoner Een', email: 'b1' + u + '@x.nl',
-    phone: '061' + u.slice(1), password: 'geheim123', geboortedatum: '1985-04-04', tier: 'rtg', pasApp: 'rtg' })).body.token;
-  lid2 = (await api(base, '/api/auth/register', { name: 'Inwoner Twee', email: 'b2' + u + '@x.nl',
-    phone: '062' + u.slice(1), password: 'geheim123', geboortedatum: '1979-09-09', tier: 'rtg', pasApp: 'rtg' })).body.token;
+  const eerste = await api(base, '/api/auth/register', { name: 'Inwoner Een', email: 'b1' + u + '@x.nl',
+    phone: '061' + u.slice(1), password: 'geheim123', geboortedatum: '1985-04-04' });
+  const tweede = await api(base, '/api/auth/register', { name: 'Inwoner Twee', email: 'b2' + u + '@x.nl',
+    phone: '062' + u.slice(1), password: 'geheim123', geboortedatum: '1979-09-09' });
+  assert.equal(eerste.status, 200);
+  assert.equal(tweede.status, 200);
+  lid = eerste.body.token;
+  lid2 = tweede.body.token;
+  assert.equal(eerste.body.state.user.tier, 'guest');
+  assert.equal(tweede.body.state.user.tier, 'guest');
+  // Aangifte vraagt een gecontroleerde identiteit, geen betaalde pas.
+  await keurLidGoed(base, lid, eerste.body.state.user.codename, '1985-04-04');
+  await keurLidGoed(base, lid2, tweede.body.state.user.codename, '1979-09-09');
   const roster = await api(base, '/api/supplier/roster', { code: 'RIJK' });
   const man = roster.body.staff.find(m => m.role === 'manager');
   rijk = (await api(base, '/api/supplier/login', { code: 'RIJK', staffId: man.id, pin: '1234' })).body.token;
   partner = (await api(base, '/api/supplier/login', { username: 'rahul', password: 'Imran' })).body.token;
   // twee aangiftes: een met openstaand saldo (niets ingehouden) en een met hoge aftrek (controle-signaal)
-  await api(base, '/api/overheid/aangifte', { inkomen: 90000, aftrek: 1000, ingehouden: 0 }, lid);
-  await api(base, '/api/overheid/aangifte', { inkomen: 50000, aftrek: 30000, ingehouden: 20000 }, lid2);
+  assert.equal((await api(base, '/api/overheid/aangifte', { inkomen: 90000, aftrek: 1000, ingehouden: 0 }, lid)).status, 200);
+  assert.equal((await api(base, '/api/overheid/aangifte', { inkomen: 50000, aftrek: 30000, ingehouden: 20000 }, lid2)).status, 200);
 });
 test.after(() => stop(srv && srv.child));
 

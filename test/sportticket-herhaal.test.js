@@ -12,7 +12,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop, stopHard } = require('./helper');
+const { startServer, stop, stopHard, maakBetaaldRtgTestaccount } = require('./helper');
 
 function api(base, pad, body, token) {
   const h = { 'Content-Type': 'application/json' };
@@ -27,8 +27,13 @@ test.before(async () => {
   srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   base = srv.base;
   const u = Date.now().toString().slice(-8);
-  const maak = (n) => api(base, '/api/auth/register', { name: 'Sport Fan', email: 'st' + n + u + '@x.nl',
-    phone: '06' + n + u.slice(1), password: 'geheim123', geboortedatum: '1992-03-03', tier: 'rtg' });
+  const maak = async (n) => {
+    const r = await api(base, '/api/auth/register', { name: 'Sport Fan', email: 'st' + n + u + '@x.nl',
+      phone: '06' + n + u.slice(1), password: 'geheim123', geboortedatum: '1992-03-03', tier: 'rtg' });
+    assert.ok(r.body.token);
+    maakBetaaldRtgTestaccount(TMP, 'st' + n + u + '@x.nl');
+    return r;
+  };
   lid = (await maak('1')).body.token;
   ander = (await maak('2')).body.token;
   const b = await api(base, '/api/member/sport/bord', {}, lid);

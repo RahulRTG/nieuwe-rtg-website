@@ -22,14 +22,15 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
+const os = require('node:os');
 const path = require('node:path');
-const { startServer, stop, laadPlaywright, browserOpties, geenBrowser, letOpFouten } = require('./helper');
+const { startServer, stopHard, maakBetaaldRtgTestaccount, laadPlaywright, browserOpties, geenBrowser, letOpFouten } = require('./helper');
 const { decodeer, PAD } = require('../server/middleware/stijlbundel-rij');
 
 const pw = laadPlaywright(), skip = geenBrowser(pw);
 const BEELDEN = process.env.RTG_DS_BEELDEN || '';
 const dag = (n) => new Date(Date.now() + n * 864e5).toISOString().slice(0, 10);
-let srv, browser, token;
+let srv, browser, token, TMP;
 
 async function post(url, data, auth = token) {
   const r = await fetch(srv.base + url, { method: 'POST', headers: { 'Content-Type': 'application/json',
@@ -65,11 +66,14 @@ async function bladen(page) {
 
 test.before(async () => {
   if (skip) return;
-  srv = await startServer({ env: { SMTP_URL: '', RTG_AI_UIT: '1' } });
+  TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-reizen-ds-'));
+  srv = await startServer({ env: { RTG_DATA_DIR: TMP, SMTP_URL: '', RTG_AI_UIT: '1' } });
   browser = await pw.chromium.launch(browserOpties(pw));
   const now = Date.now();
   token = (await post('/api/auth/register', { name: 'Reis Lid', email: 'reizen-' + now + '@e.test',
     phone: '06' + String(now).slice(-8), password: 'geheim123', geboortedatum: '1980-01-01', tier: 'rtg', pasApp: 'rtg' }, null)).token;
+  assert.ok(token);
+  maakBetaaldRtgTestaccount(TMP, 'reizen-' + now + '@e.test');
   /* Echte gegevens, langs de gewone routes: een reis bij het reisbureau en een
      verblijf in dezelfde plaats; samen horen ze een reis te worden. */
   const cat = await post('/api/reisbureau', {});
@@ -78,7 +82,7 @@ test.before(async () => {
   const huis = (await post('/api/hotels', {})).huizen.find(h => /ibiza/i.test(h.stad || ''));
   await post('/api/verblijf', { supplierCode: huis.code, roomId: huis.kamers[0].id, aankomst: dag(30), vertrek: dag(34), personen: 2 });
 });
-test.after(async () => { if (browser) await browser.close(); if (srv) await stop(srv.child); });
+test.after(async () => { if (browser) await browser.close(); if (srv) await stopHard(srv.child); if (TMP) fs.rmSync(TMP, { recursive: true, force: true }); });
 
 test('alleen het Design System: geen erfenisblad, de ds-poort klopt, de Edge staat', { skip }, async () => {
   const { ctx, page, fouten } = await open(390, 844);
@@ -210,6 +214,8 @@ test('het eigen hoofdbeeld: bewaren met twee uitsneden, na herladen op 1440 en 3
   const now = Date.now();
   const lid = (await post('/api/auth/register', { name: 'Beeld Lid', email: 'reizen-beeld-' + now + '@e.test',
     phone: '06' + String(now + 7).slice(-8), password: 'geheim123', geboortedatum: '1980-01-01', tier: 'rtg', pasApp: 'rtg' }, null)).token;
+  assert.ok(lid);
+  maakBetaaldRtgTestaccount(TMP, 'reizen-beeld-' + now + '@e.test');
   const foto = fs.readFileSync(path.join(__dirname, '..', 'public', 'images', 'daily', 'agenda.webp'));
   let { ctx, page, fouten } = await open(1440, 900, 'nl', '/apps/reizen.html', lid);
   assert.equal((await coverStand(page)).imgZichtbaar, true, 'zonder keuze staat het RTG-beeld');

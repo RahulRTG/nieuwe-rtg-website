@@ -7,7 +7,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
-const { startServer, stop, laadPlaywright, browserOpties, letOpFouten } = require('./helper');
+const { startServer, stopHard, laadPlaywright, browserOpties, letOpFouten } = require('./helper');
 const { maakReisketenFixture, goed } = require('./lib/reisketen-fixture');
 
 test('kantoor biedt vanuit de bestaande werktafel uitsluitend de juiste eigen reisofferte aan', async t => {
@@ -17,7 +17,7 @@ test('kantoor biedt vanuit de bestaande werktafel uitsluitend de juiste eigen re
   const srv = await startServer({ env: { RTG_DATA_DIR: map, SMTP_URL: '', OFFICE_CODE: 'RTG-OFFICE' } });
   let browser;
   try {
-    const x = await maakReisketenFixture(srv.base);
+    const x = await maakReisketenFixture(srv.base, { datamap: map, betaaldeReizigers: ['81'] });
     const MP = '/api/reisbureau/keten';
     async function begin(titel, idem, supplierCode) {
       return goed(await x.api(MP + '/start', { titel, bestemming: 'Ibiza', idem,
@@ -105,7 +105,7 @@ test('kantoor biedt vanuit de bestaande werktafel uitsluitend de juiste eigen re
     await ctx.close();
   } finally {
     if (browser) await browser.close();
-    await stop(srv);
+    await stopHard(srv.child);
     fs.rmSync(map, { recursive: true, force: true });
   }
 });

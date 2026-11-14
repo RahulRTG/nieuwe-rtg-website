@@ -7,7 +7,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, maakBetaaldRtgTestaccount } = require('./helper');
 
 function api(base, pad, body, token) {
   const h = { 'Content-Type': 'application/json' };
@@ -16,14 +16,16 @@ function api(base, pad, body, token) {
     .then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
 }
 
-let srv, base, lid, kmar, ops, partner, boekingId;
+let srv, base, lid, kmar, ops, partner, boekingId, TMP;
 test.before(async () => {
-  const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-kmar-'));
+  TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-kmar-'));
   srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   base = srv.base;
   const u = Date.now().toString().slice(-8);
   lid = (await api(base, '/api/auth/register', { name: 'Grens Reiziger', email: 'km' + u + '@x.nl',
     phone: '068' + u.slice(1), password: 'geheim123', geboortedatum: '1986-05-05', tier: 'rtg', pasApp: 'rtg' })).body.token;
+  assert.ok(lid);
+  maakBetaaldRtgTestaccount(TMP, 'km' + u + '@x.nl');
   const login = async code => {
     const roster = await api(base, '/api/supplier/roster', { code });
     const man = roster.body.staff.find(m => m.role === 'manager');
@@ -79,6 +81,8 @@ test('3. het grens-signaal: een kist die boardt met ongecontroleerde reizigers v
   const u = Date.now().toString().slice(-8);
   const lid2 = (await api(base, '/api/auth/register', { name: 'Tweede Reiziger', email: 'km2' + u + '@x.nl',
     phone: '069' + u.slice(1), password: 'geheim123', geboortedatum: '1992-08-08', tier: 'rtg', pasApp: 'rtg' })).body.token;
+  assert.ok(lid2);
+  maakBetaaldRtgTestaccount(TMP, 'km2' + u + '@x.nl');
   const bord = await api(base, '/api/member/vluchten/bord', {}, lid2);
   const open = bord.body.vluchten.find(v => v.nummer === 'RT205');
   // ook dit tweede lid heeft papieren nodig voor de grens

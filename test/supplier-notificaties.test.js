@@ -14,7 +14,7 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, keurLidGoed } = require('./helper');
 
 let srv, basis, kiku, hoshi, lid, voorKiku, markerEen, markerTwee;
 
@@ -55,10 +55,15 @@ test.before(async () => {
   const uniek = Date.now().toString().slice(-8);
   const reg = await post('/api/auth/register', {
     name: 'Meldingen Toets', email: 'meldingen' + uniek + '@x.nl', phone: '06' + uniek,
-    password: 'geheim123', geboortedatum: '1990-01-01', tier: 'business', pasApp: 'business'
+    password: 'geheim123', geboortedatum: '1990-01-01'
   });
   assert.equal(reg.status, 200, 'toetslid kon niet worden gemaakt');
   lid = reg.body.token;
+  assert.ok(lid, 'het boekende account heeft een sessie');
+  // Reserveren vraagt voor een gratis account echte identiteitskeuring,
+  // geen betaalpas of Business-goedkeuring. De zaaksleutels blijven apart.
+  assert.equal(reg.body.state.user.tier, 'guest', 'de boekende persona blijft gratis');
+  await keurLidGoed(basis, lid, reg.body.state.user.codename, '1990-01-01');
 });
 
 test.after(() => stop(srv && srv.child));

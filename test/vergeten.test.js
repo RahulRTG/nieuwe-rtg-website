@@ -21,7 +21,7 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 // de strenge poort mag de stderr van onze eigen server meelezen
-const { bewaakKind } = require('./helper');
+const { bewaakKind, maakBetaaldRtgTestaccount } = require('./helper');
 
 const PORT = 4700 + Math.floor(Math.random() * 80);
 const BASE = 'http://127.0.0.1:' + PORT;
@@ -122,16 +122,19 @@ test('een lid aanmaken dat overal sporen achterlaat', async () => {
   });
   assert.equal(reg.status, 200, 'registreren lukt');
   token = (await reg.json()).token;
+  maakBetaaldRtgTestaccount(TMP, MAIL);
 
   /* Een TWEEDE lid, en niet als decor: zonder iemand anders is "alleen zij ziet
      haar cadeaukaart" een bewering die niet kan zakken. Hij blijft verder overal
      buiten -- de bezem hieronder gaat over haar. */
+  const mailB = 'bram' + Date.now() + '@x.test';
   const regB = await post('/api/auth/register', {
-    name: 'Buurman Bram', email: 'bram' + Date.now() + '@x.test', phone: '0622222222',
+    name: 'Buurman Bram', email: mailB, phone: '0622222222',
     password: 'geheim12345', geboortedatum: '1987-07-07', tier: 'rtg', pasApp: 'rtg'
   });
   assert.equal(regB.status, 200, 'het tweede lid registreert ook');
   tokenB = (await regB.json()).token;
+  maakBetaaldRtgTestaccount(TMP, mailB);
 
   const antwoord = await (await post('/api/state', {}, token)).json();
   const staat = antwoord.state || antwoord;

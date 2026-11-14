@@ -7,7 +7,7 @@
    Draai: npm run e2e */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
+const { startServer, stopHard, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -26,6 +26,7 @@ test('Zorg-tab: de salon komt op het scherm en een lid boekt er een knipbeurt',
         password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' })
     }).then(r => r.json());
     assert.ok(reg.token, 'lid-registratie geeft een token');
+    require('./helper').maakBetaaldRtgTestaccount(TMP, 'verzscherm@x.nl');
 
     browser = await pw.chromium.launch(browserOpties(pw));
     const page = await browser.newPage();
@@ -100,7 +101,7 @@ test('Zorg-tab: de salon komt op het scherm en een lid boekt er een knipbeurt',
     assert.deepEqual(paginaFouten, [], 'geen JS-fouten tijdens het scherm');
   } finally {
     if (browser) await browser.close();
-    stop(child);
+    await stopHard(child);
     try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
   }
 });

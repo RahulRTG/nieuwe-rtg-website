@@ -10,7 +10,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
-const { startServer, stop, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
+const { startServer, stopHard, maakBetaaldRtgTestaccount, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
 const pw = laadPlaywright();
 
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-mobontvangst-e2e-'));
@@ -27,17 +27,21 @@ async function moet(pad, body, token, wat) {
   assert.equal(r.status, 200, wat + ' -- ' + (r.body.error || r.status));
   return r.body;
 }
-async function nieuwLid(naam) {
+async function nieuwLid(naam, betaald = false) {
   const u = Date.now().toString().slice(-8) + Math.floor(Math.random() * 10);
-  return (await api('/api/auth/register', { name: naam, email: naam.toLowerCase() + u + '@x.nl',
-    phone: '06' + u.slice(-8), password: 'geheim123', geboortedatum: '1990-05-05', tier: 'rtg', pasApp: 'rtg' })).body.token;
+  const email = naam.toLowerCase() + u + '@x.nl';
+  const reg = await api('/api/auth/register', { name: naam, email,
+    phone: '06' + u.slice(-8), password: 'geheim123', geboortedatum: '1990-05-05', tier: 'rtg', pasApp: 'rtg' });
+  assert.ok(reg.body.token, 'registratie ' + naam);
+  if (betaald) maakBetaaldRtgTestaccount(TMP, email);
+  return reg.body.token;
 }
 const beeld = async () => (await moet('/api/mob/volg', { ref: RIT }, lid, 'volgen')).opdracht;
 
 test.before(async () => {
   srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   base = srv.base;
-  lid = await nieuwLid('Ontvangst'); ander = await nieuwLid('Ander');
+  lid = await nieuwLid('Ontvangst', true); ander = await nieuwLid('Ander');
   const roster = await api('/api/supplier/roster', { code: ZAAK });
   const mg = (roster.body.staff || []).find(x => x.role === 'manager');
   const ch = (roster.body.staff || []).find(x => x.role !== 'manager');
@@ -56,7 +60,7 @@ test.before(async () => {
   await moet('/api/supplier/mob/toewijzen', { ref: RIT }, baas, 'toewijzen');
   await moet('/api/staff/mob/status', { ref: RIT, status: 'onderweg' }, chauffeur, 'onderweg');
 });
-test.after(() => { stop(srv && srv.child); try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {} });
+test.after(async () => { await stopHard(srv && srv.child); try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {} });
 
 
 test('de reiziger bevestigt zelf, onder de melding van de chauffeur', { skip: geenBrowser(pw) }, async () => {

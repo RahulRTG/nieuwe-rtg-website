@@ -7,7 +7,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, keurLidGoed } = require('./helper');
 
 function api(base, pad, body, token) {
   const h = { 'Content-Type': 'application/json' };
@@ -24,8 +24,11 @@ test.before(async () => {
   base = srv.base;
   const u = Date.now().toString().slice(-8);
   const reg = await api(base, '/api/auth/register', { name: 'Tafel', email: 't' + u + '@x.nl',
-    phone: '06' + u, password: 'geheim123', geboortedatum: '1990-01-01', tier: 'business', pasApp: 'business' });
+    phone: '06' + u, password: 'geheim123', geboortedatum: '1990-01-01' });
+  assert.equal(reg.status, 200);
+  assert.equal(reg.body.state.user.tier, 'guest');
   lid = { token: reg.body.token };
+  await keurLidGoed(base, lid.token, reg.body.state.user.codename, '1990-01-01'); // Gratis reserveren na echte testkeuring, geen Business-pas.
 });
 test.after(() => stop(srv && srv.child));
 

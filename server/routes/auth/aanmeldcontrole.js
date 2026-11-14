@@ -69,25 +69,16 @@ module.exports = ({ accounts, crypto, schoon, leeftijdVan, pasAppOk, PAS_FOUT })
         && crypto.timingSafeEqual(Buffer.from(gegeven), Buffer.from(verwacht));
       if (!goed) return { status: 409, error: 'Er bestaat al een account met dit e-mailadres.' };
     }
-    /* De poort van het merk: zelf-registreren levert ALTIJD hooguit een RTG Pass
-       (of de gratis gast-laag). Lifestyle en Business komen -- per merkregel --
-       uitsluitend na een menselijk besluit (kern/aanmeldingen.js beslis, dat
-       accounts.setTier aanroept). Wie zich rechtstreeks als Lifestyle/Business
-       probeert in te schrijven, krijgt gewoon RTG: geen enkele registratie geeft
-       die passen zelf. Eerder gaf dit veld DIRECT een Business Pass -- dat gat is
-       hier dicht. */
-    const gevraagd = String(req.body.tier || 'rtg');
+    /* Identiteit is geen aankoop of handtekening (AFSPRAAK 17). Ook een
+       gewenste betaalde pas levert hier uitsluitend een gratis account op.
+       Bestaande passen en de aparte eigenaars-bootstrap blijven ongemoeid. */
+    const gevraagd = String(req.body.tier || 'guest');
     const betaald = (gevraagd === 'lifestyle' || gevraagd === 'business');
-    const tier = betaald ? 'rtg' : gevraagd;
+    const tier = 'guest';
     const pasApp = String(req.body.pasApp || '');
-    /* In een pas-app registreer je alleen een account van die pas (gratis mag in de
-       RTG-app). Vroeg iemand zich in de EIGEN betaalde-pas-app aan voor die pas
-       (bijv. de Business-app, tier business) -- die we hierboven naar RTG
-       terugbrengen -- dan zou de pasApp niet meer bij de (nu RTG-)pas passen. Dat
-       is geen fout van de aanvrager maar het gevolg van onze eigen clamp, dus
-       toetsen we dat geval tegen RTG: hij krijgt een RTG-account i.p.v. een
-       weigering. Een ECHTE kruismismatch (bijv. business-tier in de Lifestyle-app)
-       blijft gewoon geweigerd. */
+    /* Aanmelden vanuit de eigen Business/Lifestyle-app mag een basisaccount
+       maken, maar geeft geen toegang tot die pas. Een kruismismatch blijft
+       geweigerd. Onbekende clienttiers kunnen nooit betaalrechten opleveren. */
     const pasAppKeuze = (betaald && pasApp === gevraagd) ? 'rtg' : pasApp;
     if (!pasAppOk(pasAppKeuze, tier)) return { status: 403, error: PAS_FOUT };
     return { ok: true, name, email, telefoon, password, geboren, tier, pasAppKeuze };

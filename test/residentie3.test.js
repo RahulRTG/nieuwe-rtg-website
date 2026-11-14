@@ -8,7 +8,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, maakBetaaldRtgTestaccount } = require('./helper');
 
 function api(base, pad, body, token) {
   const h = { 'Content-Type': 'application/json' };
@@ -25,8 +25,10 @@ test.before(async () => {
   base = srv.base;
   const reg = async (n) => {
     const u = (Date.now() + n).toString().slice(-8);
-    const r = await api(base, '/api/auth/register', { name: ECHT + ' ' + n, email: 'duo' + n + u + '@x.nl',
-      phone: '06' + u, password: 'geheim123', geboortedatum: '1993-01-01', tier: 'rtg', pasApp: 'rtg' });
+    const email = 'duo' + n + u + '@x.nl';
+    const r = await api(base, '/api/auth/register', { name: ECHT + ' ' + n, email,
+      phone: '06' + u, password: 'geheim123', geboortedatum: '1993-01-01', pasApp: 'rtg' });
+    maakBetaaldRtgTestaccount(TMP, email);
     return { token: r.body.token };
   };
   [a, b, c, d] = [await reg(1), await reg(2), await reg(3), await reg(4)];

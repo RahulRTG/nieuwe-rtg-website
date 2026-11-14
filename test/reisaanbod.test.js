@@ -20,7 +20,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, maakBetaaldRtgTestaccount } = require('./helper');
 
 const CODE = 'RTG-REIS-TEST';
 
@@ -38,13 +38,14 @@ let teller = 0;
    telefoon en adres (428, kern/gegevenspoort.js). Zonder die stap meet deze
    toets die poort in plaats van het reisaanbod. Invullen gaat langs de gewone
    weg -- het inrichten uit de onboarding, precies zoals een nieuw lid het doet. */
-async function versLid(P, naam) {
+async function versLid(P, naam, datamap) {
   const u = String(Date.now()).slice(-7) + String(++teller).padStart(3, '0');
   const r = await P('/api/auth/register', {
     name: naam, email: naam.toLowerCase() + u + '@x.nl',
     password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg'
   });
   assert.ok(r.body.token, naam + ' is aangemeld: ' + JSON.stringify(r.body).slice(0, 140));
+  maakBetaaldRtgTestaccount(datamap, naam.toLowerCase() + u + '@x.nl');
   const ingericht = await P('/api/onboarding/inricht', { velden: {
     telefoon: '0612345678', adres: 'Proefstraat 1', postcode: '1000 AA', plaats: 'Proefdorp', land: 'NL'
   } }, r.body.token);
@@ -63,7 +64,7 @@ test('van een leeg reisbureau naar een bevestigde reis in het dossier', async ()
   const srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP, OFFICE_CODE: CODE, RTG_DEMO: '' } });
   try {
     const P = post(srv.base);
-    const lid = await versLid(P, 'Wender');
+    const lid = await versLid(P, 'Wender', TMP);
     const kantoor = (await P('/api/office/login', { code: CODE })).body.token;
     assert.ok(kantoor, 'de kantoorcode werkt');
 
@@ -139,7 +140,7 @@ test('het aanbod is kantoorwerk, en de invoer wordt nagerekend', async () => {
   const srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP, OFFICE_CODE: CODE, RTG_DEMO: '' } });
   try {
     const P = post(srv.base);
-    const lid = await versLid(P, 'Yfke');
+    const lid = await versLid(P, 'Yfke', TMP);
     const kantoor = (await P('/api/office/login', { code: CODE })).body.token;
 
     // een lid stelt geen reizen samen, ook niet met een geldige pas
@@ -207,7 +208,7 @@ test('een afgewezen aanvraag verdwijnt uit het dossier van het lid', async () =>
   const srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP, OFFICE_CODE: CODE, RTG_DEMO: '' } });
   try {
     const P = post(srv.base);
-    const lid = await versLid(P, 'Zeger');
+    const lid = await versLid(P, 'Zeger', TMP);
     const kantoor = (await P('/api/office/login', { code: CODE })).body.token;
     const id = (await P('/api/office/reisaanbod/zet', REIS, kantoor)).body.reis.id;
 

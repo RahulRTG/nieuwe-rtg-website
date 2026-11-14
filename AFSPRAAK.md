@@ -19,6 +19,11 @@ functielijst wordt gelezen.
 contract, verbruik); `CONTROLPLANE.md` zegt wie iets mag; `PROOF.md` wat bewijs
 is. Dit document zegt hoe die drie één keten worden.
 
+**Actualisatie 13 november 2026:** §17 legt het nieuwe eigenaarsbesluit voor
+zelfservice, ondertekening, incasso, betaalherstel en misbruik vast. Dat besluit
+vervangt oudere passages waarin iedere pas menselijke toelating vraagt. Het is
+geen verklaring dat alle aansluitingen al werken of dat verkoop is vrijgegeven.
+
 ---
 
 ## 1. De correctie die aan alles vooraf ging
@@ -706,3 +711,210 @@ Wat er nog geen meter heeft, en dat hoort er net zo hard bij:
   `server/` kent `expectedVersion`, en dat is de spelwereld. Twee toestellen die
   tegelijk opzeggen is vandaag last-write-wins. Dat is geen meting maar een
   afwezigheid, en hij hoort bij stap 2 en 7 in plaats van erna.
+
+---
+
+## 17. Automatische abonnementsafhandeling — eigenaarsbesluit 13 november 2026
+
+### 17.1 Wat automatisch mag, en wie instemt
+
+Community/gratis, RTG Pass en Business Lite moeten zonder handmatige
+toelatingsstap kunnen aanmelden en upgraden. Business en Lifestyle behouden
+menselijke toelating op naam. Dit autoriseert een deterministische uitvoering
+van vastgestelde voorwaarden, niet een AI die zelf prijzen, bevoegdheden of
+akkoord verzint. Bestaande overeenkomsten blijven leidend.
+
+RTG stelt de overeenkomst op in de bestaande contract- en onboardingketen. Het
+lid leest en tekent **zelf**, ook bij gratis. Een algemene onboardinghandtekening
+bewijst niet dat een individueel betaald jaarcontract is aanvaard. Dat laatste
+moet de juiste contractversie, pas, inhoud, btw-behandeling, prijs, betaalwijze,
+looptijd, opzegging en eventuele upgradeverrekening dragen. Het betaalmandaat
+voor herhaalde afschrijving is afzonderlijk herkenbaar en aantoonbaar.
+
+De gewone registratie maakt alleen het gratis account; geen bijdragefactuur of
+betaalde rechten door een aangeleverde `tier`. Business Lite is in de huidige
+code een bedrijfsabonnement en geen extra persoonlijke account-tier: de
+vertegenwoordigingsbevoegdheid en toegang van de zaak moeten mee worden bewezen.
+
+De bestaande domeinmotoren blijven eigenaar: `aanmeldingen`,
+`commercie/contract`, `onboarding/ontvangst`, `betaalwaarheid`, facturen en
+toegangscontrole. Geen tweede contractregister, tweede factuurmotor of eigen
+betaalwaarheid. Contract aanvaard, provider bezig, betaald en rechten actief
+zijn verschillende toestanden; een terugkeer uit checkout of een geplande
+termijn bewijst geen betaling. Herhaling, gelijktijdigheid, providervertraging
+en een opslagfout na betaling moeten zonder dubbele inning kunnen herstellen.
+
+### 17.2 Achterstallige betaling
+
+Door de eigenaar expliciet gekozen:
+
+1. Automatisch herinneren en betaalherstel aanbieden op basis van aantoonbare
+   betaalstand en de toepasselijke contractafspraak.
+2. Voor nieuwe abonnementen geldt een aantoonbaar aangekondigde hersteltermijn
+   van **31 kalenderdagen** (keuze eigenaar, 13 november 2026). Bestaande
+   contractafspraken blijven leidend. Een onbevestigde notificatie of alleen
+   een verstreken plandatum is geen bewijs dat deze termijn is gegeven.
+3. Pas daarna eventueel **nieuwe betaalde diensten** beperken. Geen volledige
+   accountblokkade, paswijziging of sessie-intrekking enkel wegens achterstand.
+4. Eigen facturen, betalen, opzeggen en noodzakelijke nazorg blijven bereikbaar.
+   Een betwiste vordering of zware maatregel gaat naar menselijke beoordeling.
+
+Er is geen incassokostenregeling of bevoegdheid voor ongelimiteerd opnieuw
+innen vastgesteld. Deze mogen niet stilzwijgend in een worker worden ingevuld.
+De nieuwe lokale route verbindt de 31 dagen aan de individuele afspraak,
+de duurzaam opgeslagen persoonlijke inboxmelding en de betaalherstelketen.
+Dit beleidsbesluit activeert de standaard uitgeschakelde route niet.
+Het oude `naarGast.onbetaald`, dat alleen geplande
+termijnen telde, mag deze beleidskeuze niet omzeilen. Vrijwillig stoppen en
+daadwerkelijk einde van een overeenkomst zijn afzonderlijke gebeurtenissen.
+
+### 17.3 Misbruik
+
+Automatische technische bescherming is toegestaan: snelheidslimieten,
+kostenplafonds, stoppen van een verdachte handeling en gerichte technische
+beveiliging. Een signaal is geen definitief misbruikoordeel. Een zware of
+langdurige sanctie en een betwisting vereisen beoordeling door een mens, met
+reden en spoor. De pestgrens mag daarom geen herhaalbare 24-uursban of verplichte
+excusespoort opleggen. Een tegengehouden bericht krijgt uitleg en een verwijzing
+naar de bestaande RTG Service; dat is niet hetzelfde als een al verzonden melding.
+
+### 17.4 Directe upgrades met verrekening
+
+De eigenaar koos op 13 november 2026 **direct ingaan met verrekening**, uit de
+voorgelegde keuze direct na tekenen/betalen met een nieuwe jaartermijn versus
+wachten tot het einde van de bestaande periode. Het uitvoeringscontract is:
+
+- De upgrade gaat direct in zodra de klant het specifieke aanbod heeft getekend
+  en de eerste verschuldigde betaling aantoonbaar is voldaan. Voor Business en
+  Lifestyle is daarnaast menselijke toelating vereist. Pending, requires_action
+  en een algemene onboardinghandtekening geven geen nieuwe betaalde rechten.
+- Er begint een nieuwe termijn van twaalf maanden. Prijs, btw, betaalwijze,
+  begin/einddatum, verrekening en eerst te betalen bedrag staan vóór tekenen
+  in het aanbod. Een gewijzigde afspraak vraagt een nieuw akkoord.
+- Alleen aantoonbaar betaald, nog ongebruikt abonnementsgeld wordt naar rato
+  van de oorspronkelijke betaalde periode verrekend, met oorspronkelijke
+  korting en reeds toegepaste credits/restituties. Een open factuur of een
+  handmatig afgevinkte termijn levert geen bewezen vooruitbetaling op.
+- Iedere gebruikte credit blijft aan bronfactuur en doelcontract gebonden;
+  dezelfde betaling mag niet tweemaal worden gebruikt. Geen fictieve provider-
+  betaling bij een volledig verrekend bedrag van nul en geen automatische
+  terugbetaling buiten het overeengekomen aanbod.
+- De oude overeenkomst en betaalhistorie blijven bewaard. De vervanging sluit
+  toekomstige oude verplichtingen af op de aanvaarde grens, niet door oude
+  factuurbedragen te herschrijven. Oude opzegopdrachten mogen nieuwe rechten
+  niet intrekken. Herstart en gelijktijdige aanvragen mogen niet dubbel innen.
+
+De prijsbasis staat in `PRIJZEN.md` §7.3, de begrotingsregel in §7.7, inclusief
+de maatschappelijke reservering na omzetcorrecties. Nieuwe servicecapaciteiten,
+live-ingangsdatum en migratie van bestaande leden zijn hiermee niet vastgesteld.
+
+### 17.5 Vervolg na het eerste vooruitbetaalde jaar
+
+De eigenaar koos op 13 november 2026 expliciet: na de eerste twaalf maanden
+gaat een jaarvooruitbetaler **maandelijks** verder tegen de afgesproken,
+versiegebonden maandprijs. Er ontstaat geen nieuwe vaste jaartermijn en geen
+automatische tweede jaarafschrijving. Opnieuw een jaar vooruitbetalen vereist
+een nieuwe keuze en een daarop afgestemd aanbod. De eerste jaartermijn blijft
+11,5 maandprijzen; de maandtermijnen daarna kennen die vooruitbetaalkorting niet.
+Dit staat vóór ondertekening in nieuwe aanbiedingen. Bestaande ondertekende
+afspraken zonder dit vervolgbeleid worden niet automatisch aangepast.
+Nieuwe aanbiedingen benoemen ook dat een laatste gedeeltelijke maand naar rato
+tot de vastgelegde einddatum wordt berekend. De berekening raakt alleen nieuw
+te maken verplichtingen; eerder gestarte facturen en betaalopdrachten worden
+niet achteraf herprijsd. De regel geldt uitsluitend als hij in het getekende
+aanbod staat.
+
+### 17.6 Aansluiting en bewijsgrenzen
+
+Broninspectie vóór de implementatie op 13 november 2026 toonde de onderstaande
+aansluitgaten. Die historische lijst is geen actuele kwalificatie: de nieuwe
+route is inmiddels lokaal aangesloten achter `RTG_ABONNEMENTEN_ZELFSERVICE`,
+standaard uit. Gerichte tests beproeven aanbod, ondertekening, Stripe-protocol,
+factuur/afdracht, activering, herhaling, 31-dagenmelding en SQLite-herstel.
+Gesimuleerde providerantwoorden zijn geen echte provideracceptatie. Volledige
+route-, opslag-, browser- en releasekwalificatie blijven afzonderlijk vereist.
+
+De oorspronkelijke controlelijst:
+
+- `aanmeldingen/betaalschema.js` plant termijnen en activeert na een
+  kantoorbesluit; het is geen klantondertekening of terugkerende incasso.
+- De huidige Stripe-naad kent eenmalige betalingen, maar nog geen aangesloten
+  abonnements- of off-sessionmandaatketen naar deze contracten.
+- Een echte factuurbetaling werkt via `betaalwaarheid`; de lidmaatschapstermijn
+  wordt daar nog niet vanzelf mee voldaan of voor toegang geactiveerd.
+- Jaarvooruitbetaling met 11,5 maandprijzen, upgradeverrekening,
+  contractgebonden herinneringen en hersteltermijnen, gerichte beperking en
+  herstel na betaling moeten samen door de echte routes worden bewezen.
+- De RTG-acceptatie door kantoor maakt nog wel een contractplanning, maar
+  verleent een nieuw gratis account geen betaalde pas. Dat gat mag niet met
+  alleen `setTier` worden gedicht: klantinstemming en betaling blijven vereist.
+- Nieuwe geplande opzeggingen zijn aan hun contract en aanvraag gebonden.
+  Bevestigen vereist de referentie uit het getoonde voorbeeld; een ander contract,
+  gewijzigde prijs/termijn of verschoven getoonde opzegdatum vraagt een nieuw
+  voorbeeld. Zowel de geplande ronde als afgelopen/wacht beschermen een andere
+  op dat moment geldige afspraak. Oude ongebonden plannen worden alleen bij een
+  unieke consistente bron gekoppeld; anders blijven zij zichtbaar tegengehouden.
+  Dit is bescherming tegen oude opdrachten, nog geen upgrade-activatieketen.
+- `tekenVast` gebruikt nu ook voor leden de bestaande collectiepoort. De
+  SQLite-herstartproef bewijst ontvangstbehoud, niet alle opslagsoorten of
+  stroomuitval. JSON/geheugen gebruiken daar nog gewone `save()`; een volledige
+  crash-/opslagfoutproef en bevestiging voor iedere gebruikte opslag ontbreken.
+- De betaal-app bevestigt een pending providerantwoord niet meer als betaald.
+  De kaartbevestiging bij `requires_action` is daarmee nog niet aangesloten;
+  eerlijke wachtstatus is geen afgeronde betaalervaring.
+
+De beschermende reparaties aan registratie, versiegebonden ondertekening,
+factuurtoegang, menselijke hulp voor gratis/nazorgaccounts, oude onbetaald-regel
+en pestgrens zijn noodzakelijke onderbouw;
+ze maken deze ontbrekende keten niet vanzelf verkoopklaar. Geen kwalificatie
+"Deep Green", uitrol, echte inning of wijziging van bestaande leden afleiden
+uit deze beleidsvastlegging of uit losse lokale toetsen.
+
+### 17.7 Uitrolvoorbereiding van de lokale implementatie
+
+De nieuwe keten wordt alleen aangeboden met
+`RTG_ABONNEMENTEN_ZELFSERVICE=1`, een ondersteunde SQLite-/PostgreSQL-opslag,
+een aangesloten betaalwaarheid/Stripe-adapter en een HTTPS-`APP_URL`.
+De voorbeeldconfiguratie laat de vlag op **0**. `STRIPE_PUBLIC_KEY` wordt alleen
+bij een eigen, actuele kaart-herstelactie afgegeven; client secrets worden niet
+in contracten, termijnen, algemene standantwoorden of de browseropslag bewaard.
+De terugkeer uit checkout gaat naar RTG Geld, stand Lidmaatschap. Alleen die
+terugkeer is nooit een betaalbewijs of aanleiding voor een nieuwe afschrijving.
+
+Bij een onbekend Stripe-antwoord zonder providerreferentie stopt automatisch
+opnieuw versturen na 23 uur vanaf de **eerste** providerstart. Een latere retry
+verschuift die grens niet. Een bekende providerbetaling blijft opvraagbaar;
+een onbekende oude uitkomst vraagt afstemming, geen nieuwe sleutel.
+
+De lokale proeven omvatten echte HTTP-routes, browserbediening, SQLite-herstart,
+twee-processen-eigenaarprovisioning in SQLite en PostgreSQL, en gesimuleerde
+Stripe-protocolantwoorden. Zij bewijzen geen live provideracceptatie, productie-
+credentials, infrastructuuruitrol of stroomuitvalbestendigheid. De volledige
+releaseketen moet bij de uiteindelijke commit opnieuw worden beoordeeld.
+
+Gerichte dienstgrenzen gebruiken dezelfde betaalherstelprojectie bij nieuwe
+kassaverkoop, cadeaukaartuitgifte, personeelsuitnodiging, bureau-/concierge-intake,
+betaalde persoonlijke AI en een nieuw zakelijk roostervoorstel. Bewezen replays,
+bestaande afrekening, dossierinzage, betalen, opzeggen, intrekken en noodzakelijke
+nazorg blijven bereikbaar. Gratis fluister-/servicefunctionaliteit en het
+uitzetten of herstellen van veiligheidsbeleid worden niet stil als betaalde
+nieuwe dienst aangemerkt.
+
+### 17.8 Zakelijke reikwijdte
+
+De eigenaar koos op 13 november 2026: **Business Lite per afzonderlijke zaak;
+Business voor de hele organisatie**. Nieuwe Business-aanbiedingen binden aan
+de bestaande, door de tenant-eigenaar beheerde organisatie. Het menselijke
+toelatingsbesluit legt die organisatie en de werkelijk afgesproken prijs vast;
+een browserveld of de persoonlijke pas van een medewerker bepaalt dit niet.
+Na ondertekening en bewezen betaling projecteert één contract de productrechten
+op de bij die organisatie behorende zaken en werkomgevingen. Er ontstaat geen
+extra abonnement of factuur per vestiging en geen automatische beheerdersrol.
+
+Bestaande pakketquota, rollen, servicegrenzen en getekende afspraken blijven
+leidend; organisatiebreed betekent niet onbeperkt gebruik of onbeperkte
+menselijke dienstverlening. Afzonderlijke bestaande zaakabonnementen worden
+niet stil vervangen: een exacte overeengekomen upgrade of menselijke controle
+is nodig om overlappende betaling te voorkomen. Nieuwe betaalde inrichting
+volgt de organisatieovereenkomst en de aangekondigde 31-dagenhersteltermijn.
+Dagelijks WerkOS-werk, beveiliging, uitvoer en noodzakelijke nazorg blijven open.

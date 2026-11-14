@@ -10,7 +10,7 @@ const fs = require('fs');
 const http = require('http');
 const os = require('os');
 const path = require('path');
-const { startServer } = require('./helper');
+const { startServer, maakBetaaldRtgTestaccount } = require('./helper');
 
 let BASE, child, spraakModel, spraakAanroepen = 0;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-salonapp-'));
@@ -46,6 +46,8 @@ let teller = 0;
 async function lid() {
   const t = Date.now() + '' + (teller++);
   const r = await json(await raw('/auth/register', { name: 'Lid ' + t, email: 's' + t + '@v.test', phone: '06' + String(t).slice(-8), password: 'geheim123', geboortedatum: '1990-03-03', tier: 'rtg' }));
+  assert.ok(r.token, JSON.stringify(r));
+  maakBetaaldRtgTestaccount(TMP, 's' + t + '@v.test');
   const p = await json(await raw('/salon/lid', { wie: 'ik' }, r.token));
   return { token: r.token, codenaam: p.codenaam };
 }

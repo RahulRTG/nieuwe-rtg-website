@@ -17,11 +17,12 @@
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop, laadPlaywright, browserOpties, geenBrowser, letOpFouten } = require('./helper');
+const fs = require('node:fs'), os = require('node:os'), path = require('node:path');
+const { startServer, stopHard, maakBetaaldRtgTestaccount, laadPlaywright, browserOpties, geenBrowser, letOpFouten } = require('./helper');
 const { alleenDs, edgeLabels, edgeActies, geenOverloop, beeld } = require('./lib/ds-toets');
 
 const pw = laadPlaywright(), skip = geenBrowser(pw);
-let srv, browser, kmar, kmarId, codenaam;
+let srv, browser, kmar, kmarId, codenaam, TMP;
 
 async function post(url, data, auth) {
   const r = await fetch(srv.base + url, { method: 'POST', headers: { 'Content-Type': 'application/json',
@@ -46,7 +47,8 @@ const cockpit = page => page.waitForFunction(() => /Controles gedaan/.test(docum
 
 test.before(async () => {
   if (skip) return;
-  srv = await startServer({ env: { SMTP_URL: '', RTG_AI_UIT: '1' } });
+  TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-marechaussee-ds-'));
+  srv = await startServer({ env: { RTG_DATA_DIR: TMP, SMTP_URL: '', RTG_AI_UIT: '1' } });
   browser = await pw.chromium.launch(browserOpties(pw));
   const roster = await post('/api/supplier/roster', { code: 'KMAR' });
   kmarId = roster.staff.find(m => m.role === 'manager').id;
@@ -56,6 +58,7 @@ test.before(async () => {
   const reg = await post('/api/auth/register', { name: 'Grens Reiziger', email: 'kmds' + u + '@x.nl',
     phone: '068' + u.slice(1), password: 'geheim123', geboortedatum: '1986-05-05', tier: 'rtg', pasApp: 'rtg' });
   codenaam = reg.state.user.codename;
+  maakBetaaldRtgTestaccount(TMP, 'kmds' + u + '@x.nl');
   const bord = await post('/api/member/vluchten/bord', {}, reg.token);
   const rt = bord.vluchten.find(v => v.nummer === 'RT205');
   await post('/api/onboarding/paspoort', { nummer: 'NX1234567', vervaldatum: '2032-01-01',
@@ -63,7 +66,7 @@ test.before(async () => {
   const bk = await post('/api/member/vluchten/boek', { id: rt.id }, reg.token);
   await post('/api/member/vluchten/incheck', { id: bk.boeking.id }, reg.token);
 });
-test.after(async () => { if (browser) await browser.close(); if (srv) await stop(srv.child); });
+test.after(async () => { if (browser) await browser.close(); if (srv) await stopHard(srv.child); if (TMP) fs.rmSync(TMP, { recursive: true, force: true }); });
 
 test('alleen het Design System: geen erfenisblad, de ds-poort klopt, de Edge staat', { skip }, async () => {
   const { ctx, page, fouten } = await open(390, 844, { token: null });

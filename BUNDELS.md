@@ -13,7 +13,7 @@ omlaag.
 
 ## `apps/app-main.js`
 
-`public/apps/app-main/` -- 107 delen, 10313 regels in de delen
+`public/apps/app-main/` -- 107 delen, 10377 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -127,7 +127,7 @@ omlaag.
 
 ## `apps/backoffice.js`
 
-`public/apps/backoffice/` -- 10 delen, 1162 regels in de delen
+`public/apps/backoffice/` -- 10 delen, 1169 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -642,7 +642,7 @@ omlaag.
 
 ## `shared/basis.js`
 
-`public/shared/basis/` -- 13 delen, 956 regels in de delen
+`public/shared/basis/` -- 13 delen, 953 regels in de delen
 
 | deel | onderwerp |
 |---|---|

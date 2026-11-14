@@ -46,7 +46,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, maakBetaaldRtgTestaccount } = require('./helper');
 
 /* De grens waarop ELKE krimp telt. Zie de kop: 1 laat een rij door. */
 const ELKE_KRIMP = '0.5';
@@ -59,12 +59,13 @@ function api(base, pad, body, token) {
     .then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
 }
 
-async function lid(base) {
+async function lid(base, map) {
   const u = (Date.now() + (++seq)).toString().slice(-8);
   const r = await api(base, '/api/auth/register', { name: 'Krimpproef', email: 'kp' + u + '@x.nl',
     phone: '06' + u, password: 'geheim123', geboortedatum: '1990-04-04', geslacht: 'x',
     tier: 'rtg', pasApp: 'rtg' });
   assert.ok(r.body && r.body.token, 'registreren lukte niet: ' + JSON.stringify(r).slice(0, 300));
+  maakBetaaldRtgTestaccount(map, 'kp' + u + '@x.nl');
   return r.body.token;
 }
 
@@ -94,7 +95,7 @@ test('MELDEN: een echte route laat de val aanslaan, met de collectie erbij', asy
       RTG_BEGROTING: 'melden', RTG_BEGROTING_KRIMP: ELKE_KRIMP }, stderr: 'pipe' });
     srv.child.stderr.on('data', d => { log += d; });
 
-    const token = await lid(srv.base);
+    const token = await lid(srv.base, map);
     const id = await stuk(srv.base, token);
     const weg = await api(srv.base, '/api/muziek/weg', { id }, token);
     assert.equal(weg.status, 200, 'in meldmodus hoort de handeling gewoon door te gaan');
@@ -124,7 +125,7 @@ test('WEIGEREN: de route komt er niet door, en het stuk staat er NA de poging no
       RTG_BEGROTING: 'weigeren', RTG_BEGROTING_KRIMP: ELKE_KRIMP }, stderr: 'pipe' });
     srv.child.stderr.on('data', d => { log += d; });
 
-    const token = await lid(srv.base);
+    const token = await lid(srv.base, map);
     const id = await stuk(srv.base, token);
     assert.deepEqual(await ids(srv.base, token), [id], 'het stuk staat er voor de poging');
 
@@ -158,7 +159,7 @@ test('DE TEGENPROEF: zonder verlaagde grens verdwijnt hetzelfde stuk wel', async
   let srv = null;
   try {
     srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: map } });
-    const token = await lid(srv.base);
+    const token = await lid(srv.base, map);
     const id = await stuk(srv.base, token);
     assert.deepEqual(await ids(srv.base, token), [id], 'het stuk staat er voor de poging');
 

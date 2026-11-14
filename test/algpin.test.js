@@ -6,7 +6,7 @@
    Draai los: node --test test/algpin.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, maakBetaaldRtgTestaccount } = require('./helper');
 const fs = require('fs'); const os = require('os'); const path = require('path');
 
 async function api(base, pad, body, token) {
@@ -20,7 +20,9 @@ test('algemene pin: instellen, bewijzen, en de werk-app-poort', async () => {
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   try {
     const u = Date.now().toString(36);
-    const lid = (await api(base, '/api/auth/register', { name: 'Pin Lid', email: u + '@x.nl', phone: '0611111112', password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' })).body.token;
+    const email = u + '@x.nl';
+    const lid = (await api(base, '/api/auth/register', { name: 'Pin Lid', email, phone: '0611111112', password: 'geheim123', geboortedatum: '1990-01-01', pasApp: 'rtg' })).body.token;
+    maakBetaaldRtgTestaccount(TMP, email);
 
     // nog geen pin: status zegt dat eerlijk, en check is dan een no-op
     assert.equal((await api(base, '/api/pin/status', {}, lid)).body.gezet, false);

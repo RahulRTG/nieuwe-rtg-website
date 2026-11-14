@@ -17,14 +17,15 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
+const os = require('node:os');
 const path = require('node:path');
-const { startServer, stop, laadPlaywright, browserOpties, geenBrowser, letOpFouten } = require('./helper');
+const { startServer, stopHard, maakBetaaldRtgTestaccount, laadPlaywright, browserOpties, geenBrowser, letOpFouten } = require('./helper');
 const { decodeer, PAD } = require('../server/middleware/stijlbundel-rij');
 
 const pw = laadPlaywright(), skip = geenBrowser(pw);
 const BEELDEN = process.env.RTG_DS_BEELDEN || '';
 const morgen = () => new Date(Date.now() + 86400000).toISOString().slice(0, 10);
-let srv, browser, reiziger, leeg, vlieger, afspraak;
+let srv, browser, reiziger, leeg, vlieger, afspraak, TMP;
 
 async function post(url, data, auth) {
   const r = await fetch(srv.base + url, { method: 'POST', headers: { 'Content-Type': 'application/json',
@@ -33,8 +34,11 @@ async function post(url, data, auth) {
 }
 async function lid(naam) {
   const u = Date.now().toString().slice(-8) + Math.floor(Math.random() * 90 + 10);
-  return (await post('/api/auth/register', { name: naam, email: 'mvds' + u + '@e.test', phone: '06' + u.slice(0, 8),
-    password: 'geheim123', geboortedatum: '1980-01-01', tier: 'rtg', pasApp: 'rtg' })).token;
+  const reg = await post('/api/auth/register', { name: naam, email: 'mvds' + u + '@e.test', phone: '06' + u.slice(0, 8),
+    password: 'geheim123', geboortedatum: '1980-01-01', tier: 'rtg', pasApp: 'rtg' });
+  assert.ok(reg.token);
+  maakBetaaldRtgTestaccount(TMP, 'mvds' + u + '@e.test');
+  return reg.token;
 }
 async function open(token, breedte, hoogte, taal = 'nl') {
   const ctx = await browser.newContext({ viewport: { width: breedte, height: hoogte }, serviceWorkers: 'block', reducedMotion: 'reduce' });
@@ -64,7 +68,8 @@ async function bladen(page) {
 
 test.before(async () => {
   if (skip) return;
-  srv = await startServer({ env: { SMTP_URL: '', RTG_AI_UIT: '1', NODE_ENV: 'test', RTG_DEMO: '1' } });
+  TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-move-ds-'));
+  srv = await startServer({ env: { RTG_DATA_DIR: TMP, SMTP_URL: '', RTG_AI_UIT: '1', NODE_ENV: 'test', RTG_DEMO: '1' } });
   browser = await pw.chromium.launch(browserOpties(pw));
   reiziger = await lid('Move Lid'); leeg = await lid('Move Leeg'); vlieger = await lid('Move Vlieger');
   /* Een afspraak om 08:00 en een charter om 09:30: twee plekken, en de tweede
@@ -76,7 +81,7 @@ test.before(async () => {
   await post('/api/member/vluchten/charter', { soort: 'privejet', bestemming: 'Parijs Le Bourget', datum: d, tijd: '09:30' }, reiziger);
   await post('/api/member/vluchten/charter', { soort: 'privejet', bestemming: 'Parijs Le Bourget', datum: d, tijd: '09:30' }, vlieger);
 });
-test.after(async () => { if (browser) await browser.close(); if (srv) await stop(srv.child); });
+test.after(async () => { if (browser) await browser.close(); if (srv) await stopHard(srv.child); if (TMP) fs.rmSync(TMP, { recursive: true, force: true }); });
 
 test('alleen het Design System: geen erfenisblad, de ds-poort klopt, de Edge staat', { skip }, async () => {
   const { ctx, page, fouten } = await open(reiziger, 390, 844);

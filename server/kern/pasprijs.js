@@ -72,4 +72,29 @@ function maandCentenUit(geldPasprijzen, pas) {
   return maandCentenVoor(passen, pas);
 }
 
-module.exports = { maandCentenVoor, maandCentenUit, bodemCentenVoor, contractueel, STANDAARD };
+/* Alleen expliciete NIEUWE aanbiedingen lezen dit beleidsregime. Bestaande
+   afspraken, de oude regie en hun historische facturen worden niet gemigreerd.
+   Bruto consumentenprijzen worden niet eerst naar maandnetto afgerond om
+   vervolgens jaarbruto te gokken: ieder factuurtotaal heeft zijn eigen opbouw. */
+function abonnementsAanbod(pas, { frequentie = 'maand', aanmelding, btwProfiel = 'nl-21' } = {}) {
+  const p = (ladder.trede(pas) || {}).nieuwAanbod;
+  const btw = require('./commercie/btw');
+  if (!p || !['maand', 'jaar'].includes(frequentie))
+    return { status: 400, error: 'Kies een bestaande pas en maand- of jaarbetaling.' };
+  // Geen fiscale woonplaats afleiden uit een adres of uit browserinvoer.
+  if (!Object.hasOwn(btw.PROFIELEN, btwProfiel))
+    return { status: 409, error: 'Het belastingprofiel moet eerst worden vastgesteld.' };
+  let basis = p.maandCenten;
+  if (basis === null) {
+    basis = aanmelding && aanmelding.contract && aanmelding.contract.maandCenten;
+    if (!Number.isSafeInteger(basis) || basis < p.bodemCenten)
+      return { status: 409, error: 'Business vereist een afzonderlijk goedgekeurd aanbod boven de vastgestelde bodem.' };
+  }
+  const reken = p.basis === 'bruto' ? btw.overBruto : btw.overNetto;
+  const maand = reken(basis, btwProfiel), jaar = reken(Math.round(basis * 23 / 2), btwProfiel);
+  return { versie: 'abonnementen-2026-11-13.1', btwProfiel,
+    maand, jaar, termijn: frequentie === 'jaar' ? jaar : maand,
+    minimumMaanden: pas === 'gratis' ? 0 : 12, herstelDagen: 31 };
+}
+
+module.exports = { maandCentenVoor, maandCentenUit, bodemCentenVoor, contractueel, STANDAARD, abonnementsAanbod };

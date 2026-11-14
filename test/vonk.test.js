@@ -9,7 +9,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop, kantoorAlsPersoon } = require('./helper');
+const { startServer, stop, kantoorAlsPersoon, maakBetaaldRtgTestaccount } = require('./helper');
 
 const PNG = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==';
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-vonk-'));
@@ -26,6 +26,9 @@ async function nieuwLid(verifieer = true) {
   const u = (Date.now() + (++seq)).toString().slice(-8);
   const reg = await api('/api/auth/register', { name: 'Vonklid ' + seq, email: 'v' + u + '@x.nl', phone: '06' + u,
     password: 'geheim123', geboortedatum: '1990-05-05', geslacht: 'v', tier: 'rtg', pasApp: 'rtg' });
+  assert.equal(reg.status, 200, JSON.stringify(reg.body));
+  // De pas is de fixture; de KYC-poort wordt hieronder werkelijk doorlopen.
+  maakBetaaldRtgTestaccount(TMP, 'v' + u + '@x.nl');
   const token = reg.body.token;
   let st = await api('/api/state', {}, token);
   let codename = st.body.state.user.codename;

@@ -2,12 +2,14 @@
    de reserveringsbron; bevestigd blijft een besluit van de juiste zaak. */
 'use strict';
 const test=require('node:test'),assert=require('node:assert/strict');
+const fs=require('node:fs'),os=require('node:os'),path=require('node:path');
+const TMP=fs.mkdtempSync(path.join(os.tmpdir(),'rtg-dinner-'));
 const h=require('./helper');let srv,member,other,supplier,date;
 async function api(route,body={},token=member){const r=await fetch(srv.base+route,{method:'POST',headers:{'content-type':'application/json',...(token?{Authorization:'Bearer '+token}:{})},body:JSON.stringify(body)});return {status:r.status,body:await r.json()};}
-async function register(suffix){const r=await api('/api/auth/register',{name:'Diner '+suffix,email:'dinner-'+suffix+'-'+Date.now()+'@example.test',phone:'0612345678',password:'geheim12345',geboortedatum:'1980-01-01',tier:'rtg',pasApp:'rtg'},null);assert.equal(r.status,200);return r.body.token;}
+async function register(suffix){const email='dinner-'+suffix+'-'+Date.now()+'@example.test';const r=await api('/api/auth/register',{name:'Diner '+suffix,email,phone:'0612345678',password:'geheim12345',geboortedatum:'1980-01-01',pasApp:'rtg'},null);assert.equal(r.status,200);h.maakBetaaldRtgTestaccount(TMP,email);return r.body.token;}
 async function request(time,people=3,token=member){return api('/api/reserveer',{supplierCode:'KIKUNOI',datum:date,tijd:time,personen:people},token);}
 test.before(async()=>{
- srv=await h.startServer({env:{SMTP_URL:'',RTG_AI_UIT:'1'}});date=new Date(Date.now()+3*86400000).toISOString().slice(0,10);
+ srv=await h.startServer({env:{SMTP_URL:'',RTG_AI_UIT:'1',RTG_DATA_DIR:TMP}});date=new Date(Date.now()+3*86400000).toISOString().slice(0,10);
  member=await register('one');other=await register('two');
  const roster=await api('/api/supplier/roster',{code:'KIKUNOI'},null),manager=roster.body.staff.find(s=>s.role==='manager');
  supplier=(await api('/api/supplier/login',{code:'KIKUNOI',staffId:manager.id,pin:'1234'},null)).body.token;assert.ok(supplier);

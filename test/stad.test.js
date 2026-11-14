@@ -12,7 +12,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, maakBetaaldRtgTestaccount } = require('./helper');
 
 let srv, base, office;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-stad-'));
@@ -196,6 +196,8 @@ test('de herhaalsleutel van een melding staat bij de melding: dezelfde tik geeft
   const tok = (await (await fetch(base + '/api/auth/register', { method: 'POST', headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ name: 'Herhaler', email: 'sh' + u + '@voorbeeld.nl', phone: '06' + u, password: 'geheim12345',
       geboortedatum: '1985-05-05', tier: 'rtg' }) })).json()).token;
+  assert.ok(tok);
+  maakBetaaldRtgTestaccount(TMP, 'sh' + u + '@voorbeeld.nl');
   const lijf = { zone: 'Marina', soort: 'water', tekst: 'water op straat bij de kade', idem: 'stad-herhaal-1' };
   const eerst = await api('stad/melding', lijf, tok);
   assert.equal(eerst.status, 200);

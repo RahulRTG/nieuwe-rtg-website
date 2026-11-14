@@ -8,10 +8,11 @@
 
    Deze ronde vraagt het opnieuw aan de provider, met DEZELFDE sleutel en
    DEZELFDE aanbieder als de eerste keer (`r.start`, vastgelegd vóór de externe
-   aanroep). Een herhaling is daardoor een opzoeking en geen tweede betaling:
-   had de provider hem al, dan krijgt RTG dezelfde betaling terug; had hij hem
-   niet, dan wordt de oorspronkelijke opdracht van de klant alsnog precies een
-   keer uitgevoerd.
+   aanroep). Dat voorkomt een tweede opdracht UITSLUITEND zolang de provider
+   die sleutel bewaart. Stripe recurring zonder bekende PI/CS stopt daarom na
+   23 uur vanaf de eerste PROVIDER_START (./herstartgrens.js); een latere
+   retry verschuift die grens niet. Een bekende provider-id blijft via GET
+   opvraagbaar. Onbekend buiten de horizon vraagt zichtbare reconciliatie.
 
    Twee dingen doet hij met opzet NIET:
      - een betaling starten die nooit is aangeboden (geen PROVIDER_START). Dan
@@ -27,6 +28,7 @@ const MAX = WACHT_MS.length;
 
 module.exports = function maakHervat(ctx) {
   const { doos, save, nuIso, gebeurtenis, STATUS, definitiefBetaald, log } = ctx;
+  const anker = require('./actueel')(doos);
   const tijdVan = w => { const n = typeof w === 'number' ? w : Date.parse(String(w || '')); return Number.isFinite(n) ? n : 0; };
   const gestart = r => !!(r.providerId || (r.gebeurtenissen || []).some(g => g.soort === 'PROVIDER_START'));
   const onbekend = r => !r.providerId && gestart(r) && !definitiefBetaald(r.status);
@@ -43,10 +45,13 @@ module.exports = function maakHervat(ctx) {
     const lijst = Object.values(doos()).filter(r => magHervatten(r, grens))
       .slice(0, Math.min(100, Math.max(1, Number(limiet) || 25)));
     let afgerond = 0, wachtNog = 0, geescaleerd = 0;
-    for (const r of lijst) {
+    for (let r of lijst) {
+      const actueel = anker(r);
+      r = actueel();
       let fout = null;
       try { await begin(r.id, Object.assign({}, r.start || {}, { hervat: true })); }
       catch (e) { fout = e; }
+      r = actueel();
       if (!WACHTEND.has(r.status)) { afgerond++; continue; }
       const n = (Number(r.hervatPogingen) || 0) + 1;
       r.hervatPogingen = n;
@@ -107,5 +112,7 @@ module.exports.startVan = function startVan(o) {
   const uit = {};
   for (const k of ['aanbieder', 'methode', 'omschrijving', 'returnUrl', 'webhookUrl', 'bestemming'])
     if (o && o[k]) uit[k] = o[k];
+  if (o && o.terugkerend !== undefined)
+    uit.terugkerend = require('../../betaal/terugkerend').normaliseer(o.terugkerend);
   return uit;
 };

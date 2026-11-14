@@ -35,7 +35,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, maakBetaaldRtgTestaccount } = require('./helper');
 
 let srv, base;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-punten-'));
@@ -57,6 +57,7 @@ async function versLid() {
     password: 'geheim123', geboortedatum: '1985-05-05', tier: 'rtg'
   });
   assert.ok(r.body.token, 'registreren hoort een token te geven');
+  maakBetaaldRtgTestaccount(TMP, 'pt-' + u + '@toets.example');
   assert.equal((await api('/api/verify/upload', { image: MINI_PNG }, r.body.token)).status, 200);
   return r.body.token;
 }

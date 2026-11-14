@@ -211,14 +211,21 @@
       return '<div class="vrow" data-id="'+a.id+'">' +
         '<div class="vi"><div class="nm">'+escHtml(a.naam)+' <span class="s-1caek87">· '+escHtml(a.pasNaam)+'</span>'+uitnod+'</div>' +
           '<div class="sub">'+escHtml(a.contact||'')+'</div>' +
-          '<div class="sub" style="color:var(--soft);">'+T('bo.aanmklaar','AI klaar')+': '+escHtml(gedaan)+'</div></div>' +
+          '<div class="sub" style="color:var(--soft);">'+T('bo.aanmklaar','AI klaar')+': '+escHtml(gedaan)+'</div>' +
+          (a.pas === 'business' ? '<p>Business geldt voor de hele organisatie, niet voor een persoonlijke pas. Controleer de vertegenwoordigingsbevoegdheid van deze aanvrager.</p>' +
+            '<p><label>Goedgekeurde bestaande organisatiecode <input data-organisatie type="text" maxlength="31" autocomplete="off"></label></p>' +
+            '<p><label>Afgesproken maandbedrag exclusief btw <input data-contract-euro type="number" min="0" step="0.01"></label></p>' +
+            '<p>De organisatie en haar bindingen moeten al door de bevoegde tenantbeheerder zijn vastgelegd. Dit besluit maakt geen organisatie of extra beheerdersrollen aan.</p>' : '') + '</div>' +
         '<button class="vbtn ok" data-ok>'+T('bo.accept','Accepteren')+'</button>' +
         '<button class="vbtn no" data-no>'+T('bo.reject','Afwijzen')+'</button>' +
       '</div>';
     }).join('') : '<div class="empty">'+T('bo.noaanm','Geen openstaande aanmeldingen.')+'</div>';
     el.querySelectorAll('.vrow').forEach(row => {
       const id = row.dataset.id;
-      row.querySelector('[data-ok]').addEventListener('click', () => beslisAanm(id, 'geaccepteerd'));
+      row.querySelector('[data-ok]').addEventListener('click', () => {
+        const org = row.querySelector('[data-organisatie]'), prijs = row.querySelector('[data-contract-euro]');
+        beslisAanm(id, 'geaccepteerd', org ? { organisatie: org.value, contractEuro: prijs.value } : {});
+      });
       row.querySelector('[data-no]').addEventListener('click', () => beslisAanm(id, 'afgewezen'));
     });
     // de lopende lidmaatschapsbetalingen: na een akkoord loopt de bijdrage 12
@@ -235,8 +242,8 @@
       }
     } catch(e){}
   }
-  async function beslisAanm(id, besluit){
-    try { await call('/aanmelding/beslis', { id, besluit }); } catch(e){ alert(e.message); return; }
+  async function beslisAanm(id, besluit, velden){
+    try { await call('/aanmelding/beslis', Object.assign({ id, besluit }, velden || {})); } catch(e){ alert(e.message); return; }
     loadAanmeldingen();
   }
 

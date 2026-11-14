@@ -10,7 +10,8 @@
    Hier staat het hele publiek in een keer:
 
    - ELKE PAS. Gast, RTG, Lifestyle en Business. Let op HOE die ontstaan: zelf
-     registreren geeft altijd hooguit een RTG Pass, dus Lifestyle en Business
+     registreren geeft alleen een gratis account; RTG gebruikt een expliciete
+     betaalfixture in de eigen testdatamap. Lifestyle en Business
      lopen hier langs de echte weg -- een aanvraag die door een MENS in de
      backoffice wordt geaccepteerd. Dat is een merkregel, en een proefpubliek dat
      die regel omzeilt zou precies de weg wegtoetsen die we willen bewaken.
@@ -28,7 +29,7 @@
 
    Gebruik:
      const { bouwGezelschap } = require('./gezelschap');
-     const g = await bouwGezelschap(base);
+     const g = await bouwGezelschap(base, { dataDir: TMP });
 
    Er gaat GEEN kantoortoken meer in. Dat was er toen een gedeelde code nog een
    pas kon toekennen; sindsdien haalt dit bestand zelf een backoffice-sessie op
@@ -37,7 +38,7 @@
 */
 const { randomUUID } = require('node:crypto');
 const assert = require('node:assert/strict');
-const { kantoorAlsPersoon } = require('./helper');
+const { kantoorAlsPersoon, maakBetaaldRtgTestaccount } = require('./helper');
 
 /* De genres zoals de aanmeldingen-kern ze kent. Deze lijst is hier alleen om te
    kunnen MELDEN wat er nog niet bezet is; het publiek zelf wordt gebouwd op wat
@@ -68,10 +69,12 @@ async function bouwGezelschap(base, opties) {
     throw new Error('bouwGezelschap(base, opties): het kantoortoken is vervallen, geef alleen de opties mee.');
   const post = maakPost(base);
   const metGenres = !opties || opties.genres !== false;
+  const dataDir = opties && opties.dataDir;
+  assert.ok(typeof dataDir === 'string' && dataDir, 'het proefpubliek vereist zijn eigen testdatamap');
 
-  /* Een gewoon lid. Krijgt ALTIJD een RTG Pass, wat je ook meestuurt; dat is de
-     pas-poort en die toetsen we elders. */
-  async function lid(naam, geboortedatum) {
+  /* Registratie blijft gratis. Alleen de bedoelde RTG-persona krijgt daarna
+     de bestaande betaalfixture; hogere passen wachten op het menselijke besluit. */
+  async function lid(naam, geboortedatum, betaald = true) {
     const u = uniek();
     const email = naam.toLowerCase().replace(/[^a-z]/g, '') + u + '@gezelschap.test';
     const wachtwoord = 'gezelschap' + u;
@@ -81,10 +84,14 @@ async function bouwGezelschap(base, opties) {
       tier: 'rtg', pasApp: 'rtg'
     });
     assert.equal(r.status, 200, 'lid aanmaken lukt (' + naam + '): ' + JSON.stringify(r.body));
+    assert.equal(r.body.state.user.tier, 'guest', 'registratie kent geen betaalde pas toe');
+    if (betaald) maakBetaaldRtgTestaccount(dataDir, email);
     const staat = await post('/api/state', {}, r.body.token);
+    assert.equal(staat.status, 200);
     const s = staat.body.state || staat.body;
+    assert.equal(s.user.tier, betaald ? 'rtg' : 'guest');
     return { naam, email, wachtwoord, token: r.body.token,
-      key: 'user-' + (s.user && s.user.id), codenaam: s.user && s.user.codename, pas: 'rtg' };
+      key: 'user-' + s.user.id, codenaam: s.user.codename, pas: s.user.tier };
   }
 
   /* Optillen naar Lifestyle of Business: aanvragen met je eigen token en dan
@@ -129,8 +136,8 @@ async function bouwGezelschap(base, opties) {
   const passen = {
     gast: { naam: 'Gast', token: gast.body.token, pas: 'guest', codenaam: 'GAST', key: 'guest' },
     rtg: await lid('Rita RTG', '1994-09-14'),
-    lifestyle: await tilOp(await lid('Lies Lifestyle', '1957-02-20'), 'lifestyle'),
-    business: await tilOp(await lid('Bas Business', '1992-11-30'), 'business')
+    lifestyle: await tilOp(await lid('Lies Lifestyle', '1957-02-20', false), 'lifestyle'),
+    business: await tilOp(await lid('Bas Business', '1992-11-30', false), 'business')
   };
 
   // ---- 2. de RTF-leeftijden ----

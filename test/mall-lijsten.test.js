@@ -10,7 +10,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, maakBetaaldRtgTestaccount } = require('./helper');
 const { MAX_LIJSTEN } = require('../server/kern/mall/lijsten');
 
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-lijst-'));
@@ -36,6 +36,7 @@ test.before(async () => {
   const reg = await api('/api/auth/register', { name: 'Lijst Lid', email: 'lijst@x.nl', phone: '0612345674',
     password: 'geheim123', geboortedatum: '1990-01-01', tier: 'lifestyle', pasApp: 'lifestyle' });
   lid = reg.body.token;
+  maakBetaaldRtgTestaccount(TMP, 'lijst@x.nl');
   // een echte gratis gast (tier 'guest'), zoals de app hem maakt
   gast = (await api('/api/login', { tier: 'guest', pasApp: 'rtg' })).body.token;
   assert.ok(gast, 'de gast heeft een sessie');

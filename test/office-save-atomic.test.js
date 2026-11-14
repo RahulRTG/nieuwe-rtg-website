@@ -5,7 +5,7 @@ const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
 const { DatabaseSync } = require('node:sqlite');
-const { startServer, stopNet } = require('./helper');
+const { startServer, stopNet, maakBetaaldRtgTestaccount } = require('./helper');
 
 test('geweigerde documentopslag wijzigt geen titel, inhoud, historie of audit, ook na herstart', async () => {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-office-atomic-'));
@@ -28,7 +28,10 @@ test('geweigerde documentopslag wijzigt geen titel, inhoud, historie of audit, o
       phone: '0612233445', password: 'OnlySynthetic!2026', geboortedatum: '1990-01-01', tier: 'rtg' });
     assert.equal(reg.status, 200);
     const token = reg.body.token;
+    assert.ok(token, 'het documentaccount is geregistreerd');
+    maakBetaaldRtgTestaccount(dir, 'atomic@example.invalid');
     const maak = await api('/api/kantoorpakket/maak', { soort: 'blad', titel: 'Oorspronkelijk' }, token);
+    assert.equal(maak.status, 200, JSON.stringify(maak.body));
     const id = maak.body.id;
     const voor = opgeslagen(id), cellen = {};
     for (let i = 1; i <= 1400; i++)

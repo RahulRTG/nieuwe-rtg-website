@@ -18,7 +18,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, maakBetaaldRtgTestaccount } = require('./helper');
 
 let srv, base;
 let lidTok, lidNaam;            // het RTG-lid
@@ -46,6 +46,8 @@ test.before(async () => {
     phone: '06' + String(t).slice(-8), password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg' });
   lidTok = reg.body.token;
   assert.ok(lidTok, 'het lid krijgt een token');
+  // De bandtoets begint met een bestaande RTG Pass; registratie alleen is gratis.
+  maakBetaaldRtgTestaccount(TMP, 'lb' + t + '@e.test');
   lidNaam = ((await post('/api/auth/me', {}, lidTok)).body.user || {}).codename;
   assert.ok(lidNaam, 'en een codenaam: ' + JSON.stringify(lidNaam));
 

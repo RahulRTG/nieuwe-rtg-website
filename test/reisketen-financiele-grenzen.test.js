@@ -5,21 +5,28 @@
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop, keurLidGoed } = require('./helper');
+const fs = require('node:fs'), os = require('node:os'), path = require('node:path');
+const { startServer, stopHard, keurLidGoed, maakBetaaldRtgTestaccount } = require('./helper');
 const { maakReisketenFixture, goed } = require('./lib/reisketen-fixture');
 let srv, x;
+const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-reis-geldgrens-'));
 const MP = '/api/reisbureau/keten';
 const SP = '/api/supplier/reisbureau/keten';
 test.before(async () => {
-  srv = await startServer({ env: { SMTP_URL: '', OFFICE_CODE: 'RTG-OFFICE' } });
+  srv = await startServer({ env: { RTG_DATA_DIR: TMP, SMTP_URL: '', OFFICE_CODE: 'RTG-OFFICE' } });
   x = await maakReisketenFixture(srv.base);
 });
-test.after(async () => { await stop(srv); });
+test.after(async () => {
+  await stopHard(srv && srv.child);
+  fs.rmSync(TMP, { recursive: true, force: true });
+});
 
 async function nieuwLid(naam) {
   const r = goed(await x.api('/api/auth/register', { name: 'Financiële grens ' + naam,
     email: 'reis-geldgrens-' + naam + '@voorbeeld.test', phone: '0612345891',
     password: 'Geheim123!', geboortedatum: '1990-01-01', pasApp: 'rtg' }), 'ongekeurd lid');
+  // De reistoegang is betaald; verificatie en latere intrekking blijven echte aparte stappen.
+  maakBetaaldRtgTestaccount(TMP, 'reis-geldgrens-' + naam + '@voorbeeld.test');
   return { token: r.token, codenaam: r.state.user.codename };
 }
 const saldo = async lid => goed(await x.api('/api/pay/overzicht', {}, lid.token), 'eigen Pay-ledger');

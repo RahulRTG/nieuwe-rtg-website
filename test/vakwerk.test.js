@@ -8,7 +8,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, maakBetaaldRtgTestaccount } = require('./helper');
 
 let srv, base, lid;
 const tok = {};
@@ -33,6 +33,9 @@ test.before(async () => {
   base = srv.base;
   const reg = await api('/api/auth/register', { name: 'Vak Lid', email: 'vak@x.nl', phone: '0612345677',
     password: 'geheim123', geboortedatum: '1990-01-01', tier: 'lifestyle', pasApp: 'lifestyle' });
+  assert.equal(reg.status, 200);
+  assert.equal(reg.body.state.user.tier, 'guest', 'een gevraagde pas is geen verleend recht');
+  maakBetaaldRtgTestaccount(TMP, 'vak@x.nl');
   lid = reg.body.token;
   for (const c of ['FUEGO', 'SERENA', 'AYAKA']) tok[c] = await login(c, '1234');
 });

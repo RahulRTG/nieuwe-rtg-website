@@ -27,7 +27,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer } = require('./helper');
+const { startServer, maakBetaaldRtgTestaccount } = require('./helper');
 
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-samen-'));
 
@@ -44,13 +44,15 @@ function post(base) {
 }
 
 let teller = 0;
-async function nieuwLid(P, naam) {
+async function nieuwLid(P, naam, betaald = false) {
   const u = String(Date.now()).slice(-7) + String(++teller).padStart(3, '0');
   const r = await P('/api/auth/register', {
     name: naam, email: naam.toLowerCase() + u + '@x.nl', phone: '06' + u.slice(0, 8),
     password: 'geheim123', geboortedatum: '1990-01-01', geslacht: 'v', tier: 'rtg', pasApp: 'rtg'
   });
   assert.ok(r.body.token, naam + ' is aangemeld: ' + JSON.stringify(r.body).slice(0, 160));
+  // Alleen WBW vraagt hier een betaalpas; kascode en wekker blijven gratis.
+  if (betaald) maakBetaaldRtgTestaccount(TMP, naam.toLowerCase() + u + '@x.nl');
   await P('/api/verify/upload', { image: MINI_PNG }, r.body.token);   // RTG Pay vraagt een paspoort
   const wie = await P('/api/salon/lid', {}, r.body.token);
   return { token: r.body.token, codenaam: wie.body.codenaam };
@@ -95,9 +97,9 @@ test('Wie betaalt wat: alleen met vrienden, en de balans komt op nul uit', async
   const { child, base } = await startServer({ env: { RTG_DATA_DIR: TMP, SMTP_URL: '' } });
   try {
     const P = post(base);
-    const anna = await nieuwLid(P, 'Anouschka');
-    const bram = await nieuwLid(P, 'Bertram');
-    const vreemde = await nieuwLid(P, 'Vreemdeling');
+    const anna = await nieuwLid(P, 'Anouschka', true);
+    const bram = await nieuwLid(P, 'Bertram', true);
+    const vreemde = await nieuwLid(P, 'Vreemdeling', true);
 
     /* ---- 1. EEN VREEMDE KOMT ER NIET IN. Zonder deze grens kan iedereen
        iedereen in een geldlijstje trekken. ---- */

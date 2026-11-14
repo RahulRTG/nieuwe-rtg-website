@@ -140,6 +140,8 @@ function verifieerAdyenMelding(item) {
 
 module.exports = { AANBIEDER, BETALEN_AAN: !BETALEN_UIT && AANBIEDER !== 'uit',
   maakBetaling, haalBetaling, maakTerugbetaling, haalTerugbetaling, maakUitbetaling,
+  maakBetaalafspraak: ontvangst.maakBetaalafspraak, haalBetaalafspraak: ontvangst.haalBetaalafspraak,
+  haalKlantactie: ontvangst.haalKlantactie,
   verifieerWebhook, koppelStore, tekenDemo, mogelijkheden, kiesAanbieder,
   CONNECT_SANDBOX: sandbox.CONNECT, SEPA_SANDBOX: sandbox.SEPA,
   zetSandbox: (kanaal, aan) => regie.zet(kanaal, aan), sandboxStand: regie.stand,

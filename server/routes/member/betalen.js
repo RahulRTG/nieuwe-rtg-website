@@ -20,8 +20,11 @@ module.exports = (kern) => {
   }
   const ledenInvoices = (req) => ledenStaat(req).invoices || [];
 
+  // Een gratis of teruggezette pas houdt toegang tot de EIGEN facturen.
+  // Alleen een anonieme gast mag nooit bij het gedeelde demodossier komen.
+
   app.post('/api/pay', auth, async (req, res) => {
-    if (req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor leden.' });
+    if (!req.session.account && req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor accounts.' });
     if (!betaal.BETALEN_AAN) return res.status(503).json({
       error: 'Betalen staat bewust uitgeschakeld. Er is niets afgeschreven.', code: 'betalingen-uit' });
     const zPay = db.data.techniek && db.data.techniek.zekeringen && db.data.techniek.zekeringen.betalingen;
@@ -51,6 +54,9 @@ module.exports = (kern) => {
        DE ROUTE SCHRIJFT DE LEDENSTAAT NIET MEER. getMemberState geeft een kopie;
        de afwikkeling bewaart haar eigen verse kopie, en een save van de oude
        kopie hier zou "betaald" weer overschrijven. */
+    if (targets.some(i => i.abonnement)) return res.status(409).json({
+      error: 'Rond deze abonnementstermijn af via Lidmaatschap. Daar blijven contract, verrekening en betaaltoestemming gekoppeld.',
+      code: 'abonnement-eigen-betaalroute' });
     if (!betaalWaarheid) return res.status(503).json({ error: 'De betaalwaarheid is niet aangesloten; er is niets afgeschreven.' });
     const wie = principalVoorSession(req.session);
     let foundation = 0;
@@ -88,7 +94,7 @@ module.exports = (kern) => {
   require('./betalen-munt')(Object.assign({}, kern, { ledenStaat, ledenInvoices }));
 
   app.post('/api/factuur', auth, (req, res) => {
-    if (req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor leden.' });
+    if (!req.session.account && req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor accounts.' });
     const inv = ledenInvoices(req).find(i => i.id === req.body.invoiceId);
     if (!inv) return res.status(404).json({ error: 'Factuur niet gevonden.' });
     const who = { codename: liveCodename(req.session), tier: req.session.tier };
@@ -99,7 +105,7 @@ module.exports = (kern) => {
   });
 
   app.post('/api/facturen/overzicht', auth, (req, res) => {
-    if (req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor leden.' });
+    if (!req.session.account && req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor accounts.' });
     const jaar = String(req.body.jaar || '').match(/\d{4}/) ? req.body.jaar : null;
     const alle = ledenInvoices(req).filter(i => !jaar || String(i.date || '').includes(jaar));
     const who = { codename: liveCodename(req.session), tier: req.session.tier };

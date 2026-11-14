@@ -78,7 +78,7 @@ module.exports = (kern) => {
   });
 
   app.post('/api/gast/eten/beoordeel', auth, (req, res) => {
-    if (req.session.tier === 'guest') return res.status(403).json({ error:'Beoordelen is voor leden.' });
+    if (!req.session.account) return res.status(403).json({ error:'Beoordelen vraagt een eigen account.' });
     const x = eigenRekening(req, res); if (!x) return;
     /* De doos bestaat hier zeker -- de rekening is er zojuist in gevonden -- dus
        Hlees geeft dezelfde doos terug als H, zonder er een te kunnen scheppen op

@@ -27,7 +27,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, maakBetaaldRtgTestaccount } = require('./helper');
 
 let srv, base, baas, werker, lidToken;
 const ZAAK = 'KIKUNOI';
@@ -64,6 +64,7 @@ test.before(async () => {
   const reg = await api('/api/auth/register', { name: 'Brug Lid', email: 'bl' + u + '@voorbeeld.test',
     password: 'bruggeheim123', geboortedatum: '1992-02-02', tier: 'rtg', pasApp: 'rtg' });
   lidToken = reg.body.token;
+  maakBetaaldRtgTestaccount(TMP, 'bl' + u + '@voorbeeld.test');
   assert.equal((await api('/api/account/koppel',
     { soort: 'personeel', code: ZAAK, staffId: st.id, pin: staffPin }, lidToken)).status, 200);
   werker = (await api('/api/supplier/login', { code: ZAAK, staffId: st.id, pin: staffPin })).body.token;

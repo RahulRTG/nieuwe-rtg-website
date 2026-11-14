@@ -6,7 +6,7 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs'); const os = require('os'); const path = require('path');
-const { startServer } = require('./helper');
+const { startServer, maakBetaaldRtgTestaccount } = require('./helper');
 
 let BASE, child;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-bord-'));
@@ -35,6 +35,7 @@ const BORD = { lijsten: [
 test('1. een lid maakt een bord, bewaart en leest terug; de sanitizer klemt', async () => {
   const t = Date.now();
   const lid = (await json(await raw('/api/auth/register', { name: 'Lid ' + t, email: 'b' + t + '@v.test', phone: '0687' + String(t).slice(-6), password: 'geheim123', geboortedatum: '1990-02-02', tier: 'rtg' }))).token;
+  maakBetaaldRtgTestaccount(TMP, 'b' + t + '@v.test');
   let r = await json(await raw('/api/kantoorpakket/maak', { soort: 'bord' }, lid));
   assert.equal(r.ok, true);
   assert.equal(r.soort, 'bord');

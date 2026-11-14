@@ -11,8 +11,11 @@
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const os = require('node:os');
+const path = require('node:path');
 const { startServer, letOpFouten, kantoorAlsPersoon, laadPlaywright, browserOpties, geenBrowser,
-  volgVerzoeken, wachtOpWaarde, wachtOpRust } = require('./helper');
+  volgVerzoeken, wachtOpWaarde, wachtOpRust, stopHard, maakBetaaldRtgTestaccount } = require('./helper');
 
 const pw = laadPlaywright();
 const post = (base, pad, lijf, tok) => fetch(base + pad, { method: 'POST',
@@ -38,15 +41,24 @@ async function dubbelklikEnWacht(page, selector, pad) {
 }
 
 test('een dubbelklik op Overboeken en op Pas uitgeven stuurt een sleutel en boekt een keer', { skip: geenBrowser(pw) }, async () => {
-  const { child, base } = await startServer({ env: { SMTP_URL: '' } });
-  let browser;
+  const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-bank-dubbelklik-'));
+  let srv, browser;
   try {
+    srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
+    const { base } = srv;
     const kantoor = await kantoorAlsPersoon(base);
     assert.ok(kantoor, 'een herleidbaar mens van het kantoor zet de ledenbank live');
     assert.equal((await post(base, '/api/office/bank/leden', { aan: true }, kantoor)).ledenAan, true);
     const u = Date.now().toString().slice(-8) + Math.floor(Math.random() * 90 + 10);
-    const tok = (await post(base, '/api/auth/register', { name: 'Banklid', email: 'dk' + u + '@x.nl', phone: '06' + u.slice(0, 8),
-      password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg' })).token;
+    const email = 'dk' + u + '@x.nl';
+    const reg = await post(base, '/api/auth/register', { name: 'Banklid', email, phone: '06' + u.slice(0, 8),
+      password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg' });
+    const tok = reg.token;
+    assert.ok(tok, JSON.stringify(reg));
+    assert.equal(reg.state.user.tier, 'guest', 'registratie koopt geen pas');
+    // De dubbelklikproef betreft een bestaande betaalde bankhouder, niet nieuwe inschrijving.
+    maakBetaaldRtgTestaccount(TMP, email);
+    assert.equal((await post(base, '/api/state', {}, tok)).state.user.tier, 'rtg');
     await post(base, '/api/bank/akkoord', {}, tok);
     await post(base, '/api/bank/rekening/open', { soort: 'spaar', idem: 'spaar-' + u }, tok);
     const ov = await post(base, '/api/bank/overzicht', {}, tok);
@@ -95,7 +107,10 @@ test('een dubbelklik op Overboeken en op Pas uitgeven stuurt een sleutel en boek
     assert.equal((passen.passen || []).filter((p) => p.iban === betaal.iban).length, 1, 'een pas uitgegeven: ' + JSON.stringify(passen).slice(0, 200));
     assert.deepEqual(fouten, [], 'paginafouten: ' + fouten.join(' | '));
   } finally {
-    if (browser) await browser.close();
-    child.kill();
+    try { if (browser) await browser.close(); }
+    finally {
+      await stopHard(srv && srv.child);
+      fs.rmSync(TMP, { recursive: true, force: true });
+    }
   }
 });

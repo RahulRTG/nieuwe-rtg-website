@@ -45,7 +45,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
+const { startServer, stopHard, maakBetaaldRtgTestaccount, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
 
 const pw = laadPlaywright();
 
@@ -76,6 +76,12 @@ test('RTG Chauffeur: de PDA weigert zonder personeelssessie, neemt een rit aan e
         tier: 'rtg', pasApp: 'rtg' });
       assert.ok(reg.body.token, 'het lid is aangemeld: ' + JSON.stringify(reg.body).slice(0, 160));
       const lid = reg.body.token;
+      assert.equal(reg.body.state.user.tier, 'guest', 'registratie koopt geen pas');
+      // Alleen de reiziger krijgt bestaande betaalrechten; centrale en chauffeur houden hun echte zaakrol.
+      maakBetaaldRtgTestaccount(TMP, 'ch' + u + '@x.nl');
+      const staat = await post(base, '/api/state', {}, lid);
+      assert.equal(staat.status, 200);
+      assert.equal(staat.body.state.user.tier, 'rtg');
 
       const roster = await post(base, '/api/supplier/roster', { code: 'MKKX' });
       const manager = (roster.body.staff || []).find(s => s.role === 'manager');
@@ -221,8 +227,10 @@ test('RTG Chauffeur: de PDA weigert zonder personeelssessie, neemt een rit aan e
 
       assert.deepEqual(fouten, [], 'geen JS-fouten op de chauffeurs-PDA: ' + fouten.join(' | '));
     } finally {
-      if (browser) await browser.close();
-      await stop(child);
-      try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) { /* weg is weg */ }
+      try { if (browser) await browser.close(); }
+      finally {
+        await stopHard(child);
+        fs.rmSync(TMP, { recursive: true, force: true });
+      }
     }
   });

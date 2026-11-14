@@ -17,13 +17,17 @@
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop, laadPlaywright, browserOpties, geenBrowser, letOpFouten } = require('./helper');
+const fs = require('node:fs');
+const os = require('node:os');
+const path = require('node:path');
+const { startServer, stopHard, maakBetaaldRtgTestaccount, laadPlaywright, browserOpties, geenBrowser, letOpFouten } = require('./helper');
 const { alleenDs, edgeLabels, edgeActies, geenOverloop, beeld } = require('./lib/ds-toets');
 
 const pw = laadPlaywright(), skip = geenBrowser(pw);
 const PAPIEREN_OK = { kenteken: '2030-01-01', verzekering: '2030-01-01', apk: '2030-01-01',
   taxivergunning: '2030-01-01', boordcomputer: '2030-01-01' };
 let srv, browser, zaak, lid;
+const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-dispatch-scherm-'));
 
 async function post(pad, body, token) {
   const r = await fetch(srv.base + pad, { method: 'POST', headers: { 'Content-Type': 'application/json',
@@ -44,16 +48,24 @@ async function open(breedte, hoogte, taal = 'nl', token = zaak) {
 
 test.before(async () => {
   if (skip) return;
-  srv = await startServer({ env: { SMTP_URL: '', RTG_AI_UIT: '1' } });
+  srv = await startServer({ env: { SMTP_URL: '', RTG_AI_UIT: '1', RTG_DATA_DIR: TMP } });
   browser = await pw.chromium.launch(browserOpties(pw));
   const roster = await post('/api/supplier/roster', { code: 'MKKX' });
   const m = (roster.body.staff || []).find(x => x.role === 'manager');
   zaak = (await post('/api/supplier/login', { code: 'MKKX', staffId: m.id, pin: '1234' })).body.token;
   assert.ok(zaak, 'de centrale van de taxizaak logt in');
   const u = Date.now().toString().slice(-8);
-  lid = (await post('/api/auth/register', { name: 'Reiziger', email: 'dsd' + u + '@x.nl', phone: '06' + u,
-    password: 'geheim12345', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' })).body.token;
+  const reg = await post('/api/auth/register', { name: 'Reiziger', email: 'dsd' + u + '@x.nl', phone: '06' + u,
+    password: 'geheim12345', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' });
+  assert.equal(reg.status, 200);
+  lid = reg.body.token;
   assert.ok(lid, 'het lid is aangemeld');
+  assert.equal(reg.body.state.user.tier, 'guest', 'registratie koopt geen pas');
+  // De rit is van een bestaande RTG-reiziger; de dispatcher blijft dezelfde bevoegde medewerker.
+  maakBetaaldRtgTestaccount(TMP, 'dsd' + u + '@x.nl');
+  const staat = await post('/api/state', {}, lid);
+  assert.equal(staat.status, 200);
+  assert.equal(staat.body.state.user.tier, 'rtg');
   const a = await post('/api/supplier/mob/voertuig', { categorie: 'taxi', naam: 'Wagen A', loc: { lat: 38.909, lng: 1.433 },
     energieNiveau: 80, bestuurder: 'chauffeur-a', papieren: PAPIEREN_OK }, zaak);
   assert.equal(a.body.asset && a.body.asset.inzetbaar, true, 'Wagen A mag rijden');
@@ -61,7 +73,13 @@ test.before(async () => {
     energieNiveau: 90, bestuurder: 'chauffeur-b', papieren: Object.assign({}, PAPIEREN_OK, { taxivergunning: '2020-01-01' }) }, zaak);
   assert.equal(b.body.asset && b.body.asset.inzetbaar, false, 'Wagen B heeft een verlopen vergunning');
 });
-test.after(async () => { if (browser) await browser.close(); if (srv) await stop(srv.child); });
+test.after(async () => {
+  try { if (browser) await browser.close(); }
+  finally {
+    await stopHard(srv && srv.child);
+    fs.rmSync(TMP, { recursive: true, force: true });
+  }
+});
 
 test('alleen het Design System: geen erfenisblad, de ds-poort klopt, de Edge staat', { skip }, async () => {
   const { ctx, page, fouten } = await open(390, 844);

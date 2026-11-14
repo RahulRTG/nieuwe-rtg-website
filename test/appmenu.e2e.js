@@ -33,7 +33,7 @@
    Draai: npm run e2e */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop, laadPlaywright, browserOpties, geenBrowser, edgeActies, volgVerzoeken, wachtOpRust, wachtTot } = require('./helper');
+const { startServer, stopHard, maakBetaaldRtgTestaccount, laadPlaywright, browserOpties, geenBrowser, edgeActies, volgVerzoeken, wachtOpRust, wachtTot } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -58,21 +58,22 @@ async function api(base, pad, body) {
   return r.json();
 }
 
-/* Een echt lid, want zonder inlog bouwt metgezel.js niets en heeft de toets
-   niets te meten. */
-async function lidToken(base, email) {
+/* Een echt lid met de bedoelde betaalde RTG-instappas voor deze wereld-/reisproeven.
+   Registratie zelf blijft gratis; dit bewijst geen abonnement of hogere pas. */
+async function lidToken(base, email, datamap) {
   const reg = await api(base, '/api/auth/register', { name: 'Menu Lid', email, phone: '0612345799',
-    password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' });
+    password: 'geheim123', geboortedatum: '1990-01-01', pasApp: 'rtg' });
   assert.ok(reg.token, 'lid-registratie geeft een token');
+  maakBetaaldRtgTestaccount(datamap, email);
   return reg.token;
 }
 
 async function metLid(fn) {
   const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-menu-'));
-  const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
-  let browser;
+  let child, base, browser;
   try {
-    const tok = await lidToken(base, 'appmenu' + process.pid + '@x.nl');
+    ({ child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } }));
+    const tok = await lidToken(base, 'appmenu' + process.pid + '@x.nl', TMP);
     browser = await pw.chromium.launch(browserOpties(pw));
     const ctx = await browser.newContext({ viewport: { width: 390, height: 844 } });
     /* DE INTAKE STAAT HIER BUITEN, EN DAT MOET VIA DE STATUS.
@@ -111,9 +112,11 @@ async function metLid(fn) {
     }, tok);
     await fn({ base, ctx });
   } finally {
-    if (browser) await browser.close();
-    stop(child);
-    try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
+    try { if (browser) await browser.close(); }
+    finally {
+      await stopHard(child);
+      fs.rmSync(TMP, { recursive: true, force: true });
+    }
   }
 }
 

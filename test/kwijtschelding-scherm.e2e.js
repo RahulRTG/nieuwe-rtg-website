@@ -18,15 +18,20 @@
    Draai: npm run e2e */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
+const { startServer, stopHard, keurLidGoed, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
 
 const pw = laadPlaywright();
-const api = async (base, pad, body, token) => (await fetch(base + pad, { method: 'POST',
-  headers: Object.assign({ 'Content-Type': 'application/json' }, token ? { Authorization: 'Bearer ' + token } : {}),
-  body: JSON.stringify(body || {}) })).json();
+const api = async (base, pad, body, token, verwacht = 200) => {
+  const r = await fetch(base + pad, { method: 'POST',
+    headers: Object.assign({ 'Content-Type': 'application/json' }, token ? { Authorization: 'Bearer ' + token } : {}),
+    body: JSON.stringify(body || {}) });
+  const uit = await r.json();
+  assert.equal(r.status, verwacht, pad + ': ' + JSON.stringify(uit).slice(0, 200));
+  return uit;
+};
 
 // het scherm vraagt de grond met een prompt(); die wordt hier beantwoord
 const zegJa = (page, antwoord) => {
@@ -34,14 +39,20 @@ const zegJa = (page, antwoord) => {
 };
 
 async function open(pw, base, token, fouten) {
-  const page = await (await pw.chromium.launch(browserOpties(pw))).newPage();
-  letOpFouten(page, fouten);
-  await page.addInitScript(t => { localStorage.setItem('rtg_werk_rijk', t); }, token);
-  await page.goto(base + '/apps/belastingkantoor.html', { waitUntil: 'domcontentloaded' });
-  await page.waitForSelector('#app:not([hidden])', { timeout: 20000 });
-  await page.click('.tab[data-t="aan"]');
-  await page.waitForSelector('#aanLijst .item', { timeout: 15000 });
-  return page;
+  const browser = await pw.chromium.launch(browserOpties(pw));
+  try {
+    const page = await browser.newPage();
+    letOpFouten(page, fouten);
+    await page.addInitScript(t => { localStorage.setItem('rtg_werk_rijk', t); }, token);
+    await page.goto(base + '/apps/belastingkantoor.html', { waitUntil: 'domcontentloaded' });
+    await page.waitForSelector('#app:not([hidden])', { timeout: 20000 });
+    await page.click('.tab[data-t="aan"]');
+    await page.waitForSelector('#aanLijst .item', { timeout: 15000 });
+    return page;
+  } catch (fout) {
+    // Bij een fout vóór de return bestaat p1/p2 nog niet: deze eigenaar ruimt de browser op.
+    try { await browser.close(); } finally { throw fout; }
+  }
 }
 
 test('Belastingkantoor: kwijtschelden is voordragen en beslissen, door twee mensen',
@@ -52,9 +63,17 @@ test('Belastingkantoor: kwijtschelden is voordragen en beslissen, door twee mens
   try {
     // een inwoner met een openstaande aanslag
     const u = Date.now().toString().slice(-8);
-    const lid = (await api(base, '/api/auth/register', { name: 'Inwoner Kwijt', email: 'k' + u + '@x.nl',
-      phone: '063' + u.slice(1), password: 'geheim123', geboortedatum: '1985-04-04', tier: 'rtg', pasApp: 'rtg' })).token;
-    await api(base, '/api/overheid/aangifte', { inkomen: 90000, aftrek: 1000, ingehouden: 0 }, lid);
+    const reg = await api(base, '/api/auth/register', { name: 'Inwoner Kwijt', email: 'k' + u + '@x.nl',
+      phone: '063' + u.slice(1), password: 'geheim123', geboortedatum: '1985-04-04', tier: 'rtg', pasApp: 'rtg' });
+    const lid = reg.token;
+    assert.ok(lid);
+    assert.equal(reg.state.user.tier, 'guest', 'aangifte vraagt geen betaalde pas');
+    const aangifte = { inkomen: 90000, aftrek: 1000, ingehouden: 0 };
+    const geweigerd = await api(base, '/api/overheid/aangifte', aangifte, lid, 403);
+    assert.match(geweigerd.hoe, /paspoort|Identiteitsverificatie/i, 'zonder controle blijft de identiteitspoort dicht');
+    await keurLidGoed(base, lid, reg.state.user.codename, '1985-04-04');
+    assert.equal((await api(base, '/api/state', {}, lid)).state.user.tier, 'guest', 'identiteitscontrole koopt geen pas');
+    await api(base, '/api/overheid/aangifte', aangifte, lid);
 
     // twee inspecteurs
     const roster = await api(base, '/api/supplier/roster', { code: 'RIJK' });
@@ -113,7 +132,7 @@ test('Belastingkantoor: kwijtschelden is voordragen en beslissen, door twee mens
     assert.deepEqual(fouten, [], 'geen JS-fouten op het scherm');
   } finally {
     for (const p of [p1, p2]) if (p) { try { await p.context().browser().close(); } catch (e) { /* al dicht */ } }
-    stop(child);
-    try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) { /* opruimen mag falen */ }
+    await stopHard(child);
+    fs.rmSync(TMP, { recursive: true, force: true });
   }
 });

@@ -10,7 +10,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, maakBetaaldRtgTestaccount } = require('./helper');
 
 function api(base, pad, body, token) {
   const h = { 'Content-Type': 'application/json' };
@@ -29,7 +29,8 @@ test.before(async () => {
   club = (await api(base, '/api/supplier/login', { code: 'FCRTG', staffId: man.id, pin: '1234' })).body.token;
   const u = Date.now().toString().slice(-8);
   lid = (await api(base, '/api/auth/register', { name: 'Sport Fan', email: 'sp' + u + '@x.nl',
-    phone: '063' + u.slice(1), password: 'geheim123', geboortedatum: '1992-03-03', tier: 'rtg', pasApp: 'rtg' })).body.token;
+    phone: '063' + u.slice(1), password: 'geheim123', geboortedatum: '1992-03-03', pasApp: 'rtg' })).body.token;
+  maakBetaaldRtgTestaccount(TMP, 'sp' + u + '@x.nl');
   office = (await api(base, '/api/office/login', { code: 'RTG-OFFICE' })).body.token;
   // de komende thuiswedstrijd uit de seed, voor de ticket-tests
   const b = await api(base, '/api/member/sport/bord', {}, lid);

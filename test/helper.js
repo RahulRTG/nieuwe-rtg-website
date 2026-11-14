@@ -717,15 +717,7 @@ async function elevateTier(base, memberToken, pas, approverToken) {
    e-mailadres noemen; een onbekend account of niet-testproces faalt hard. */
 function maakBetaaldRtgTestaccount(dataDir, email) {
   if (!dataDir || !email) throw new TypeError('maakBetaaldRtgTestaccount vraagt een testdatamap en e-mailadres');
-  const code = [
-    "const a=require('./server/accounts');",
-    "a.init();",
-    "const u=a.findByLogin(process.argv[1]);",
-    "if(!u) throw Error('testaccount niet gevonden');",
-    "if(!a.setTier(u.id,'rtg')) throw Error('RTG-testpas kon niet worden gezet');",
-    "if(a.checkpoint) a.checkpoint();"
-  ].join('');
-  const r = spawnSync(process.execPath, ['-e', code, String(email)], {
+  const r = spawnSync(process.execPath, [path.join(__dirname, 'fixtures/betaald-rtg-account.cjs'), String(email)], {
     cwd: path.join(__dirname, '..'), encoding: 'utf8',
     env: { ...process.env, NODE_ENV: 'test', RTG_DATA_DIR: String(dataDir), SMTP_URL: '' }
   });

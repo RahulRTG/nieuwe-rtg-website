@@ -3,6 +3,7 @@
 'use strict';
 
 module.exports = function maakReiziger({ ctx, schoon }) {
+  const { mobVraagToegang, mobEigenToegang } = require('./werktoegang')(ctx);
   /* Wat een reiziger te kiezen heeft, hier, nu. Dit antwoord bouwt de app uit
      de actuele modules op, zodat de keuzes nooit naast het register bestaan. */
   function mobAanbod(waar = {}) {
@@ -27,30 +28,32 @@ module.exports = function maakReiziger({ ctx, schoon }) {
   }
 
   function mobMijn(session) {
+    const toegang = mobEigenToegang(session); if (toegang.error) return toegang;
     const eigen = ctx.opdrachtenVan(session.key);
     const lopend = eigen.find(o => !['afgerekend', 'geannuleerd', 'voltooid'].includes(o.status)) || null;
     return { ok: true,
       lopend: lopend ? Object.assign(ctx.opdrachtBeeld(lopend, true),
         { positie: lopend.positie || null, mag: ctx.opdrachtVolgende(lopend) }) : null,
       ritten: eigen.slice(0, 25).map(o => ctx.opdrachtBeeld(o)),
-      favorieten: ctx.favLijst(session).favorieten };
+      favorieten: session.tier === 'guest' ? [] : ctx.favLijst(session).favorieten };
   }
 
   function mobVraag(session, body = {}) {
-    if (session.tier === 'guest') return { status: 403, error: 'RTG Vervoer is voor leden.' };
+    const toegang = mobVraagToegang(session, body); if (toegang.error) return toegang;
     return ctx.opdrachtMaak({ soort: 'lid', key: session.key, session, groep: session.tier,
-      org: body.namensOrganisatie ? schoon(body.namensOrganisatie, 20) : null,
+      org: toegang.organisatie,
       stad: schoon(body.stad, 40) || null }, body);
   }
 
   /* Alleen de reiziger zelf kan zijn rit annuleren; dispatch heeft een eigen
      ingang met zijn eigen bevoegdheidscontrole. */
   function mobAnnuleer(session, body = {}) {
+    const toegang = mobEigenToegang(session); if (toegang.error) return toegang;
     const o = ctx.opdrachtMet(schoon(body.ref, 30));
     if (!o) return { status: 404, error: 'Opdracht niet gevonden.' };
     if (o.reiziger !== session.key) return { status: 403, error: 'Dit is uw rit niet.' };
     return ctx.opdrachtAnnuleer(o.ref, 'lid', body.reden);
   }
 
-  return { mobAanbod, mobMijn, mobVraag, mobAnnuleer };
+  return { mobAanbod, mobMijn, mobVraag, mobAnnuleer, mobVraagToegang, mobEigenToegang };
 };

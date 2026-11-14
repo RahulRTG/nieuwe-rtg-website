@@ -45,7 +45,7 @@
 
 function maakMobiliteit(state) {
   const { db, save, crypto, schoon, codenaamVan, haversine, etaMinutes, notify,
-    findSupplier, logActivity, sseToOffice, sseToCustomer, pay, ovPrijsVan, accounts, bewerkCollectie, afwezigOp } = state;
+    findSupplier, logActivity, sseToOffice, sseToCustomer, pay, ovPrijsVan, accounts, bewerkCollectie, afwezigOp, zaakAbonnement } = state;
 
   const nu = () => new Date().toISOString();
   const id = p => (p || 'mb') + crypto.randomBytes(4).toString('hex');
@@ -64,7 +64,7 @@ function maakMobiliteit(state) {
      gedrag: assets leunt op het register, de opdracht op plekken en het
      register, matching op assets, dispatch op alledrie. */
   const ctx = { db, save: mobSave, crypto, schoon, nu, id, codenaamVan, haversine, etaMinutes,
-    notify, findSupplier, logActivity, sseToOffice, sseToCustomer, pay, ovPrijsVan, accounts, afwezigOp };
+    notify, findSupplier, logActivity, sseToOffice, sseToCustomer, pay, ovPrijsVan, accounts, afwezigOp, zaakAbonnement };
 
   ctx.opslag = opslag;   // de enige db-aanraking; zie ./opslag.js
 

@@ -1,11 +1,11 @@
 {
   "stempel": {
-    "op": "2026-11-12T22:01:05.885Z",
-    "commit": "b99fd4c8ab",
+    "op": "2026-11-14T18:52:50.822Z",
+    "commit": "3885a337f",
     "boomVuil": false,
-    "boomAnders": 10,
+    "boomAnders": 2,
     "instrument": "scripts/doorbelasting.js",
-    "node": "v26.12.1"
+    "node": "v24.22.1"
   },
   "graad": "gemeten",
   "wat": "of de doorbelasting van RTG aantoonbaar te classificeren is: per vorm en per euro",
@@ -21,8 +21,8 @@
   ],
   "regel": "onbekend is een uitkomst en nooit een aanname: een bedrag zonder aantoonbare herkomst wordt niet naar rtgEigen of derdePartij geduwd, want beide fouten zijn onzichtbaar en komen allebei iemand goed uit",
   "vorm": {
-    "vormenTotaal": 1630,
-    "geldvormen": 224,
+    "vormenTotaal": 1632,
+    "geldvormen": 225,
     "volgbaar": 43,
     "perHerkomstveld": {
       "bron": 23,
@@ -32,7 +32,7 @@
       "leverancier": 8,
       "economischeHerkomst": 4
     },
-    "nietVolgbaar": 181,
+    "nietVolgbaar": 182,
     "volgbareModules": [
       "server/kern/appbieb.js",
       "server/kern/betaalopdracht/index.js",
@@ -80,7 +80,7 @@
     ],
     "perModule": {
       "server/kern/aanmeldingen": {
-        "geldvormen": 1,
+        "geldvormen": 2,
         "volgbaar": 0
       },
       "server/kern/alpine.js": {
@@ -156,7 +156,7 @@
         "volgbaar": 1
       },
       "server/kern/commercie": {
-        "geldvormen": 7,
+        "geldvormen": 8,
         "volgbaar": 0
       },
       "server/kern/eten": {
@@ -284,10 +284,6 @@
         "volgbaar": 1
       },
       "server/kern/overheid": {
-        "geldvormen": 1,
-        "volgbaar": 0
-      },
-      "server/kern/pasladder.js": {
         "geldvormen": 1,
         "volgbaar": 0
       },

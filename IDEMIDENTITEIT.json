@@ -1,11 +1,11 @@
 {
   "stempel": {
-    "op": "2026-11-12T21:27:12.078Z",
-    "commit": "a06d1852a0",
+    "op": "2026-11-14T18:52:54.567Z",
+    "commit": "3885a337f",
     "boomVuil": false,
-    "boomAnders": 0,
+    "boomAnders": 3,
     "instrument": "scripts/idemidentiteit.js",
-    "node": "v26.12.1"
+    "node": "v24.22.1"
   },
   "soort": "triage",
   "uitleg": "Waaraan ziet dit huis dat twee aanroepen hetzelfde verzoek dragen -- per plek waar idempotentie wordt gedaan, in twee families: langs metIdem en met de hand ernaast. Gelezen is elke metIdem-aanroep onder server/, plus elke opzoeking op een idem-sleutel die daar met de hand omheen gaat; lexicaal, dus zonder iets uit te voeren.",
@@ -19,9 +19,9 @@
   "voegtToe": 25,
   "nietTeLezen": 4,
   "voegtToeIsGeenGoedkeuring": true,
-  "handwerkPlekken": 5,
+  "handwerkPlekken": 6,
   "handwerkVergelijkt": 5,
-  "handwerkGeenVergelijking": 0,
+  "handwerkGeenVergelijking": 1,
   "plekken": [
     {
       "bestand": "server/kern/bank/incasso.js",
@@ -701,6 +701,15 @@
       ],
       "uitspraak": "vergelijkt",
       "regelTekst": "const al = verzoekIdemZoek(idemSleutel);"
+    },
+    {
+      "bestand": "server/kern/experience/opslag.js",
+      "regel": 83,
+      "opzoeker": "idemLees",
+      "gevondenAls": "eerder",
+      "vergeleken": [],
+      "uitspraak": "geenVergelijking",
+      "regelTekst": "const eerder = idemLees(key, idemKey);"
     }
   ]
 }

@@ -1,9 +1,9 @@
 {
  "stempel": {
-  "op": "2026-11-10T18:45:17.913Z",
-  "commit": "fb2743bdb",
+  "op": "2026-11-14T04:28:44.514Z",
+  "commit": "74e9ff92c",
   "boomVuil": false,
-  "boomAnders": 0,
+  "boomAnders": 1,
   "instrument": "scripts/handlerwacht.js",
   "node": "v24.18.0"
  },
@@ -331,7 +331,7 @@
   },
   {
    "sleutel": "POST /api/aanmelding/bewijs",
-   "bestand": "server/routes/aanmeldingen.js:115",
+   "bestand": "server/routes/aanmeldingen.js:116",
    "staat": "openbaar",
    "reden": "hoort bij de aanvraag zelf; de aanvrager heeft nog geen sessie, en aftekenen zit wel achter het kantoor"
   },
@@ -359,12 +359,12 @@
   },
   {
    "sleutel": "POST /api/auth/tweede",
-   "bestand": "server/routes/member/tweefactor.js:129",
+   "bestand": "server/routes/member/tweefactor.js:130",
    "staat": "eigenControle"
   },
   {
    "sleutel": "POST /api/auth/verify-email",
-   "bestand": "server/routes/auth/account.js:96",
+   "bestand": "server/routes/auth/account.js:93",
    "staat": "openbaar",
    "reden": "de bevestigingslink IS de geloofsbrief (verifyActionToken); ongeldig of verlopen geeft 400"
   },

@@ -3,7 +3,7 @@
    opeenvolgende tests niet meer op dezelfde poort (de oude oorzaak van
    sporadische "fetch failed"), en kan de suite weer met concurrency draaien. */
 const { randomUUID } = require('node:crypto');
-const { spawn } = require('node:child_process');
+const { spawn, spawnSync } = require('node:child_process');
 const net = require('node:net');
 const os = require('node:os');
 const path = require('node:path');
@@ -700,6 +700,28 @@ async function elevateTier(base, memberToken, pas, approverToken) {
   if (!besluit.aanmelding || besluit.aanmelding.status !== 'geaccepteerd')
     throw new Error('elevateTier: beslis mislukt (' + JSON.stringify(besluit).slice(0, 120) + ')');
   return besluit;
+}
+
+/* EEN BETAALD RTG-ACCOUNT ALS TESTFIXTURE, NIET ALS PRODUCTROUTE.
+
+   Registreren levert bewust altijd een gratis account op. Toetsen die over De
+   Residence, mobiliteit of een ander betaald onderdeel gaan, hoeven de hele
+   Stripe-protocolproef niet opnieuw op te bouwen; die keten staat apart in
+   abonnementen-http.test.js. Vroeger smokkelden zulke toetsen `tier: 'rtg'`
+   mee naar /api/auth/register. Dat veld wordt terecht genegeerd, waardoor de
+   toets niet meer zijn onderwerp bereikte.
+
+   Dit hulpje zet daarom alleen in de GEISOLEERDE testdatabase een reeds
+   geregistreerd account op RTG. Er is met opzet geen HTTP-deur en geen
+   productiecode voor. De aanroeper moet de eigen RTG_DATA_DIR en het exacte
+   e-mailadres noemen; een onbekend account of niet-testproces faalt hard. */
+function maakBetaaldRtgTestaccount(dataDir, email) {
+  if (!dataDir || !email) throw new TypeError('maakBetaaldRtgTestaccount vraagt een testdatamap en e-mailadres');
+  const r = spawnSync(process.execPath, [path.join(__dirname, 'fixtures/betaald-rtg-account.cjs'), String(email)], {
+    cwd: path.join(__dirname, '..'), encoding: 'utf8',
+    env: { ...process.env, NODE_ENV: 'test', RTG_DATA_DIR: String(dataDir), SMTP_URL: '' }
+  });
+  if (r.status !== 0) throw new Error('betaalde RTG-testfixture mislukte: ' + String(r.stderr || r.stdout || '').trim());
 }
 
 /* Paginafouten verzamelen, zonder de ruis van de browser zelf.
@@ -1899,7 +1921,7 @@ async function bankDeur(page, naam, opties) {
 }
 
 module.exports = { startBrowser, testMotor, testMotoren, webkitAfbreking, afbrekingsTekst, afgebrokenIn, edgeActies, edgeBediening, edgeRahul, edgeCatalogus, edgeWerkbladen, bankDeur, pasAppAdres, bewaakKind, binnenEenDag, browserOpties, drukte, elevateTier, geduld, geenBrowser, wachtOpWaarde, wachtOpSchil,
-  installeerNepMicrofoon, kantoorAlsPersoon, kantoorKoppelBody, zaakMensOpNaam, keurLidGoed, laadPlaywright, laadScherm, metGedeeldeBrowser, letOpFouten,
+  installeerNepMicrofoon, kantoorAlsPersoon, kantoorKoppelBody, maakBetaaldRtgTestaccount, zaakMensOpNaam, keurLidGoed, laadPlaywright, laadScherm, metGedeeldeBrowser, letOpFouten,
   nepMediaArgs, opstartGeduld, startServer, stroomAdres, stop, stopHard, stopNet, veegDoor, volgVerzoeken, vrijePoort, vrijePoortReeks, efemeerBereik,
   wachtOpRust, wachtTot, wachtOpTekst, wachtOpZichtbaar, wachtOpVerandering,
   wachtOpNetstilte, wachtOpVloeiend, wachtOpBestand, klikEnWacht, tekstVan, postJson,

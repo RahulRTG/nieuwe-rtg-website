@@ -4,7 +4,7 @@
    afwijzen -- zitten achter de office-inlog (RTG-personeel). */
 module.exports = (kern) => {
   const { app, auth, officeAuth, aanmeldingen, accounts, tooManyTries, boardroomWie } = kern;
-  const veilig = (res, werk) => { try { const r = werk(); res.status(r && r.status ? r.status : 200).json(r); } catch (e) { console.error('[aanmeldingen]', e); res.status(500).json({ error: 'Er ging iets mis. Probeer het opnieuw.' }); } };
+  const veilig = async (res, werk) => { try { const r = await werk(); res.status(Number.isInteger(r?.status) ? r.status : 200).json(r); } catch (e) { console.error('[aanmeldingen]', e); res.status(500).json({ error: 'Er ging iets mis. Probeer het opnieuw.' }); } };
   /* WIE HEEFT DIT BESLOTEN?
 
      Hier stond `req.session.codename || ... || 'RTG-personeel'`. Deze routes
@@ -24,6 +24,7 @@ module.exports = (kern) => {
      kent de pas waar het over gaat. Zelfde patroon als bij RTG Bank. */
   const wie = req => boardroomWie(req) || null;
   const aanvragerVan = require('./aanmeldingen/aanvraag')({ app, accounts, tooManyTries, aanmeldingen });
+  require('./aanmeldingen/automatisch')({ app, auth, aanvragerVan, aanmeldingen });
 
   // de wachtrij en het besluit: alleen RTG-personeel
   app.post('/api/aanmelding/lijst', officeAuth, (req, res) => veilig(res, () => aanmeldingen.lijst((req.body || {}).status)));
@@ -38,7 +39,7 @@ module.exports = (kern) => {
   app.post('/api/aanmelding/verleng', officeAuth, (req, res) => veilig(res, () =>
     aanmeldingen.verlengLidmaatschap(String((req.body || {}).id || ''), (req.body || {}).euro)));
   app.post('/api/aanmelding/opzeggen', officeAuth, (req, res) => veilig(res, () =>
-    aanmeldingen.zegOpLidmaatschap(String((req.body || {}).id || ''))));
+    aanmeldingen.zegOpLidmaatschap(String((req.body || {}).id || ''), { contractId: (req.body || {}).contractId })));
   app.post('/api/aanmelding/contracten', officeAuth, (req, res) => veilig(res, () =>
     ({ ok: true, contracten: aanmeldingen.contracten.lijst(req.body || {}) })));
 
@@ -49,12 +50,12 @@ module.exports = (kern) => {
      staan achter de LEDENdeur, en het verschil is niet de deur maar de SLEUTEL:
 
        kantoor   zegOpLidmaatschap(req.body.id)      -- een id uit het lichaam
-       lid       lidAbonnement.zegOpZelf(account.id) -- de sessie, nooit het lichaam
+       lid       lidAbonnement.zegOpZelf(account.id, referentie) -- eigenaar uit sessie
 
      De kantoorroute achter een ledendeur hangen zou betekenen dat elk lid elk
-     willekeurig lidmaatschap kan opzeggen. Daarom neemt geen van deze drie iets
-     uit `req.body`; `aanvragerVan` geeft het accountId uit het geverifieerde
-     token, dezelfde weg als bij de aanvraag hierboven.
+     willekeurig lidmaatschap kan opzeggen. `aanvragerVan` geeft het accountId uit
+     het geverifieerde token. De bevestiging bindt alleen aan het eigen vooraf
+     getoonde contract; een referentie uit de body verleent geen bevoegdheid.
 
      `auth` en niet `officeAuth`: auth weigert een leverancier- en kantoorsessie,
      want die hebben geen lidmaatschap. Zie de kop van opzet/diensten2.js.
@@ -76,23 +77,23 @@ module.exports = (kern) => {
 
   app.post('/api/mijn/abonnement', auth, (req, res) => veilig(res, () => {
     const id = ikBen(req);
-    return id == null ? GEEN_ACCOUNT : aanmeldingen.lidAbonnement.mijn(id);
+    return id == null ? GEEN_ACCOUNT : aanmeldingen.lidAbonnement.mijn(id, { contractId: (req.body || {}).contractId });
   }));
   /* Wat opzeggen gaat doen, zonder dat het gebeurt. Dit is GEEN schrijfroute en
      de naam zegt dat: een lid hoort de gevolgen te kunnen lezen voordat hij
      drukt, anders is de bevestiging zelf een dark pattern. */
   app.post('/api/mijn/abonnement/opzegvoorbeeld', auth, (req, res) => veilig(res, () => {
     const id = ikBen(req);
-    return id == null ? { status: 404, error: GEEN_ACCOUNT.reden } : aanmeldingen.lidAbonnement.opzegVoorbeeld(id);
+    return id == null ? { status: 404, error: GEEN_ACCOUNT.reden } : aanmeldingen.lidAbonnement.opzegVoorbeeld(id, { contractId: (req.body || {}).contractId });
   }));
   app.post('/api/mijn/abonnement/opzeggen', auth, (req, res) => veilig(res, () => {
     const id = ikBen(req);
-    return id == null ? { status: 404, error: GEEN_ACCOUNT.reden } : aanmeldingen.lidAbonnement.zegOpZelf(id);
+    return id == null ? { status: 404, error: GEEN_ACCOUNT.reden } : aanmeldingen.lidAbonnement.zegOpZelf(id, req.body);
   }));
 
   app.post('/api/aanmelding/beslis', officeAuth, (req, res) => veilig(res, () =>
     aanmeldingen.beslis(String((req.body || {}).id || ''), String((req.body || {}).besluit || ''), wie(req), (req.body || {}).notitie,
-      { contractEuro: (req.body || {}).contractEuro })));
+      { contractEuro: (req.body || {}).contractEuro, organisatie: (req.body || {}).organisatie })));
   // het betaalschema: na een akkoord loopt de bijdrage 12 maanden automatisch,
   // met de 30%-foundationsplit. Alleen voor het personeel.
   app.post('/api/aanmelding/betalingen', officeAuth, (req, res) => veilig(res, () => aanmeldingen.betalingen(req.body || {})));

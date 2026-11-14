@@ -9,6 +9,7 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const { startServer, stop } = require('./helper');
+const historischAccount = require('./lib/historisch-account');
 
 const PNG = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==';
 const OWNER = 'baas' + Date.now().toString().slice(-6) + '@rtg-test.nl';
@@ -20,7 +21,7 @@ function api(base, pad, body, token) {
     .then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
 }
 
-let srv, base, lid, brand;
+let srv, base, lid, brand, TMP;
 async function sign(token,body){
   const current=await api(base,'/api/onboarding/status',{},token);
   return api(base,'/api/onboarding/teken',{...body,contractVersion:current.body.contract.versie},token);
@@ -28,7 +29,7 @@ async function sign(token,body){
 
 
 test.before(async () => {
-  const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-onb-'));
+  TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-onb-'));
   srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP, DEMO_SUPPLIER: 'KIKUNOI', RTG_OWNER_EMAIL: OWNER } });
   base = srv.base;
   brand = (await api(base, '/api/supplier/login', { username: 'rahul', password: 'Imran' })).body.token;
@@ -46,18 +47,19 @@ async function registreer(email) {
    naam, e-mailadres, geboortedatum (en een wachtwoord). De rest -- telefoon,
    adres, postcode, woonplaats, land, nationaliteit, paspoort -- heeft een LATER
    moment en komt pas als een handeling erom vraagt (kern/gegevenspoort.js). */
-test('1. een vers lid wordt bij het inloggen alleen naar naam, e-mail en geboortedatum gevraagd', async () => {
+test('1. een nieuw gratis account krijgt alleen de eigen noodzakelijke intake', async () => {
   lid = await registreer('reiziger' + Date.now().toString().slice(-7) + '@x.nl');
   const st = (await api(base, '/api/onboarding/status', {}, lid)).body;
   const gevraagd = st.velden.map(v => v.id).sort();
-  assert.deepEqual(gevraagd, ['email', 'geboortedatum', 'naam'], 'meer vraagt de poort niet');
+  assert.equal(st.tier, 'guest');
+  assert.deepEqual(gevraagd, ['email', 'naam'], 'geboortedatum is bij gratis registratie al gecontroleerd');
   for (const id of ['telefoon', 'adres', 'postcode', 'woonplaats', 'land', 'nationaliteit', 'paspoort']) {
     assert.ok(!gevraagd.includes(id), id + ' hoort bij een handeling, niet bij de voordeur');
     assert.ok(!st.ontbrekend.includes(id), id + ' mag de onboarding niet blokkeren');
   }
   // ze bestaan wel: een scherm mag ze tonen als "nog aan te vullen", als geen poort
   const later = (st.laterVelden || []).map(v => v.id);
-  for (const id of ['telefoon', 'adres', 'postcode', 'woonplaats', 'land', 'nationaliteit']) {
+  for (const id of ['telefoon', 'adres', 'postcode', 'woonplaats', 'land']) {
     assert.ok(later.includes(id), id + ' komt terug als later-veld');
   }
   // de drie die wel gevraagd worden, zijn geprefilld uit het account
@@ -163,8 +165,11 @@ test('5. elke leverancier heeft een eigen scope die los AI-aanpasbaar is', async
   assert.ok(!plat.velden.some(v => v.id === 'bsn'), 'de eigen scope lekt niet naar het platform');
 });
 
-test('7. de gratis RTG Pass hoeft geen paspoort, tenzij hij RTG Pay gebruikt', async () => {
-  const vrij = await registreer('vrij' + Date.now().toString().slice(-7) + '@x.nl');
+test('7. een bestaande RTG Pass vraagt pas bij RTG Pay om een paspoort', async () => {
+  const email = 'vrij' + Date.now().toString().slice(-7) + '@x.nl';
+  historischAccount(TMP, { email, name: 'Bestaand RTG lid', tier: 'rtg' });
+  const vrij = (await api(base, '/api/auth/login', { login: email, password: 'geheim123', pasApp: 'rtg' })).body.token;
+  assert.ok(vrij);
   // alle ontbrekende (niet-KYC) velden invullen; de eigenaar kan er eerder een
   // hebben toegevoegd (bijv. noodcontact), dus dynamisch. Geen paspoort nodig.
   let st = (await api(base, '/api/onboarding/status', {}, vrij)).body;

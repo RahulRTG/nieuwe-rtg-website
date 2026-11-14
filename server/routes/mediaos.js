@@ -1,6 +1,6 @@
 /* Domein "mediaos": DE MEDIA OS -- één mediawereld over Klankwerk, Theater,
-   Clips en Podium heen. Alles achter de gewone leden-inlog; een gast komt er
-   niet in, net als bij de vier apps eronder.
+   Clips en Podium heen. Alles achter een eigen account; de anonieme gast komt
+   er niet in, net als bij de vier apps eronder.
 
    Er staat hier bewust GEEN kantoorkant. Melden, goedkeuren en verwijderen
    blijven waar ze horen: bij het domein dat het stuk bezit. Een tweede deur
@@ -15,7 +15,7 @@ module.exports = (kern) => {
   if (!mediaWereld) return;
   const stuur = (res, r) => r && r.error ? res.status(r.status || 400).json({ error: r.error }) : res.json(r);
   const geenGast = (req, res) => {
-    if (req.session.tier === 'guest') { res.status(403).json({ error: 'De Media OS is voor leden.' }); return true; }
+    if (req.session.tier === 'guest' && !req.session.account) { res.status(403).json({ error: 'De Media OS is voor accounts.' }); return true; }
     return false;
   };
   const sess = (req) => req.session;

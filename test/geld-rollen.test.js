@@ -52,11 +52,13 @@ function api(pad, body, token) {
 
 async function maakLid(merk) {
   const u = (Date.now() + Math.floor(Math.random() * 1e6)).toString().slice(-9);
-  const r = await api('/api/auth/register', {
-    name: 'Rollen ' + merk, email: 'rol' + merk + u + '@voorbeeld.test', phone: '06' + u,
-    password: 'geheim12345', geboortedatum: '1990-03-03', geslacht: 'v',
-    tier: 'business', pasApp: 'business'
+  const email = 'rol' + merk + u + '@voorbeeld.test';
+  // Dit toetst bestaande bankrechten, niet inschrijving. Nieuwe registratie
+  // geeft terecht geen Business-rechten op grond van een browserveld.
+  require('./lib/historisch-account')(TMP, {
+    name: 'Rollen ' + merk, email, phone: '06' + u, tier: 'business', password: 'geheim12345'
   });
+  const r = await api('/api/auth/login', { login: email, password: 'geheim12345', pasApp: 'business' });
   assert.ok(r.body.token, merk + ' moet een sessie krijgen: ' + JSON.stringify(r.body).slice(0, 120));
   return { token: r.body.token };
 }

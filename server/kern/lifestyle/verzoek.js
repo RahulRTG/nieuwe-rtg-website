@@ -59,14 +59,23 @@ module.exports = (ctx) => {
   function conciergeVraag(key, body) {
     const titel = schoon(body.titel, 100);
     if (!titel) return { status: 400, error: 'Waarmee kunnen wij u van dienst zijn?' };
+    const details = schoon(body.details, 800);
+    const categorie = CATEGORIEEN.includes(body.categorie) ? body.categorie : 'overig';
+    const sleutel = schoon(body.sleutel, 80) || ('verzoek-' + rid() + rid() + rid());
+    const eerder = (bureau().cases(key)?.zaken || []).find(c => c.sleutel === sleutel);
+    if (eerder) {
+      if (eerder.bron !== 'verzoek' || eerder.titel !== titel || (eerder.details || '') !== details || eerder.categorie !== categorie)
+        return { status: 409, error: 'Deze aanvraagsleutel hoort bij een ander verzoek.' };
+      return { status: 200, ok: true, herhaald: true, verzoek: alsVerzoek(eerder) };
+    }
     if (alle(key).filter(v => OPEN(v.status)).length >= 50)
       return { status: 400, error: 'U heeft veel lopende verzoeken. Wij ronden er graag eerst een paar met u af.' };
-    const details = schoon(body.details, 800);
-    const sleutel = schoon(body.sleutel, 80) || ('verzoek-' + rid() + rid() + rid());
+    if (ctx.magNieuweDienst?.(key) === false)
+      return require('../aanmeldingen/abonnementsdiensten').fout();
     const r = bureau().lusIntake(key, { zin: titel + (details ? '. ' + details : ''), sleutel });
     if (r.error) return r;
     const c = r.zaak;
-    Object.assign(c, { titel, details, categorie: CATEGORIEEN.includes(body.categorie) ? body.categorie : 'overig', bron: 'verzoek' });
+    Object.assign(c, { titel, details, categorie, bron: 'verzoek' });
     save();
     return { status: 200, ok: true, verzoek: alsVerzoek(c) };
   }

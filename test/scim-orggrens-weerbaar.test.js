@@ -20,7 +20,7 @@
    - scim/index.js binnenOrg(): `return !!domein && k.domeinen.includes(domein)`
      -> `return true` -> toets 2 zakt (B zet het account van A uit).
    - scim/filter.js: de externalId-weigering weg -> toets 3 zakt.
-   - scim/index.js maak(): `tier: 'rtg'` -> `tier: gegevens.tier || 'rtg'` -> toets 4 zakt.
+   - scim/index.js maak(): `tier: 'guest'` -> `tier: gegevens.tier || 'rtg'` -> toets 4 zakt.
 
    Draai los: node --test test/scim-orggrens-weerbaar.test.js */
 'use strict';
@@ -120,7 +120,7 @@ test('4. aanmaken buiten de eigen domeinen of zonder adres wordt geweigerd, en n
   }
   assert.equal(accounts.findByLogin('iemand@klant-b.test'), null, 'de weigering liet niets achter');
   const u = accounts.getUserById(Number(piet.id));
-  assert.equal(u.tier, 'rtg', 'tier uit het SCIM-lichaam wordt genegeerd');
+  assert.equal(u.tier, 'guest', 'tier uit het SCIM-lichaam verleent geen betaald abonnement');
   const nogmaals = await roep('POST', '/Users', { sleutel: A, body: { userName: 'piet@klant-a.test' } });
   assert.equal(nogmaals.code, 200, 'bestaand binnen de eigen org: het bestaande account terug');
   assert.equal(nogmaals.body.id, piet.id);

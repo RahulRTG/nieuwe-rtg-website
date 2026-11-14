@@ -72,6 +72,9 @@ function maakRonde({ fees, contracten, tegoed, verrekening, allocatie, boekAsync
     const bijna = contracten.verlooptBinnen(VERLENGVENSTER_DAGEN, nuIso);
     let gezet = 0;
     for (const c of bijna) {
+      // Nieuwe individueel getekende afspraken worden na de eerste termijn
+      // maandelijks opzegbaar voortgezet, niet stil in een nieuwe jaarlock gezet.
+      if (c.automatischAbonnement) continue;
       const r = contracten.verlengbaar(c);
       if (r && r.ok) {
         gezet++;

@@ -121,7 +121,7 @@ function cspNonce(publicDir, aan) {
       /* Stempelaar, sandbox-volgorde en het handattribuut: zie ./kopinjectie.js,
          met daar de reden waarom de volgorde heilig is. */
       html = kopinjecties(html, nonce, req, res, magnaat);
-      res.set('Content-Security-Policy', CSP(nonce, magnaat));
+      res.set('Content-Security-Policy', CSP(nonce, magnaat, paginaPad));
       res.type('html');
       if (req.method === 'HEAD') {
         res.setHeader('Content-Length', Buffer.byteLength(html));

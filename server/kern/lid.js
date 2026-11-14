@@ -24,21 +24,9 @@ function maakLid(deps) {
     require('./lid/contact')({ db, PERSONAS });
   const { facturenVoor, reisVoor, eersteBijdrageFactuur } = require('./lid/facturen')({ i18n, deps });
 
-  /* STARTINHOUD VOOR EEN NIEUW ACCOUNT: LEEG.
-
-     Hier stond `JSON.parse(JSON.stringify(db.data.invoices))` en hetzelfde voor
-     db.data.trip. Wie zich echt aanmeldde kreeg daarmee de DEMO-inhoud als zijn
-     eigen persoonlijke gegevens: een reis naar Ibiza die hij nooit boekte, vier
-     facturen op zijn naam, een villa in Cala Jondal. Dat is geen kennismaking
-     maar een leugen -- en precies de leugen die de merkregel verbiedt (nooit
-     claimen dat een boeking verwerkt is).
-
-     De demo blijft bestaan, maar op de plek waar hij hoort: de demo-SESSIES
-     (inloggen op een pas zonder account, alleen als DEMO aanstaat) lezen
-     db.data, en het geseede demo-account krijgt zijn inhoud expliciet mee
-     (demoLidInhoud in server.js). Een echt account begint leeg en vult zich met
-     wat het lid zelf doet. Wat de schermen in die lege stand tonen is geen wit
-     vlak maar een uitleg: wat hier komt te staan, en hoe je het in gang zet. */
+  /* Een nieuw account begint leeg, zonder geerfde demo-reizen of facturen.
+     Alleen demo-sessies lezen db.data; demoLidInhoud in server.js vult het
+     demo-account expliciet. Echte inhoud ontstaat door handelingen van het lid. */
   function memberTemplate() {
     return { invoices: [], trip: null, creatorCredit: 0, creatorLikes: 0 };
   }
@@ -115,18 +103,21 @@ function maakLid(deps) {
         folder: p.folder ? { titel: p.folder.titel, fotos: p.folder.fotos || [], items: p.folder.items || [] } : null
       };
     });
-    const state = { user: { tier: sess.tier, ...persona, lidmaatschap: lidmaatschap.voorSessie(sess) },
+    const state = { user: { ...persona, tier: sess.tier, lidmaatschap: lidmaatschap.voorSessie(sess) },
       posts, creatorCredit: 0, creatorLikes: 0, lang };
     // Ook gratis gebruikers (zonder pas) mogen solliciteren en hun sollicitaties
     // met status terugzien; de rest van het ledenpaneel blijft voor leden.
     state.myApplications = myApplications(sess.key);
+    // Factuurinzage en betaalherstel zijn niet afhankelijk van een betaalde pas.
+    // Het account bepaalt het dossier; een anonieme gast krijgt nooit demo-inhoud.
+    const md = sess.account ? (accounts.getMemberState(sess.account.id) || memberTemplate())
+      : (sess.tier !== 'guest' ? db.data : null);
+    state.invoices = md ? facturenVoor(md, sess.tier, lang) : [];
     if (sess.tier !== 'guest') {
       // Echte accounts hebben hun eigen boekingen/betalingen; demo-sessies delen
       // de vaste demo-inhoud.
-      const md = sess.account ? (accounts.getMemberState(sess.account.id) || memberTemplate()) : db.data;
       // facturen (afboekcode, btw, pasprijs uit de boardroom) en de reis staan in
       // ./lid/facturen.js -- inclusief waarom de prijs daar NIET hard staat
-      state.invoices = facturenVoor(md, sess.tier, lang);
       const reis = reisVoor(md, lang);
       if (reis) state.trip = reis;
       state.creatorCredit = sess.account ? (md.creatorCredit || 0) : (db.data.creatorCredit[sess.tier] || 0);

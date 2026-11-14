@@ -10,10 +10,14 @@ zeven lagen, drie prijsmechanismen, en het onderscheid dat alles bij elkaar
 houdt (catalogusprijs ≠ contractprijs ≠ factuurbedrag). Lees die als je aan de
 structuur werkt; dit document als je een bedrag zoekt.
 
-**Leesstatus, 12 november 2026:** §0–6 beschrijven het bestaande besluit en de
+**Leesstatus, 13 november 2026:** §0–6 beschrijven het bestaande besluit en de
 historische doorlichting; sommige uitvoeringsnotities zijn inmiddels verouderd.
-§7 bevat het **nieuwe eigenaarsbesluit over prijzen en jaarbetaling voor Travel
-& Lifestyle**, met nog uit te werken serviceprofielen en conceptvoorwaarden.
+§7 bevat het **officiële interne abonnementsbesluit `abonnementen-2026-11-13.1`**:
+de prijsbasis in §7.3, jaarbetaling en de uitsluitend op abonnementen gedragen
+begroting in §7.7. De eigenaar heeft dit na de voorzichtige kostenbegroting
+uitdrukkelijk vastgesteld met "Doe maar officieel maken". Dit vervangt de
+prijsbasis van 12 november en de eerdere eis dat gratis zichzelf moet financieren;
+serviceprofielen en overige conceptvoorwaarden blijven nog uit te werken.
 De oude bedragen in §0–6 zijn niet de nieuwe commerciële prijsbasis. De huidige
 runtime-ladder in `server/kern/pasladder.js`, getekende contracten en publieke
 voorwaarden zijn hiermee nog niet gewijzigd; migratie en verkoopvrijgave staan open.
@@ -454,8 +458,11 @@ staat (§4.9).
 
 ## 7. Travel & Lifestyle — prijsbesluit en conceptvoorwaarden
 
-*12 november 2026. Status: PRIJSBESLUIT VASTGELEGD, NIET VERKOOPKLAAR.
-De eigenaar heeft de basisprijzen in §7.3 vastgesteld. Serviceprofielen,
+*13 november 2026. Status: OFFICIEEL INTERN BELEID, NIET VERKOOPKLAAR.
+Beleidsversie: `abonnementen-2026-11-13.1`. Intern vastgesteld op deze datum;
+de ingangsdatum voor nieuwe klantcontracten is nog niet vrijgegeven.
+De eigenaar heeft de herziene basisprijzen in §7.3 en begrotingsregel in §7.7
+vastgesteld na een voorzichtige begroting met zichtbare aannames. Serviceprofielen,
 upgradeprijzen, overige conceptvoorwaarden en implementatie zijn nog niet
 goedgekeurd. De gekozen bedragen zijn geen gemeten marktgemiddelden of bewezen
 rendabele tarieven; de marktankers hieronder blijven een beperkte vergelijking.*
@@ -485,13 +492,15 @@ Waar commissie daadwerkelijk vervalt, wordt de vrijvallende vergoeding
 **per partner afgesproken: betere marge en/of ledenvoordeel**. Deze richting is
 nog niet als nieuwe commissie- of abonnementsregel geïmplementeerd.
 
-**Aanvullend eigenaarsbesluit: gratis leden moeten voor RTG zelfstandig
-winstgevend zijn.** Het gratis segment is geen verliesproduct dat door betaalde
-abonnementen moet worden gefinancierd. Toets dit op cohorten, inclusief leden die
-niets boeken, en met alle toerekenbare kosten; niet als onhoudbare garantie dat
-ieder afzonderlijk gratis account geld oplevert. Gratis moet al veel kunnen.
-Vooraf begrensde kostbare AI en vrijwillig gekozen extra's mogen de economie
-ondersteunen, maar geen onverwachte rekening of blokkade van verplichte nazorg.
+**Eigenaarsbesluit van 13 november: alleen abonnementen dragen de basisbegroting.**
+Na de 30%-maatschappelijke reservering moeten abonnementen alle begrote RTG-kosten
+dragen, ook de kosten van gratis gebruikers en niet-boekers. Commissie en andere
+inkomsten worden daarin op nul gezet; werkelijk gerealiseerde netto-opbrengsten
+zijn extra voor RTG (§7.7). Dit vervangt de eerdere eis dat het gratis segment
+niet uit abonnementen mocht worden gefinancierd. Werkelijke cohortresultaten
+blijven apart zichtbaar; betaald inkomen niet aan gratis toerekenen om dat
+cohort kunstmatig winstgevend te verklaren. Gratis moet bruikbaar blijven, zonder
+onverwachte rekening of blokkade van verplichte nazorg.
 
 De richting: gratis waardevol meedoen, betalen voor blijvende digitale waarde
 en het vastgestelde commissievoordeel binnen zijn reikwijdte, méér betalen voor
@@ -511,7 +520,7 @@ uitvoering van dezelfde boeking.
 
 Afleiding: onderscheid toegang, standaardboekingsservice en persoonlijk maatwerk.
 Deze steekproef onderbouwt die structuur, niet de marktconformiteit of rendabiliteit
-van de gekozen RTG-prijzen. Vooral €14.000 inclusief btw per maand voor Lifestyle
+van de gekozen RTG-prijzen. Vooral de vaste Lifestyle-prijs uit §7.3
 vraagt een afzonderlijk, aantoonbaar waardevol serviceprofiel; de genoemde gewone
 concierge-abonnementen bewijzen die positionering niet. Geen ongefundeerde
 besparingspercentages, "goedkoper dan iedereen" of vaste terugverdientijd op de
@@ -526,24 +535,38 @@ automatisch op reizen, commissies of buitenlandse diensten.
 | Bestaande pas | Maandtermijn bij jaarcontract | Jaartotaal gespreid | Jaar vooruit met korting | Positionering en besluitgrens |
 |---|---:|---:|---:|---|
 | RTG Community (`gratis`) | €0 | €0 | €0 | Reizen/lifestyle, dossier en ondersteuning bij eigen boekingen. Ook gratis zakelijke basis voor Salon, productverkoop en eigen klantenbeheer; de gratis ondernemer betaalt 15% commissie, ook bij een betaalde koper (§9.3). Over de daar vastgelegde grondslag; werkelijke providerkosten afzonderlijk zichtbaar. |
-| RTG Pass (`rtg`) | €65 incl. btw | €780 incl. btw | €747,50 incl. btw | Consumentenpas met premium digitale mogelijkheden en €0 RTG-verkoopcommissie op gedekte opdrachten, behalve de verkoperscommissie van gratis ondernemers (§9.3); uitbreidbaar met afzonderlijk gekozen upgrades. Bundels en eventuele menselijke service nog vast te stellen. |
-| RTG Business Lite (`business-lite`) | €150 excl. btw | €1.800 excl. btw | €1.725 excl. btw | Voor zzp/mkb; premium ondernemerstools en reis-/lifestyledienstverlening, uitbreidbaar met afzonderlijk gekozen upgrades. Als verkoper 5% commissie bij gratis leden en 0% bij betaalde leden binnen de dekking (§9.3). Gebruikersdekking en bundels nog uit te werken. |
-| RTG Business Pass (`business`) | vanaf €3.500 excl. btw | vanaf €42.000 excl. btw | vanaf €40.250 excl. btw | Zakelijke dienstverlening op overeengekomen scope, met mogelijke upgrades. De bodem is geen offerte of factuur; servicecapaciteit en verantwoordelijkheid moeten bij de werkelijk overeengekomen prijs passen. |
-| RTG Lifestyle Pass (`lifestyle`) | €14.000 incl. btw | €168.000 incl. btw | €161.000 incl. btw | Hoogwaardige persoonlijke reis- en lifestyledienstverlening met €0 RTG-verkoopcommissie op gedekte opdrachten, behalve de verkoperscommissie van gratis ondernemers (§9.3). Vast basisbedrag, niet "vanaf"; concreet serviceprofiel en personeelsdekking nog vast te stellen. |
+| RTG Pass (`rtg`) | €250 incl. btw | €3.000 incl. btw | €2.875 incl. btw | Consumentenpas met premium digitale mogelijkheden en €0 RTG-verkoopcommissie op gedekte opdrachten, behalve de verkoperscommissie van gratis ondernemers (§9.3); uitbreidbaar met afzonderlijk gekozen upgrades. Bundels en eventuele menselijke service nog vast te stellen. |
+| RTG Business Lite (`business-lite`) | €400 excl. btw | €4.800 excl. btw | €4.600 excl. btw | Voor zzp/mkb; premium ondernemerstools en reis-/lifestyledienstverlening, uitbreidbaar met afzonderlijk gekozen upgrades. Als verkoper 5% commissie bij gratis leden en 0% bij betaalde leden binnen de dekking (§9.3). Gebruikersdekking en bundels nog uit te werken. |
+| RTG Business Pass (`business`) | vanaf €6.500 excl. btw | vanaf €78.000 excl. btw | vanaf €74.750 excl. btw | Zakelijke dienstverlening op overeengekomen scope, met mogelijke upgrades. De bodem is geen offerte of factuur; servicecapaciteit en verantwoordelijkheid moeten bij de werkelijk overeengekomen prijs passen. |
+| RTG Lifestyle Pass (`lifestyle`) | €20.000 incl. btw | €240.000 incl. btw | €230.000 incl. btw | Hoogwaardige persoonlijke reis- en lifestyledienstverlening met €0 RTG-verkoopcommissie op gedekte opdrachten, behalve de verkoperscommissie van gratis ondernemers (§9.3). Vast basisbedrag, niet "vanaf"; concreet serviceprofiel en personeelsdekking nog vast te stellen. |
 
 Bij ieder aanbod staan **jaarprijs, twaalf maanden eerste looptijd, betaalwijze
-en opzeg-/verlengingsregel** naast elkaar. "€65 per maand" mag niet zelfstandig
+en opzeg-/verlengingsregel** naast elkaar. "€250 per maand" mag niet zelfstandig
 de indruk van een maandelijks opzegbaar abonnement wekken. Jaarlijks betalen
 verlaagt alleen de prijs, niet de twaalf maanden afgesproken dienstverlening.
-De korting is €32,50 voor RTG Pass, €75 voor Business Lite, vanaf €1.750 voor
-Business en €7.000 voor Lifestyle, telkens op dezelfde btw-basis als de tabel.
+De korting is €125 voor RTG Pass, €200 voor Business Lite, vanaf €3.250 voor
+Business en €10.000 voor Lifestyle, telkens op dezelfde btw-basis als de tabel.
 Voor Business wordt 11,5 maal de **overeengekomen** maandbasis gebruikt, niet
 automatisch 11,5 maal de bodem. Eventuele upgrades zijn nog niet geprijsd en
 vallen niet stilzwijgend onder deze basistarieven of kortingsafspraak.
 
+**Vervolgkeuze, bevestigd op 13 november 2026:** na het eerste vooruitbetaalde
+jaar volgt automatisch maandbetaling tegen de afgesproken maandprijs, met de
+afgesproken maandelijkse opzegbaarheid. Geen automatische tweede jaarbetaling
+of nieuwe vaste jaartermijn. Opnieuw een jaar vooruitbetalen vraagt een nieuwe
+expliciete keuze en passend aanbod; bestaande ondertekende afspraken blijven
+leidend. Zie `AFSPRAAK.md` §17.5.
+
 De consumentenpas is persoonsgebonden. Huishoudelijke reisdekking staat in §7.5;
-een gezin krijgt niet automatisch meerdere concierge-abonnementen. Voor zakelijke
-passen worden entiteiten, gebruikers, integraties en verantwoordelijkheden vooraf
+een gezin krijgt niet automatisch meerdere concierge-abonnementen.
+**Zakelijke reikwijdte, bevestigd op 13 november 2026: Business Lite geldt per
+afzonderlijke zaak; Business voor de hele organisatie**, inclusief de bestaande
+bevoegd gekoppelde zaken en werkomgevingen. Voor Business wordt niet opnieuw
+per vestiging een basisabonnement gerekend. Dit verleent geen persoonlijke
+Business-passen of beheerdersrollen aan medewerkers. Bestaande getekende
+afspraken worden niet stil gemigreerd; overlap met losse zaakabonnementen
+vereist een exact overeengekomen upgrade of menselijke controle.
+Voor zakelijke passen worden entiteiten, gebruikers, integraties en verantwoordelijkheden vooraf
 in het aanbod benoemd. Het eerdere voorstel van maximaal 50 gebruikers is niet
 vastgesteld en wordt niet stilzwijgend onderdeel van dit prijsbesluit.
 
@@ -766,13 +789,32 @@ Daarbij horen toepasselijke informatie, insolventiebescherming en bijstand.
 Geen ANVR-/SGR-aansluiting of verzekering claimen zonder bewijs. Laat de daadwerkelijke
 boekingsroutes beoordelen, niet alleen de tekst. Zie [Europese Commissie](https://europa.eu/youreurope/business/selling-in-eu/selling-goods-services/package-travel/index_nl.htm).
 
-### 7.7 Financiële ondergrens — geen rendementsclaim
+### 7.7 Officiële begrotingsregel — alleen abonnementen, geen rendementsclaim
 
 De bestaande 30%-verdeling over kwalificerende lidbijdragen exclusief btw blijft
-behouden: 20% lokale impact en 10% stichting. Niet 30% over doorbetaalde reissommen.
+behouden: 20% lokale impact en 10% stichting, na korting en omzetcorrecties.
+Niet 30% over doorbetaalde reissommen.
 Reserveren is niet hetzelfde als aantoonbaar afdragen. Btw-profiel en eligible
 revenue worden per geldsoort gecontroleerd; extra servicefees niet stilzwijgend
 anders classificeren om de maatschappelijke afspraak te ontwijken.
+
+**De basisexploitatie moet volledig uit abonnementen kunnen worden betaald.**
+Van dezelfde netto abonnementsomzet gaat 30% naar de maatschappelijke reservering.
+De resterende 70% moet alle begrote RTG-kosten dragen, inclusief gratis accounts,
+risico's en financieringskosten. Het vastgestelde ontwerpdoel is 20% resultaat
+vóór winstbelasting over diezelfde omzetbasis; daarmee is ongeveer 50% beschikbaar
+voor kosten inclusief begrotingsbuffers. Dit is een planningsdoel, geen bewezen
+marge, uitkeerbare winst of garantie bij elk ledenaantal.
+
+Commissie, losse diensten, upgrades en overige inkomsten staan in de basisbegroting
+op **€0**. De afzonderlijk vastgestelde commissiematrix van §9.3 blijft bestaan.
+Gerealiseerde extra opbrengsten zijn pas netto extra voor RTG na hun eigen kosten,
+btw, restituties en overige verplichtingen, inclusief toepasselijke maatschappelijke
+afdracht; geen omzet verwarren met vrije winst. Geen extra inkomsten vooraf
+nodig rekenen om de basisexploitatie sluitend te presenteren. Klantgelden,
+doorlopende reissommen en Foundation-vermogen zijn geen RTG-omzet of vrije buffer.
+De entiteitsgrenzen en vereiste grondslagen uit `ECONOMIE.md` blijven gelden;
+dit begrotingsbesluit geeft geen recht op doorbelasting tussen rechtspersonen.
 
 Indicatieve maandberekening bij betaling in maandtermijnen, afgerond op centen
 bij iedere geldstap. De afzonderlijke vooruitbetaaltabel daaronder verwerkt de
@@ -783,19 +825,19 @@ deze berekening op de bodem getoond, niet als vastgestelde contractprijs.
 
 | Pas | Omzet ex btw per maand | 30% reservering | Rest vóór alle kosten |
 |---|---:|---:|---:|
-| RTG Pass | €53,72 | €16,12 | €37,60 |
-| Business Lite | €150 | €45 | €105 |
-| Business — vanaf | €3.500 | €1.050 | €2.450 |
-| Lifestyle | €11.570,25 | €3.471,08 | €8.099,17 |
+| RTG Pass | €206,61 | €61,98 | €144,63 |
+| Business Lite | €400 | €120 | €280 |
+| Business — vanaf | €6.500 | €1.950 | €4.550 |
+| Lifestyle | €16.528,93 | €4.958,68 | €11.570,25 |
 
 Bij **één jaar vooruitbetalen**, na korting en met dezelfde twaalf maanden service:
 
 | Pas | Jaaromzet ex btw na korting | 30% reservering | Rest vóór alle jaarkosten |
 |---|---:|---:|---:|
-| RTG Pass | €617,77 | €185,33 | €432,44 |
-| Business Lite | €1.725 | €517,50 | €1.207,50 |
-| Business — vanaf | €40.250 | €12.075 | €28.175 |
-| Lifestyle | €133.057,85 | €39.917,36 | €93.140,49 |
+| RTG Pass | €2.376,03 | €712,81 | €1.663,22 |
+| Business Lite | €4.600 | €1.380 | €3.220 |
+| Business — vanaf | €74.750 | €22.425 | €52.325 |
+| Lifestyle | €190.082,64 | €57.024,79 | €133.057,85 |
 
 Deze restanten zijn **geen winst en geen vrij besteedbaar personeelsbudget**:
 menselijke uitvoering, platform, AI, opslag, betaalverwerking, normale
@@ -807,25 +849,29 @@ Meerwerk vraagt dezelfde toets, inclusief de toepasselijke Foundation-behandelin
 
 De 20/10-deelbedragen en het bestaande expliciete afrondingsveld uit
 `server/kern/commercie/allocatie/regels.js` blijven samen onderdeel van het bewijs.
-Bij een RTG-maandtermijn is 30% €16,12, terwijl afzonderlijk afgeronde 20% (€10,74)
-en 10% (€5,37) samen €16,11 zijn. De resterende cent mag bij afwikkeling niet
-verdwijnen; gebruik de bestaande afrondingsroute, geen tweede verdeelmechanisme.
+Als afzonderlijk afgeronde 20% en 10% niet optellen tot de afgeronde 30%, mag
+het verschil bij afwikkeling niet verdwijnen. Gebruik de bestaande expliciete
+afrondingsroute, geen tweede verdeelmechanisme.
 Lagere incasso-/financieringskosten door vooruitbetaling zijn mogelijke voordelen,
 geen al bewezen dekking van de korting. Vooruitbetaling is geen onmiddellijk
 vrije winst: de dienstverlening en mogelijke restituties moeten nog worden gedragen.
 
-**Gratis moet op eigen benen staan.** Meet per gratis cohort en vaste meetperiode:
+**Gratis blijft afzonderlijk meetbaar, maar wordt in de basisbegroting gedragen
+door abonnementen.** Meet per gratis cohort en vaste meetperiode:
 werkelijk verdiende partnervergoedingen na annuleringen en terugbetalingen, plus
 opbrengst van vrijwillig gekozen extra's, minus de kosten van álle leden in dat
 cohort. Daaronder vallen ook niet-boekers, AI, infrastructuur, opslag, support,
 boekingsafhandeling, acquisitie, uitval en een transparant aandeel in gedeelde
 kosten. Geen omzet uit betaalde passen toerekenen om gratis groen te verklaren.
 Niet-gemeten kosten zijn onbekend, niet nul; verwachte toekomstige commissie is
-nog geen gerealiseerde opbrengst. Naast positief resultaat moet de kasplanning
-de tijd tussen servicekosten en werkelijke commissieontvangst kunnen dragen.
+nog geen gerealiseerde opbrengst. Voor de basisbegroting blijven deze extra
+opbrengsten op nul, terwijl alle gratis kosten wel meetellen. In de werkelijke
+administratie dezelfde kosten slechts één keer boeken; cohortuitsplitsing en
+bedrijfsbegroting zijn twee gezichtspunten, geen twee kostenboekingen.
 
-Dit is een te bewijzen bedrijfsnorm, geen constatering dat gratis al winstgevend
-is. Gebruik de bestaande kostenvoorzieningen voor verbruiksmeting en begrenzing,
+Het oude zelfstandige-gratisrendabiliteitsvereiste is hiermee vervangen; dit is
+geen constatering dat gratis al winstgevend is. Gebruik de bestaande
+kostenvoorzieningen voor verbruiksmeting en begrenzing,
 maar bewijs eerst dat alle relevante uitvoeringsroutes en kosten daarin echt
 meelopen. Hun aanwezigheid bewijst nog geen sluitende kostenbeheersing. Stel
 bundels vast op gemeten kosten, met vooraf zichtbare grenzen en zonder de
@@ -841,18 +887,103 @@ binnen hun dekking vervalt; bij gratis verkopers blijft de standaardcommissie
 bestaan. Gemiste commissie is geen boekhoudkundige kostenpost,
 maar wel een relevante commerciële vergelijking. Als de kosten niet passen:
 processen, aanbod of toekomstige prijs expliciet herzien, niet achteraf een
-verborgen fee toevoegen of verliezen naar de andere groep verschuiven.
+verborgen fee toevoegen of verliezen in de cohortmeting verbergen.
+
+#### 7.7.1 Begrotingsonderbouwing bij vaststelling — aannames, geen realisatie
+
+Rekenbijlage: `RTG-prijzen-en-kosten.xlsx`, gedeeld met de eigenaar op 13 november
+2026, tabbladen `Prijsmodel` en `Aannames`. Dit is de ongewijzigde voorstelberekening
+waarop de vaststelling volgde; labels als "voorgesteld" en "huidige beleidsprijs"
+beschrijven daarin de situatie vóór dit besluit. §7.3 is vanaf vaststelling de
+enige actuele prijsbeleidsbron, niet die historische vergelijking in het rekenblad.
+SHA-256 van de bijlage:
+`9f1e468886a0b83cd5d9068088ed6993760a02ddb74e2b44427d01d7ee5f8d78`.
+
+Er zijn geen geverifieerde eigen facturen, loonstaten of aantallen betalende leden
+aan deze begroting ten grondslag gelegd. Onderstaande getallen zijn expliciete
+planningsaannames; vóór verkoop toetsen aan offertes, capaciteit, vraag en metingen.
+
+- Basisvolume: 1.000 RTG, 300 Lite, 10 Business en 3 Lifestyle-contracten,
+  plus 5.000 gratis accounts. Alle betaalde contracten betalen in het scenario
+  jaarlijks vooruit; 11,5 maandprijzen worden over twaalf servicemaanden verdeeld.
+  Daarna 2% omzetcorrectie voor uitval/restituties; btw-aanname 21% op abonnementen.
+- Menselijke uitvoering: gemiddeld 0,15 / 0,5 / 20 / 45 productieve uren per
+  contract per maand, tegen €60 / €60 / €85 / €100 volledig begrote uurkosten.
+  Eenmalige inrichting: 0,25 / 2 / 12 / 10 uur, verdeeld over het eerste jaar.
+  Dit zijn geen inbegrepen contracturen, achteraf opgelegde limieten, bewezen
+  personeelsdekking of een belofte van een exclusief team of 24/7-service.
+- Variabele AI/infrastructuur: €3 / €10 / €100 / €150 per betaald contract per
+  maand. Acquisitie: €120 / €360 / €2.400 / €6.000 per gewonnen klant, verdeeld
+  over twaalf maanden. RTG-gefinancierd ledenvoordeel: €2 / €5 / €25 / €100
+  per maand. Volgorde steeds RTG / Lite / Business / Lifestyle.
+- Vaste organisatie: €35.125 per maand, inclusief ondernemersbeloning (€6.000),
+  twee technische FTE (€14.000), kerninfrastructuur (€1.000), security/privacy/juridisch
+  (€3.000), administratie (€1.500), verzekerings-/garantiepremies (€2.000),
+  kantoor/software (€1.000), merkmarketing (€1.000), beperkte noodretainer
+  (€2.500) en terugverdienbudget voor €75.000 opstart over 24 maanden (€3.125).
+  Productieve uitvoeringsuren zitten niet nogmaals in deze vaste bezetting.
+  Gedeelde organisatie-, gratis-, Connect- en kapitaalkosten worden in het model
+  gelijk per betalend contract verdeeld: een grove begrotingssleutel, geen
+  gemeten kostendriver of boekhoudkundige omzettoerekening aan gratis cohorten.
+- Gratis: per account €1 AI/cloud en 0,01 uur service à €60 per maand;
+  0,02 boekingen à €1.000, waarvan 50% met RTG als eigen betalingskostendrager.
+  Kosten van niet-boekers tellen mee. Geen commissieopbrengst als dekking.
+- Eigen RTG-reizen: per betaald contract 0,15 / 0,3 / 4 / 3 boekingen per
+  maand à €2.000 / €2.500 / €3.000 / €10.000; 2,5% + €0,25 betaalverwerking
+  per boeking en 0,5% niet-verhaalbaar verlies. Geen reissommen als abonnementomzet;
+  geen tweede betaling door de klant van al in de reisprijs opgenomen kosten.
+- Abonnementsbetaling: 2,5% + €0,25 per jaarlijkse incasso, plus 0,7% Billing
+  over bruto incasso; terugbetalingen verdienen die kosten in het model niet terug.
+  Connect: 500 actieve verkopers, €2 per account, vier payouts à €0,10,
+  €2.000 payoutvolume per verkoper met 0,5% verwerkings-/platformkosten en
+  0,2% niet-verhaalbaar verkopersverlies. Dit zijn begrotingsposten, geen eigen
+  providercontract; order-PSP van externe verkopers niet dubbel bij RTG boeken.
+- 10% onvoorzien op de operationele kosten vóór abonnement-PSP/Billing.
+  Kosten exclusief terugvorderbare btw; niet-terugvorderbare btw hoort in de
+  betreffende inkooppost. De buffer is geen gemeten factuur of fiscale voorziening.
+- Werkkapitaal: 10% reserve op maandreis-/payoutvolume, 25% voorfinanciering van
+  eigen reisvolume, €100.000 geblokkeerde garantieruimte en €650.000 aangenomen
+  providerreserve voor jaarabonnementen; 8% jaarlijkse kapitaalkosten.
+  Geen provider-/bankofferte of bewezen garantiedekking. Aanvullende lening voor
+  opstart/buffer staat expliciet op nul: eigen financiering aangenomen, niet bewezen.
+
+| Maandgemiddelde, geen kasontvangst | Basisscenario | Tegenvallerscenario |
+|---|---:|---:|
+| Betaalde contracten | 1.313 | 657 |
+| Gratis accounts | 5.000 | 5.000 |
+| Abonnementsomzet ex btw na vooruitbetaalkorting en 2% correctie | €414.358,78 | €214.941,10 |
+| 30% maatschappelijke reservering | €124.307,63 | €64.482,33 |
+| Alle begrote kosten inclusief buffers | €203.737,65 | €177.119,74 |
+| Begroot resultaat vóór winstbelasting | €86.313,50 | −€26.660,97 |
+| Resultaat / dezelfde netto abonnementsomzet | 20,83% | −12,40% |
+
+Tegenvaller: 500 RTG, 150 Lite, 5 Business en 2 Lifestyle; dezelfde prijzen,
+gratis aantallen en Connect-aannames; uitvoering, variabele infrastructuur en
+eigen reisfrequentie +50%, vaste kosten +15% en acquisitiekosten +25%.
+De positieve basisuitkomst is dus geen bewijs dat de prijzen bij lager volume
+alle kosten dragen. Bedragen zijn maandgemiddelden met modelafronding; facturen
+en definitieve grootboekafronding volgen hun eigen gecontroleerde geldstappen.
+
+De rekenbijlage geeft circa 562 contractequivalenten voor break-even en 1.247
+voor het 20%-doel, uitsluitend bij continu dezelfde basismix en kostenaannames.
+Dit zijn geen gegarandeerde aantallen echte klanten of onbeperkte schaalbaarheid.
+De bruto startfinancieringsraming van €2.231.454,23 omvat onder meer drie maanden
+buffer, opstart/acquisitie/inrichting en de aangenomen reserves, zonder toekomstige
+ontvangsten weg te strepen. Het is geen vastgesteld minimumkapitaal of cashflowprognose.
+Een eigen maandelijkse kasplanning blijft nodig voor jaarlijkse incasso,
+dienstverlening, afdracht, restituties, leveranciers en geblokkeerd geld.
 
 ### 7.8 Conflicten met de huidige implementatie en afspraken
 
 | Huidige bron | Wat vóór invoering expliciet moet veranderen |
 |---|---|
-| `server/kern/pasladder.js`, `pasprijs.js`, `test/pasladder.test.js` | De runtime bevat nog RTG €65 ex, Business vanaf €5.000 ex en Lifestyle vanaf €20.000 ex. Het nieuwe eigenaarsbesluit is RTG €65 incl, Business vanaf €3.500 ex en Lifestyle vast €14.000 incl; Business Lite blijft €150 ex. Consumentenbruto, zakelijke bodem en Lifestyle-basis correct modelleren en afronden; €65 incl is niet €65 ex. Serviceprofielen en implementatie zijn nog open. |
+| `server/kern/pasladder.js`, `pasprijs.js`, `test/pasladder.test.js` | De runtime bevat nog RTG €65 ex, Lite €150 ex, Business vanaf €5.000 ex en Lifestyle vanaf €20.000 ex. De actuele beleidsprijzen staan uitsluitend in §7.3. Consumentenbruto, zakelijke bodem en de vaste Lifestyle-basis correct modelleren en afronden; een bedrag incl. btw is niet hetzelfde bedrag excl. btw. Serviceprofielen en implementatie zijn nog open. |
+| `index.html`, `public/site/passen/*.html`, `test/public-pricing.test.js` | De bestaande openbare prijsweergave en publicatietoets dragen nog de eerdere beleidsprijzen van 12 november (versie `2026-11-12.1`). Ze zijn geen actuele weergave van dit interne besluit. Publicatie, verwijzingen en toetsen moeten in een afzonderlijke geautoriseerde wijziging op §7.3 worden aangesloten, zonder daarmee een checkout, verkoopvrijgave of contractmigratie te activeren. |
 | `server/kern/commercie/contract.js`, aanmeldingen en publieke voorwaarden | De twaalfmaandsbasis blijft; nieuwe prijzen, betaalwijze, toelating, prijslock, wettelijke herroeping en opzegging na het eerste jaar moeten samen worden bewezen. Bestaande overeenkomsten niet automatisch omzetten. |
 | `server/kern/commercie/capaciteiten.js`, partneraanmelding | Gratis zakelijke basis uit §9 is nog geen bestaand recht; scheiden van betaalde ondernemerssoftware zonder een tweede rechtenmodel. |
 | `server/kern/commercie/vergoeding.js`, partnerkanaal, subsidies | Universele nulcommissie en de oude servicegrondslag passen niet bij de 15%/15%/5%/0%-matrix in §9.3. Tarief en afrekening expliciet modelleren; geen heffing op alle omzet buiten RTG. Bestaande `lid + RTG === bruto === zaak`-afspraken niet kapot salderen. |
 | `test/mn03-commercieelvoordeel.test.js`, aanbevelingen | De oude aanname van geen commercieel belang moet vóór invoering worden vervangen door bewijs op het werkelijke keuzepad: commissiebelang zichtbaar, geen betaalde rangschikking verhullen of aanbeveling op commissie optimaliseren. Niet alleen de nultoets schrappen. |
-| `public/apps/juridisch/voorwaarden.html` | Ex-btw consumentenprijzen, alleen abonnementsinkomsten, algemene nettoprijsclaims en automatische uitsluiting van pakketreizen passen niet bij dit voorstel. Jaarcontract blijft, maar opzegging, verlenging en herroeping moeten volledig worden uitgewerkt. Niet alleen nieuwe bedragen in oude zinnen zetten. |
+| `public/apps/juridisch/voorwaarden.html` | Ex-btw consumentenprijzen, algemene nettoprijsclaims en automatische uitsluiting van pakketreizen passen niet bij dit besluit. Alleen abonnementen dragen de basisbegroting; dit is geen claim dat RTG nooit andere inkomsten ontvangt. Jaarcontract blijft, maar opzegging, verlenging en herroeping moeten volledig worden uitgewerkt. Niet alleen nieuwe bedragen in oude zinnen zetten. |
 | `public/apps/juridisch/partnervoorwaarden.html` | Algemene 0%-belofte, betaalde partnerpoort en verplichte Salonactiviteit moeten op rol en nieuwe afspraak worden beoordeeld. Geen wijziging van bestaande partnerrechten zonder akkoord. |
 
 Bestaande ledenprijsgarantie, toegekende voordelen en getekende servicebeloften
@@ -865,8 +996,10 @@ staan erbij. Geen automatische downgrade van een bestaand intensief conciergecon
 Besloten: de prijsbasis in §7.3; betaalde passen hebben een vaste eerste
 jaarlooptijd met keuze tussen twaalf maandtermijnen en één vooruitbetaling met
 een halve maand korting. RTG Pass, Business Lite en Business kunnen met gekozen
-extra's worden uitgebreid. Gratis moet als cohort zelfstandig winstgevend zijn;
-betaalde consumenten krijgen €0 RTG-verkoopcommissie op gedekte opdrachten,
+extra's worden uitgebreid. Alleen abonnementen dragen de basisbegroting,
+inclusief alle gratis kosten, na de 30%-reservering; andere opbrengsten zijn
+netto extra en staan in die begroting op nul. Het 20%-doel is geen winstgarantie.
+Betaalde consumenten krijgen €0 RTG-verkoopcommissie op gedekte opdrachten,
 behalve bij gratis ondernemers als verkoper. Die betalen 15% commissie,
 ook bij een betaald RTG-lid als koper: de eerdere nulbelofte is expliciet beperkt.
 Betaalde ondernemers betalen 5% bij gratis leden en 0% bij betaalde leden binnen
@@ -942,7 +1075,7 @@ deze uitwerking omzeilt de huidige grenzen niet.
 
 | Bestaande pas | Wat de klant ermee gedaan krijgt | Menselijke uitvoering en grens |
 |---|---|---|
-| Gratis | Complete standaardreis-/lifestyle-opdracht met dossier en nazorg; bruikbare basisapps. Voor ondernemers ook Salon, producten verkopen en eigen klantenbestand beheren volgens §9. | Vereiste controles, uitzonderingen en probleemhulp. Geen doorlopend persoonlijk bureau of onbeperkte zware AI. Partnercommissie volgens §7.5; zelfstandig rendabel gratis cohort. |
+| Gratis | Complete standaardreis-/lifestyle-opdracht met dossier en nazorg; bruikbare basisapps. Voor ondernemers ook Salon, producten verkopen en eigen klantenbestand beheren volgens §9. | Vereiste controles, uitzonderingen en probleemhulp. Geen doorlopend persoonlijk bureau of onbeperkte zware AI. Partnercommissie volgens §7.5; kosten in de abonnementsbegroting, werkelijke cohortresultaten afzonderlijk meten (§7.7). |
 | RTG Pass | Persoonlijke digitale regie: herbruikbare voorkeuren, toegestane agenda-/documentcontext, plandossiers, vertrekvoorbereiding en hervatten zonder opnieuw beginnen. Commissievrije gedekte opdrachten, behalve de verkoperscommissie van gratis ondernemers (§9.3). | Normale afhandeling en controles; persoonlijke maatwerkuitvoering als gekozen upgrade. Geen impliciete vaste uitvoerder, gratis externe aankopen of onbeperkte AI. |
 | Business Lite | Standaardwerkomgeving voor zzp/mkb, passend bij het bedrijfstype: taken, planning, personeel en kassa waar toepasselijk; zakelijke aanvragen, goedkeuringen, reisdocumenten en kosten op de juiste opdracht. | De ondernemer houdt dagelijkse regie; RTG ondersteunt standaardinrichting en problemen met de verkochte dienst. Geen uitbestede bedrijfsvoering, enterprise-SLA of impliciete maatwerkintegraties. |
 | Business | Beheerd zakelijk reis- en lifestyleprogramma: inrichting van afgesproken beleid, RTG-serviceverantwoordelijke met vervanging, leveranciersafstemming, dossierbewaking, verstoringen en controleerbare rapportage. Zakelijke tools en governance binnen overeengekomen scope. | RTG neemt afgesproken operationeel werk over; de onderneming behoudt besluitmacht en werkgeversverantwoordelijkheid. Geen exclusief volledig team of onbeperkte implementatie voor de bodemprijs. |
@@ -1108,13 +1241,13 @@ vooraf vaststellen. Geen onnodige identiteitskopieën voor iedereen.
 
 ### 8.8 De economie moet de complete dienstverlening dragen
 
-Gratis apart beoordelen op werkelijke commissie en vrijwillige extra's,
-inclusief niet-boekers, controles, fraudeonderzoek, mislukte betalingen, refunds
-en toegerekende infrastructuur. Betaald op abonnement en gekozen extra's;
-commissie van gratis verkopers blijft volgens §9.3 bestaan, ook bij betaalde
-kopers, en wordt één keer aan de juiste groep toegerekend. Geen verborgen
-verkoopcommissie of onbeperkte nulclaim. De bestaande
-30%-verdeling blijft behouden zoals §7.7 beschrijft.
+De basisbegroting rekent uitsluitend met abonnementen en neemt ook alle gratis
+kosten mee: niet-boekers, controles, fraudeonderzoek, mislukte betalingen, refunds
+en toegerekende infrastructuur. De 30%-verdeling blijft behouden volgens §7.7.
+Werkelijke cohortresultaten apart beoordelen; commissie van gratis verkopers
+blijft volgens §9.3 bestaan, ook bij betaalde kopers, en wordt één keer aan de
+juiste groep toegerekend. Extra's en commissies zijn geen vooraf ingeboekte
+dekking van de basisbelofte. Geen verborgen verkoopcommissie of onbeperkte nulclaim.
 
 Een upgrade koopt méér capaciteit, bereik of uitvoering, geen reparatie van de
 basisbelofte. Voor RTG/Lite/Business uitwerken: AI/opslag, aanvullende uitvoering
@@ -1197,7 +1330,12 @@ de actuele werking te beoordelen.
 Voor verkoop: servicecapaciteit, personeelsrooster/vervanging, bereikbaarheid,
 inclusies/exclusies, upgradeprijzen, zakelijke/huishouddekking, provider- en
 partnerafspraken en echte kostendata. Autonome betalingen en externe communicatie
-zijn **niet** besloten. Nieuwe beloften gaan via bestaande scopebesluiten;
+waren in deze conceptuitwerking **niet** besloten. Het aanvullende besluit van
+13 november 2026 in `AFSPRAAK.md` §17 staat automatische abonnementsafhandeling
+toe voor gratis, RTG en Lite, met expliciete klantondertekening en aantoonbaar
+betaalmandaat; Business/Lifestyle houden menselijke toelating. Dat is geen
+algemene machtiging voor andere uitgaande betalingen of externe communicatie.
+Nieuwe beloften gaan via bestaande scopebesluiten;
 bestaande verplichtingen mogen ondertussen niet worden uitgekleed.
 
 Dit sluit het **ontwerp van de lus**, niet de uitvoering. Alleen documentatie
@@ -1274,9 +1412,9 @@ Laat Lite zien bij een echte vervolgvraag, bijvoorbeeld order, voorraad en
 administratie verbinden. Toon het verschil op het eigen toegestane werk,
 zonder generieke dagelijkse upsell of blokkade midden in een bestelling.
 
-Business Lite blijft €150 exclusief btw per maand bij een jaarcontract:
-€1.800 in twaalf termijnen of €1.725 bij jaarlijkse vooruitbetaling. Betaalde
-rechten pas na expliciet akkoord op prijs en dienstverlening. Hetzelfde bedrijf,
+Voor Business Lite gelden de actuele prijs en beide jaarbetaalwijzen uit §7.3,
+vastgesteld op 13 november 2026. Betaalde rechten pas na expliciet akkoord op
+prijs en dienstverlening. Hetzelfde bedrijf,
 profiel, assortiment, klantenbestand en orderhistorie blijven bestaan; geen
 migratie naar een tweede CRM.
 
@@ -1292,7 +1430,10 @@ automatische jaarlijkse upgrade omdat een gebruiksgrens is bereikt.
 Vastgesteld op 12 november 2026 op de expliciete eigenaarsopdracht
 "Maak het definitief". Deze paragraaf is de canonieke beleidsbron voor de
 commissiegrondslag, reisrol, btw-inrichting, providerkeuze/kostenverdeling en
-correcties. De al gekozen basisprijzen en jaarbetaling in §7.3 blijven ongewijzigd.
+correcties. Dit commissiebesluit wijzigde op 12 november de toen gekozen
+basisprijzen en jaarbetaling niet. De basisprijzen zijn vervolgens op 13 november
+herzien in §7.3 onder versie `abonnementen-2026-11-13.1`; de jaarbetaalkeuze en
+deze commissiematrix zijn daarbij behouden.
 §8-servicecapaciteiten, nog niet bepaalde upgrades en overige conceptvoorwaarden
 worden hiermee niet stilzwijgend goedgekeurd.
 
@@ -1515,8 +1656,10 @@ Dit is geen escrow- of insolventiebescherming.
   aan het lid buiten de vooraf geaccepteerde volledige reisprijs, en geen
   toerekening aan een ander reisbureau dat niet bij die verkoop betrokken is.
 - RTG draagt vaste Connect-accountkosten en de standaard Connect-platform- en
-  uitbetaalkosten uit abonnement/commissie. Die kosten horen wel in de cohortkostentoets;
-  gratis is niet rendabel verklaard doordat ze buiten beeld blijven.
+  uitbetaalkosten. Sinds het begrotingsbesluit van 13 november worden die volledig
+  meegenomen in de abonnementgedragen basisbegroting (§7.7); gerealiseerde netto
+  commissie is extra. De kosten horen ook in de afzonderlijke cohortkostentoets,
+  zonder dubbeltelling; gratis is niet rendabel doordat kosten buiten beeld blijven.
 - Geen extra consumententoeslag. Geen nieuw gebruik van het oude RTG-tarief
   €0,10 + 1% als zogenaamd externe kostprijs. Bestaande getekende afspraken eerst migreren.
 - Valutawissel, duurdere betaalmethoden en versnelde uitbetaling uitsluitend na
@@ -1685,6 +1828,11 @@ Ook de oude nulcommissie en gratis-zakelijkblokkade zijn nog runtimebasis.
 Geen testverwachting veranderd om nieuw beleid ten onrechte groen te laten lijken.
 
 ### 9.4 Rendabiliteit en vrijwillige groei
+
+Voor de basisbegroting geldt §7.7: alle gratis zakelijke kosten meenemen, maar
+commissie en extra diensten op nul begroten. Abonnementen moeten de kosten
+kunnen dragen na de maatschappelijke reservering. Dat is een bedrijfsbrede
+financieringskeuze, geen bewijs van zelfstandig winstgevende gratis cohorten.
 
 Meet de gratis zakelijke groep afzonderlijk: werkelijk verdiende rechtmatige
 standaardcommissies en afzonderlijke dienstopbrengsten minus hosting, opslag, AI, support, verificatie,

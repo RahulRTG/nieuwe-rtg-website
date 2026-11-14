@@ -6,7 +6,7 @@
    Draai los: node --test test/sparren.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, maakBetaaldRtgTestaccount } = require('./helper');
 const fs = require('fs'); const os = require('os'); const path = require('path');
 
 function verseDataDir() { return fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-spar-')); }
@@ -15,19 +15,21 @@ async function api(base, pad, body, token) {
   const r = await fetch(base + pad, { method: 'POST', headers: h, body: JSON.stringify(body || {}) });
   return { status: r.status, body: await r.json() };
 }
-async function registreer(base) {
+async function registreer(base, dataDir) {
   const u = Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
-  return (await api(base, '/api/auth/register', {
+  const token = (await api(base, '/api/auth/register', {
     name: 'Spar Lid', email: u + '@x.nl', phone: '06' + u.replace(/\D/g, '').padEnd(8, '1').slice(0, 8),
-    password: 'geheim123', geboortedatum: '1990-01-01', tier: 'business', pasApp: 'business'
+    password: 'geheim123', geboortedatum: '1990-01-01', pasApp: 'rtg'
   })).body.token;
+  maakBetaaldRtgTestaccount(dataDir, u + '@x.nl');
+  return token;
 }
 
 test('1. parkeren, lijst en status via de routes', async () => {
   const TMP = verseDataDir();
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   try {
-    const lid = await registreer(base);
+    const lid = await registreer(base, TMP);
     // leeg om te beginnen
     const leeg = await api(base, '/api/spar/lijst', {}, lid);
     assert.equal(leeg.status, 200);
@@ -58,7 +60,7 @@ test('2. een spar-vraag in het gesprek parkeert de gedachte', async () => {
   const TMP = verseDataDir();
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   try {
-    const lid = await registreer(base);
+    const lid = await registreer(base, TMP);
     const g = await api(base, '/api/fluister', { q: 'spar met me over een verrassingsfeest voor Sam' }, lid);
     assert.equal(g.status, 200);
     assert.ok(/sparren|meedenk|beter/i.test(g.body.antwoord || ''), 'Rahul reageert in sparmodus');

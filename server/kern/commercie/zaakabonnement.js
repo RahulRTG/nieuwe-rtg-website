@@ -52,6 +52,9 @@ const TERUGVAL = 'business';
 
 function maakZaakabonnement({ db, save, nu }) {
   const tijd = nu || klok.nu;
+  const diensten = require('../aanmeldingen/abonnementsdiensten')({ db,
+    nu: () => new Date(tijd()).toISOString() });
+  const organisaties = require('./organisatieabonnement')({ db, nu: () => new Date(tijd()).toISOString() });
 
   const eigen = require('../eigencollectie')({ db, domein: 'kern/commercie/zaakabonnement', bezit: { zaakAbonnement: 'kaart' } });
   function alles() { return eigen.bak('zaakAbonnement'); }
@@ -63,6 +66,10 @@ function maakZaakabonnement({ db, save, nu }) {
      een terugval die je kunt tellen en een terugval die verdwijnt. */
   function van(code) {
     const c = sleutel(code);
+    const org = organisaties.vanZaak(c);
+    if (org) return { code: c, pas: org.ok ? 'business' : null, herkomst: 'organisatie',
+      organisatieCode: org.tenant?.org || null, contractId: org.contract?.id || null,
+      sinds: org.contract?.activering?.at || null, door: null, controleNodig: !org.ok };
     const r = leesAlles()[c];
     if (r && ladder.trede(r.pas))
       return { code: c, pas: r.pas, herkomst: 'vastgelegd', sinds: r.sinds, door: r.door || null,
@@ -77,6 +84,8 @@ function maakZaakabonnement({ db, save, nu }) {
     const c = sleutel(code);
     const t = ladder.trede(pas);
     if (!c) return { status: 400, error: 'Welke zaak?' };
+    const org = organisaties.controleZaak(c);
+    if (!org.ok) return org;
     if (!t || !t.beschikbaar) return { status: 400, error: 'Deze trede bestaat niet of is niet beschikbaar.' };
     if (!caps.mag(pas, 'can_be_partner'))
       return { status: 400, error: t.naam + ' is geen zakelijk abonnement; een zaak hoort op ' +
@@ -91,21 +100,22 @@ function maakZaakabonnement({ db, save, nu }) {
      geen enkele aanroeper per ongeluk een tier meegeven die hij ergens anders
      vandaan heeft. */
   function mag(code, cap) { return caps.mag(van(code).pas, cap); }
+  function magDienst(code, dienst) { return diensten.zaak(sleutel(code), dienst); }
 
   /* Wie draait er op de terugval? Dit is het getal dat de migratie zichtbaar
      houdt. `zaakCodes` komt van de aanroeper omdat deze laag de
      leverancierstabel niet hoort te kennen. */
   function zonderAbonnement(zaakCodes) {
     const bekend = leesAlles();
-    const uit = (zaakCodes || []).map(sleutel).filter(c => !bekend[c]);
+    const uit = (zaakCodes || []).map(sleutel).filter(c => !bekend[c] && !organisaties.vanZaak(c));
     return { aantal: uit.length, codes: uit.slice(0, 200), terugval: TERUGVAL };
   }
 
   function lijst() {
-    return Object.entries(leesAlles()).map(([code, r]) => ({ code, ...van(code), sinds: r.sinds }));
+    return [...new Set([...Object.keys(leesAlles()), ...organisaties.zaken()])].map(code => van(code));
   }
 
-  return { van, zet, mag, zonderAbonnement, lijst, TERUGVAL };
+  return { van, zet, mag, magDienst, zonderAbonnement, lijst, TERUGVAL };
 }
 
 module.exports = { maakZaakabonnement, TERUGVAL };

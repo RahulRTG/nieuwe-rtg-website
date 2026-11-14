@@ -10,12 +10,20 @@
    aantal alleen omlaag. Stijlblokken zelf zijn wél per antwoord gestempeld. */
 'use strict';
 
-const CSP = (nonce, magnaat = false) =>
-  "default-src 'self'; script-src 'self' 'nonce-" + nonce + "'; " +
+const CSP = (nonce, magnaat = false, paginaPad = '') => {
+  // Alleen het Geld-betaalscherm. Geen Stripe-netwerk op overige apps of
+  // Magnaat. CardElement/3DS, geen Link/Address/Checkout-embed of Google Maps.
+  // Bron: docs.stripe.com/security/guide#content-security-policy, 13-11-2026.
+  const stripe = !magnaat && paginaPad === '/apps/geld.html';
+  return "default-src 'self'; script-src 'self' 'nonce-" + nonce + "'" +
+  (stripe ? ' https://js.stripe.com https://*.js.stripe.com' : '') + '; ' +
   "style-src 'self' 'nonce-" + nonce + "'; style-src-attr 'unsafe-inline'; " +
   "font-src 'self'; img-src 'self' data: blob:; media-src 'self' data: blob:; " +
-  "connect-src " + (magnaat ? "'none'" : "'self'") + "; frame-ancestors 'self'; base-uri 'self'; " +
+  "connect-src " + (magnaat ? "'none'" : "'self'") + (stripe ? ' https://api.stripe.com' : '') + '; ' +
+  (stripe ? "frame-src 'self' https://js.stripe.com https://*.js.stripe.com https://hooks.stripe.com; " : '') +
+  "frame-ancestors 'self'; base-uri 'self'; " +
   "form-action " + (magnaat ? "'none'" : "'self'") + "; object-src 'none'";
+};
 
 function magnaatHtml(html, actief) {
   if (!actief) return html;

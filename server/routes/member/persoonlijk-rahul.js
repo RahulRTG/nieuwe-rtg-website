@@ -35,10 +35,9 @@ module.exports = (kern) => {
   /* ---- Fluister: de persoonlijke assistent met geheugen (kern/fluister.js).
      Voor iedereen, over de eigen gegevens; alles is opvraagbaar en wisbaar. */
   app.post('/api/fluister', auth, async (req, res) => {
-    /* De pestgrens staat VOOR alles: drie waarschuwingen bij pesten, dan een
-       vurig slotantwoord en 24 uur weg; daarna opent alleen een excuus de
-       deur weer (kern/pestgrens.js). Neemt de poort het gesprek over, dan
-       komt er geen gewone AI-beurt en ook geen stuur-lus. */
+    /* De pestgrens stopt alleen deze verdachte beurt, nooit automatisch de
+       volgende of het account. Voor langdurige sancties is een mens nodig.
+       Bij een gestopte beurt geen gewone AI-uitvoering en geen stuur-lus. */
     /* Het stille codewoord (kern/veilig/codewoord.js). Staat hier, in de gewone
        Rahul-route, omdat de zin juist in een DOODGEWOON gesprek moet kunnen
        vallen: je hoeft geen app te openen, en degene die meekijkt ziet je niets
@@ -49,7 +48,9 @@ module.exports = (kern) => {
     const plafondTrede = plafond.geldigeTrede(req.body.plafond);
     const grendel = plafond.grendelVoor(plafondTrede, 'member');
     const grens = pestgrens.poort(req.session.key, req.body.q);
-    if (grens) return res.json({ antwoord: grens.antwoord, pestgrens: true, weg: !!grens.weg });
+    if (grens) return res.json({ antwoord: grens.antwoord, pestgrens: true, weg: false,
+      bescherming: grens.bescherming, beoordelingNodig: !!grens.beoordelingNodig,
+      service: grens.service });
     // het scherm, aan DEZE sessie gebonden (EDGE.md par. 14.4)
     const sch = kern.contextDomeinen.scherm(req.session, req.body.context, req.body.q);
     // sessie mee voor doen (reserveren, 24 uur plannen)

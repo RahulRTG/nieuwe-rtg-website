@@ -72,6 +72,15 @@ async function commitAccountWijzigingen(client, wijzigingen) {
 // voor ./achtergrond.js
 function accountPool() { return PGMODE && pgKlaar && pg ? pg.pool : null; }
 const { leesVers } = require('./transactie');
+async function leesStaffVanLidVers(code, id) {
+  if (!accountPool()) throw new Error('De gedeelde accountwaarheid is niet gereed.');
+  try {
+    const { rows } = await leesVers(() => pg.pool.query(
+      'SELECT * FROM supplier_staff WHERE supplier_code=$1 AND member_id=$2 ORDER BY id', [code, id]));
+    for (const r of rows) upsertLocalStaff(r);
+    return rows;
+  } catch (e) { planAccountHerstel(e, 'eigenaar-herlezen'); throw e; }
+}
 
 /* De gedeelde intrekkingsoutbox is een eigen onderwerp: ./mirror-intrekking.js. */
 const { bewaarIntrekking, gedeeldeIntrekkingen, voltooiIntrekkingen } =
@@ -190,7 +199,7 @@ module.exports = {
   PGMODE, rawUser, rawStaff, nieuwId,
   markUser: wachtrij.markUser, markStaff: wachtrij.markStaff, markDelete: wachtrij.markDelete,
   authoriteitKlaar, postgresKlaar: authoriteitKlaar, commitAccountWijzigingen,
-  accountPool, planAccountHerstel,
+  accountPool, planAccountHerstel, leesStaffVanLidVers,
   bewaarIntrekking, gedeeldeIntrekkingen, voltooiIntrekkingen,
   startPostgres, onExternalChange, flushBijAfsluiten
 };

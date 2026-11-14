@@ -75,7 +75,8 @@ test('4. de stand toont de hint, nooit de sleutel', () => {
 test('5. een medewerker in dienst krijgt een account -- en NOOIT een betaalde pas', async () => {
   const r = await scim.maak(accounts, 'alfa', { userName: 'nieuw@alfa.test', name: { formatted: 'Nieuw Persoon' } });
   assert.equal(r.bestond, false);
-  assert.equal(r.user.tier, 'rtg');
+  assert.equal(r.user.tier, 'guest', 'provisioning geeft geen betaald RTG-abonnement');
+  assert.notEqual(r.user.tier, 'rtg');
   assert.notEqual(r.user.tier, 'business');
   assert.equal(r.user.actief, 1);
   assert.equal(accounts.realNameOf(r.user), 'Nieuw Persoon');

@@ -8,7 +8,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, maakBetaaldRtgTestaccount } = require('./helper');
 
 let srv, base, a, b, c, groepId;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-wbw-'));
@@ -29,7 +29,8 @@ const MINI_PNG = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAf
 async function lid() {
   const u = (Date.now() + (++seq)).toString().slice(-8);
   const reg = await api('/api/auth/register', { name: 'Lid ' + seq, email: 'w' + u + '@x.nl', phone: '06' + u,
-    password: 'geheim123', geboortedatum: '1990-05-05', geslacht: 'v', tier: 'rtg', pasApp: 'rtg' });
+    password: 'geheim123', geboortedatum: '1990-05-05', geslacht: 'v', pasApp: 'rtg' });
+  maakBetaaldRtgTestaccount(TMP, 'w' + u + '@x.nl');
   const kyc = await api('/api/verify/upload', { image: MINI_PNG }, reg.body.token);
   assert.equal(kyc.status, 200, 'het paspoort is ingestuurd: ' + JSON.stringify(kyc.body).slice(0, 120));
   const st = await api('/api/state', {}, reg.body.token);

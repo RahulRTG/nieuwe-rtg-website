@@ -71,7 +71,7 @@ module.exports = function aanmeldStap(g, tekst, ruwTekst, id, ctx) {
       if (tekst.length < 6) return stap(4, { vertrouwelijk: true, tekst: 'Net te kort; minstens zes tekens.' });
       g.velden.password = String(ruwTekst).slice(0, 200);
       g.stap = 'klaar';
-      g.velden.tier = 'rtg';
+      g.velden.tier = 'guest';
       const interesse = g.velden.interesse === 'business'
         ? ' Je noemde je bedrijf: de Business Pass gaat op uitnodiging; ik noteer je interesse, beloven kan ik niets.'
         : (g.velden.interesse === 'lifestyle' ? ' De Lifestyle Pass gaat op uitnodiging; ik noteer je interesse, beloven kan ik niets.' : '');
@@ -79,8 +79,8 @@ module.exports = function aanmeldStap(g, tekst, ruwTekst, id, ctx) {
       const werk = g.werkgever ? ' Je werkt bij ' + g.werkgever.naam + '; dat noteer ik.' : '';
       /* Alleen de vier velden. `phone` gaat hier NIET mee: dat vraagt Rahul pas
          wanneer er iets bezorgd of gereserveerd moet worden. */
-      const velden = { name: g.velden.name, email: g.velden.email, geboortedatum: g.velden.geboortedatum, password: g.velden.password, tier: 'rtg' };
-      const uit = { tekst: 'Dat is rond: welkom in het huis. Je RTG Pass staat vanaf dit moment op je naam.' + interesse + werk,
+      const velden = { name: g.velden.name, email: g.velden.email, geboortedatum: g.velden.geboortedatum, password: g.velden.password, tier: 'guest' };
+      const uit = { tekst: 'De gegevens voor je gratis account zijn compleet. Na het aanmaken bekijk en onderteken je zelf de overeenkomst. Een betaald abonnement is hiermee nog niet afgesloten.' + interesse + werk,
         klaar: true, velden, werkgever: g.werkgever, woonplaats: g.velden.woonplaats || null };
       gesprekken.delete(id);
       return uit;

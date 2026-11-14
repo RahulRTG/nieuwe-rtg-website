@@ -86,13 +86,17 @@ test('2. lid A zegt het lidmaatschap van lid B niet op, ook niet met zijn id in 
   /* DIT IS DE TOETS. De kantoorroute neemt een `id` uit de body; zou de
      ledenroute dat ook doen, dan kon A hier B opzeggen. */
   const poging = await api('/api/mijn/abonnement/opzeggen', { id: b.aanmeldingId }, a.token);
-  assert.equal(poging.status, 200, 'A zegt iets op -- namelijk zijn EIGEN lidmaatschap');
+  assert.equal(poging.status, 409, 'zonder eigen voorbeeld wordt niets opgezegd');
+  const vreemd = (await api('/api/mijn/abonnement/opzegvoorbeeld', {}, b.token)).body;
+  assert.equal((await api('/api/mijn/abonnement/opzeggen', vreemd, a.token)).status, 409);
 
   const vanB = await api('/api/mijn/abonnement', {}, b.token);
   assert.equal(vanB.body.abonnement.stand, 'ACTIEF',
     'het lidmaatschap van B is niet geraakt; het id in de body is genegeerd');
   const vanA = await api('/api/mijn/abonnement', {}, a.token);
-  assert.equal(vanA.body.abonnement.stand, 'OPZEGGEND', 'en dat van A staat wel op opzeggend');
+  assert.equal(vanA.body.abonnement.stand, 'ACTIEF', 'ook A wordt niet onbedoeld opgezegd');
+  const eigen = (await api('/api/mijn/abonnement/opzegvoorbeeld', {}, a.token)).body;
+  assert.equal((await api('/api/mijn/abonnement/opzeggen', { ...eigen, id: b.aanmeldingId }, a.token)).status, 200);
 });
 
 test('3. de kantoorroute blijft dicht voor een lid', async () => {
@@ -114,11 +118,31 @@ test('5. twee tikken over de route zijn geen twee opzeggingen', async () => {
   const office = await kantoorAlsPersoon(base, 'RTG-OFFICE');
   const lid = await lidMetAbonnement(office);
 
-  const een = await api('/api/mijn/abonnement/opzeggen', {}, lid.token);
+  const voorbeeld = (await api('/api/mijn/abonnement/opzegvoorbeeld', {}, lid.token)).body;
+  const een = await api('/api/mijn/abonnement/opzeggen', voorbeeld, lid.token);
   assert.equal(een.status, 200);
   assert.equal(een.body.alOpgezegd, false);
-  const twee = await api('/api/mijn/abonnement/opzeggen', {}, lid.token);
+  const twee = await api('/api/mijn/abonnement/opzeggen', voorbeeld, lid.token);
   assert.equal(twee.status, 200, 'de tweede is geen fout');
   assert.equal(twee.body.alOpgezegd, true);
   assert.equal(twee.body.eindigtOp, een.body.eindigtOp, 'en dezelfde einddatum');
+});
+
+test('6. oude bevestiging na een nieuwe afspraak wijzigt geen contract of pas', async () => {
+  const office = await kantoorAlsPersoon(base, 'RTG-OFFICE');
+  const lid = await lidMetAbonnement(office);
+  const oud = (await api('/api/mijn/abonnement/opzegvoorbeeld', {}, lid.token)).body;
+  const a = (await api('/api/aanmelding/aanvraag', { idem: randomUUID(), pas: 'rtg',
+    naam: 'Vervolgafspraak', contact: 'vervolg@example.test' }, lid.token)).body;
+  const besluit = await api('/api/aanmelding/beslis', { id: a.ontvangst.aanvraagId, besluit: 'geaccepteerd' }, office);
+  assert.equal(besluit.status, 200);
+  const nieuw = (await api('/api/mijn/abonnement', {}, lid.token)).body.abonnement;
+  assert.notEqual(nieuw.contractId, oud.contractId);
+  assert.equal((await api('/api/mijn/abonnement/opzeggen', oud, lid.token)).status, 409);
+  for (const wanneer of ['nu', 'einde'])
+    assert.equal((await api('/api/mijn/pas/gast', { ...oud, wanneer }, lid.token)).status, 409);
+  const na = await api('/api/mijn/abonnement', {}, lid.token);
+  assert.equal(na.status, 200, 'de sessie blijft bruikbaar');
+  assert.equal(na.body.abonnement.contractId, nieuw.contractId);
+  assert.equal(na.body.abonnement.stand, 'ACTIEF');
 });

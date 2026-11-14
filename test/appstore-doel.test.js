@@ -73,8 +73,9 @@ async function publiceer(over) {
 test.before(async () => {
   srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   base = srv.base;
-  lid = (await api('/api/auth/register', { name: 'Doel Lid', email: 'doel@x.nl', phone: '0612345674',
-    password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' })).body.token;
+  /* Deze toets installeert een app van derden en heeft dus bewust de betaalde
+     RTG Pass nodig. Registratie maakt terecht alleen een gratis account. */
+  lid = (await api('/api/login', { tier: 'rtg', pasApp: 'rtg' })).body.token;
   office = (await api('/api/office/login', { code: 'RTG-OFFICE' })).body.token;
   /* DE TEKENAAR IS EEN MENS OP NAAM: de gedeelde code met een getypte naam
      tekent geen app meer af (kern/appstore/vierogen.js, 11 oktober 2026). */

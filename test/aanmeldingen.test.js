@@ -12,16 +12,22 @@ function maak() {
   return require('../server/kern/aanmeldingen')({ db, save: () => {}, crypto, schoon, geldPasprijzen }).aanmeldingen;
 }
 
-test('een aanmelding krijgt automatisch de hele reis en wacht op de mens', () => {
+test('een aanmelding krijgt automatisch uitleg, geen uitgevoerd akkoord of betaling', () => {
   const a = maak();
   const r = a.aanvraag({ pas: 'rtg', naam: 'Amber', contact: 'amber@example.com' });
   assert.equal(r.ok, true);
   assert.equal(r.aanmelding.status, 'in behandeling');
-  // de zes geautomatiseerde stappen staan er en zijn allemaal door de AI gedaan
+  // De zes berichten zijn klaargezet; dit zegt niets over uitvoering of akkoord.
   const ids = r.aanmelding.reis.map(s => s.id);
   for (const stap of ['welkom', 'onboarding', 'rondleiding', 'rtf', 'security', 'privacy'])
     assert.ok(ids.includes(stap), stap + ' zit in de reis');
   assert.ok(r.aanmelding.reis.every(s => s.auto === true), 'elke stap is geautomatiseerd');
+  assert.ok(r.aanmelding.reis.every(s => s.status === 'uitleg'));
+  const onboarding = r.aanmelding.reis.find(s => s.id === 'onboarding');
+  assert.match(onboarding.tekst, /nog geen akkoord, ondertekening of betaling/);
+  assert.doesNotMatch(onboarding.tekst, /onboarding rond|hebben je .*akkoord/);
+  assert.equal(a.contracten.lijst().length, 0, 'uitleg sluit geen overeenkomst');
+  assert.equal(a.betalingen().aantalLeden, 0, 'uitleg maakt geen betaaltermijnen');
 });
 
 test('de toon draait mee met de pas (je voor RTG, u voor Business)', () => {
@@ -73,7 +79,7 @@ test('alleen een mens (met naam) beslist; de AI kan Lifestyle/Business nooit toe
     'en zeker niet de oude verzonnen naam die elk besluit droeg');
 });
 
-test('na accepteren loopt de betaling 12 maanden automatisch met de 30%-split', () => {
+test('na accepteren worden 12 maandtermijnen gepland met de 30%-split, niet betaald', () => {
   const a = maak();
   const life = a.aanvraag({ pas: 'lifestyle', naam: 'Gast' }).aanmelding;
   /* De Lifestyle Pass is contractueel (kern/pasladder.js): er is geen
@@ -86,6 +92,7 @@ test('na accepteren loopt de betaling 12 maanden automatisch met de 30%-split', 
   const lid = bet.lidmaatschappen[0];
   assert.equal(lid.termijnen.length, 12, '12 maandtermijnen');
   const t1 = lid.termijnen[0];
+  assert.equal(t1.status, 'gepland', 'een betaalschema is geen incassobewijs');
   assert.equal(t1.bedrag, 20000);        // Lifestyle 20.000 ex btw p/m
   assert.equal(t1.foundation, 6000);     // 30%
   assert.equal(t1.lokaal, 4000);         // 20%

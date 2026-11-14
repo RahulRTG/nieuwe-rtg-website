@@ -32,8 +32,13 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const { startServer, stop, keurLidGoed } = require('./helper');
 const fs = require('fs'); const os = require('os'); const path = require('path');
+const historischAccount = require('./lib/historisch-account');
 
-function verseDataDir() { return fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-lidfac-')); }
+function verseDataDir() {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-lidfac-'));
+  historischAccount(dir, { email: 'historisch-factuurlid@example.test', name: 'Bestaand factuurlid', tier: 'rtg', phone: '0612345678' });
+  return dir;
+}
 async function api(base, pad, body, token) {
   const h = { 'Content-Type': 'application/json' }; if (token) h.Authorization = 'Bearer ' + token;
   const r = await fetch(base + pad, { method: 'POST', headers: h, body: JSON.stringify(body || {}) });
@@ -46,13 +51,13 @@ async function afhaalQr(base, ref, token) {
   assert.equal(r.status, 200, JSON.stringify(r.body).slice(0, 200));
   return r.body.code;
 }
-async function registreer(base, naam) {
-  const u = Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
-  const r = (await api(base, '/api/auth/register', {
-    name: naam || 'Factuur Lid', email: u + '@x.nl',
-    phone: '06' + u.replace(/\D/g, '').padEnd(8, '1').slice(0, 8),
-    password: 'geheim123', geboortedatum: '1990-01-01', tier: 'business', pasApp: 'business'
-  })).body;
+async function bestaandLid(base) {
+  const login = await api(base, '/api/auth/login', {
+    login: 'historisch-factuurlid@example.test', password: 'geheim123', pasApp: 'rtg'
+  });
+  assert.equal(login.status, 200, JSON.stringify(login.body));
+  const r = login.body;
+  assert.equal(r.state.user.tier, 'rtg');
   // achteraf betalen geldt alleen voor een geverifieerde volwassene
   await keurLidGoed(base, r.token, r.state.user.codename, '1990-01-01');
   return r.token;
@@ -126,7 +131,7 @@ test('1. een betaalde bestelling in de app levert precies EEN factuur op, op de 
   const TMP = verseDataDir();
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   try {
-    const lid = await registreer(base);
+    const lid = await bestaandLid(base);
     const mgr = await managerVan(base, 'KIKUNOI');
     const item = await eersteItem(base, lid, 'KIKUNOI');
 
@@ -165,7 +170,7 @@ test('2. de gezamenlijke rekening geeft een factuur PER BON, en de fooi staat er
   try {
     const mgr = await managerVan(base, 'KIKUNOI');
     await api(base, '/api/supplier/settings', { code: 'KIKUNOI', opties: { betaalVooraf: false } }, mgr);
-    const lid = await registreer(base);
+    const lid = await bestaandLid(base);
     const item = await eersteItem(base, lid, 'KIKUNOI');
 
     const r1 = await api(base, '/api/order', { supplierCode: 'KIKUNOI', items: [{ id: item, qty: 1 }], table: '7' }, lid);
@@ -197,7 +202,7 @@ test('3. een betaalde boeking en een betaalde rit leveren allebei een factuur op
   const TMP = verseDataDir();
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   try {
-    const lid = await registreer(base);
+    const lid = await bestaandLid(base);
 
     // een dienst boeken bij een zelfstandige
     const mgrB = await managerVan(base, 'CASTELL');
@@ -231,7 +236,7 @@ test('4. de balie int een onbetaalde bon op de ophaalcode: een factuur, en de be
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   try {
     const mgr = await managerVan(base, 'KIKUNOI');
-    const lid = await registreer(base);
+    const lid = await bestaandLid(base);
     const item = await eersteItem(base, lid, 'KIKUNOI');
     const o = await api(base, '/api/order', { supplierCode: 'KIKUNOI', items: [{ id: item, qty: 1 }], naarKassa: true }, lid);
     assert.equal(o.status, 200);
@@ -266,7 +271,7 @@ test('5. een bon die al in de app is betaald, wordt aan de balie NIET nog eens g
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   try {
     const mgr = await managerVan(base, 'KIKUNOI');
-    const lid = await registreer(base);
+    const lid = await bestaandLid(base);
     const item = await eersteItem(base, lid, 'KIKUNOI');
     const o = await api(base, '/api/order', { supplierCode: 'KIKUNOI', items: [{ id: item, qty: 1 }] }, lid);
     const ref = o.body.order.ref;
@@ -300,7 +305,7 @@ test('6. een tafelticket in een keer afrekenen factureert elke bon aan de tafel 
     const mgr = await managerVan(base, 'KIKUNOI');
     await api(base, '/api/supplier/settings', { code: 'KIKUNOI', opties: { betaalVooraf: false } }, mgr);
     const tafel = '7';
-    const lid = await registreer(base);
+    const lid = await bestaandLid(base);
     const item = await eersteItem(base, lid, 'KIKUNOI');
     const r1 = await api(base, '/api/order', { supplierCode: 'KIKUNOI', items: [{ id: item, qty: 1 }], table: tafel }, lid);
     const r2 = await api(base, '/api/order', { supplierCode: 'KIKUNOI', items: [{ id: item, qty: 3 }], table: tafel }, lid);
@@ -348,7 +353,7 @@ test('6b. een tafelticket op contant telt de maandboekhouding NIET dubbel', asyn
     const mgr = await managerVan(base, 'KIKUNOI');
     await api(base, '/api/supplier/settings', { code: 'KIKUNOI', opties: { betaalVooraf: false } }, mgr);
     const tafel = '9';
-    const lid = await registreer(base);
+    const lid = await bestaandLid(base);
     const item = await eersteItem(base, lid, 'KIKUNOI');
     const r1 = await api(base, '/api/order', { supplierCode: 'KIKUNOI', items: [{ id: item, qty: 2 }], table: tafel }, lid);
     const r2 = await api(base, '/api/order', { supplierCode: 'KIKUNOI', items: [{ id: item, qty: 1 }], table: tafel }, lid);
@@ -486,7 +491,7 @@ test('7. de btw-aangifte komt uit op de omzet die de maandboekhouding telt', asy
   try {
     const mgr = await managerVan(base, 'KIKUNOI');
     await tweeTarieven(base, mgr);
-    const lid = await registreer(base);
+    const lid = await bestaandLid(base);
     const item = await eersteItem(base, lid, 'KIKUNOI');
     /* En een BAR-artikel, want de boekhouding telt de bar apart tegen het
        standaardtarief. Zonder een tweede tarief in deze toets zou een factuur
@@ -649,7 +654,7 @@ test('9. een bon die met een cadeaukaart wordt betaald: aangifte en boekhouding 
   try {
     const mgr = await managerVan(base, 'KIKUNOI');
     await tweeTarieven(base, mgr);
-    const lid = await registreer(base);
+    const lid = await bestaandLid(base);
     const kaartMenu = (await api(base, '/api/supplier/menu/get', { code: 'KIKUNOI' }, lid)).body;
     const eten = (kaartMenu.menu || []).find(x => x.station !== 'bar');
     const bar = (kaartMenu.menu || []).find(x => x.station === 'bar');

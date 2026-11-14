@@ -35,7 +35,7 @@
    de suite (routes/member/bureau.js). */
 'use strict';
 
-module.exports = ({ db, save, bewerkCollectie, crypto, anthropic, liveCodename, notify, notifySupplier, bezitZet, levensgraaf }) => {
+module.exports = ({ db, save, bewerkCollectie, crypto, anthropic, liveCodename, notify, notifySupplier, bezitZet, levensgraaf, magDienst }) => {
   const nu = () => new Date().toISOString();
   const rid = () => crypto.randomBytes(4).toString('hex');
   const schoon = (t, n) => String(t == null ? '' : t).replace(/[<>]/g, '').trim().slice(0, n || 200);
@@ -56,7 +56,7 @@ module.exports = ({ db, save, bewerkCollectie, crypto, anthropic, liveCodename, 
   const orkMod = require('./orkestratie')({ graaf: graafMod.graaf,
     cases: (k) => casesMod.cases(k), beoordeel: delegatieMod.beoordeel, rid,
     inAanbouw: kamersMod.inAanbouw });
-  const casesMod = require('./cases')({ db, save, nu, rid, schoon, liveCodename, notify,
+  const casesMod = require('./cases')({ db, save, nu, rid, schoon, liveCodename, notify, magDienst,
     beoordeel: delegatieMod.beoordeel, deelopdrachten: orkMod.deelopdrachten, bezitZet });
   // Alleen de API-opdracht krijgt een duurzame bedoeling. Interne callers
   // houden hun bestaande synchrone caseOpen-contract.
@@ -66,7 +66,7 @@ module.exports = ({ db, save, bewerkCollectie, crypto, anthropic, liveCodename, 
       const ork = require('./orkestratie')({ graaf: graafMod.graaf,
         cases: k => casesMod.cases(k), beoordeel: d.beoordeel, rid, inAanbouw: kamersMod.inAanbouw });
       return require('./cases')({ levens, save: () => {}, nu, rid, schoon,
-        liveCodename, notify, beoordeel: d.beoordeel, deelopdrachten: ork.deelopdrachten, bezitZet });
+        liveCodename, notify, magDienst, beoordeel: d.beoordeel, deelopdrachten: ork.deelopdrachten, bezitZet });
     } });
   /* De concierge-lus (CONCIERGE.md) op dezelfde zaken: geen tweede wachtrij,
      een tweede werkwijze. ./lus-regels.js rekent, ./lus.js en ./lus-wens.js

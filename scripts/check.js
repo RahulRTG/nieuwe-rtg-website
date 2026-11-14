@@ -3513,6 +3513,7 @@ console.log('\n47) saveDuurzaam() staat alleen waar duurzaamheid vóór bevestig
     ['server/db/index.js', 'draagt de vlag van de aanroeper door naar de bundel; kiest zelf niets'],
     ['scripts/check.js', 'deze regel zelf noemt zijn naam'],
     ['test/saveduurzaam.test.js', 'de toets die bewijst dat hij bevestigt'],
+    ['test/memberfactuur-basis.test.js', 'legt uitsluitend de historische contractfixture vast in een test-tempmap, voor de HTTP-proef van eigen factuurtoegang na contractafloop; geen nieuwe productaanroeper'],
     ['test/sqlite-duurzaam-sync.test.js', 'bewijst FULL vóór dezelfde atomaire commit, fouten zonder schijnsucces en duurzame herhaling zonder dubbel effect'],
     ['test/sqlite-noop-barriere.test.js', 'bewijst de echte FULL-noopbarrière met een actieve actuele lezer en behoud van de TRUNCATE-backupgrens'],
     ['test/geldbeleid-opslagvlak.test.js', 'bewijst eigenaargerichte geldbeleidopslag binnen dezelfde duurzame buitenbundel, echte FULL-noopbarrières en fouten zonder vals succes; geen nieuwe productaanroeper'],

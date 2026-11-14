@@ -11,9 +11,11 @@
    Draai los: node --test test/geldbeleid.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
+const fs = require('node:fs'), os = require('node:os'), path = require('node:path');
 const { startServer, stop, binnenEenDag } = require('./helper');
 
 let srv, base;
+const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-geldbeleid-'));
 
 /* Status en lichaam samen terug: de foutpaden hieronder beweren een EXACTE
    statuscode, en een helper die alleen het lichaam geeft zou een 500 met een
@@ -37,18 +39,18 @@ const MINI_PNG = 'data:image/png;base64,' +
 let teller = 0;
 async function versLid() {
   const t = Date.now() + '-' + (teller++);
-  const r = await api('/api/auth/register', {
-    name: 'Beleid Toets', email: 'geldbeleid-' + t + '@toets.example',
-    password: 'geheim123', geboortedatum: '1985-05-05', tier: 'rtg'
-  });
-  assert.ok(r.body.token, 'registreren hoort een token te geven, kreeg: ' + JSON.stringify(r.body).slice(0, 160));
+  const email = 'geldbeleid-' + t + '@toets.example';
+  require('./lib/historisch-account')(TMP, { name: 'Beleid Toets', email,
+    password: 'geheim123', tier: 'rtg' });
+  const r = await api('/api/auth/login', { login: email, password: 'geheim123', pasApp: 'rtg' });
+  assert.ok(r.body.token, 'het historische regressielid hoort een token te geven, kreeg: ' + JSON.stringify(r.body).slice(0, 160));
   const kyc = await api('/api/verify/upload', { image: MINI_PNG }, r.body.token);
   assert.equal(kyc.status, 200, 'het paspoort hoort aangenomen te worden: ' + JSON.stringify(kyc.body).slice(0, 160));
   return r.body.token;
 }
 
-test.before(async () => { srv = await startServer({ env: { SMTP_URL: '' } }); base = srv.base; });
-test.after(() => stop(srv));
+test.before(async () => { srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } }); base = srv.base; });
+test.after(() => { stop(srv); try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {} });
 
 /* 1a. De harde grens van GELD.md par. 3: geld verlaat het huis nooit
    autonoom, dus 'automatisch' bestaat uitsluitend voor de maandelijkse

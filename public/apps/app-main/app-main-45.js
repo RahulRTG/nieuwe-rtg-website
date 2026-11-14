@@ -21,8 +21,7 @@
   /* ---------- reizen ---------- */
 
   function renderTrip(){
-    /* Nog geen reis: dan staat hier wat een reisoverzicht IS en hoe het ontstaat.
-       Een nieuw account begint leeg en erft de demo-reis niet meer. */
+    // Geen reis: uitleg, nooit geerfde demo-inhoud.
     if (!trip){
       $('#tripSub').textContent = T('app.trip.emptysub','Uw reisoverzicht is nog leeg.');
       const uitleg = (k, kop, tekst) =>
@@ -47,9 +46,8 @@
     renderAgenda();
   }
 
-  /* de reisagenda: alles met een datum (tafels, tickets, ritten, events)
-     automatisch samengevoegd tot een dagprogramma onder de reis */
-  const AGENDA_ICO = {};  // geen emoji-markers meer; alle items dragen het rustige '·'
+  /* Reisagenda: het dagprogramma onder de reis. */
+  const AGENDA_ICO = {};
   async function renderAgenda(){
     if (!API.live) return;
     let wrap = $('#agendaWrap');
@@ -87,6 +85,9 @@
       const data = await API.call('/api/pay', target === 'all' ? {all:true} : {invoiceId: target});
       foundation = data.foundation;
       applyState(data.state);
+      // Een gestart betaalverzoek is nog geen betaling. De server houdt de
+      // factuur open tot providerbewijs is verwerkt; de app vertelt hetzelfde.
+      if (data.pending || (data.intents && data.intents.length)) return { pending: true };
     } else {
       const targets = target === 'all' ? invoices.filter(i => i.status === 'open') : invoices.filter(i => i.id === target);
       for (const inv of targets){
@@ -106,12 +107,20 @@
     const pw = $('#paywait'), card = pw.querySelector('.paycard');
     $('#payAmt').textContent = amount;
     $('#payIcon').innerHTML = FID.replace(/currentColor/g, '#0C0C0B');
-    $('#payLbl').textContent = T('app.payingfid','Betalen met Face ID…');
+    $('#payLbl').textContent = T('app.paymentprocessing','Betaling verwerken…');
     card.classList.add('scanning'); card.classList.remove('done');
     pw.classList.add('open');
     setTimeout(async () => {
       try {
         const result = await doPay();
+        if (result && result.pending) {
+          card.classList.remove('scanning');
+          pw.classList.remove('open');
+          payBusy = false;
+          toast(T('app.paymentpending','Nog niet betaald: de betaalprovider wacht op bevestiging. Uw factuur blijft open.'));
+          renderPay(); renderHome(); renderTrip();
+          return;
+        }
         card.classList.remove('scanning'); card.classList.add('done');
         $('#payIcon').innerHTML = CHECK;
         $('#payLbl').textContent = T('app.confirmed','Bevestigd');
@@ -119,7 +128,7 @@
           pw.classList.remove('open');
           payBusy = false;
           if (opts.message) toast(opts.message(result));
-          else { toast(T('app.paid','Betaald') + '. ' + eur(result) + ' ' + T('app.tofoundation','gaat naar de RTFoundation.')); renderPay(); renderHome(); renderTrip(); }
+          else { toast(T('app.paid','Betaald') + (result > 0 ? '. ' + eur(result) + ' ' + T('app.foundationreserved','gereserveerd voor de RTFoundation.') : '.')); renderPay(); renderHome(); renderTrip(); }
           if (opts.after) opts.after(result);
         }, 700);
       } catch (e) {
@@ -131,9 +140,7 @@
   }
 
   /* ---------- betalen met munten (crypto) ----------
-     Kies een munt, ontvang het exacte bedrag en een adres. RTG zet de munten via
-     een vergunninghoudende aanbieder meteen om naar euro; wij houden zelf geen
-     crypto vast. Zodra het netwerk bevestigt, zetten we de factuur op betaald. */
+     Bedrag en adres via de aanbieder; pas betaald na netwerkbevestiging. */
   let muntPoll = null;
   function muntStop(){ if (muntPoll){ clearInterval(muntPoll); muntPoll = null; } }
   // cfg: { euro, titel, maak: async(munt)=>verzoek, klaar?: async()=>bool }

@@ -1,27 +1,27 @@
 {
  "stempel": {
-  "op": "2026-11-12T22:01:04.472Z",
-  "commit": "b99fd4c8ab",
+  "op": "2026-11-14T04:28:43.995Z",
+  "commit": "74e9ff92c",
   "boomVuil": false,
-  "boomAnders": 9,
+  "boomAnders": 0,
   "instrument": "scripts/mutatiecontract.js",
-  "node": "v26.12.1"
+  "node": "v24.18.0"
  },
  "uitleg": "Per schrijfroute vijf assen: semantiek (kern/mutatie.js), duplicaatgedrag (lib/idemsleutels.js), bewijs (IDEMPROEF.json), toegang en stand (kern/mutatiecontract.js). Afgeleid uit die bronnen; alleen de BEDOELING komt uit server/lib/mutatiecontracten.js, want die is geen waarneming.",
  "grens": "Een stand wordt nooit afgeleid uit bewijs. Het bewijs draagt hooguit een VOORSTEL; de stand komt uit een verklaring van een mens. Zonder die regel staat dit register binnen een uur op 100% en weet niemand meer wat dat betekent.",
  "gemeten": {
-  "totaal": 5440,
-  "geclassificeerd": 5440,
+  "totaal": 5446,
+  "geclassificeerd": 5446,
   "perStand": {
    "BLOCKED_BY_TEST_FIXTURE": 3163,
-   "NOT_APPLICABLE": 1308,
-   "PROTECTED": 743,
+   "NOT_APPLICABLE": 1309,
+   "PROTECTED": 748,
    "INTENTIONALLY_NON_IDEMPOTENT": 226
   },
-  "vastgesteldDoorMens": 2329,
+  "vastgesteldDoorMens": 2335,
   "afgeleidDoorScript": 3111,
   "toegangWaargenomen": {
-   "AUTHENTICATED": 4526,
+   "AUTHENTICATED": 4532,
    "PUBLIC": 85,
    "OBJECT_SCOPED": 788,
    "(niet af te leiden -- vraagt een verklaring)": 25,
@@ -32,7 +32,7 @@
    "kale ronde: beschermd": 138,
    "kale ronde: onbeschermd": 128,
    "kale ronde: geen uitspraak": 4881,
-   "niet gemeten": 293
+   "niet gemeten": 299
   },
   "voorstellen": {},
   "metingVan": "2026-09-29T18:39:11.935Z"
@@ -57016,6 +57016,132 @@
     "hindernis": null
    },
    "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "abonnementen.aanbod",
+   "route": "POST /api/mijn/abonnement/automatisch/aanbod",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "abonnementen.betalen",
+   "route": "POST /api/mijn/abonnement/automatisch/betalen",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "abonnementen.herstel",
+   "route": "POST /api/mijn/abonnement/automatisch/herstel",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "abonnementen.intrekken",
+   "route": "POST /api/mijn/abonnement/automatisch/intrekken",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "abonnementen.stand",
+   "route": "POST /api/mijn/abonnement/automatisch/stand",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "abonnementen.teken",
+   "route": "POST /api/mijn/abonnement/automatisch/teken",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
    "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null

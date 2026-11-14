@@ -42,13 +42,16 @@ module.exports = ({ db, bewerkCollectie, crypto, nu }) => {
   /* Een nieuwe kaart. `idem` maakt een herhaling (dubbeltik, retry na een
      crash) tot DEZELFDE kaart -- maar zonder code: die is een keer getoond, en
      wie hem kwijt is, roteert. */
-  function uitgeef({ supplierCode, supplierName, bedrag, kocht, customerKey, issuer, idem }) {
+  function uitgeef({ supplierCode, supplierName, bedrag, kocht, customerKey, issuer, idem, magNieuweUitgifte }) {
     const s = sleutel(idem);
     const idemHash = s ? afdruk('gc-uitgifte-v1|' + supplierCode + '|' + (customerKey || '') + '|' + s) : null;
     return transactie(bron => {
       const eerder = idemHash ? bron.find(g => g && g.uitgifte_idem === idemHash) : null;
       if (eerder) return { ok: true, herhaald: true, codeGetoond: false, kaart: naarBuiten(eerder),
         uitleg: 'De code is alleen bij de eerste keer getoond. Kwijt? Vraag een nieuwe code aan; de oude vervalt dan.' };
+      // Servercallback na de ontvangst: herstel van al uitgegeven waarde blijft open.
+      if (magNieuweUitgifte && magNieuweUitgifte() === false)
+        return require('./aanmeldingen/abonnementsdiensten').fout();
       const kaart = { id: 'GC' + crypto.randomBytes(8).toString('hex'), supplierCode, supplierName,
         bedrag, saldo: bedrag, herkomst: issuer, kocht, customerKey: customerKey || null, at: nu(), verzilveringen: [],
         uitgifte_idem: idemHash, historie: [] };
@@ -153,4 +156,3 @@ module.exports = ({ db, bewerkCollectie, crypto, nu }) => {
     mijn: na(mijn), kijk, naarBuiten, codeHash, zorg: migratie.zorg, migreer: migratie.migreer,
     DOEL, SCOPE, GELDIG_MS, MAX_GEBRUIK };
 };
-

@@ -1,4 +1,4 @@
-/* Kern-module "aanmeldingen": de aanmelding voor een pas, per pas geheel
+/* Kern-module "aanmeldingen": de historische aanmelding voor een pas, per pas geheel
    geautomatiseerd -- BEHALVE de beslissing. Alles wat een mens vroeger met de
    hand deed rond een nieuwe aanmelding (de eerste berichten, de onboarding-uitleg,
    de rondleiding door het systeem, de uitleg over de RTFoundation, en de uitleg
@@ -12,12 +12,19 @@
    kennen: beslis() met een menselijke naam. Er is geen automatische toekenning.
    RTG Pass mag door iedereen worden aangevraagd (na de AI-intake), maar ook die
    aanvraag legt de app netjes op de stapel; het personeel zet de definitieve
-   ja of nee. Opslag: de collectie aanmeldingen. */
+   ja of nee. Opslag: de collectie aanmeldingen.
+
+   De expliciet vrijgegeven nieuwe abonnementsroute voegt versiegebonden
+   klantinstemming en aantoonbare betaling toe. RTG/Lite kennen daar automatische
+   toelating; Business/Lifestyle houden het menselijke besluit. De oude route
+   en bestaande rechten worden niet stilzwijgend gemigreerd. */
 
 const { PASSEN, REIS } = require('./aanmeldingen/catalogus');
 
-module.exports = ({ db, save, crypto, schoon, geldPasprijzen, accounts, meldLid, bewerkCollectie }) => {
-  const nu = () => new Date().toISOString();
+module.exports = ({ db, save, crypto, schoon, geldPasprijzen, accounts, meldLid, bewerkCollectie,
+  betaal, betaalWaarheid, abonnementenBeschikbaar = false, abonnementReturnUrl }) => {
+  const nu = () => new Date(require('../lib/klok').nu()).toISOString();
+  const zelfservice = abonnementenBeschikbaar === true && !!betaal && !!betaalWaarheid && !!abonnementReturnUrl;
   const rid = () => crypto.randomBytes(4).toString('hex');
   const kap = (t, n) => schoon(String(t == null ? '' : t), n || 200);
   const eur = c => Math.round(c) / 100;
@@ -29,10 +36,10 @@ module.exports = ({ db, save, crypto, schoon, geldPasprijzen, accounts, meldLid,
   /* Het betaalschema (de 12 maandtermijnen met de 30%-foundation-split en het
      kantooroverzicht) draait als submodule op dezelfde context; zie
      aanmeldingen/betaalschema.js. */
-  const { startBetalingen, betalingen, verlengLidmaatschap, zegOpLidmaatschap, contracten } = require('./aanmeldingen/betaalschema')({ B, geldPasprijzen, rid, nu, eur, PASSEN, db, save });
+  const { startBetalingen, betalingen, verlengLidmaatschap, zegOpLidmaatschap, contracten } = require('./aanmeldingen/betaalschema')({ B, geldPasprijzen, rid, nu, eur, PASSEN, db, save, bewerkCollectie });
   /* De ondernemersintake en de automatische bedrijfsprovisioning na de
      eerste voldane termijn; zie aanmeldingen/bedrijf.js. */
-  const bedrijfMod = require('./aanmeldingen/bedrijf')({ db, save, kap, nu, accounts });
+  const bedrijfMod = require('./aanmeldingen/bedrijf')({ db, save, kap, nu, accounts, bewerkCollectie });
   const vind = id => A().find(a => a.id === String(id || ''));
 
   /* De aanvraagkant staat apart: hoe een aanmelding ONTSTAAT en hoe hij eruit
@@ -50,7 +57,11 @@ module.exports = ({ db, save, crypto, schoon, geldPasprijzen, accounts, meldLid,
      kan nabootsen. Toegang tot Lifestyle/Business ontstaat UITSLUITEND hier. */
   // Het menselijke besluit (accepteren/afwijzen, en het optillen van de pas)
   // staat in ./aanmeldingen/besluit.js; zie de kop daar waarom apart.
-  const { beslis } = require('./aanmeldingen/besluit')({ vind, beeld, kap, nu, accounts, save, startBetalingen, PASSEN });
+  const { beslis } = require('./aanmeldingen/besluit')({ vind, beeld, kap, nu, accounts, save, startBetalingen, PASSEN,
+    zelfservice, organisatieVoor: require('./tenant/lezen')({ db }).haal });
+  const automatisch = require('./aanmeldingen/abonnementen')({ db, accounts, bewerkCollectie, betaal, betaalWaarheid,
+    beschikbaar: zelfservice, returnUrl: abonnementReturnUrl, nu,
+    provisioneer: id => bedrijfMod.provisioneerAutomatisch(id) });
 
   /* Seam voor de AI-laag: mag deze PAS automatisch worden toegekend? Nooit, voor
      geen enkele pas. Zo kan geen assistent per ongeluk toegang beloven.
@@ -103,5 +114,5 @@ module.exports = ({ db, save, crypto, schoon, geldPasprijzen, accounts, meldLid,
   };
 
   return { aanmeldingen: Object.assign({ aanvraag, lijst, een, beslis, betalingen, verlengLidmaatschap, zegOpLidmaatschap, contracten,
-    termijnVoldaan, magAutomatischToekennen, PASSEN, lidAbonnement, naarGast }, klaarzetten, bedoeling) };
+    termijnVoldaan, magAutomatischToekennen, PASSEN, lidAbonnement, naarGast, automatisch }, klaarzetten, bedoeling) };
 };

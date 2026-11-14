@@ -19,7 +19,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, maakBetaaldRtgTestaccount } = require('./helper');
 
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-mobontvangst-'));
 const ZAAK = 'MKKX';
@@ -37,8 +37,11 @@ async function moet(pad, body, token, wat) {
 }
 async function nieuwLid(naam) {
   const u = Date.now().toString().slice(-8) + Math.floor(Math.random() * 10);
-  return (await api('/api/auth/register', { name: naam, email: naam.toLowerCase() + u + '@x.nl',
-    phone: '06' + u.slice(-8), password: 'geheim123', geboortedatum: '1990-05-05', tier: 'rtg', pasApp: 'rtg' })).body.token;
+  const email = naam.toLowerCase() + u + '@x.nl';
+  const token = (await api('/api/auth/register', { name: naam, email,
+    phone: '06' + u.slice(-8), password: 'geheim123', geboortedatum: '1990-05-05', pasApp: 'rtg' })).body.token;
+  maakBetaaldRtgTestaccount(TMP, email);
+  return token;
 }
 const beeld = async () => (await moet('/api/mob/volg', { ref: RIT }, lid, 'volgen')).opdracht;
 

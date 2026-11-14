@@ -23,7 +23,7 @@
 
 const ladder = require('../pasladder');
 
-module.exports = ({ vind, beeld, kap, nu, accounts, save, startBetalingen, PASSEN }) => {
+module.exports = ({ vind, beeld, kap, nu, accounts, save, startBetalingen, PASSEN, zelfservice = false, organisatieVoor }) => {
   function beslis(id, besluit, door, notitie, opties) {
     const a = vind(id); if (!a) return { status: 404, error: 'Deze aanmelding bestaat niet.' };
     if (a.status !== 'in behandeling') return { status: 409, error: 'Over deze aanmelding is al beslist (' + a.status + ').' };
@@ -34,11 +34,22 @@ module.exports = ({ vind, beeld, kap, nu, accounts, save, startBetalingen, PASSE
        voor iedereen open) noteren we eerlijk dat het via de gedeelde code ging
        -- beter een spoor dat "we weten het niet" zegt dan een spoor dat een
        persoon verzint. Zie test/aanmeldbesluit.test.js. */
-    const anoniem = !door || kap(door, 60).length < 2;
+    const anoniem = !door || kap(door, 60).length < 2 || /gedeelde code|RTG-personeel|^AI$|getekend en betaald contract/i.test(String(door).trim());
     if (anoniem && (a.pas === 'lifestyle' || a.pas === 'business'))
       return { status: 403, error: 'Een ' + (a.pas === 'business' ? 'Business' : 'Lifestyle') +
         ' Pass wordt alleen toegekend door een herleidbaar persoon. Log in met je eigen RTG-account (gekoppeld aan de backoffice) in plaats van met de gedeelde kantoorcode.' };
     const wie = anoniem ? 'backoffice (gedeelde code)' : kap(door, 60);
+    let organisatie = null;
+    if (zelfservice && a.pas === 'business' && besluit === 'geaccepteerd') {
+      const code = String((opties || {}).organisatie || '').trim().toUpperCase();
+      const t = typeof organisatieVoor === 'function' && organisatieVoor(code);
+      if (!/^[A-Z0-9][A-Z0-9-]{1,30}$/.test(code) || !t || t.org !== code || t.actief === false ||
+          t.levensloop && t.levensloop.stand !== 'actief')
+        return { status: 409, error: 'Kies de bestaande actieve organisatie die bij deze menselijke Business-toelating hoort. Een oude toelating zonder organisatie wordt niet automatisch omgezet.' };
+      if (!Number.isSafeInteger(a.accountId) || !accounts || !accounts.getUserById(a.accountId))
+        return { status: 409, error: 'Business-toelating moet aan het eigen bestaande account van de aanvrager zijn gebonden.' };
+      organisatie = t.org;
+    }
 
     /* DE CONTRACTPRIJS. Business en Lifestyle dragen geen bedrag in de
        prijslijst (kern/pasladder.js): hun hoogte spreek je per klant af. Tot
@@ -57,35 +68,38 @@ module.exports = ({ vind, beeld, kap, nu, accounts, save, startBetalingen, PASSE
        enige plek die weet wat mag. Een tweede kopie van "minimaal 5.000" is
        precies hoe deze codebase eerder drie verschillende pasprijzen kreeg. */
     let contract = null;
-    if (besluit === 'geaccepteerd' && ladder.trede(a.pas) && ladder.trede(a.pas).contractueel) {
+    if (besluit === 'geaccepteerd' && ladder.trede(a.pas) && ladder.trede(a.pas).contractueel &&
+        !(zelfservice && a.pas === 'lifestyle')) {
       const euro = Number((opties || {}).contractEuro);
       if (!Number.isFinite(euro))
         return { status: 400, error: 'De ' + (PASSEN[a.pas] || {}).naam + ' heeft geen lijstprijs: noteer het afgesproken maandbedrag (vanaf ' +
           ladder.euro(ladder.bodemCentenVan(a.pas)) + ' ex btw) bij dit besluit.' };
       const centen = Math.round(euro * 100);
-      if (centen < ladder.bodemCentenVan(a.pas))
+      const bodem = zelfservice ? ladder.trede(a.pas).nieuwAanbod.bodemCenten : ladder.bodemCentenVan(a.pas);
+      if (centen < bodem)
         return { status: 400, error: (PASSEN[a.pas] || {}).naam + ' kost minimaal ' +
-          ladder.euro(ladder.bodemCentenVan(a.pas)) + ' per maand; ' + ladder.euro(centen) + ' kan niet.' };
+          ladder.euro(bodem) + ' per maand; ' + ladder.euro(centen) + ' kan niet.' };
       contract = { maandCenten: centen, door: wie, at: nu() };
     }
 
     a.status = besluit;
-    a.besluit = { besluit, door: wie, notitie: kap(notitie, 300), at: nu() };
+    a.besluit = { besluit, door: wie, notitie: kap(notitie, 300), at: nu(), ...(organisatie ? { organisatie } : {}) };
     a.bijgewerkt = nu();
     if (besluit === 'geaccepteerd') {
       if (contract) a.contract = contract;
       // na een akkoord loopt de betaling automatisch: 12 maanden, met de 30%-split
-      startBetalingen(a);
+      if (!zelfservice) startBetalingen(a);
       // De poort van het merk: een Lifestyle-/Business Pass ontstaat hier, door dit
       // menselijke besluit, en nergens anders (zelf-registreren geeft ze niet).
       // Is er een account gekoppeld, dan tillen we het nu op via setTier.
-      if ((a.pas === 'lifestyle' || a.pas === 'business') && a.accountId && accounts && accounts.setTier) {
+      if (!zelfservice && (a.pas === 'lifestyle' || a.pas === 'business') && a.accountId && accounts && accounts.setTier) {
         const opgetild = accounts.setTier(a.accountId, a.pas);
         a.besluit.optillen = opgetild ? { naar: a.pas } : { mislukt: true };
       }
     }
     save();
-    return { ok: true, aanmelding: beeld(a), betaalschema: besluit === 'geaccepteerd' };
+    return { ok: true, aanmelding: beeld(a), betaalschema: !zelfservice && besluit === 'geaccepteerd',
+      ...(zelfservice && besluit === 'geaccepteerd' ? { volgende: 'Lees en teken het persoonlijke aanbod; toegang volgt pas na de eerste betalingsverplichting.' } : {}) };
   }
 
   return { beslis };

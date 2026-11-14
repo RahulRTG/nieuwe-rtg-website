@@ -58,6 +58,8 @@ module.exports = ctx => {
       if (dubbel) return { status: 409,
         error: 'Deze uitnodiging is zojuist al eenmalig uitgegeven en wordt niet opnieuw getoond. Roteer haar als de ontvanger de code niet kreeg.',
         herhaald: true, invite: publiek(dubbel) };
+      if (ctx.kern?.zaakAbonnement?.magDienst?.(supplier.code, { nieuweBetaaldeDienst: true }) === false)
+        return require('../../../kern/aanmeldingen/abonnementsdiensten').fout();
       if (heel.filter(x => !x.toegang.ingetrokken_at && !x.claim && !geldig(x)).length >= 500)
         return { status: 409, error: 'Trek eerst oude personeelsuitnodigingen in.' };
       const id = 'sinv-' + crypto.randomBytes(8).toString('hex');

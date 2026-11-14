@@ -126,11 +126,16 @@ Object.assign(kern, require('../kern/werkplek')({ db, save, bewerkCollectie: hul
    alleen het accepteren of afwijzen blijft mensenwerk. De AI kent nooit zelf
    Lifestyle/Business toe. */
 Object.assign(kern, require('../kern/aanmeldingen')({ db, save, crypto, schoon, accounts, bewerkCollectie: hulp.bewerkCollectie,
+  betaal: hulp.betaal, betaalWaarheid: kern.betaalWaarheid,
+  abonnementenBeschikbaar: process.env.RTG_ABONNEMENTEN_ZELFSERVICE === '1' &&
+    ['sqlite', 'postgres'].includes(require('../db').STORE),
+  abonnementReturnUrl: /^https:\/\//.test(process.env.APP_URL || '')
+    ? new URL('/apps/geld.html?abonnement=herstel#lidmaatschap', process.env.APP_URL).toString() : null,
   // laat gebonden: geld-regie en meldingen (naar gast, C5) staan er pas later
   geldPasprijzen: () => (kern.geldPasprijzen ? kern.geldPasprijzen() : null),
   meldLid: (...a) => kern.meldLid && kern.meldLid(...a) }));
-/* De pestgrens (kern/pestgrens.js): drie waarschuwingen bij pesten, dan een
-   vurig slotantwoord en 24 uur weg; daarna opent alleen een excuus de deur. */
+/* De pestgrens stopt de verdachte beurt. Een trefwoord geeft geen langdurige
+   schorsing; daarvoor en voor betwisting blijft een menselijke beoordeling nodig. */
 Object.assign(kern, require('../kern/pestgrens')({ db, save }));
 /* De RTG Food Court (kern/foodcourt.js): alle restaurants op een rij, in de
    stijl van een reserveerplatform; kies datum en gezelschap en zie de vrije

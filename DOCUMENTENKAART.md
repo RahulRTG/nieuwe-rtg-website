@@ -1091,6 +1091,21 @@ bovenkwam: het antwoord van
 `/api/office/payroll/run/open` is een samenvatting zonder stroken, dus wie
 daarin naar loonregels zoekt meet altijd nul.
 
+**Actualisatie commercieel beleid, 13 november 2026:** lees eerst de actuele
+leesstatus van `COMMERCIE.md` en `PRIJZEN.md`. De officiële abonnementsprijsbasis
+en jaarbetaling staan uitsluitend in `PRIJZEN.md` §7.3 (versie
+`abonnementen-2026-11-13.1`); §7.7 regelt een uitsluitend abonnementgedragen
+begroting, na 30% maatschappelijke reservering en inclusief alle gratis RTG-kosten.
+Andere inkomsten staan op nul in die begroting; netto realisatie is extra.
+§9.3 blijft het commissiebesluit met 15%/15%/5%/0%, dus geen algemene nulcommissie.
+Serviceprofielen, publieke prijsactualisatie, runtime- en contractmigratie zijn
+niet door deze interne vaststelling vrijgegeven; zie §7.8–7.9.
+
+**Historische kaartblokken:** de bewaarde samenvattingen van COMMERCIE en PRIJZEN
+hieronder beschrijven de eerdere architectuur/runtime. Hun bedragen,
+Lifestyle-bodem en universele nulcommissie zijn geen actueel prijsbeleid.
+De bevroren instructie-inventaris blijft intact; de actualisatie hierboven is leidend.
+
 **`LINK.md` is de adres- en capabilitylaag** — wat een RTG-code is. De contactpin
 was een sociale functie; RTG Link is de laag eronder: één menselijk adres (RTG
 PIN), waarachter het platform per context tijdelijke, begrensde bevoegdheden

@@ -133,6 +133,7 @@ const api = {
   /* Een accountmutatie buiten een HTTP-verzoek (timers, de AVG-veger): in
      productie een eigen PostgreSQL-transactie, zie ./achtergrond.js. */
   achtergrondWerk: (fn) => require('./achtergrond').buitenVerzoek(fn),
+  maakEigenaarEenmaal: (g) => require('./staff-eigenaar')(g),
   verifyPassword: kluis.verifyPassword,
   moetVernieuwen: kluis.moetVernieuwen,
   /* Een afgeleide sleutel voor een ander doel; de ruwe sessiesleutel verlaat de

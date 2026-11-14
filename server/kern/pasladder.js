@@ -74,26 +74,31 @@ const LADDER = [
      twee namen te hebben. Het interne id blijft `gratis` -- dat is beschrijvend
      en het staat in opgeslagen ledenrijen. */
   { id: 'gratis', naam: 'RTG Community',
+    nieuwAanbod: { maandCenten: 0, basis: 'bruto', mens: false },
     bodemCenten: 0, standaardCenten: 0,
     vast: true, contractueel: false, beschikbaar: true,
     voor: 'de maatschappelijke laag: de minimale ingang tot het RTG OS' },
 
   { id: 'rtg', naam: 'RTG Pass',
+    nieuwAanbod: { maandCenten: 25000, basis: 'bruto', mens: false },
     bodemCenten: 6500, standaardCenten: 6500,
     vast: false, contractueel: false, beschikbaar: true,
     voor: 'de consument' },
 
   { id: 'business-lite', naam: 'RTG Business Lite',
+    nieuwAanbod: { maandCenten: 40000, basis: 'netto', mens: false },
     bodemCenten: 15000, standaardCenten: 15000,
     vast: false, contractueel: false, beschikbaar: true,
     voor: 'zzp en klein MKB: software-as-a-service, geen omzetcommissie' },
 
   { id: 'business', naam: 'RTG Business Pass',
+    nieuwAanbod: { maandCenten: null, bodemCenten: 650000, basis: 'netto', mens: true },
     bodemCenten: 500000, standaardCenten: null,
     vast: false, contractueel: true, beschikbaar: true,
     voor: 'grotere organisaties: een enterprise-relatie' },
 
   { id: 'lifestyle', naam: 'RTG Lifestyle Pass',
+    nieuwAanbod: { maandCenten: 2000000, basis: 'bruto', mens: true },
     bodemCenten: 2000000, standaardCenten: null,
     vast: false, contractueel: true, beschikbaar: true,
     voor: 'high-touch: concierge en volledige regie, met een mens erachter' }

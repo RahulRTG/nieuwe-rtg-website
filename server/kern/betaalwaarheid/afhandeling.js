@@ -9,6 +9,7 @@ const WACHT_MS = Object.freeze([60 * 1000, 5 * 60 * 1000, 30 * 60 * 1000, 2 * 60
 
 module.exports = function maakAfhandeling(ctx) {
   const { d, doos, save, nuIso, gebeurtenis, STATUS, log, afhandelaars } = ctx;
+  const anker = ctx.anker || require('./actueel')(doos);
   const bezig = new Map();
   const tijdVan = waarde => {
     const n = typeof waarde === 'number' ? waarde : Date.parse(String(waarde || ''));
@@ -30,13 +31,20 @@ module.exports = function maakAfhandeling(ctx) {
   }
 
   async function handelAf(r) {
+    if (!r) return false;
+    const actueel = anker(r);
+    r = actueel();
     if (!r || r.status !== STATUS.BEVESTIGD || r.afgehandeldAt) return false;
     const eerder = bezig.get(r.id);
     if (eerder) return eerder;
     const werk = (async () => {
       const fn = afhandelaars.get(r.soort);
       if (!fn) return fout(r, new Error('Geen afhandelaar geregistreerd voor ' + r.soort + '.'));
-      try { await fn(r); } catch (e) { return fout(r, e); }
+      try { await fn(r); } catch (e) { return fout(actueel(), e); }
+      r = actueel();
+      if (r.afgehandeldAt) return true;
+      if (r.status !== STATUS.BEVESTIGD)
+        return fout(r, new Error('De betaalstand is gewijzigd tijdens de domeinafhandeling.'));
 
       const lengte = Array.isArray(r.gebeurtenissen) ? r.gebeurtenissen.length : 0;
       const bijgewerktAt = r.bijgewerktAt;
@@ -46,6 +54,7 @@ module.exports = function maakAfhandeling(ctx) {
       gebeurtenis(r, 'DOMEIN_AFGEHANDELD', { bron: r.soort });
       try { save(); }
       catch (e) {
+        r = actueel();
         delete r.afgehandeldAt;
         if (Array.isArray(r.gebeurtenissen)) r.gebeurtenissen.length = lengte;
         r.bijgewerktAt = bijgewerktAt;

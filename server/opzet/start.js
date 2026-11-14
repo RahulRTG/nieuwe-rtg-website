@@ -70,6 +70,9 @@ module.exports = function start(deps) {
        processtoring strandde, blijft niet op een nieuwe providerretry wachten. */
     if (kern.betaalWaarheid && typeof kern.betaalWaarheid.ronde === 'function')
       kern.betaalWaarheid.ronde().catch(e => log.uitzondering(e, { bron: 'betaalwaarheid-herstel' }));
+    if (kern.aanmeldingen?.automatisch) kern.aanmeldingen.automatisch.ronde()
+      .then(r => { if (r.fouten?.length) log.warn('Abonnementen vragen herstel', { aantal: r.fouten.length }); })
+      .catch(e => log.uitzondering(e, { bron: 'abonnementen-herstel' }));
   }, RONDE_MS).unref();
 
   /* Een IdP-retry blijft gewenst, maar is niet de enige herstelmotor. Een na

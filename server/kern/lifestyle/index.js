@@ -46,7 +46,11 @@ module.exports = ({ db, save, crypto, anthropic, liveCodename, notify, kern }) =
      laat binnen: via `kern`, en alleen `kern.bureau` en `kern.bureauBalie` --
      deze module leest verder niets uit de kern. */
   const verzoek = require('./verzoek')({ save, schoon, rid, nu, notify, liveCodename, L, mijn,
-    bureau: () => kern.bureau, balie: () => kern.bureauBalie });
+    bureau: () => kern.bureau, balie: () => kern.bureauBalie,
+    magNieuweDienst: key => {
+      const id = /^user-([1-9][0-9]*)$/.exec(key);
+      return !id || kern.aanmeldingen?.automatisch?.magDienst(Number(id[1]), { nieuweBetaaldeDienst: true }) !== false;
+    } });
   const ctx = { db, save, anthropic, liveCodename, nu, rid, schoon, vandaag, isDatum, L, verzoekenAlle: verzoek.verzoekenAlle };
   const dossier = require('./dossier')(ctx);
   ctx.bezittingen = dossier.bezittingen;

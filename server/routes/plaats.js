@@ -14,13 +14,14 @@
    dezelfde regel als in kern/geldbeleid en om dezelfde reden. Een positie naast
    een echte naam is precies wat privacy by design hier moet voorkomen.
 
-   Achter de gewone leden-inlog. Gasten niet: een gast heeft geen codenaam die
-   ergens bij hoort, en een venster zonder houder is niet in te trekken. */
+   Achter de eigen account-inlog, ook voor gratis werknemers en eigen nazorg.
+   Accountsloze gasten/demo's niet: een venster moet een echte houder hebben
+   die zijn toestemming kan inzien en intrekken. */
 module.exports = (kern) => {
   const { app, auth, plaats, liveCodename, werkgeversVan, werkbeleidPauzeStand } = kern;
   const stuur = (res, r) => (r && r.error) ? res.status(r.status || 400).json({ error: r.error }) : res.json(r);
   const geenGast = (req, res) => {
-    if (req.session.tier === 'guest') { res.status(403).json({ error: 'De plaatslaag is voor leden.' }); return true; }
+    if (!req.session.account) { res.status(403).json({ error: 'De plaatslaag vraagt uw eigen account.' }); return true; }
     return false;
   };
   const wie = (req) => liveCodename(req.session);

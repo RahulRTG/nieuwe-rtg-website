@@ -27,9 +27,9 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop, maakBetaaldRtgTestaccount } = require('./helper');
+const { startServer, stopHard } = require('./helper');
 
-let srv, base, baas, werker, lidToken;
+let srv, base, baas, werker, lidToken, anderToken, lidId, lidCode;
 const ZAAK = 'KIKUNOI';
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-plaatsbrug-'));
 
@@ -64,15 +64,21 @@ test.before(async () => {
   const reg = await api('/api/auth/register', { name: 'Brug Lid', email: 'bl' + u + '@voorbeeld.test',
     password: 'bruggeheim123', geboortedatum: '1992-02-02', tier: 'rtg', pasApp: 'rtg' });
   lidToken = reg.body.token;
-  maakBetaaldRtgTestaccount(TMP, 'bl' + u + '@voorbeeld.test');
+  assert.equal(reg.status, 200, JSON.stringify(reg.body));
+  assert.equal(reg.body.state.user.tier, 'guest', 'eigen werk en toestemming vragen geen betaalde persoonlijke pas');
+  lidId = reg.body.state.user.id; lidCode = reg.body.state.user.codename;
+  const ander = await api('/api/auth/register', { name: 'Andere Werker', email: 'ander' + u + '@voorbeeld.test',
+    password: 'bruggeheim123', geboortedatum: '1990-01-01' });
+  assert.equal(ander.status, 200, JSON.stringify(ander.body));
+  anderToken = ander.body.token;
   assert.equal((await api('/api/account/koppel',
     { soort: 'personeel', code: ZAAK, staffId: st.id, pin: staffPin }, lidToken)).status, 200);
   werker = (await api('/api/supplier/login', { code: ZAAK, staffId: st.id, pin: staffPin })).body.token;
   assert.ok(baas && werker && lidToken);
 });
-test.after(() => {
-  stop(srv && srv.child);
-  try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
+test.after(async () => {
+  await stopHard(srv && srv.child);
+  fs.rmSync(TMP, { recursive: true, force: true });
 });
 
 test('1. uitgeklokt is er niets te melden; ingeklokt weet het lid dat zelf', async () => {
@@ -116,6 +122,18 @@ test('3. zegt het lid ja, dan ligt de toestemming er en hoeft er niets meer gevr
   assert.ok(na.venster, 'de toestemming ligt er');
   assert.equal(na.venster.bron, 'dienst bij ' + ZAAK, 'met de reden erbij, na te vertellen');
   assert.ok(new Date(na.venster.sluit).getTime() > Date.now(), 'en met een einde');
+  const vals = { key: 'user-' + lidId, codenaam: lidCode, account: lidId, doel: 'dienst' };
+  const andereDienst = await api('/api/plaats/dienst', vals, anderToken);
+  assert.equal(andereDienst.status, 200);
+  assert.deepEqual(andereDienst.body.diensten, [], 'een vreemde werknemer erft geen dienst uit de body');
+  const andereHekken = await api('/api/plaats/hekken', vals, anderToken);
+  assert.equal(andereHekken.status, 200);
+  assert.ok(!andereHekken.body.hekken.some(h => h.id === 'leverancier:' + ZAAK), 'de eigen werkplekfilter blijft gelden');
+  const andereStand = await api('/api/plaats/stand', vals, anderToken);
+  assert.equal(andereStand.status, 200);
+  assert.deepEqual(andereStand.body.vensters, [], 'een echt geopend vreemd venster is niet leesbaar');
+  assert.equal((await api('/api/plaats/venster/sluit', vals, anderToken)).status, 404);
+  assert.ok((await dienstStand()).venster, 'een vreemde intrekking sluit mijn venster niet');
   /* Vanaf hier hoort de app gewoon te beginnen zonder iets te vragen: een vraag
      die je al beantwoord hebt, nog eens stellen is zeuren. */
 });
@@ -140,9 +158,13 @@ test('4. uitklokken maakt de reden weg -- en dan hoort het venster te sluiten', 
   assert.equal(stand.body.waarnemingen.length, 0, 'en er ligt geen waarneming meer');
 });
 
-test('5. een gast heeft hier niets te zoeken', async () => {
-  const gast = (await api('/api/login', { tier: 'guest' })).body.token;
-  assert.ok(gast, 'een gastsessie bestaat');
-  const r = await api('/api/plaats/dienst', {}, gast);
-  assert.equal(r.status, 403, 'een gast heeft geen codenaam waar een venster bij hoort');
+test('5. zonder echt account geen eigen werkplek, toestemming of inzage', async () => {
+  const routes = ['hekken', 'venster', 'venster/sluit', 'waarneem', 'stand', 'dienst'];
+  for (const route of routes) assert.equal((await api('/api/plaats/' + route, {})).status, 401);
+  for (const tier of ['guest', 'rtg']) {
+    const gast = (await api('/api/login', { tier })).body.token;
+    assert.ok(gast, 'de accountsloze demo bestaat');
+    for (const route of routes) assert.equal((await api('/api/plaats/' + route, {}, gast)).status, 403,
+      tier + ' zonder eigen account komt niet door ' + route);
+  }
 });

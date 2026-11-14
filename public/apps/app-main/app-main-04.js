@@ -1,7 +1,7 @@
 /* inloggen en de staat binnenhalen: token, pas en het eerste scherm */
     API.token = t;
     try {
-      applyState((await API.call('/state')).state);
+      if (!applyState((await API.call('/state')).state)) return;
       if (wervingscode) {
         try {
           await API.call('/werving/verbind', { kassacode: wervingscode });
@@ -31,6 +31,7 @@
       loadSocial();
       checkOnboarding(); laadAgendaLid();
     } catch(e){
+      if (API.token !== t) return; // een oude restore mag een nieuwe login niet afmelden
       API.token = null;
       // A lost connection is not a revoked session. Keep the stored token for
       // an explicit retry, while the existing gate keeps the workspace closed.

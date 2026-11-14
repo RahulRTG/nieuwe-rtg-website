@@ -444,11 +444,11 @@ test('APPWERKT opent Bord en Schrift met hun echte tabgebonden Schoolpas',
   }
 });
 
-test('APPWERKT opent Gezin met een echt uitgenodigd en gekoppeld proeflid',
+test('APPWERKT opent Gezin alleen voor het echt uitgenodigde gratis account',
   { skip: geenBrowser(pw), timeout: 120000 }, async () => {
-  const { startServer, stop } = require('./helper');
+  const { startServer, stopHard } = require('./helper');
   const { haalSessies, opslagVoor, verbindGezinProeflid } = require('../scripts/lib/proefsessies');
-  const { rijen, meetIngang, maakContext, bezoek, bedien } = require('../scripts/appwerkt');
+  const { rijen, meetIngang, maakContext, openIngang, bezoek, bedien } = require('../scripts/appwerkt');
   const data = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-appwerkt-gezin-'));
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: data } });
   let browser;
@@ -457,12 +457,44 @@ test('APPWERKT opent Gezin met een echt uitgenodigd en gekoppeld proeflid',
     assert.deepEqual(overgeslagen, []);
     const gekoppeld = await verbindGezinProeflid(base);
     assert.equal(gekoppeld.ok, true, gekoppeld.reden);
+    async function stateVan(token) {
+      const r = await fetch(base + '/api/state', { method: 'POST', headers: {
+        'Content-Type': 'application/json', Authorization: 'Bearer ' + token
+      }, body: '{}' });
+      assert.equal(r.status, 200, 'de eigen accountprojectie moet beschikbaar zijn');
+      return (await r.json()).state;
+    }
+    const eigen = await stateVan(gekoppeld.token), vreemd = await stateVan(sessies.lid.waarde);
+    assert.equal(eigen.user.tier, 'guest', 'een gezinsuitnodiging geeft geen betaalde pas');
+    assert.equal(eigen.user.account, true);
+    assert.equal(eigen.foundation.gekoppeld.length, 1);
+    assert.equal(eigen.foundation.gekoppeld[0].gezinNaam, gekoppeld.gezinNaam);
+    assert.equal(vreemd.user.tier, 'guest');
+    assert.notEqual(vreemd.user.id, eigen.user.id);
+    assert.equal(Object.hasOwn(vreemd, 'foundation'), false, 'een vreemde gratis persoon krijgt geen gezinsprojectie');
     browser = await pw.chromium.launch(browserOpties(pw));
     const ctx = await maakContext(browser, opslagVoor({
       lid: { ...sessies.lid, waarde: gekoppeld.token }
     }));
     const rij = rijen().find((r) => r.functie === 'tab:gezin');
     const meet = meetIngang(rij);
+    for (const [naam, opslag, ingelogd] of [
+      ['ongebonden gratis account', opslagVoor({ lid: sessies.lid }), true],
+      ['anonieme bezoeker', opslagVoor({}), false]
+    ]) {
+      const controle = await maakContext(browser, opslag), page = await controle.newPage();
+      try {
+        await openIngang(page, base, meet);
+        await page.locator(ingelogd ? '#app.active' : '#gate').waitFor({ state: 'visible' });
+        assert.equal(await page.locator('#tabGezin').evaluate(el => el.classList.contains('h-weg')), true, naam);
+        assert.equal(await page.locator('#gezinFamilies [data-los], #rtfReplyBtn').count(), 0,
+          naam + ' krijgt geen gekoppelde gezinsbediening');
+        assert.equal((await page.locator('#gezinFamilies').textContent()).includes(gekoppeld.gezinNaam), false,
+          naam + ' ziet geen gegevens van het gekoppelde gezin');
+        assert.equal(await page.locator('#gezinInfo').textContent(), '', naam + ' ziet geen gezinsinfo');
+        assert.equal(await page.locator('#gezinChat').textContent(), '', naam + ' ziet geen gezinschat');
+      } finally { await controle.close(); }
+    }
     const gezien = await bezoek(ctx, base, meet);
     assert.deepEqual(gezien.crash, [], 'de gekoppelde gezinsstand opent niet');
     assert.equal(gezien.poort, false, 'het gekoppelde lid bleef achter een poort');
@@ -472,12 +504,372 @@ test('APPWERKT opent Gezin met een echt uitgenodigd en gekoppeld proeflid',
       'niet alle gezinsbediening is aangeraakt (' + bediening.geklikt + '/' + bediening.gevonden + ')');
     assert.deepEqual(bediening.crash.concat(bediening.serverfout), [],
       'de gezinsbediening veroorzaakte fouten');
+    // De test vangt de bestaande API-instantie, zonder productie-testdeur.
+    // Beide tokens komen van echte accounts; het oude HTTP-antwoord is echt.
+    const wissel = await ctx.newPage();
+    await wissel.addInitScript(() => {
+      Object.defineProperty(window, 'RTGApp', { configurable: true, set(shell) {
+        Object.defineProperty(window, 'RTGApp', { configurable: true, writable: true, value: shell });
+        const maak = shell.maakAPI;
+        shell.maakAPI = function(opts) {
+          const api = maak.call(this, opts);
+          if (opts?.foutTekst === 'API-fout') window.__appwerktAPI = api;
+          return api;
+        };
+      } });
+    });
+    await openIngang(wissel, base, meet);
+    await wissel.locator('#gezinFamilies [data-los]').waitFor({ state: 'visible' });
+    assert.equal(await wissel.evaluate(() => window.__appwerktAPI.token), gekoppeld.token);
+    let geefWisselVrij, wisselBinnen, wisselFout, eersteState = true;
+    const wisselVrij = new Promise(resolve => { geefWisselVrij = resolve; });
+    const wisselVast = new Promise((resolve, reject) => { wisselBinnen = resolve; wisselFout = reject; });
+    await wissel.route(/\/api\/state$/, async route => {
+      if (!eersteState) return route.continue();
+      eersteState = false;
+      try {
+        const antwoord = await route.fetch();
+        assert.equal(antwoord.status(), 200);
+        assert.equal((await antwoord.json()).state.foundation.gekoppeld[0].code, eigen.foundation.gekoppeld[0].code);
+        wisselBinnen(); await wisselVrij; await route.fulfill({ response: antwoord });
+      } catch (e) { wisselFout(e); }
+    });
+    try {
+      await wissel.evaluate(() => { window.__appwerktOudeState = window.RTGRealtime.onSync('foundation'); });
+      await wisselVast;
+      await wissel.evaluate(async token => {
+        window.__appwerktAPI.token = token;
+        await window.RTGRealtime.onSync('foundation');
+      }, sessies.lid.waarde);
+      assert.equal(await wissel.locator('#gezinFamilies [data-los], #rtfReplyBtn').count(), 0);
+      assert.equal(await wissel.locator('#gezinInfo').textContent(), '');
+      assert.equal(await wissel.locator('#gezinChat').textContent(), '');
+      geefWisselVrij();
+      await wissel.evaluate(() => window.__appwerktOudeState);
+      assert.equal(await wissel.evaluate(() => window.__appwerktAPI.token), sessies.lid.waarde);
+      assert.equal(await wissel.locator('#tabGezin').evaluate(el => el.classList.contains('h-weg')), true);
+      assert.equal(await wissel.locator('#gezinFamilies [data-los], #rtfReplyBtn').count(), 0,
+        'een laat volledig antwoord van het vorige account herstelt diens binding niet');
+      assert.equal(await wissel.locator('#gezinInfo').textContent(), '');
+      assert.equal(await wissel.locator('#gezinChat').textContent(), '');
+    } finally { geefWisselVrij(); await wissel.unrouteAll({ behavior: 'wait' }); await wissel.close(); }
+    // Zonder herladen moet de echte ontkoppelactie ook de eerder ontvangen
+    // clientprojectie intrekken; een nieuwe lege context zou dit niet bewijzen.
+    const page = await ctx.newPage();
+    await openIngang(page, base, meet);
+    const los = page.locator('#gezinFamilies [data-los]');
+    await los.waitFor({ state: 'visible' });
+    assert.equal(await los.count(), 1, 'de bestaande binding staat vóór intrekken werkelijk in de browser');
+    await page.locator('#gezinInfo .card').first().waitFor({ state: 'visible' });
+    await page.locator('#gezinChat [data-chat]').first().waitFor({ state: 'visible' });
+    assert.match(await page.locator('#gezinInfo').textContent(), /Belangrijke info/);
+    assert.match(await page.locator('#gezinChat').textContent(), /Papa/);
+    await page.locator('#gezinChat [data-chat]').first().click();
+    // Een nieuw gezin heeft nog geen berichten: de lege flex-lijst heeft nul
+    // hoogte. Bewijs echte bediening én gevoelige inhoud vóór het intrekken.
+    await page.locator('#grtIn').waitFor({ state: 'visible' });
+    assert.match(await page.locator('#grtThread').textContent(), /Gesprek met Papa/);
+    const priveBericht = 'Privé gezinsbericht vóór het intrekken.';
+    await page.locator('#grtIn').fill(priveBericht);
+    const [verstuurd] = await Promise.all([
+      page.waitForResponse(r => r.url().endsWith('/api/foundation/gezin/chat') && r.request().method() === 'POST'),
+      page.locator('#grtStuur').click()
+    ]);
+    assert.equal(verstuurd.status(), 200, 'het privébericht is echt door de bevoegde serverroute aangenomen');
+    assert.equal((await verstuurd.json()).bericht.tekst, priveBericht);
+    await page.locator('#grtMsgs').getByText(priveBericht, { exact: true }).waitFor({ state: 'visible' });
+    // Houd echte, vóór intrekken geautoriseerde antwoorden vast. Geen verzonnen
+    // payload: na intrekken mag zelfs deze succesvolle oude inhoud niet terugkomen.
+    let geefVrij, alleBinnen, stuk;
+    const vrij = new Promise(resolve => { geefVrij = resolve; });
+    const binnen = new Promise((resolve, reject) => { alleBinnen = resolve; stuk = reject; });
+    const vast = new Set();
+    const vertraag = /\/api\/(?:rtf\/(?:overzicht|kanaal)|foundation\/gezin\/[^/]+\/chat\/[^/?]+)$/;
+    await page.route(vertraag, async route => {
+      try {
+        const antwoord = await route.fetch();
+        assert.equal(antwoord.status(), 200, 'alle vertraagde antwoorden waren vóór intrekken bevoegd');
+        const pad = new URL(route.request().url()).pathname;
+        if (pad.includes('/chat/')) {
+          assert.ok((await antwoord.json()).berichten.some(m => m.tekst === priveBericht),
+            'de vertraagde echte thread bevat het eerder zichtbare privébericht');
+        }
+        vast.add(pad);
+        if (vast.size === 3) alleBinnen();
+        await vrij;
+        await route.fulfill({ response: antwoord });
+      } catch (e) { stuk(e); }
+    });
+    try {
+      await page.evaluate(() => window.RTGRealtime.onSync('foundation'));
+      await page.locator('#gezinChat [data-chat]').first().click();
+      await binnen;
+      let stateBinnen, stateFout, eerste = true;
+      const stateVast = new Promise((resolve, reject) => { stateBinnen = resolve; stateFout = reject; });
+      await page.route(/\/api\/state$/, async route => {
+        if (!eerste) return route.continue();
+        eerste = false;
+        try {
+          const antwoord = await route.fetch();
+          assert.equal(antwoord.status(), 200);
+          assert.equal((await antwoord.json()).state.foundation.gekoppeld[0].code, eigen.foundation.gekoppeld[0].code);
+          vast.add('/api/state'); stateBinnen(); await vrij;
+          await route.fulfill({ response: antwoord });
+        } catch (e) { stateFout(e); }
+      });
+      await page.evaluate(() => { window.__appwerktOudeState = window.RTGRealtime.onSync('foundation'); });
+      await stateVast;
+      page.once('dialog', dialog => dialog.accept());
+      const [ontkoppeld] = await Promise.all([
+        page.waitForResponse(r => r.url().endsWith('/api/rtf/ontkoppel') && r.request().method() === 'POST'),
+        los.click()
+      ]);
+      assert.equal(ontkoppeld.status(), 200);
+      await page.waitForFunction(() => document.querySelector('#tabGezin').classList.contains('h-weg') &&
+        !document.querySelector('#gezinFamilies [data-los], #rtfReplyBtn'));
+      assert.equal((await page.locator('#gezinFamilies').textContent()).includes(gekoppeld.gezinNaam), false,
+        'dezelfde pagina bewaart geen oude gezinsbinding na intrekken');
+      assert.equal(await page.locator('#gezinInfo').textContent(), '', 'intrekken wist de eerder zichtbare info');
+      assert.equal(await page.locator('#gezinChat').textContent(), '', 'intrekken wist chat, leden en gesprek');
+      assert.equal(await page.locator('#gezinChat').isVisible(), false);
+      const afgerond = [...vast].map(pad => page.waitForEvent('requestfinished', {
+        predicate: request => new URL(request.url()).pathname === pad
+      }));
+      geefVrij();
+      await Promise.all(afgerond);
+      await page.evaluate(() => window.__appwerktOudeState);
+      await page.unrouteAll({ behavior: 'wait' });
+      await page.evaluate(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))));
+      assert.equal(await page.locator('#gezinInfo').textContent(), '', 'een laat overzicht zet geen ingetrokken info terug');
+      assert.equal(await page.locator('#gezinChat').textContent(), '', 'laat kanaal/thread heropent het gezinsgesprek niet');
+      assert.equal(await page.locator('#gezinChat').isVisible(), false);
+      assert.equal(await page.locator('#grtMsgs, #grtIn, #grtStuur').count(), 0);
+      assert.equal(await page.locator('#tabGezin').evaluate(el => el.classList.contains('h-weg')), true);
+      assert.equal(await page.locator('#gezinFamilies [data-los], #rtfReplyBtn').count(), 0,
+        'ook een laat volledig state-antwoord kan de ingetrokken binding niet opnieuw geldig maken');
+    } finally { geefVrij(); await page.unrouteAll({ behavior: 'wait' }); }
+    const na = await stateVan(gekoppeld.token);
+    assert.equal(na.user.tier, 'guest');
+    assert.equal(Object.hasOwn(na, 'foundation'), false, 'de volledige serverprojectie laat de ingetrokken binding weg');
+    for (const pad of ['/api/rtf/kanaal', '/api/rtf/bericht']) {
+      const geweigerd = await fetch(base + pad, { method: 'POST', headers: {
+        'Content-Type': 'application/json', Authorization: 'Bearer ' + gekoppeld.token
+      }, body: JSON.stringify({ code: eigen.foundation.gekoppeld[0].code, tekst: 'Niet meer bevoegd' }) });
+      assert.equal(geweigerd.status, 403, pad + ' blijft ook server-side ingetrokken');
+      assert.match((await geweigerd.json()).error, /niet.*gekoppeld/i);
+    }
     await ctx.close();
   } finally {
     if (browser) await browser.close();
-    await stop(child);
+    await stopHard(child);
     try { fs.rmSync(data, { recursive: true, force: true }); } catch (e) {}
   }
+});
+
+test('App-state bindt ontvangst en toepassing aan account en generatie; echte login mag het token wisselen', async () => {
+  const vm = require('node:vm'), verzoeken = [];
+  const zand = { location: { protocol: 'https:' }, user: {}, invoices: [], trip: null,
+    posts: [], creatorLikes: 0, myApps: [], rtf: {}, syncGezinContext() {},
+    fetch: (url, opties) => new Promise(resolve => { verzoeken.push({ url, opties, resolve }); }) };
+  zand.window = zand;
+  const context = vm.createContext(zand);
+  vm.runInContext(fs.readFileSync(path.join(__dirname, '../public/shared/appshell.js'), 'utf8') + '\n' +
+    fs.readFileSync(path.join(__dirname, '../public/apps/app-main/app-main-02_state.js'), 'utf8') +
+    '\nthis.eigenaar = maakAppState();', context);
+  const { API, applyState, verwerpOudeState, refreshState, aanvaardSessie } = zand.eigenaar;
+  const antwoord = data => verzoeken.at(-1).resolve({ ok: true, status: 200, json: async () => data });
+  const a = { user: { id: 'A', account: true, tier: 'guest' }, foundation: { gekoppeld: [{ code: 'GEZIN-A' }] } };
+  const b = { user: { id: 'B', account: true, tier: 'guest' } };
+  const vroeg = API.call('/auth/verify-email', { token: 'emailbewijs' });
+  antwoord({ ok: true }); await vroeg;
+  assert.equal(Object.hasOwn(zand, 'grtEpoch'), false, 'de vroege API-call heeft geen later geïnitialiseerde gezinsvariabelen nodig');
+  const login = API.call('/auth/login', { login: 'A' });
+  antwoord({ token: 'token-A', state: a }); const ingelogd = await login;
+  aanvaardSessie(ingelogd);
+  assert.equal(API.token, 'token-A', 'een echt API-loginantwoord mag zijn nieuwe token aannemen');
+  assert.equal(zand.user.id, 'A');
+
+  const oud = API.call('/api/state');
+  const oudVerzoek = verzoeken.at(-1);
+  const tweedeFactor = API.call('/auth/2fa', { bewijs: 'bewijs-B' });
+  antwoord({ token: 'token-B', state: b }); const gewisseld = await tweedeFactor;
+  aanvaardSessie(gewisseld);
+  assert.equal(API.token, 'token-B', 'ook een doorgegeven tweede-factor/passkey-antwoord blijft gebonden');
+  const geweigerd = assert.rejects(oud, /niet meer actueel/);
+  oudVerzoek.resolve({ ok: true, status: 200, json: async () => ({ state: a }) }); await geweigerd;
+  assert.equal(zand.user.id, 'B'); assert.equal(zand.rtf.gekoppeld.length, 0);
+  assert.equal(applyState(a), false, 'een reeds ontvangen antwoord van A kan na tokenwissel niet worden toegepast');
+  assert.equal(applyState({ ...b }), false, 'een ongebonden kopie is geen nieuw gezaghebbend antwoord');
+
+  const ontvangen = API.call('/state'); antwoord({ state: b }); const klaar = await ontvangen;
+  const onderweg = API.call('/api/state'); const oudGezin = verzoeken.at(-1);
+  verwerpOudeState();
+  assert.equal(applyState(klaar.state), false, 'intrekken verwerpt ook reeds ontvangen maar nog niet toegepaste state');
+  const ingetrokken = assert.rejects(onderweg, /niet meer actueel/);
+  oudGezin.resolve({ ok: true, status: 200, json: async () => ({ state: a }) }); await ingetrokken;
+  const vers = refreshState(); antwoord({ state: { ...b } });
+  assert.equal(await vers, true, 'een vers verzoek na intrekken werkt normaal');
+  assert.equal(zand.user.id, 'B'); assert.equal(zand.rtf.gekoppeld.length, 0);
+  assert.equal(verzoeken.at(-1).opties.headers.Authorization, 'Bearer token-B');
+
+  // Roep ook de echte login/restore-callers aan: alleen de factory testen zou
+  // een oude restore-catch die het nieuwe token wist niet aan het licht brengen.
+  const drie = fs.readFileSync(path.join(__dirname, '../public/apps/app-main/app-main-03.js'), 'utf8');
+  const vier = fs.readFileSync(path.join(__dirname, '../public/apps/app-main/app-main-04.js'), 'utf8');
+  const loginBron = drie.slice(drie.indexOf('  async function login('), drie.indexOf('  // Blijf ingelogd:'));
+  const restoreBron = drie.slice(drie.indexOf('  async function restoreSession(){')) +
+    vier.slice(0, vier.indexOf('  async function doLogout(){'));
+  const opslag = new Map(), verwijderd = [];
+  Object.assign(zand, { API, applyState, aanvaardSessie, vastePas: 'lifestyle', wervingscode: '',
+    laadPersonalOS: async () => {}, pasAdres: pas => '/apps/app.html?pas=' + pas,
+    localStorage: { getItem: key => opslag.get(key), setItem: (key, value) => opslag.set(key, value),
+      removeItem: key => { verwijderd.push(key); opslag.delete(key); } } });
+  zand.location.replace = adres => { zand.omleiding = adres; };
+  vm.runInContext(loginBron + '\n' + restoreBron, context);
+  for (const status of [200, 401]) {
+    API.token = null; opslag.set('rtg_member_token', 'restore-A-' + status);
+    const herstel = zand.restoreSession(), vertraagd = verzoeken.at(-1);
+    const huidig = API.call('/auth/login', { login: 'B' });
+    antwoord({ token: 'login-B-' + status, state: { ...b } });
+    await zand.login('rtg', { response: await huidig });
+    assert.equal(API.token, 'login-B-' + status); assert.equal(zand.user.id, 'B');
+    assert.equal(zand.omleiding, '/apps/app.html?pas=rtg');
+    vertraagd.resolve({ ok: status === 200, status, json: async () => status === 200 ? { state: { ...a } } : { error: 'Oude sessie verlopen' } });
+    await herstel;
+    assert.equal(API.token, 'login-B-' + status, 'late restore ' + status + ' mag de nieuwe login niet afmelden');
+    assert.equal(opslag.get('rtg_member_token'), 'login-B-' + status);
+    assert.equal(zand.user.id, 'B'); assert.deepEqual(verwijderd, []);
+  }
+  const oudLogin = API.call('/auth/login', { login: 'A' });
+  antwoord({ token: 'ontvangen-maar-oud', state: { ...a } }); const oudAntwoord = await oudLogin;
+  verwerpOudeState();
+  await assert.rejects(zand.login('rtg', { response: oudAntwoord }), /niet meer actueel/);
+  assert.equal(API.token, 'login-B-401', 'een inmiddels verworpen login zet zijn token niet vóór de statecontrole');
+  assert.equal(zand.user.id, 'B'); assert.equal(opslag.get('rtg_member_token'), 'login-B-401');
+});
+
+test('GezinRT intrekken wist sessie en callbacks; late tickets, retries en media blijven gesloten', async () => {
+  const vm = require('node:vm'), nodes = new Map(), requests = [], tickets = [], media = [], streams = [], timers = new Map();
+  let timerId = 0;
+  const later = () => { let resolve, reject; const promise = new Promise((ja, nee) => { resolve = ja; reject = nee; }); return { promise, resolve, reject }; };
+  const node = id => {
+    if (!nodes.has(id)) nodes.set(id, { style: {}, textContent: '', srcObject: null, appendChild() {}, classList: { toggle() {} } });
+    return nodes.get(id);
+  };
+  const antwoord = data => ({ ok: true, json: async () => data });
+  const zand = {
+    document: { getElementById: node, createElement: () => ({ style: {} }), head: { appendChild() {} }, body: { appendChild() {} } },
+    fetch: (url, opts) => {
+      requests.push({ url, opts });
+      if (url.endsWith('/stroom/ticket')) { const d = later(); tickets.push(d); return d.promise; }
+      return Promise.resolve(antwoord({ iceServers: [], chats: [], berichten: [], bericht: { tekst: 'nieuw' } }));
+    },
+    EventSource: class {
+      constructor(url) { this.url = url; this.listeners = {}; this.readyState = 1; streams.push(this); }
+      addEventListener(naam, fn) { this.listeners[naam] = fn; }
+      close() { this.closed = true; this.readyState = 2; }
+      emit(naam, data) { this.listeners[naam]?.({ data: JSON.stringify(data) }); }
+    },
+    setTimeout: fn => { const id = ++timerId; timers.set(id, fn); return id; }, clearTimeout: id => timers.delete(id),
+    setInterval: fn => { const id = ++timerId; timers.set(id, fn); return id; }, clearInterval: id => timers.delete(id),
+    RTGMedia: { vraag: () => { const d = later(); media.push(d); return d.promise; } },
+    alert: () => assert.fail('ingetrokken media mag geen dialoog terugzetten'), console
+  };
+  zand.window = zand;
+  const bron = ['01', '02', '03'].map(n => fs.readFileSync(path.join(__dirname,
+    '../public/apps/foundation/gezin-rt/gezin-rt-' + n + '.js'), 'utf8')).join('\n');
+  vm.runInNewContext(bron, zand);
+  const rt = zand.GezinRT, spoel = () => new Promise(resolve => setImmediate(resolve));
+  let oudeChat = 0, nieuweChat = 0;
+  const init = (code, token, onChat) => rt.init({ code, token, mijnId: 'oppas', leden: [{ id: 'ouder', naam: code }], onChat });
+  init('OUD', 'oud-token', () => oudeChat++);
+  rt.stop(); tickets[0].resolve(antwoord({ ticket: 'oud-ticket' })); await spoel();
+  assert.equal(streams.length, 0, 'een laat ticket opent geen stroom na stop');
+  assert.equal(timers.size, 0);
+  const voor = requests.length;
+  await assert.rejects(rt.stuur('ouder', 'verboden'), /gesloten/);
+  await assert.rejects(rt.thread('ouder'), /gesloten/);
+  await assert.rejects(rt.chats(), /gesloten/);
+  rt.setToken('oud-token');
+  assert.equal(requests.length, voor, 'stop wist token/code; oude bedieningscalls starten geen verzoek');
+
+  init('HERSTEL', 'herstel-token', () => oudeChat++);
+  tickets[1].reject(new Error('netwerk')); await spoel();
+  assert.equal(timers.size, 1, 'een levende sessie houdt zijn normale herstelroute');
+  const oudeRetry = [...timers.values()][0];
+  rt.stop(); const gestopt = requests.length; oudeRetry(); await spoel();
+  assert.equal(requests.length, gestopt, 'ook een al klaargezette retry is na stop inert');
+  assert.equal(timers.size, 0);
+
+  init('NIEUW', 'nieuw-token', () => nieuweChat++);
+  tickets[2].resolve(antwoord({ ticket: 'nieuw-ticket' })); await spoel();
+  assert.equal(streams.length, 1);
+  const kanaal = streams[0];
+  kanaal.emit('chat', { van: 'ouder', tekst: 'actueel' }); assert.equal(nieuweChat, 1);
+  kanaal.emit('bel', { naar: 'oppas', van: 'ouder', vanNaam: 'Privé naam', kind: 'ring' });
+  assert.equal(node('grt-incoming').style.display, 'flex');
+  assert.equal(node('grt-inaam').textContent, 'Privé naam');
+  rt.bel('ouder', false); assert.equal(media.length, 1);
+  rt.stop();
+  let gestopteTracks = 0;
+  media[0].resolve({ getTracks: () => [{ stop: () => gestopteTracks++ }] }); await spoel();
+  assert.equal(gestopteTracks, 1, 'media die pas na stop beschikbaar komt wordt direct gestopt');
+  assert.equal(kanaal.closed, true);
+  assert.equal(node('grt-incoming').style.display, 'none');
+  assert.equal(node('grt-inaam').textContent, '');
+  assert.equal(node('grt-call').style.display, 'none');
+  assert.equal(node('grt-local').srcObject, null);
+  assert.equal(node('grt-remote').srcObject, null);
+  assert.equal(timers.size, 0);
+
+  init('VOLGEND', 'volgend-token', () => nieuweChat++);
+  tickets[3].resolve(antwoord({ ticket: 'volgend-ticket' })); await spoel();
+  kanaal.emit('chat', { van: 'ouder', tekst: 'oud' });
+  kanaal.emit('bel', { naar: 'oppas', van: 'ouder', kind: 'ring' }); kanaal.onerror();
+  assert.equal(oudeChat, 0); assert.equal(nieuweChat, 1, 'oud kanaal mag ook de nieuwe callback niet aanroepen');
+  assert.equal(node('grt-incoming').style.display, 'none'); assert.equal(timers.size, 0);
+  streams[1].emit('chat', { van: 'ouder', tekst: 'nieuw' }); assert.equal(nieuweChat, 2);
+  await rt.stuur('ouder', 'nieuw');
+  const verzonden = JSON.parse(requests.at(-1).opts.body);
+  assert.equal(verzonden.code, 'VOLGEND'); assert.equal(verzonden.token, 'volgend-token');
+  rt.bel('ouder', false);
+  let actieveTracks = 0;
+  media[1].resolve({ getTracks: () => [{ stop: () => actieveTracks++ }] }); await spoel();
+  assert.equal(node('grt-call').style.display, 'flex', 'nieuwe sessie kan normaal een oproep starten');
+  const ticketAantal = tickets.length, levendKanaal = streams[1];
+  rt.setToken('ververst-in-gesprek');
+  assert.equal(tickets.length, ticketAantal, 'tokenverversing verbreekt het actieve gesprek niet');
+  assert.notEqual(levendKanaal.closed, true);
+  levendKanaal.emit('chat', { van: 'ouder', tekst: 'na tokenverversing' });
+  assert.equal(nieuweChat, 3, 'het eigen levende kanaal blijft chat doorgeven na tokenverversing');
+  levendKanaal.emit('bel', { naar: 'oppas', van: 'ouder', kind: 'hangup' });
+  assert.equal(actieveTracks, 1, 'ook het echte hangup-signaal blijft het actieve gesprek beëindigen');
+  assert.equal(node('grt-call').style.display, 'none');
+  rt.bel('ouder', false);
+  media[2].resolve({ getTracks: () => [{ stop: () => actieveTracks++ }] }); await spoel();
+  assert.equal(JSON.parse(requests.at(-1).opts.body).token, 'ververst-in-gesprek');
+  levendKanaal.readyState = 2; levendKanaal.onerror();
+  assert.equal(timers.size, 1, 'een echt gesloten kanaal behoudt de herstelroute tijdens een gesprek');
+  const herstel = [...timers.entries()][0]; timers.delete(herstel[0]); herstel[1](); await spoel();
+  assert.equal(requests.at(-1).opts.headers.Authorization, 'Bearer ververst-in-gesprek',
+    'herstel gebruikt het actuele token, niet het token van het oude stroomticket');
+  tickets.at(-1).resolve(antwoord({ ticket: 'ververst-ticket' })); await spoel();
+  const hersteldKanaal = streams.at(-1);
+  levendKanaal.emit('chat', { van: 'ouder', tekst: 'oude stroom' });
+  assert.equal(nieuweChat, 3, 'de vervangen stroom mag geen callback meer leveren');
+  hersteldKanaal.emit('chat', { van: 'ouder', tekst: 'hersteld' });
+  assert.equal(nieuweChat, 4);
+  rt.stop();
+  assert.equal(actieveTracks, 2, 'ook opnieuw actieve mediatracks stoppen bij intrekken');
+  assert.equal(node('grt-local').srcObject, null);
+  hersteldKanaal.emit('chat', { van: 'ouder', tekst: 'na stop' });
+  hersteldKanaal.emit('bel', { naar: 'oppas', van: 'ouder', kind: 'ring' });
+  hersteldKanaal.onerror();
+  assert.equal(nieuweChat, 4); assert.equal(node('grt-incoming').style.display, 'none');
+  assert.equal(timers.size, 0, 'intrekken sluit ook het met vernieuwd token herstelde kanaal');
+  init('LAAT', 'laat-token', () => assert.fail('een gestopte sessie heeft geen callback'));
+  rt.stop(); tickets.at(-1).reject(new Error('laat netwerkfalen')); await spoel();
+  assert.equal(timers.size, 0, 'een pas na stop afgewezen ticket plant geen nieuwe retry');
 });
 
 test('APPWERKT wacht op het echte Zorg-aanbod voordat het de tab bedient',

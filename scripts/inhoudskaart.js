@@ -118,7 +118,13 @@ if (require.main !== module) return;
     .filter(([k]) => !isDeur(k.split(' ')[1]))
     .filter(([k]) => k.split(' ')[1].startsWith('/api/'))
     .map(([k]) => k));
-  if (!doel.size) { console.log('geen blinde of onbesliste routes; de kaart heeft niets te doen'); return; }
+  // Bestaande vormcontracten moeten ook opnieuw kunnen worden gemeten nadat
+  // de OUTPUT-proef ze heeft bewezen; anders verouderen ze onherstelbaar.
+  let oud = {};
+  try { oud = JSON.parse(fs.readFileSync(UITSLAG, 'utf8')).perRoute || {}; } catch (e) { if (!e || e.code !== 'ENOENT') throw e;}
+  for (const [k, v] of Object.entries(oud))
+    if (!v.onwaarneembaar && !isDeur(k.split(' ')[1])) doel.add(k);
+  if (!doel.size) { console.log('geen routes met een te meten vormcontract'); return; }
 
   /* De rolverdeling, met de PUBLIEKE routes erbij: rolVan() geeft daar niets
      terug en verdeelOpRol zou ze wegleggen, maar een route zonder poort is
@@ -147,7 +153,9 @@ if (require.main !== module) return;
   console.log('  blinde + onbesliste routes (geen deur): ' + doel.size);
   console.log('  bereikbaar (publiek of bekende rol)   : ' + verdeling.metRol.length);
 
-  const server = await start({ naam: 'inhoudskaart', env: { RTG_DEMO: '1', RTG_MAGNAAT_TEST: '1', OFFICE_CODE: 'RTG-OFFICE-PROEF' } });
+  const server = await start({ naam: 'inhoudskaart', env: { NODE_ENV: 'test', RTG_DEMO: '1', RTG_MAGNAAT_TEST: '1',
+    // Dezelfde geïsoleerde toestelstand als test/inhoudswacht.test.js.
+    RTG_BEZITSBEWIJS: 'aanbevolen', OFFICE_CODE: 'RTG-OFFICE-PROEF' } });
   const { basis, klaar } = server;
   const doe = async (methode, pad, lijf, tok) => {
     try {
@@ -204,8 +212,6 @@ if (require.main !== module) return;
   klaar();
 
   /* Stapelen: vers wint, de rest blijft. */
-  let oud = {};
-  try { oud = JSON.parse(fs.readFileSync(UITSLAG, 'utf8')).perRoute || {}; } catch (e) { if (!e || e.code !== 'ENOENT') throw e;}
   /* Snoeien bij het stapelen: geen niet-/api/-paden (buiten bereik van de
      liegpoort) en geen waarneembaar profiel zonder sleutels -- dat zou een
      wacht zijn die niets wacht. */

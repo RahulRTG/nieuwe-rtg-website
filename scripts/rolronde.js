@@ -313,7 +313,10 @@ async function main() {
   let srv = null, basis = BASIS_EXTERN;
   if (!basis) {
     srv = await require('./lib/wegwerpserver').start({ naam: 'rolronde', poort: PORT, gereed: 'ready',
-      env: { NODE_ENV: 'test', ...require('./lib/voltooiwereld').KANTOORWERELD, OFFICE_CODE: 'RTG-OFFICE' } });
+      // Een synthetische HTTPS-terugkeer maakt bestaande abonnementsbediening
+      // toetsbaar; zelfbedieningsverkoop blijft standaard gesloten.
+      env: { NODE_ENV: 'test', ...require('./lib/voltooiwereld').KANTOORWERELD,
+        OFFICE_CODE: 'RTG-OFFICE', APP_URL: 'https://rtg.example' } });
     basis = srv.basis;
   }
   const vraag = maakVraag(basis);

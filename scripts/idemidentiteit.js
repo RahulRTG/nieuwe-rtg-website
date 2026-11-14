@@ -228,6 +228,13 @@ function handwerk(alle) {
       for (const v of kaalVenster.matchAll(new RegExp('\\b' + naam + '\\.([A-Za-z_$][\\w$]*)\\s*(?:!==|===|!=|==)', 'g'))) {
         velden.add(v[1]);
       }
+      // De bestaande util vergelijkt fingerprints tijd-veilig. Een gewone
+      // === afdwingen zou hier juist de veilige vergelijking laten verdwijnen.
+      const utilPad = path.join(WORTEL, 'server/kern/util.js');
+      const veiligeImport = [...bron.matchAll(/\bconst\s*\{\s*veiligGelijk\s*\}\s*=\s*require\((['"])([^'"]+)\1\)/g)]
+        .some(v => path.resolve(path.dirname(bestand), v[2]).replace(/(?:\.js)?$/, '.js') === utilPad);
+      if (veiligeImport) for (const v of kaalVenster.matchAll(new RegExp('\\bveiligGelijk\\s*\\(\\s*' + naam + '\\.([A-Za-z_$][\\w$]*)\\s*,', 'g')))
+        velden.add(v[1]);
       uit.push({
         bestand: rel(bestand), regel, opzoeker: functie, gevondenAls: naam,
         vergeleken: [...velden].sort(),

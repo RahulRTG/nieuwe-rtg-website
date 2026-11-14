@@ -38,7 +38,7 @@ test('Onderzoekslab gebruikt zijn centrale DS-owner zonder runtime-stijlinjectie
       await wachtTot(page, () => document.querySelectorAll('#labKpi .labkpi').length === 4,
         null, { wat: 'de vier KPI-kaarten uit de bestaande Lab-gegevens' });
 
-      const stand = await page.evaluate(() => {
+      const stand = await page.evaluate(async () => {
         window.LabPro.meld('Project veilig vastgelegd');
         const melding = document.querySelector('.labmeld');
         const kpis = document.querySelector('.labkpis');
@@ -47,12 +47,17 @@ test('Onderzoekslab gebruikt zijn centrale DS-owner zonder runtime-stijlinjectie
         const stijlverzoeken = performance.getEntriesByType('resource')
           .map((r) => new URL(r.name).pathname)
           .filter((p) => p.endsWith('.css'));
+        const stijlbladen = [...document.querySelectorAll('link[rel="stylesheet"]')];
+        const stijlteksten = await Promise.all(stijlbladen.map(async (l) => {
+          try { return await (await fetch(l.href)).text(); } catch (_) { return ''; }
+        }));
         return {
           owner: document.body.classList.contains('ds-onderzoekslab'),
-          component: [...document.querySelectorAll('link[rel="stylesheet"]')]
+          component: stijlbladen
             .some((l) => new URL(l.href).pathname === '/ds/componenten/onderzoekslab.css') ||
-            stijlverzoeken.includes('/ds/componenten/onderzoekslab.css'),
-          stijlbronnen: [...document.querySelectorAll('link[rel="stylesheet"]')].map((l) => new URL(l.href).pathname),
+            stijlverzoeken.includes('/ds/componenten/onderzoekslab.css') ||
+            stijlteksten.some((css) => css.includes('.ds-onderzoekslab .labkpis')),
+          stijlbronnen: stijlbladen.map((l) => new URL(l.href).pathname),
           stijlverzoeken,
           ingespoten,
           kpiWeergave: getComputedStyle(kpis).display,

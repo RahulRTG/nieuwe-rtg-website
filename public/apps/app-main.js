@@ -13,7 +13,7 @@
    zodat een blijvend verschil (een proxy die niets doorlaat) geen herlaadlus
    wordt maar gewoon doorgaat. Doorgaan met een mismatch is nog altijd beter
    dan een zwart scherm, en de melding in de console zegt dan wat er speelt. */
-var RTG_BOUW = 'e6396e0d';
+var RTG_BOUW = '21c4098c';
 (function bouwWacht(){
   try {
     var m = document.querySelector('meta[name="rtg-bouw"]');
@@ -284,6 +284,14 @@ var RTG_BOUW = 'e6396e0d';
     } catch(e){ return null; }
   }
   let websiteAanvraag = websiteAanvraagUitAdres();
+  /* RTG Direct-links bevatten alleen een gekozen onderwerp, nooit vrije tekst
+     of persoonsgegevens. De gebruiker schrijft zijn vraag pas NA aanmelden in
+     de beveiligde app. */
+  const rtgDirectUitAdres = () => {
+    const v = String(new URLSearchParams(location.hash.replace(/^#/, '')).get('rtg-direct') || '').toLowerCase();
+    return ['algemeen', 'passen', 'organisatie', 'techniek'].includes(v) ? v : null;
+  };
+  let rtgDirect = rtgDirectUitAdres();
   if (vastePas){
     const ml = document.getElementById('manifestLink');
     if (ml) ml.href = '/manifests/pas-' + vastePas + '.webmanifest';
@@ -343,14 +351,25 @@ var RTG_BOUW = 'e6396e0d';
     if (window.RTGLevend) RTGLevend.familie();
   }
   function pasThemaZet(t){
+    if (t !== 'standaard' && t !== 'bordeaux' && t !== 'parelmoer') return;
     try { localStorage.setItem(pasThemaKey(), t); } catch(e){}
     pasThemaToepassen();
+  }
+  function pasThemaWissel(){
+    const t = pasThemaHuidig() === 'parelmoer' ? 'standaard' : 'parelmoer';
+    pasThemaZet(t);
+    return t;
   }
   // meteen toepassen, ook op het beginscherm
   pasThemaToepassen();
   // seam voor de OS-schil (bedieningspaneel): thema lezen/zetten zonder de
   // logica hierboven te dupliceren. Iedereen mag kiezen.
-  window.RTGOSThema = { huidig: pasThemaHuidig, zet: pasThemaZet, keuzeMogelijk: () => true };
+  window.RTGOSThema = {
+    huidig: pasThemaHuidig,
+    zet: pasThemaZet,
+    wissel: pasThemaWissel,
+    keuzeMogelijk: () => true
+  };
 
   /* DE PAS AANNEMEN ZONDER HERLADEN. Een kale /apps/app.html (zonder ?pas=) is
      de deur waar bijna elk scherm naar terugwijst. Tot hier herlaadde de
@@ -2546,13 +2565,15 @@ var RTG_BOUW = 'e6396e0d';
        blijft de stand leeg als het account even later wel binnen is. */
     if (!lijst || gevuldeTabs[tab] || !user) return;
     gevuldeTabs[tab] = true;
-    // een gratis gebruiker heeft geen reizen, betalen, AI of assets: die
+    // een gratis gebruiker heeft geen reizen, AI of assets: die
     // tabbladen staan voor hem verborgen, dus halen we er ook niets voor op.
     // Zorg wel, zodra hij een eigen account heeft: dat tabblad hoort bij
     // FoundationOS, en dat staat open na het aanmaken van een account
     // (besluit van de eigenaar, 5 oktober 2026). Een bezoeker zonder account
     // ziet het nog steeds niet.
-    if (user.tier === 'guest' && ['reizen','betalen','ai','assets'].includes(tab)) return;
+    if (user.tier === 'guest' && ['reizen','ai','assets'].includes(tab)) return;
+    // Eigen facturen en betaalherstel blijven ook zonder betaalde pas bereikbaar.
+    if (tab === 'betalen' && user.tier === 'guest' && !user.account) return;
     if (tab === 'zorg' && user.tier === 'guest' && !user.account) return;
     for (const [naam, fn] of lijst) stap(naam, fn);
   }
@@ -2695,11 +2716,12 @@ var RTG_BOUW = 'e6396e0d';
        aannemen dat een element bestaat. Viel er een om, dan kwam de rest van
        renderAll niet eens op gang en hielp het afschermen van de stappen
        hieronder niets. */
-    // gratis gebruiker (zonder pas): reizen, betalen en AI zijn voor leden
+    // Gratis account: betaalde diensten blijven apart, eigen facturen bereikbaar.
     const guest = user.tier === 'guest';
     stap('scherm-aanloop', () => {
     $('#codeChipTxt').textContent = user.codename;
-    ['reizen','betalen','ai','assets'].forEach(t => { const b = document.querySelector('.tabbar button[data-tab="'+t+'"]'); if (b) b.style.display = guest ? 'none' : ''; });
+    ['reizen','ai','assets'].forEach(t => { const b = document.querySelector('.tabbar button[data-tab="'+t+'"]'); if (b) b.style.display = guest ? 'none' : ''; });
+    { const b = document.querySelector('.tabbar button[data-tab="betalen"]'); if (b) b.style.display = (guest && !user.account) ? 'none' : ''; }
     // zorg hoort bij FoundationOS: open voor elk eigen account, ook gratis
     { const b = document.querySelector('.tabbar button[data-tab="zorg"]'); if (b) b.style.display = (guest && !user.account) ? 'none' : ''; }
     // het OS-beginscherm leest dit: zonder pas geen wallet-tegel en geen balk
@@ -5304,7 +5326,7 @@ var RTG_BOUW = 'e6396e0d';
   // acties zijn ook gewoon vindbaar in Spotlight: instellingen als resultaten
   function osActies() {
     const uit = [
-      { naam: 'Licht of donker', glyf: 'thema', doe: () => { const b = $('#rtg-thema-knop'); if (b) b.click(); } },
+      { naam: 'Licht of donker', glyf: 'thema', doe: () => { if (window.RTGOSThema) RTGOSThema.wissel(); } },
       { naam: 'Meldingen', glyf: 'meldingen', doe: () => { const b = $('#bell'); if (b) b.click(); } },
       { naam: 'Bedieningspaneel', glyf: 'paneel', doe: () => { ccSync(); if (ccScrim) ccScrim.classList.add('open'); } },
       { naam: 'Taal kiezen', glyf: 'taal', doe: () => { if (window.RTGi18n) RTGi18n.openModal(); } },
@@ -5533,9 +5555,12 @@ var RTG_BOUW = 'e6396e0d';
   // twee apps naast elkaar (split screen)
   const ccSplit = $('#osCcSplit');
   if (ccSplit) ccSplit.addEventListener('click', () => { sluitScrims(); if (window.RTGSplit) RTGSplit.open(); });
-  // licht/donker: de (verborgen) gedeelde themaknop blijft de motor
+  // licht/donker is een korte ingang naar dezelfde OS-themamotor als de drie
+  // zichtbare keuzes hierboven; er is geen tweede opslag of verborgen knop.
   const ccLicht = $('#osCcLicht');
-  if (ccLicht) ccLicht.addEventListener('click', () => { const b = $('#rtg-thema-knop'); if (b) b.click(); });
+  if (ccLicht) ccLicht.addEventListener('click', () => {
+    if (window.RTGOSThema) { RTGOSThema.wissel(); ccSync(); }
+  });
   const ccUit = $('#osCcUit');
   if (ccUit) ccUit.addEventListener('click', () => { sluitScrims(); const b = $('#logoutBtn'); if (b) b.click(); });
   // helderheid: puur visueel, onthouden per browser
@@ -5889,8 +5914,12 @@ var RTG_BOUW = 'e6396e0d';
       return true;
     }
     if (/^(licht|donker|lichte modus|donkere modus)$/.test(q)) {
-      const b = $('#rtg-thema-knop');
-      if (b) { b.click(); bannerToon('✦', 'Rahul', 'De weergave is omgezet.'); return true; }
+      if (window.RTGOSThema && RTGOSThema.keuzeMogelijk()) {
+        const licht = /^(licht|lichte modus)$/.test(q);
+        RTGOSThema.zet(licht ? 'parelmoer' : 'standaard');
+        bannerToon('✦', 'Rahul', 'De weergave staat op ' + (licht ? 'licht' : 'donker') + '.');
+        return true;
+      }
       return false;
     }
     m = q.match(/^(?:open|start|ga naar)\s+(.+)$/);
@@ -7651,9 +7680,9 @@ var RTG_BOUW = 'e6396e0d';
     $('#gcCode').textContent = o.pickup ? T('app.gc.bon','Bon') + ' ' + o.pickup : '';
     const qh = $('#gcQr');
     if (qh){
-      qh.innerHTML = ''; qh.style.display = 'none';
+      qh.innerHTML = ''; qh.classList.add('h-weg');
       if (window.RTGQRteken && d && d.code){
-        try { qh.appendChild(RTGQRteken.teken(String(d.code), { schaal: 4, ecc: 'M' })); qh.style.display = 'inline-block'; } catch(e){}
+        try { qh.appendChild(RTGQRteken.teken(String(d.code), { schaal: 4, ecc: 'M' })); qh.classList.remove('h-weg'); } catch(e){}
       }
     }
     $('#glowCode').classList.add('open');
@@ -7850,7 +7879,7 @@ var RTG_BOUW = 'e6396e0d';
     }
     document.querySelectorAll('#content [data-goto]').forEach(b => b.addEventListener('click', () => openTab(b.dataset.goto)));
     const fEl = $('#homeFoundation'); if (fEl) fEl.style.display='none';
-    const gtab = $('#tabGezin'); if (gtab) gtab.style.display='none';
+    const gtab = $('#tabGezin'); if (gtab) gtab.classList.add('h-weg');
     // een gratis account (met paspoort) kan vrienden toevoegen en met hen chatten
 /* de betaalgeschiedenis van de gratis gebruiker */
     if (user.account) loadSocial(); else { const c = $('#homeContacts'); if (c) c.style.display='none'; }
@@ -7891,11 +7920,11 @@ var RTG_BOUW = 'e6396e0d';
   function esc(t){ return String(t==null?'':t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
   function renderFoundation(){
     const homeEl = $('#homeFoundation'), tab = $('#tabGezin'), dot = $('#tabGezinDot');
-    if (!user || !user.account){ if(homeEl) homeEl.style.display='none'; if(tab) tab.style.display='none'; return; }
+    if (!user || !user.account){ if(homeEl) homeEl.style.display='none'; if(tab) tab.classList.add('h-weg'); return; }
     const g = (rtf.gekoppeld || []), m = (rtf.meldingen || []);
     const ongelezen = m.filter(x=>!x.gelezen).length;
-    if (tab) tab.style.display = g.length ? '' : 'none';
-    if (dot) dot.style.display = (g.length && ongelezen) ? 'block' : 'none';
+    if (tab) tab.classList.toggle('h-weg', !g.length);
+    if (dot) dot.classList.toggle('h-weg', !(g.length && ongelezen));
     // compacte ingang op Home
     if (homeEl){
       homeEl.style.display='';
@@ -8048,8 +8077,7 @@ var RTG_BOUW = 'e6396e0d';
   /* ---------- reizen ---------- */
 
   function renderTrip(){
-    /* Nog geen reis: dan staat hier wat een reisoverzicht IS en hoe het ontstaat.
-       Een nieuw account begint leeg en erft de demo-reis niet meer. */
+    // Geen reis: uitleg, nooit geerfde demo-inhoud.
     if (!trip){
       $('#tripSub').textContent = T('app.trip.emptysub','Uw reisoverzicht is nog leeg.');
       const uitleg = (k, kop, tekst) =>
@@ -8074,9 +8102,8 @@ var RTG_BOUW = 'e6396e0d';
     renderAgenda();
   }
 
-  /* de reisagenda: alles met een datum (tafels, tickets, ritten, events)
-     automatisch samengevoegd tot een dagprogramma onder de reis */
-  const AGENDA_ICO = {};  // geen emoji-markers meer; alle items dragen het rustige '·'
+  /* Reisagenda: het dagprogramma onder de reis. */
+  const AGENDA_ICO = {};
   async function renderAgenda(){
     if (!API.live) return;
     let wrap = $('#agendaWrap');
@@ -8114,6 +8141,9 @@ var RTG_BOUW = 'e6396e0d';
       const data = await API.call('/api/pay', target === 'all' ? {all:true} : {invoiceId: target});
       foundation = data.foundation;
       applyState(data.state);
+      // Een gestart betaalverzoek is nog geen betaling. De server houdt de
+      // factuur open tot providerbewijs is verwerkt; de app vertelt hetzelfde.
+      if (data.pending || (data.intents && data.intents.length)) return { pending: true };
     } else {
       const targets = target === 'all' ? invoices.filter(i => i.status === 'open') : invoices.filter(i => i.id === target);
       for (const inv of targets){
@@ -8133,12 +8163,20 @@ var RTG_BOUW = 'e6396e0d';
     const pw = $('#paywait'), card = pw.querySelector('.paycard');
     $('#payAmt').textContent = amount;
     $('#payIcon').innerHTML = FID.replace(/currentColor/g, '#0C0C0B');
-    $('#payLbl').textContent = T('app.payingfid','Betalen met Face ID…');
+    $('#payLbl').textContent = T('app.paymentprocessing','Betaling verwerken…');
     card.classList.add('scanning'); card.classList.remove('done');
     pw.classList.add('open');
     setTimeout(async () => {
       try {
         const result = await doPay();
+        if (result && result.pending) {
+          card.classList.remove('scanning');
+          pw.classList.remove('open');
+          payBusy = false;
+          toast(T('app.paymentpending','Nog niet betaald: de betaalprovider wacht op bevestiging. Uw factuur blijft open.'));
+          renderPay(); renderHome(); renderTrip();
+          return;
+        }
         card.classList.remove('scanning'); card.classList.add('done');
         $('#payIcon').innerHTML = CHECK;
         $('#payLbl').textContent = T('app.confirmed','Bevestigd');
@@ -8146,7 +8184,7 @@ var RTG_BOUW = 'e6396e0d';
           pw.classList.remove('open');
           payBusy = false;
           if (opts.message) toast(opts.message(result));
-          else { toast(T('app.paid','Betaald') + '. ' + eur(result) + ' ' + T('app.tofoundation','gaat naar de RTFoundation.')); renderPay(); renderHome(); renderTrip(); }
+          else { toast(T('app.paid','Betaald') + (result > 0 ? '. ' + eur(result) + ' ' + T('app.foundationreserved','gereserveerd voor de RTFoundation.') : '.')); renderPay(); renderHome(); renderTrip(); }
           if (opts.after) opts.after(result);
         }, 700);
       } catch (e) {
@@ -8158,9 +8196,7 @@ var RTG_BOUW = 'e6396e0d';
   }
 
   /* ---------- betalen met munten (crypto) ----------
-     Kies een munt, ontvang het exacte bedrag en een adres. RTG zet de munten via
-     een vergunninghoudende aanbieder meteen om naar euro; wij houden zelf geen
-     crypto vast. Zodra het netwerk bevestigt, zetten we de factuur op betaald. */
+     Bedrag en adres via de aanbieder; pas betaald na netwerkbevestiging. */
   let muntPoll = null;
   function muntStop(){ if (muntPoll){ clearInterval(muntPoll); muntPoll = null; } }
   // cfg: { euro, titel, maak: async(munt)=>verzoek, klaar?: async()=>bool }
@@ -8731,6 +8767,10 @@ var RTG_BOUW = 'e6396e0d';
   async function ask(qIn){
     const q = String(qIn || '').trim();
     if (!q) return;
+    /* Een RTG Direct-vraag gaat rechtstreeks naar de interne Servicezaak. De
+       algemene Rahul-motor krijgt hem niet eerst: de gebruiker koos hier
+       expliciet voor contact met een medewerker. */
+    if (user.account && rtgDirect){ chatSend(q); return; }
     // eerst Rahul-motor: geheugen, seintjes, zoeken en echt regelen
     // (reserveren, het 24-uursblok, een Tik, betaalverzoeken); pakt hij de
     // vraag niet, dan neemt de gewone gesprekslaag het over
@@ -8763,11 +8803,28 @@ var RTG_BOUW = 'e6396e0d';
   }
 
   /* ---------- doorlopend gesprek in de app voor echte accounts ---------- */
-  function renderChatMsgs(msgs, concierge){
+  function eigenChatMode(){
+    return user.tier === 'rtg' ? 'rahul'
+      : user.tier === 'lifestyle' || user.tier === 'business' ? 'concierge' : 'service';
+  }
+  function renderChatMsgs(msgs, mode){
+    const concierge = mode === 'concierge';
+    // Ook een al geopend scherm volgt de actuele servermodus na pasverval.
+    $('#aiTitle').textContent = mode === 'service' ? T('chat.service.title','RTG Service.')
+      : concierge ? T('chat.concierge.title','Uw concierge.') : T('ai.title.rtg','Rahul.');
+    const deck = document.querySelector('.view[data-view="ai"] .sub');
+    if (deck) deck.textContent = mode === 'service' ? T('chat.service.deck','Ondersteuning bij uw account, betaling en nazorg. Geen persoonlijke AI of concierge.') : concierge
+      ? T('chat.concierge.deck','Uw persoonlijke concierge, in uw beveiligde app-lijn. Eén doorlopend gesprek.')
+      : T('chat.rahul.deck','Rahul, in uw beveiligde app-lijn. Eén doorlopend gesprek.');
+    if (mode !== 'service'){
+      $('#chips').innerHTML = '<button class="chip" id="aiBetaalChip">' + FID_MINI + T('dp.aichip','Betaal een partner') + '</button>';
+      const bc = $('#aiBetaalChip'); if (bc) bc.addEventListener('click', () => kiesPartnerEnBetaal('ai'));
+    } else { $('#chips').innerHTML = ''; }
     const chat = $('#chat');
     if (!msgs.length){
       chat.innerHTML = '';
-      bubble(concierge ? T('chat.concierge.hi','Goedendag. Schrijf ons hier in de app; uw concierge helpt u persoonlijk.') : aiOpener(), 'ai');
+      bubble(mode === 'service' ? T('chat.service.hi','Hulp bij uw account, betaling of nazorg vindt u via Hulp in de app. U kunt daar een medewerker vragen.')
+        : concierge ? T('chat.concierge.hi','Goedendag. Schrijf ons hier in de app; uw concierge helpt u persoonlijk.') : aiOpener(), 'ai');
       return;
     }
     // Met Util.el: de berichttekst (van de gast of de concierge) gaat structureel
@@ -8775,7 +8832,7 @@ var RTG_BOUW = 'e6396e0d';
     const E = Util.el;
     const bubbels = msgs.map(m => E('div', { class: 'bubble ' + (m.from === 'member' ? 'user' : 'ai') },
       null,
-      m.text));
+      (m.from === 'service' ? T('chat.service.automatisch','RTG Service · automatisch bericht: ') : '') + m.text));
     const last = msgs[msgs.length - 1];
     if (concierge && last && last.from === 'member'){
       bubbels.push(E('div', { class: 'bubble ai pending' }, T('chat.concierge.pending', 'Uw concierge is ingelicht en reageert zo.')));
@@ -8784,20 +8841,10 @@ var RTG_BOUW = 'e6396e0d';
     $('#content').scrollTop = $('#content').scrollHeight;
   }
   async function renderChat(){
-    const concierge = user.tier !== 'rtg';
-    $('#aiTitle').textContent = concierge ? T('chat.concierge.title','Uw concierge.') : T('ai.title.rtg','Rahul.');
-    const deck = document.querySelector('.view[data-view="ai"] .sub');
-    if (deck) deck.textContent = concierge
-      ? T('chat.concierge.deck','Uw persoonlijke concierge, in uw beveiligde app-lijn. Eén doorlopend gesprek.')
-      : T('chat.rahul.deck','Rahul, in uw beveiligde app-lijn. Eén doorlopend gesprek.');
-    // Vaste snelactie: alles regelen én afrekenen kan hier. Face ID, direct naar de partner.
-    if (user.tier !== 'guest'){
-      $('#chips').innerHTML = '<button class="chip" id="aiBetaalChip">' + FID_MINI + T('dp.aichip','Betaal een partner') + '</button>';
-      const bc = $('#aiBetaalChip'); if (bc) bc.addEventListener('click', () => kiesPartnerEnBetaal('ai'));
-    } else { $('#chips').innerHTML = ''; }
-    if (!API.live){ $('#chat').innerHTML = ''; bubble(aiOpener(), 'ai'); return; }
-    try { const d = await API.call('/chat/history'); renderChatMsgs(d.messages, concierge); }
-    catch (e) { $('#chat').innerHTML = ''; bubble(aiOpener(), 'ai'); }
+    const mode = eigenChatMode();
+    if (!API.live){ renderChatMsgs([], mode); return; }
+    try { const d = await API.call('/chat/history'); renderChatMsgs(d.messages, d.mode || mode); }
+    catch (e) { renderChatMsgs([], mode); }
   }
   // Kies een partner en reken direct met Face ID af (vanuit de AI/concierge).
   function kiesPartnerEnBetaal(bron){
@@ -8821,31 +8868,66 @@ var RTG_BOUW = 'e6396e0d';
   }
   async function chatSend(q){
     if (!API.live){ bubble(q, 'user'); setTimeout(() => bubble(aiAnswer(q), 'ai'), 400); return; }
-    try { const d = await API.call('/chat/send', { text: q }); renderChatMsgs(d.messages, user.tier !== 'rtg'); }
+    if (rtgDirect) {
+      bubble(q, 'user');
+      try {
+        const titels = { algemeen: T('direct.titel.algemeen','Contact via RTG Direct'),
+          passen: T('direct.titel.passen','Vraag over een RTG-formule'),
+          organisatie: T('direct.titel.organisatie','Vraag over RTG voor een organisatie'),
+          techniek: T('direct.titel.techniek','Vraag over de techniek van RTG') };
+        const d = await API.call('/service/open', { onderwerp: rtgDirect === 'techniek' ? 'app' : 'anders',
+          titel: titels[rtgDirect] || titels.algemeen, tekst: q });
+        await API.call('/service/mens', { id: d.zaak.id,
+          tekst: T('direct.mens','Contact via RTG Direct') });
+        bubble(T('direct.ok','Uw vraag staat veilig bij RTG als') + ' ' + d.zaak.id + '. ' +
+          T('direct.react','Een medewerker reageert hier in de app.'), 'ai');
+        rtgDirect = null;
+        history.replaceState(null, '', location.pathname + location.search);
+      } catch (e) { bubble(T('direct.mis','Versturen lukte nog niet. Uw tekst blijft hieronder staan.'), 'ai'); const i = $('#askInput'); if (i) i.value = q; }
+      return;
+    }
+    try { const d = await API.call('/chat/send', { text: q }); renderChatMsgs(d.messages, d.mode || eigenChatMode()); }
     catch (e) { toast(e.message || 'Versturen mislukt.'); }
   }
 
   /* De websitebrief gaat pas naar de server NADAT de gebruiker in deze app is
      ingelogd. Geen externe berichtendienst of openbaar aanvraag-endpoint:
-     dezelfde ingelogde /chat/send-lijn die de app zelf gebruikt. We wissen het
+     de ingelogde Service-lijn. We wissen het
      fragment pas na een geslaagde aanname, zodat een netwerkstoring de aanvraag
      niet stil laat verdwijnen en een herlaad hem opnieuw kan proberen. */
   let websiteAanvraagBezig = false;
   async function verwerkWebsiteAanvraag(){
-    if (!websiteAanvraag || websiteAanvraagBezig || !user.account || !API.live) return;
+    if ((!websiteAanvraag && !rtgDirect) || websiteAanvraagBezig || !user.account || !API.live) return;
     websiteAanvraagBezig = true;
+    if (rtgDirect && !websiteAanvraag) {
+      openTab('ai');
+      const invoer = $('#askInput');
+      if (invoer) {
+        const onderwerp = { algemeen: T('direct.algemeen','Ik wil contact opnemen over: '),
+          passen: T('direct.passen','Ik heb een vraag over een RTG-formule: '),
+          organisatie: T('direct.organisatie','Ik wil RTG voor mijn organisatie bespreken: '),
+          techniek: T('direct.techniek','Ik heb een technische vraag: ') };
+        invoer.value = onderwerp[rtgDirect] || onderwerp.algemeen;
+        invoer.focus();
+      }
+      toast(T('direct.schrijf','Schrijf uw vraag. Deze gaat rechtstreeks naar een RTG-medewerker.'));
+      websiteAanvraagBezig = false;
+      return;
+    }
     const regels = [
       'Aanvraag via rtravelgroup.store', '',
       'Wereld / behoefte: ' + websiteAanvraag.requirement,
-      'Naam: ' + websiteAanvraag.name,
-      'E-mail: ' + websiteAanvraag.email,
-      websiteAanvraag.phone ? 'Telefoon: ' + websiteAanvraag.phone : null,
       '', 'Brief:', websiteAanvraag.message
     ].filter(regel => regel !== null);
     try {
-      const d = await API.call('/chat/send', { text: regels.join('\n') });
+      const d = await API.call('/service/open', { onderwerp: 'anders',
+        titel: 'Aanvraag via rtravelgroup.store · ' + websiteAanvraag.requirement,
+        tekst: regels.join('\n') });
+      await API.call('/service/mens', { id: d.zaak.id,
+        tekst: T('aanvraag.service.mens','Aanvraag via de publieke website') });
       openTab('ai');
-      renderChatMsgs(d.messages, user.tier !== 'rtg');
+      bubble(T('aanvraag.service.ok','Uw aanvraag staat veilig bij RTG als') + ' ' + d.zaak.id + '. ' +
+        T('aanvraag.service.react','Een medewerker reageert in de app.'), 'ai');
       websiteAanvraag = null;
       history.replaceState(null, '', location.pathname + location.search);
       toast(T('aanvraag.app.ok','Uw aanvraag staat in uw beveiligde RTG-lijn.'));

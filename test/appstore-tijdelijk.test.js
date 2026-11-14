@@ -17,7 +17,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop, kantoorAlsPersoon, zaakMensOpNaam } = require('./helper');
+const { startServer, stop, kantoorAlsPersoon, zaakMensOpNaam, maakBetaaldRtgTestaccount } = require('./helper');
 const { leesTot, isVerlopen } = require('../server/kern/appstore/tijdelijk');
 
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-tijdelijk-'));
@@ -55,7 +55,8 @@ test.before(async () => {
   srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   base = srv.base;
   lid = (await api('/api/auth/register', { name: 'Tijd Lid', email: 't@x.nl', phone: '0612340009',
-    password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' })).body.token;
+    password: 'geheim123', geboortedatum: '1990-01-01', pasApp: 'rtg' })).body.token;
+  maakBetaaldRtgTestaccount(TMP, 't@x.nl');
   office = (await api('/api/office/login', { code: 'RTG-OFFICE' })).body.token;
   /* DE TEKENAAR IS EEN MENS OP NAAM: de gedeelde code met een getypte naam
      tekent geen app meer af (kern/appstore/vierogen.js, 11 oktober 2026). */

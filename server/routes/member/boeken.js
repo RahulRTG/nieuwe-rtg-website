@@ -82,7 +82,11 @@ module.exports = (kern) => {
   });
 
   app.post('/api/suppliers', auth, (req, res) => {
-    if (req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor leden.' });
+    /* De gids is de etalage, geen betaalde dienst. Een gratis account mag de
+       zichtbare partners dus zien; alleen de anonieme gastpersona blijft buiten
+       omdat favorieten en reiscontext aan een eigen sessie hangen. */
+    if (req.session.tier === 'guest' && !req.session.account)
+      return res.status(403).json({ error: 'Alleen voor accounts.' });
     const city = req.body.city;
     // De Salon is verplicht: partners zonder compleet Salon-profiel tonen we niet
     const list = db.data.suppliers.filter(s => (!city || s.city === city) && salonZichtbaar(s))

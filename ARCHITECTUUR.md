@@ -19,9 +19,9 @@ Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 | Wat | Aantal |
 |---|---|
 | API-endpoints | 5582 |
-| servermodules (`server/**/*.js`) | 4741 |
+| servermodules (`server/**/*.js`) | 4742 |
 | routebestanden (`server/routes/**`) | 682 |
-| kernmodules (`server/kern/**`) | 2975 |
+| kernmodules (`server/kern/**`) | 2976 |
 | schermen (`public/**/*.html`) | 328 |
 | gedeelde browsermodules (`public/shared/*.js`) | 470 |
 | toetsbestanden (`test/*.test.js`) | 2841 |
@@ -144,9 +144,9 @@ cluster, translate), de foundation-mount, SSO, SCIM, onboarding en de losse takk
 
 | Meting | Nu |
 |---|---|
-| kern-namen die routes aanraken | 1696 |
+| kern-namen die routes aanraken | 1695 |
 | daarvan door **meer dan één** domein (de echte koppeling) | 260 |
-| daarvan door precies één domein | 1436 |
+| daarvan door precies één domein | 1435 |
 | breedste enkele routebestand | 71 namen |
 | gepakt uit kern en nergens gebruikt | 0 |
 

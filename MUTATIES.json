@@ -1,11 +1,11 @@
 {
   "stempel": {
-    "op": "2026-11-13T15:25:29.220Z",
-    "commit": "ce185d73c",
+    "op": "2026-11-14T12:29:59.392Z",
+    "commit": "8380a6852",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
-    "node": "v24.18.0"
+    "node": "v26.13.1"
   },
   "uitleg": "Per toetsbestand: kan hij zakken? Pure toetsen krijgen een bronmutatie in de module die ze laden; servertoetsen krijgen de liegpoort (RTG_LIEG). scherp = de deuren bleven open, dus hij zakte op de INHOUD en niet op de inlog.",
   "grens": "een toets die zakt is bewezen GEVOELIG, niet bewezen GOED -- hij kan op de verkeerde reden zakken. Een toets die groen blijft is niet bewezen waardeloos: de operatoren zijn mechanisch en er zijn fouten die ze niet maken.",
@@ -159,6 +159,46 @@
       "module": "server/kern/mediaos/aanwezigheid.js",
       "operator": "===->!==#0",
       "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "abonnementscredit-bewijs.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/commercie/abonnementsverrekening.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 8,
+      "geprobeerd": 1
+    },
+    "abonnementscredit.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/commercie/abonnementsverrekening.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 7,
+      "geprobeerd": 1
+    },
+    "abonnementsopzegging.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/aanmeldingen/betaalschema.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 1,
+      "geprobeerd": 2
+    },
+    "abonnementsprijs.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/pasprijs.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 3,
+      "geprobeerd": 1
+    },
+    "abonnementsverrekening.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/commercie/abonnementsverrekening.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 14,
       "geprobeerd": 1
     },
     "access-language.e2e.js": {
@@ -4136,6 +4176,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 5,
       "scherp": "gezakt"
+    },
+    "contractstand-commit.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/db/verzoekcontext.js",
+      "operator": "optie-uit#0",
+      "gezakt": 2,
+      "geprobeerd": 2
     },
     "contrastcontext.e2e.js": {
       "soort": "puur",
@@ -12261,6 +12309,14 @@
       "gezakt": 6,
       "scherp": "gezakt"
     },
+    "mobiliteit-werktoegang.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/mobiliteit/opslag.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 12,
+      "geprobeerd": 1
+    },
     "mobiliteit.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -14720,6 +14776,14 @@
       "operator": "getal+1#1",
       "gezakt": 1,
       "geprobeerd": 2
+    },
+    "pg-schaduwmerge.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/pg/verzoekbijzonder.js",
+      "operator": "===->!==#0",
+      "gezakt": 9,
+      "geprobeerd": 1
     },
     "pg-snapshot.test.js": {
       "soort": "server",
@@ -17359,6 +17423,14 @@
       "module": "public/shared/rtg-heritage-order.js",
       "operator": "true->false#0",
       "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "rtg-heritage-overlay.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/shared/rtg-heritage-components.js",
+      "operator": "browser-export-weg#0",
+      "gezakt": 8,
       "geprobeerd": 1
     },
     "rtg-heritage-transition.test.js": {

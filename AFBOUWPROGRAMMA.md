@@ -223,6 +223,23 @@ Contactlijnresolutie heeft een eigen samenhangende module; gedeelde
 accountcontrole hoeft geen globale kernexport meer te zijn. Bron wordt eerst
 vastgelegd, daarna pas opnieuw gemeten.
 
+**Lokale herproef op bron `8380a6852`.** Alle negen nieuw gemeten
+mutatieproeven herkennen een ingebrachte fout; daarna is de bron hersteld.
+De vier vuile bewijsregisters zijn opnieuw uit de vastgelegde bron gegenereerd.
+De canonieke rolronde, inclusief invoerspoor, bewijst nu 2.055 ledenroutes:
+nul rolscheidingsgaten en geen onbekende antwoorden. Negen vooraf benoemde
+routes blijven niet meetbaar met deze generieke fixture en tellen niet als
+bewijs. Norm, alle 78 statische huisregels en deltapoort slagen lokaal.
+
+Testscherf 2 van de remote ronde faalde op drie achtergelopen registers.
+Na regeneratie slagen de betrokken registerproeven lokaal 44/44.
+`EXPERIENCEWERKT.json` kreeg uitsluitend een actuele bronhash; 114 apps,
+316 schermen, nul bewezen dimensies en `NOT_TESTED` blijven ongewijzigd.
+De andere drie remote unit-scherven en schermdeel 1 zijn nog rood;
+schermdeel 2 werd geannuleerd. Schermdelen 3/4/5 en alle vier
+toegankelijkheidsdelen zijn groen. De resterende fouten krijgen per
+oorzaak een begrensde herstelgroep, geen bredere vrijstelling.
+
 Automatisch samenvoegen op #727 is uitgezet: de vier beschermde checks alleen
 wachten niet op alle aanvullende scherm- en dekkingsuitslagen. De integrator
 controleert de volledige ronde en kandidaatboom vóór een normale beschermde

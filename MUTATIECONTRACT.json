@@ -1,9 +1,9 @@
 {
  "stempel": {
-  "op": "2026-11-14T11:02:32.074Z",
-  "commit": "01319f65b",
-  "boomVuil": true,
-  "boomAnders": 27,
+  "op": "2026-11-14T12:36:55.873Z",
+  "commit": "8380a6852",
+  "boomVuil": false,
+  "boomAnders": 2,
   "instrument": "scripts/mutatiecontract.js",
   "node": "v26.13.1"
  },
@@ -57900,7 +57900,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": "geen anonieme demo-gast",
+    "uitHandler": null,
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -58089,7 +58089,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": "geen anonieme demo-gast",
+    "uitHandler": null,
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -58116,7 +58116,7 @@
    "duplicaatregel": "nietIdempotent",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": "geen anonieme demo-gast",
+    "uitHandler": null,
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -58137,7 +58137,7 @@
    "duplicaatregel": "nietIdempotent",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": "geen anonieme demo-gast",
+    "uitHandler": null,
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -58347,7 +58347,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": "geen anonieme demo-gast",
+    "uitHandler": null,
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -58374,7 +58374,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": "geen anonieme demo-gast",
+    "uitHandler": "ja",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"

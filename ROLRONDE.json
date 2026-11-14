@@ -1,11 +1,11 @@
 {
   "stempel": {
-    "op": "2026-10-25T10:30:42.148Z",
-    "commit": "ce1a748b2c",
+    "op": "2026-11-14T12:58:17.105Z",
+    "commit": "8380a6852",
     "boomVuil": false,
-    "boomAnders": 0,
+    "boomAnders": 14,
     "instrument": "scripts/rolronde.js",
-    "node": "v26.12.1",
+    "node": "v26.13.1",
     "invoer": {
       "meting": "invoerspoor",
       "versie": 1,
@@ -45,6 +45,7 @@
         "server/accounts/publiekmail.js",
         "server/accounts/registratie.js",
         "server/accounts/sessiegrens.js",
+        "server/accounts/staff-eigenaar.js",
         "server/accounts/staff-sessie.js",
         "server/accounts/staff.js",
         "server/accounts/state.js",
@@ -166,9 +167,12 @@
         "server/betaal/naslag.js",
         "server/betaal/ontvangst.js",
         "server/betaal/providerbewijs.js",
+        "server/betaal/stripe-afspraak.js",
         "server/betaal/stripe-gehost.js",
+        "server/betaal/stripe-klantactie.js",
         "server/betaal/synthetisch-naslag.js",
         "server/betaal/synthetisch.js",
+        "server/betaal/terugkerend.js",
         "server/betaal/uitbetaalgrendel.js",
         "server/betaal/uitbetaling.js",
         "server/betaal/webhook.js",
@@ -383,15 +387,35 @@
         "server/kern/aanmeldgesprek.js",
         "server/kern/aanmeldingen.js",
         "server/kern/aanmeldingen/aanvraag.js",
+        "server/kern/aanmeldingen/abonnementen.js",
+        "server/kern/aanmeldingen/abonnementsaanbod-intrekken.js",
+        "server/kern/aanmeldingen/abonnementsaanbod-ontvangst.js",
+        "server/kern/aanmeldingen/abonnementsaanbod-vorm.js",
+        "server/kern/aanmeldingen/abonnementsaanbod.js",
+        "server/kern/aanmeldingen/abonnementsactivering.js",
+        "server/kern/aanmeldingen/abonnementsbetaalgrens.js",
+        "server/kern/aanmeldingen/abonnementsbetaling.js",
+        "server/kern/aanmeldingen/abonnementscontext.js",
+        "server/kern/aanmeldingen/abonnementsdiensten.js",
+        "server/kern/aanmeldingen/abonnementsfactuur.js",
+        "server/kern/aanmeldingen/abonnementsherstel.js",
+        "server/kern/aanmeldingen/abonnementsmeldingen.js",
+        "server/kern/aanmeldingen/abonnementssettlement.js",
+        "server/kern/aanmeldingen/abonnementstermijn.js",
         "server/kern/aanmeldingen/bedoeling.js",
+        "server/kern/aanmeldingen/bedrijf-automatisch.js",
+        "server/kern/aanmeldingen/bedrijf-plan.js",
         "server/kern/aanmeldingen/bedrijf.js",
         "server/kern/aanmeldingen/besluit.js",
+        "server/kern/aanmeldingen/betaalschema-opzeg.js",
         "server/kern/aanmeldingen/betaalschema.js",
         "server/kern/aanmeldingen/bewijs.js",
         "server/kern/aanmeldingen/catalogus.js",
         "server/kern/aanmeldingen/klaarzetten.js",
         "server/kern/aanmeldingen/lidabonnement-opzeg.js",
+        "server/kern/aanmeldingen/lidabonnement-termijnen.js",
         "server/kern/aanmeldingen/lidabonnement.js",
+        "server/kern/aanmeldingen/naargast-ronde.js",
         "server/kern/aanmeldingen/naargast.js",
         "server/kern/aanmeldkanaal.js",
         "server/kern/aanwezigheid.js",
@@ -436,6 +460,7 @@
         "server/kern/ai/routermeting.js",
         "server/kern/ai/routeropslag.js",
         "server/kern/ai/routertellers.js",
+        "server/kern/ai/substitutie.js",
         "server/kern/aidata.js",
         "server/kern/aipoort.js",
         "server/kern/algpin-herstel.js",
@@ -662,14 +687,17 @@
         "server/kern/betaalregie-waarheid.js",
         "server/kern/betaalregie.js",
         "server/kern/betaalwaarheid/aanmaken.js",
+        "server/kern/betaalwaarheid/actueel.js",
         "server/kern/betaalwaarheid/afhandeling.js",
         "server/kern/betaalwaarheid/beeld.js",
         "server/kern/betaalwaarheid/bewijs.js",
         "server/kern/betaalwaarheid/controle.js",
+        "server/kern/betaalwaarheid/herstartgrens.js",
         "server/kern/betaalwaarheid/hervat.js",
         "server/kern/betaalwaarheid/inbox.js",
         "server/kern/betaalwaarheid/index.js",
         "server/kern/betaalwaarheid/inkomend.js",
+        "server/kern/betaalwaarheid/klantactie.js",
         "server/kern/betaalwaarheid/staten.js",
         "server/kern/betaalwaarheid/terug.js",
         "server/kern/betaalwaarheid/terugveeg.js",
@@ -764,6 +792,7 @@
         "server/kern/bureau/cases.js",
         "server/kern/bureau/collectie.js",
         "server/kern/bureau/delegatie.js",
+        "server/kern/bureau/diensten.js",
         "server/kern/bureau/dieren.js",
         "server/kern/bureau/index.js",
         "server/kern/bureau/kamers.js",
@@ -799,6 +828,7 @@
         "server/kern/carriereledger/projectie.js",
         "server/kern/carriereledger/regels.js",
         "server/kern/checklijst.js",
+        "server/kern/civilis/contract.js",
         "server/kern/clamd.js",
         "server/kern/clips-kantoor.js",
         "server/kern/clips-lezers.js",
@@ -815,6 +845,7 @@
         "server/kern/comm/collega.js",
         "server/kern/comm/deelnemer.js",
         "server/kern/comm/dm.js",
+        "server/kern/comm/gast-lijn.js",
         "server/kern/comm/gast-lijsten.js",
         "server/kern/comm/gast-verhuizing.js",
         "server/kern/comm/gast.js",
@@ -915,6 +946,9 @@
         "server/kern/commerce/verkoopweglijst.js",
         "server/kern/commerce/werkwoorden.js",
         "server/kern/commerce/werkwoordlijst.js",
+        "server/kern/commercie/abonnementsbewijs.js",
+        "server/kern/commercie/abonnementscredit.js",
+        "server/kern/commercie/abonnementsverrekening.js",
         "server/kern/commercie/allocatie.js",
         "server/kern/commercie/allocatie/regels.js",
         "server/kern/commercie/besluit.js",
@@ -930,6 +964,7 @@
         "server/kern/commercie/claims/open.js",
         "server/kern/commercie/claims/poort.js",
         "server/kern/commercie/contract.js",
+        "server/kern/commercie/contract/abonnement.js",
         "server/kern/commercie/contract/verplichting.js",
         "server/kern/commercie/contract/vorm.js",
         "server/kern/commercie/fee.js",
@@ -940,6 +975,7 @@
         "server/kern/commercie/handhaving/spoken.js",
         "server/kern/commercie/handhaving/tekst.js",
         "server/kern/commercie/lidpoort.js",
+        "server/kern/commercie/organisatieabonnement.js",
         "server/kern/commercie/prijsmelding.js",
         "server/kern/commercie/rechten.js",
         "server/kern/commercie/risicouitzondering.js",
@@ -1483,6 +1519,7 @@
         "server/kern/isolatie/zetten.js",
         "server/kern/journaalbestand.js",
         "server/kern/journaallezen.js",
+        "server/kern/journaalmigratie.js",
         "server/kern/journaalrotatie.js",
         "server/kern/journaalverhuizing.js",
         "server/kern/journaalvorm.js",
@@ -2036,6 +2073,7 @@
         "server/kern/mobiliteit/vergeten.js",
         "server/kern/mobiliteit/voertuigcatalogus.js",
         "server/kern/mobiliteit/voortgang.js",
+        "server/kern/mobiliteit/werktoegang.js",
         "server/kern/mobiliteit/zakelijk.js",
         "server/kern/modebezorg.js",
         "server/kern/modebezorg/bezorgcode.js",
@@ -2260,6 +2298,7 @@
         "server/kern/passen.js",
         "server/kern/pay/bakken.js",
         "server/kern/pay/bewijs.js",
+        "server/kern/pay/boeking-bekend.js",
         "server/kern/pay/boeking.js",
         "server/kern/pay/budget.js",
         "server/kern/pay/dekking.js",
@@ -2347,6 +2386,10 @@
         "server/kern/pdf-redactie.js",
         "server/kern/pdf-xref.js",
         "server/kern/pdf.js",
+        "server/kern/personalos/catalog.js",
+        "server/kern/personalos/contract.js",
+        "server/kern/personalos/engine.js",
+        "server/kern/personalos/index.js",
         "server/kern/personas.js",
         "server/kern/personeel.js",
         "server/kern/persoonseis-lijst.js",
@@ -2434,15 +2477,28 @@
         "server/kern/reisbieb/index.js",
         "server/kern/reisbureau-advies.js",
         "server/kern/reisbureau-besluit.js",
+        "server/kern/reisbureau-betaaltoestemming.js",
         "server/kern/reisbureau-betaling.js",
+        "server/kern/reisbureau-betalingsrijen.js",
         "server/kern/reisbureau-context.js",
         "server/kern/reisbureau-geldrijen.js",
+        "server/kern/reisbureau-inning.js",
+        "server/kern/reisbureau-keten.js",
+        "server/kern/reisbureau-ketenbetaling.js",
+        "server/kern/reisbureau-ketencontract.js",
+        "server/kern/reisbureau-ketenexport.js",
+        "server/kern/reisbureau-ketennazorg.js",
+        "server/kern/reisbureau-ketenopslag.js",
         "server/kern/reisbureau-nazorg.js",
+        "server/kern/reisbureau-nazorgbeeld.js",
+        "server/kern/reisbureau-nazorgtransactie.js",
         "server/kern/reisbureau-opslag.js",
+        "server/kern/reisbureau-prijsgrond.js",
         "server/kern/reisbureau-samenstelling.js",
         "server/kern/reisbureau-terugboeking.js",
         "server/kern/reisbureau-teruggave.js",
         "server/kern/reisbureau-thuis.js",
+        "server/kern/reisbureau-toegang.js",
         "server/kern/reisbureau-wijziging.js",
         "server/kern/reisbureau.js",
         "server/kern/reisgezelschap-delen.js",
@@ -2576,6 +2632,8 @@
         "server/kern/rtfos/netwerk.js",
         "server/kern/rtfos/ondernemers.js",
         "server/kern/rtfos/opslag.js",
+        "server/kern/rtfos/opvang-partner.js",
+        "server/kern/rtfos/opvang.js",
         "server/kern/rtfos/partners-portaal.js",
         "server/kern/rtfos/partners.js",
         "server/kern/rtfos/projecten-besluit.js",
@@ -2696,8 +2754,11 @@
         "server/kern/service/persoonlijk.js",
         "server/kern/service/post.js",
         "server/kern/service/prioriteit.js",
+        "server/kern/service/rahul-lijn.js",
+        "server/kern/service/rahul.js",
         "server/kern/service/router.js",
         "server/kern/service/teams.js",
+        "server/kern/service/zaak-melder.js",
         "server/kern/service/zaak.js",
         "server/kern/servicekosten.js",
         "server/kern/ses-ontvangst.js",
@@ -2957,6 +3018,7 @@
         "server/kern/stuur/paden.js",
         "server/kern/stuur/plafond.js",
         "server/kern/stuur/plan.js",
+        "server/kern/stuur/plantweeling.js",
         "server/kern/stuur/rail-corpus-bevestig.js",
         "server/kern/stuur/rail-corpus-context.js",
         "server/kern/stuur/rail-corpus-doel.js",
@@ -2975,6 +3037,7 @@
         "server/kern/stuur/staving.js",
         "server/kern/stuur/taakbeeld.js",
         "server/kern/stuur/toets.js",
+        "server/kern/stuur/waarborgcontract.js",
         "server/kern/supplierdefaults.js",
         "server/kern/synergie.js",
         "server/kern/taalbeleid.js",
@@ -2993,10 +3056,15 @@
         "server/kern/tenant/index.js",
         "server/kern/tenant/journaal.js",
         "server/kern/tenant/levensloop.js",
+        "server/kern/tenant/lezen.js",
         "server/kern/tenant/merkkern.js",
         "server/kern/tenant/opslag.js",
         "server/kern/tenant/register.js",
+        "server/kern/tenant/uitgang-grens.js",
         "server/kern/tenant/uitgang-leesbaar.js",
+        "server/kern/tenant/uitgang-reis.js",
+        "server/kern/tenant/uitgang-reisgrens.js",
+        "server/kern/tenant/uitgang-validatie.js",
         "server/kern/tenant/uitgang.js",
         "server/kern/theater/huisstijl.js",
         "server/kern/theater/index.js",
@@ -3266,6 +3334,7 @@
         "server/kern/zaakdoos/koppen.js",
         "server/kern/zaakdoos/netwerk.js",
         "server/kern/zaakdoos/proxy.js",
+        "server/kern/zaakdoos/reisketen.js",
         "server/kern/zaakdoos/sleutels-schaduw.js",
         "server/kern/zaakdoos/sleutels-uitgever.js",
         "server/kern/zaakdoos/sleutels.js",
@@ -3292,6 +3361,7 @@
         "server/lib/account-op-sleutel.js",
         "server/lib/acme.js",
         "server/lib/ankerdienst.js",
+        "server/lib/ankerherstel.js",
         "server/lib/ankerherzegel.js",
         "server/lib/ankerherzegelopslag.js",
         "server/lib/ankerjournalen.js",
@@ -3314,6 +3384,7 @@
         "server/lib/cache.js",
         "server/lib/cdp.js",
         "server/lib/correlatie.js",
+        "server/lib/csvcel.js",
         "server/lib/document-operatiepad.js",
         "server/lib/dubbeltik.js",
         "server/lib/dubbeltikkast.js",
@@ -3413,6 +3484,7 @@
         "server/lib/idemsleutels-reisconcept.js",
         "server/lib/idemsleutels-reisgezelschap.js",
         "server/lib/idemsleutels-reisherkomst.js",
+        "server/lib/idemsleutels-reisketen.js",
         "server/lib/idemsleutels-reisteruggave.js",
         "server/lib/idemsleutels-restbak.js",
         "server/lib/idemsleutels-rtc.js",
@@ -3432,6 +3504,7 @@
         "server/lib/idemsleutels-werelden.js",
         "server/lib/idemsleutels-zaakregie.js",
         "server/lib/idemsleutels.js",
+        "server/lib/immutable-json.js",
         "server/lib/jws.js",
         "server/lib/keten-anker.js",
         "server/lib/keten-verifieer.js",
@@ -3446,6 +3519,7 @@
         "server/lib/losvanverzoek.js",
         "server/lib/luisteradres.js",
         "server/lib/mutatiecontracten-aankomst.js",
+        "server/lib/mutatiecontracten-abonnementen.js",
         "server/lib/mutatiecontracten-afhaalcode.js",
         "server/lib/mutatiecontracten-afleidrest-b.js",
         "server/lib/mutatiecontracten-afleidrest-c.js",
@@ -3464,6 +3538,7 @@
         "server/lib/mutatiecontracten-beschermzaak.js",
         "server/lib/mutatiecontracten-cadeaukaart.js",
         "server/lib/mutatiecontracten-carriereledger.js",
+        "server/lib/mutatiecontracten-civilis-opvang.js",
         "server/lib/mutatiecontracten-codedeuren.js",
         "server/lib/mutatiecontracten-codefamilie.js",
         "server/lib/mutatiecontracten-conciergelus.js",
@@ -3545,6 +3620,8 @@
         "server/lib/mutatiecontracten-padparameter.js",
         "server/lib/mutatiecontracten-partnerkanaal.js",
         "server/lib/mutatiecontracten-partnernetwerk.js",
+        "server/lib/mutatiecontracten-personalisatie.js",
+        "server/lib/mutatiecontracten-personalos.js",
         "server/lib/mutatiecontracten-personeel.js",
         "server/lib/mutatiecontracten-portaalrotatie.js",
         "server/lib/mutatiecontracten-praktijk.js",
@@ -3556,11 +3633,13 @@
         "server/lib/mutatiecontracten-reis.js",
         "server/lib/mutatiecontracten-reisconcept.js",
         "server/lib/mutatiecontracten-reisherkomst.js",
+        "server/lib/mutatiecontracten-reisketen.js",
         "server/lib/mutatiecontracten-reisnazorg.js",
         "server/lib/mutatiecontracten-reisopgave.js",
         "server/lib/mutatiecontracten-reisteruggave.js",
         "server/lib/mutatiecontracten-restdeuren.js",
         "server/lib/mutatiecontracten-ritontvangst.js",
+        "server/lib/mutatiecontracten-rtf-onboarding.js",
         "server/lib/mutatiecontracten-rtflabfonds.js",
         "server/lib/mutatiecontracten-rtfsamen.js",
         "server/lib/mutatiecontracten-rtgboek.js",
@@ -3607,6 +3686,7 @@
         "server/lib/mutatiecontracten.js",
         "server/lib/ontvangst-operatiepad.js",
         "server/lib/padvorm.js",
+        "server/lib/reisketen-antwoord.js",
         "server/lib/releaseidentiteit.js",
         "server/lib/rtgjson.js",
         "server/lib/sleutelbestand.js",
@@ -3720,6 +3800,7 @@
         "server/opzet/connectwebhook.js",
         "server/opzet/contextspoor.js",
         "server/opzet/contractstand.js",
+        "server/opzet/demo-eigenaar.js",
         "server/opzet/democratie-router.js",
         "server/opzet/diensten.js",
         "server/opzet/diensten2.js",
@@ -3738,6 +3819,7 @@
         "server/opzet/kern-geldnaden.js",
         "server/opzet/kernlaag1.js",
         "server/opzet/kernlaag1b.js",
+        "server/opzet/kernlaag2-reisbureau.js",
         "server/opzet/kernlaag2.js",
         "server/opzet/kernlaag2b.js",
         "server/opzet/kernlaag2c.js",
@@ -3745,6 +3827,7 @@
         "server/opzet/kernlaag3b.js",
         "server/opzet/kernlaag3c.js",
         "server/opzet/kernlaag3w.js",
+        "server/opzet/kernlaag4-bedrijfsmaat.js",
         "server/opzet/kernlaag4-comm.js",
         "server/opzet/kernlaag4-gemeenschap.js",
         "server/opzet/kernlaag4.js",
@@ -3827,6 +3910,7 @@
         "server/pg/verzoekmerge.js",
         "server/pg/verzoekmeters.js",
         "server/pg/verzoekrtgai.js",
+        "server/pg/verzoekschaduw.js",
         "server/pg/verzoekschrijf.js",
         "server/pg/verzoekspoor-wissing.js",
         "server/pg/verzoeksporen.js",
@@ -3852,6 +3936,7 @@
         "server/routes/aanmeldgesprek.js",
         "server/routes/aanmeldingen.js",
         "server/routes/aanmeldingen/aanvraag.js",
+        "server/routes/aanmeldingen/automatisch.js",
         "server/routes/account.js",
         "server/routes/adres.js",
         "server/routes/agenda.js",
@@ -4012,6 +4097,7 @@
         "server/routes/kantoren/regie-toegang.js",
         "server/routes/kantoren/regie.js",
         "server/routes/kantoren/reisbureau.js",
+        "server/routes/kantoren/reisketen.js",
         "server/routes/kantoren/reisteruggave-keten.js",
         "server/routes/kantoren/reisteruggave.js",
         "server/routes/kantoren/reizen.js",
@@ -4119,6 +4205,7 @@
         "server/routes/member/privacy.js",
         "server/routes/member/pulse.js",
         "server/routes/member/rechterhand.js",
+        "server/routes/member/reisketen.js",
         "server/routes/member/rendezvous-connection.js",
         "server/routes/member/rendezvous.js",
         "server/routes/member/residentie.js",
@@ -4205,6 +4292,7 @@
         "server/routes/payroll-os-zaak.js",
         "server/routes/payroll-os.js",
         "server/routes/payroll.js",
+        "server/routes/personalos.js",
         "server/routes/plaats.js",
         "server/routes/planners.js",
         "server/routes/podium.js",
@@ -4223,6 +4311,7 @@
         "server/routes/rtfos/governance.js",
         "server/routes/rtfos/index.js",
         "server/routes/rtfos/netwerk.js",
+        "server/routes/rtfos/opvang.js",
         "server/routes/rtfos/portalen.js",
         "server/routes/rtfos/ruil.js",
         "server/routes/rtfos/uitvoering.js",
@@ -4404,6 +4493,7 @@
         "server/routes/supplier/pda/vloer.js",
         "server/routes/supplier/poort.js",
         "server/routes/supplier/prplus.js",
+        "server/routes/supplier/reisketen.js",
         "server/routes/supplier/reserveringen.js",
         "server/routes/supplier/retail.js",
         "server/routes/supplier/retour.js",
@@ -4735,6 +4825,7 @@
         "server/kern/bureau",
         "server/kern/care",
         "server/kern/carriereledger",
+        "server/kern/civilis",
         "server/kern/clubs",
         "server/kern/comm",
         "server/kern/command",
@@ -4859,6 +4950,7 @@
         "server/kern/payroll/jaargangen",
         "server/kern/payroll/jaargangen/nl-2026.json",
         "server/kern/pda",
+        "server/kern/personalos",
         "server/kern/plaats",
         "server/kern/planners",
         "server/kern/platformregister",
@@ -5164,6 +5256,9 @@
         },
         {
           "pad": "server/kern/carriereledger"
+        },
+        {
+          "pad": "server/kern/civilis"
         },
         {
           "pad": "server/kern/clubs"
@@ -5524,6 +5619,9 @@
         },
         {
           "pad": "server/kern/pda"
+        },
+        {
+          "pad": "server/kern/personalos"
         },
         {
           "pad": "server/kern/plaats"
@@ -5941,15 +6039,15 @@
     }
   },
   "uitleg": "De rolronde: welke rol komt waar binnen, gevraagd aan een echte server in plaats van aan de brontekst. gaten MAG ALLEEN DALEN en gemeten mag ALLEEN STIJGEN -- zie scripts/rolronde.js. Dit is de VERTICALE scheiding; de horizontale (lid A tegen lid B) is de gluurder-trede van de ladder.",
-  "gedraaid": "2026-10-25T10:30:42.199Z",
+  "gedraaid": "2026-11-14T12:58:17.156Z",
   "meters": {
     "rolscheidingGaten": 0,
-    "rolscheidingGemeten": 2032
+    "rolscheidingGemeten": 2055
   },
-  "routesOnderzocht": 5166,
+  "routesOnderzocht": 5203,
   "sessieHersteld": 2,
-  "publiekOfVroegGevalideerd": 180,
-  "andereRol": 2948,
+  "publiekOfVroegGevalideerd": 182,
+  "andereRol": 2960,
   "zonderAntwoord": [],
   "nietMeetbaar": [
     {
@@ -5973,21 +6071,6 @@
       "reden": "de Arrival-poort vereist naast het lid een geldige, objectgebonden Arrival Pass in het lichaam"
     },
     {
-      "route": "POST /api/bank/krediet",
-      "status": 503,
-      "reden": "functie staat in deze proefinstallatie aantoonbaar uit: dom-bank-krediet"
-    },
-    {
-      "route": "POST /api/bank/krediet/aanvraag",
-      "status": 503,
-      "reden": "functie staat in deze proefinstallatie aantoonbaar uit: dom-bank-krediet"
-    },
-    {
-      "route": "POST /api/bank/krediet/aflossing",
-      "status": 503,
-      "reden": "functie staat in deze proefinstallatie aantoonbaar uit: dom-bank-krediet"
-    },
-    {
       "route": "POST /api/democratie/partij/koppel",
       "status": 401,
       "reden": "de partijkoppeling vereist naast het lid een eenmalige koppelcode in de kop"
@@ -6001,16 +6084,6 @@
       "route": "POST /api/leerhuis/lees",
       "status": 503,
       "reden": "het leerhuis staat standaard uit; de rolronde zet geen organisatie- en Academy-bron op"
-    },
-    {
-      "route": "POST /api/munt/direct",
-      "status": 503,
-      "reden": "muntbetalingen vereisen een geconfigureerde muntprovider"
-    },
-    {
-      "route": "POST /api/munt/verzoek",
-      "status": 503,
-      "reden": "muntbetalingen vereisen een geconfigureerde muntprovider"
     },
     {
       "route": "POST /api/ondertiteling/fragment",
@@ -7366,6 +7439,48 @@
       "na": 200
     },
     {
+      "route": "POST /api/bank/krediet",
+      "rol": "leverancier",
+      "voor": 200,
+      "antwoord": 401,
+      "na": 200
+    },
+    {
+      "route": "POST /api/bank/krediet",
+      "rol": "kantoor",
+      "voor": 200,
+      "antwoord": 401,
+      "na": 200
+    },
+    {
+      "route": "POST /api/bank/krediet/aanvraag",
+      "rol": "leverancier",
+      "voor": 200,
+      "antwoord": 401,
+      "na": 200
+    },
+    {
+      "route": "POST /api/bank/krediet/aanvraag",
+      "rol": "kantoor",
+      "voor": 200,
+      "antwoord": 401,
+      "na": 200
+    },
+    {
+      "route": "POST /api/bank/krediet/aflossing",
+      "rol": "leverancier",
+      "voor": 200,
+      "antwoord": 401,
+      "na": 200
+    },
+    {
+      "route": "POST /api/bank/krediet/aflossing",
+      "rol": "kantoor",
+      "voor": 200,
+      "antwoord": 401,
+      "na": 200
+    },
+    {
       "route": "POST /api/bank/naar-wallet",
       "rol": "leverancier",
       "voor": 200,
@@ -17041,7 +17156,7 @@
     },
     {
       "route": "POST /api/member/bureau/beveiliging",
-      "rol": "rtg-pas",
+      "rol": "gratis-account",
       "methode": "POST",
       "pad": "/api/member/bureau/beveiliging",
       "premium": {
@@ -17057,22 +17172,22 @@
           "tier": "lifestyle"
         }
       },
-      "rtg": {
+      "gratis": {
         "voor": {
           "status": 200,
           "id": 38,
-          "tier": "rtg"
+          "tier": "guest"
         },
         "status": 403,
         "na": {
           "status": 200,
           "id": 38,
-          "tier": "rtg"
+          "tier": "guest"
         }
       },
       "oordeel": {
         "stand": "bewezen",
-        "reden": "eigen Lifestyle-account binnen, afzonderlijk geldig RTG-account geweigerd"
+        "reden": "eigen Lifestyle-account binnen, afzonderlijk geldig gratis account geweigerd"
       }
     },
     {
@@ -17315,7 +17430,7 @@
     },
     {
       "route": "POST /api/member/bureau/delegatie",
-      "rol": "rtg-pas",
+      "rol": "gratis-account",
       "methode": "POST",
       "pad": "/api/member/bureau/delegatie",
       "premium": {
@@ -17331,22 +17446,22 @@
           "tier": "lifestyle"
         }
       },
-      "rtg": {
+      "gratis": {
         "voor": {
           "status": 200,
           "id": 38,
-          "tier": "rtg"
+          "tier": "guest"
         },
         "status": 403,
         "na": {
           "status": 200,
           "id": 38,
-          "tier": "rtg"
+          "tier": "guest"
         }
       },
       "oordeel": {
         "stand": "bewezen",
-        "reden": "eigen Lifestyle-account binnen, afzonderlijk geldig RTG-account geweigerd"
+        "reden": "eigen Lifestyle-account binnen, afzonderlijk geldig gratis account geweigerd"
       }
     },
     {
@@ -17379,7 +17494,7 @@
     },
     {
       "route": "POST /api/member/bureau/dieren",
-      "rol": "rtg-pas",
+      "rol": "gratis-account",
       "methode": "POST",
       "pad": "/api/member/bureau/dieren",
       "premium": {
@@ -17395,22 +17510,22 @@
           "tier": "lifestyle"
         }
       },
-      "rtg": {
+      "gratis": {
         "voor": {
           "status": 200,
           "id": 38,
-          "tier": "rtg"
+          "tier": "guest"
         },
         "status": 403,
         "na": {
           "status": 200,
           "id": 38,
-          "tier": "rtg"
+          "tier": "guest"
         }
       },
       "oordeel": {
         "stand": "bewezen",
-        "reden": "eigen Lifestyle-account binnen, afzonderlijk geldig RTG-account geweigerd"
+        "reden": "eigen Lifestyle-account binnen, afzonderlijk geldig gratis account geweigerd"
       }
     },
     {
@@ -17513,7 +17628,7 @@
     },
     {
       "route": "POST /api/member/bureau/graaf",
-      "rol": "rtg-pas",
+      "rol": "gratis-account",
       "methode": "POST",
       "pad": "/api/member/bureau/graaf",
       "premium": {
@@ -17529,22 +17644,22 @@
           "tier": "lifestyle"
         }
       },
-      "rtg": {
+      "gratis": {
         "voor": {
           "status": 200,
           "id": 38,
-          "tier": "rtg"
+          "tier": "guest"
         },
         "status": 403,
         "na": {
           "status": 200,
           "id": 38,
-          "tier": "rtg"
+          "tier": "guest"
         }
       },
       "oordeel": {
         "stand": "bewezen",
-        "reden": "eigen Lifestyle-account binnen, afzonderlijk geldig RTG-account geweigerd"
+        "reden": "eigen Lifestyle-account binnen, afzonderlijk geldig gratis account geweigerd"
       }
     },
     {
@@ -17563,7 +17678,7 @@
     },
     {
       "route": "POST /api/member/bureau/kamers",
-      "rol": "rtg-pas",
+      "rol": "gratis-account",
       "methode": "POST",
       "pad": "/api/member/bureau/kamers",
       "premium": {
@@ -17579,22 +17694,22 @@
           "tier": "lifestyle"
         }
       },
-      "rtg": {
+      "gratis": {
         "voor": {
           "status": 200,
           "id": 38,
-          "tier": "rtg"
+          "tier": "guest"
         },
         "status": 403,
         "na": {
           "status": 200,
           "id": 38,
-          "tier": "rtg"
+          "tier": "guest"
         }
       },
       "oordeel": {
         "stand": "bewezen",
-        "reden": "eigen Lifestyle-account binnen, afzonderlijk geldig RTG-account geweigerd"
+        "reden": "eigen Lifestyle-account binnen, afzonderlijk geldig gratis account geweigerd"
       }
     },
     {
@@ -17697,7 +17812,7 @@
     },
     {
       "route": "POST /api/member/bureau/nu",
-      "rol": "rtg-pas",
+      "rol": "gratis-account",
       "methode": "POST",
       "pad": "/api/member/bureau/nu",
       "premium": {
@@ -17713,22 +17828,22 @@
           "tier": "lifestyle"
         }
       },
-      "rtg": {
+      "gratis": {
         "voor": {
           "status": 200,
           "id": 38,
-          "tier": "rtg"
+          "tier": "guest"
         },
         "status": 403,
         "na": {
           "status": 200,
           "id": 38,
-          "tier": "rtg"
+          "tier": "guest"
         }
       },
       "oordeel": {
         "stand": "bewezen",
-        "reden": "eigen Lifestyle-account binnen, afzonderlijk geldig RTG-account geweigerd"
+        "reden": "eigen Lifestyle-account binnen, afzonderlijk geldig gratis account geweigerd"
       }
     },
     {
@@ -17747,7 +17862,7 @@
     },
     {
       "route": "POST /api/member/bureau/overzicht",
-      "rol": "rtg-pas",
+      "rol": "gratis-account",
       "methode": "POST",
       "pad": "/api/member/bureau/overzicht",
       "premium": {
@@ -17763,22 +17878,22 @@
           "tier": "lifestyle"
         }
       },
-      "rtg": {
+      "gratis": {
         "voor": {
           "status": 200,
           "id": 38,
-          "tier": "rtg"
+          "tier": "guest"
         },
         "status": 403,
         "na": {
           "status": 200,
           "id": 38,
-          "tier": "rtg"
+          "tier": "guest"
         }
       },
       "oordeel": {
         "stand": "bewezen",
-        "reden": "eigen Lifestyle-account binnen, afzonderlijk geldig RTG-account geweigerd"
+        "reden": "eigen Lifestyle-account binnen, afzonderlijk geldig gratis account geweigerd"
       }
     },
     {
@@ -17993,7 +18108,7 @@
     },
     {
       "route": "POST /api/member/bureau/reputatie",
-      "rol": "rtg-pas",
+      "rol": "gratis-account",
       "methode": "POST",
       "pad": "/api/member/bureau/reputatie",
       "premium": {
@@ -18009,22 +18124,22 @@
           "tier": "lifestyle"
         }
       },
-      "rtg": {
+      "gratis": {
         "voor": {
           "status": 200,
           "id": 38,
-          "tier": "rtg"
+          "tier": "guest"
         },
         "status": 403,
         "na": {
           "status": 200,
           "id": 38,
-          "tier": "rtg"
+          "tier": "guest"
         }
       },
       "oordeel": {
         "stand": "bewezen",
-        "reden": "eigen Lifestyle-account binnen, afzonderlijk geldig RTG-account geweigerd"
+        "reden": "eigen Lifestyle-account binnen, afzonderlijk geldig gratis account geweigerd"
       }
     },
     {
@@ -18155,7 +18270,7 @@
     },
     {
       "route": "POST /api/member/bureau/termijnen",
-      "rol": "rtg-pas",
+      "rol": "gratis-account",
       "methode": "POST",
       "pad": "/api/member/bureau/termijnen",
       "premium": {
@@ -18171,22 +18286,22 @@
           "tier": "lifestyle"
         }
       },
-      "rtg": {
+      "gratis": {
         "voor": {
           "status": 200,
           "id": 38,
-          "tier": "rtg"
+          "tier": "guest"
         },
         "status": 403,
         "na": {
           "status": 200,
           "id": 38,
-          "tier": "rtg"
+          "tier": "guest"
         }
       },
       "oordeel": {
         "stand": "bewezen",
-        "reden": "eigen Lifestyle-account binnen, afzonderlijk geldig RTG-account geweigerd"
+        "reden": "eigen Lifestyle-account binnen, afzonderlijk geldig gratis account geweigerd"
       }
     },
     {
@@ -18205,7 +18320,7 @@
     },
     {
       "route": "POST /api/member/bureau/tower",
-      "rol": "rtg-pas",
+      "rol": "gratis-account",
       "methode": "POST",
       "pad": "/api/member/bureau/tower",
       "premium": {
@@ -18221,22 +18336,22 @@
           "tier": "lifestyle"
         }
       },
-      "rtg": {
+      "gratis": {
         "voor": {
           "status": 200,
           "id": 38,
-          "tier": "rtg"
+          "tier": "guest"
         },
         "status": 403,
         "na": {
           "status": 200,
           "id": 38,
-          "tier": "rtg"
+          "tier": "guest"
         }
       },
       "oordeel": {
         "stand": "bewezen",
-        "reden": "eigen Lifestyle-account binnen, afzonderlijk geldig RTG-account geweigerd"
+        "reden": "eigen Lifestyle-account binnen, afzonderlijk geldig gratis account geweigerd"
       }
     },
     {
@@ -18381,7 +18496,7 @@
     },
     {
       "route": "POST /api/member/bureau/zaken",
-      "rol": "rtg-pas",
+      "rol": "gratis-account",
       "methode": "POST",
       "pad": "/api/member/bureau/zaken",
       "premium": {
@@ -18397,22 +18512,22 @@
           "tier": "lifestyle"
         }
       },
-      "rtg": {
+      "gratis": {
         "voor": {
           "status": 200,
           "id": 38,
-          "tier": "rtg"
+          "tier": "guest"
         },
         "status": 403,
         "na": {
           "status": 200,
           "id": 38,
-          "tier": "rtg"
+          "tier": "guest"
         }
       },
       "oordeel": {
         "stand": "bewezen",
-        "reden": "eigen Lifestyle-account binnen, afzonderlijk geldig RTG-account geweigerd"
+        "reden": "eigen Lifestyle-account binnen, afzonderlijk geldig gratis account geweigerd"
       }
     },
     {
@@ -20377,7 +20492,7 @@
     },
     {
       "route": "POST /api/member/rechterhand/attenties",
-      "rol": "rtg-pas",
+      "rol": "gratis-account",
       "methode": "POST",
       "pad": "/api/member/rechterhand/attenties",
       "premium": {
@@ -20393,22 +20508,22 @@
           "tier": "lifestyle"
         }
       },
-      "rtg": {
+      "gratis": {
         "voor": {
           "status": 200,
           "id": 38,
-          "tier": "rtg"
+          "tier": "guest"
         },
         "status": 403,
         "na": {
           "status": 200,
           "id": 38,
-          "tier": "rtg"
+          "tier": "guest"
         }
       },
       "oordeel": {
         "stand": "bewezen",
-        "reden": "eigen Lifestyle-account binnen, afzonderlijk geldig RTG-account geweigerd"
+        "reden": "eigen Lifestyle-account binnen, afzonderlijk geldig gratis account geweigerd"
       }
     },
     {
@@ -20483,7 +20598,7 @@
     },
     {
       "route": "POST /api/member/rechterhand/cellier",
-      "rol": "rtg-pas",
+      "rol": "gratis-account",
       "methode": "POST",
       "pad": "/api/member/rechterhand/cellier",
       "premium": {
@@ -20499,22 +20614,22 @@
           "tier": "lifestyle"
         }
       },
-      "rtg": {
+      "gratis": {
         "voor": {
           "status": 200,
           "id": 38,
-          "tier": "rtg"
+          "tier": "guest"
         },
         "status": 403,
         "na": {
           "status": 200,
           "id": 38,
-          "tier": "rtg"
+          "tier": "guest"
         }
       },
       "oordeel": {
         "stand": "bewezen",
-        "reden": "eigen Lifestyle-account binnen, afzonderlijk geldig RTG-account geweigerd"
+        "reden": "eigen Lifestyle-account binnen, afzonderlijk geldig gratis account geweigerd"
       }
     },
     {
@@ -20575,7 +20690,7 @@
     },
     {
       "route": "POST /api/member/rechterhand/cercle",
-      "rol": "rtg-pas",
+      "rol": "gratis-account",
       "methode": "POST",
       "pad": "/api/member/rechterhand/cercle",
       "premium": {
@@ -20591,22 +20706,22 @@
           "tier": "lifestyle"
         }
       },
-      "rtg": {
+      "gratis": {
         "voor": {
           "status": 200,
           "id": 38,
-          "tier": "rtg"
+          "tier": "guest"
         },
         "status": 403,
         "na": {
           "status": 200,
           "id": 38,
-          "tier": "rtg"
+          "tier": "guest"
         }
       },
       "oordeel": {
         "stand": "bewezen",
-        "reden": "eigen Lifestyle-account binnen, afzonderlijk geldig RTG-account geweigerd"
+        "reden": "eigen Lifestyle-account binnen, afzonderlijk geldig gratis account geweigerd"
       }
     },
     {
@@ -20695,7 +20810,7 @@
     },
     {
       "route": "POST /api/member/rechterhand/entourage",
-      "rol": "rtg-pas",
+      "rol": "gratis-account",
       "methode": "POST",
       "pad": "/api/member/rechterhand/entourage",
       "premium": {
@@ -20711,22 +20826,22 @@
           "tier": "lifestyle"
         }
       },
-      "rtg": {
+      "gratis": {
         "voor": {
           "status": 200,
           "id": 38,
-          "tier": "rtg"
+          "tier": "guest"
         },
         "status": 403,
         "na": {
           "status": 200,
           "id": 38,
-          "tier": "rtg"
+          "tier": "guest"
         }
       },
       "oordeel": {
         "stand": "bewezen",
-        "reden": "eigen Lifestyle-account binnen, afzonderlijk geldig RTG-account geweigerd"
+        "reden": "eigen Lifestyle-account binnen, afzonderlijk geldig gratis account geweigerd"
       }
     },
     {
@@ -20815,7 +20930,7 @@
     },
     {
       "route": "POST /api/member/rechterhand/garderobe",
-      "rol": "rtg-pas",
+      "rol": "gratis-account",
       "methode": "POST",
       "pad": "/api/member/rechterhand/garderobe",
       "premium": {
@@ -20831,22 +20946,22 @@
           "tier": "lifestyle"
         }
       },
-      "rtg": {
+      "gratis": {
         "voor": {
           "status": 200,
           "id": 38,
-          "tier": "rtg"
+          "tier": "guest"
         },
         "status": 403,
         "na": {
           "status": 200,
           "id": 38,
-          "tier": "rtg"
+          "tier": "guest"
         }
       },
       "oordeel": {
         "stand": "bewezen",
-        "reden": "eigen Lifestyle-account binnen, afzonderlijk geldig RTG-account geweigerd"
+        "reden": "eigen Lifestyle-account binnen, afzonderlijk geldig gratis account geweigerd"
       }
     },
     {
@@ -20921,7 +21036,7 @@
     },
     {
       "route": "POST /api/member/rechterhand/hangar",
-      "rol": "rtg-pas",
+      "rol": "gratis-account",
       "methode": "POST",
       "pad": "/api/member/rechterhand/hangar",
       "premium": {
@@ -20937,22 +21052,22 @@
           "tier": "lifestyle"
         }
       },
-      "rtg": {
+      "gratis": {
         "voor": {
           "status": 200,
           "id": 38,
-          "tier": "rtg"
+          "tier": "guest"
         },
         "status": 403,
         "na": {
           "status": 200,
           "id": 38,
-          "tier": "rtg"
+          "tier": "guest"
         }
       },
       "oordeel": {
         "stand": "bewezen",
-        "reden": "eigen Lifestyle-account binnen, afzonderlijk geldig RTG-account geweigerd"
+        "reden": "eigen Lifestyle-account binnen, afzonderlijk geldig gratis account geweigerd"
       }
     },
     {
@@ -21027,7 +21142,7 @@
     },
     {
       "route": "POST /api/member/rechterhand/logboek",
-      "rol": "rtg-pas",
+      "rol": "gratis-account",
       "methode": "POST",
       "pad": "/api/member/rechterhand/logboek",
       "premium": {
@@ -21043,22 +21158,22 @@
           "tier": "lifestyle"
         }
       },
-      "rtg": {
+      "gratis": {
         "voor": {
           "status": 200,
           "id": 38,
-          "tier": "rtg"
+          "tier": "guest"
         },
         "status": 403,
         "na": {
           "status": 200,
           "id": 38,
-          "tier": "rtg"
+          "tier": "guest"
         }
       },
       "oordeel": {
         "stand": "bewezen",
-        "reden": "eigen Lifestyle-account binnen, afzonderlijk geldig RTG-account geweigerd"
+        "reden": "eigen Lifestyle-account binnen, afzonderlijk geldig gratis account geweigerd"
       }
     },
     {
@@ -21133,7 +21248,7 @@
     },
     {
       "route": "POST /api/member/rechterhand/maison",
-      "rol": "rtg-pas",
+      "rol": "gratis-account",
       "methode": "POST",
       "pad": "/api/member/rechterhand/maison",
       "premium": {
@@ -21149,22 +21264,22 @@
           "tier": "lifestyle"
         }
       },
-      "rtg": {
+      "gratis": {
         "voor": {
           "status": 200,
           "id": 38,
-          "tier": "rtg"
+          "tier": "guest"
         },
         "status": 403,
         "na": {
           "status": 200,
           "id": 38,
-          "tier": "rtg"
+          "tier": "guest"
         }
       },
       "oordeel": {
         "stand": "bewezen",
-        "reden": "eigen Lifestyle-account binnen, afzonderlijk geldig RTG-account geweigerd"
+        "reden": "eigen Lifestyle-account binnen, afzonderlijk geldig gratis account geweigerd"
       }
     },
     {
@@ -21281,7 +21396,7 @@
     },
     {
       "route": "POST /api/member/rechterhand/mecenaat",
-      "rol": "rtg-pas",
+      "rol": "gratis-account",
       "methode": "POST",
       "pad": "/api/member/rechterhand/mecenaat",
       "premium": {
@@ -21297,22 +21412,22 @@
           "tier": "lifestyle"
         }
       },
-      "rtg": {
+      "gratis": {
         "voor": {
           "status": 200,
           "id": 38,
-          "tier": "rtg"
+          "tier": "guest"
         },
         "status": 403,
         "na": {
           "status": 200,
           "id": 38,
-          "tier": "rtg"
+          "tier": "guest"
         }
       },
       "oordeel": {
         "stand": "bewezen",
-        "reden": "eigen Lifestyle-account binnen, afzonderlijk geldig RTG-account geweigerd"
+        "reden": "eigen Lifestyle-account binnen, afzonderlijk geldig gratis account geweigerd"
       }
     },
     {
@@ -21373,7 +21488,7 @@
     },
     {
       "route": "POST /api/member/rechterhand/nalatenschap",
-      "rol": "rtg-pas",
+      "rol": "gratis-account",
       "methode": "POST",
       "pad": "/api/member/rechterhand/nalatenschap",
       "premium": {
@@ -21389,22 +21504,22 @@
           "tier": "lifestyle"
         }
       },
-      "rtg": {
+      "gratis": {
         "voor": {
           "status": 200,
           "id": 38,
-          "tier": "rtg"
+          "tier": "guest"
         },
         "status": 403,
         "na": {
           "status": 200,
           "id": 38,
-          "tier": "rtg"
+          "tier": "guest"
         }
       },
       "oordeel": {
         "stand": "bewezen",
-        "reden": "eigen Lifestyle-account binnen, afzonderlijk geldig RTG-account geweigerd"
+        "reden": "eigen Lifestyle-account binnen, afzonderlijk geldig gratis account geweigerd"
       }
     },
     {
@@ -21563,7 +21678,7 @@
     },
     {
       "route": "POST /api/member/rechterhand/reisboek",
-      "rol": "rtg-pas",
+      "rol": "gratis-account",
       "methode": "POST",
       "pad": "/api/member/rechterhand/reisboek",
       "premium": {
@@ -21579,22 +21694,22 @@
           "tier": "lifestyle"
         }
       },
-      "rtg": {
+      "gratis": {
         "voor": {
           "status": 200,
           "id": 38,
-          "tier": "rtg"
+          "tier": "guest"
         },
         "status": 403,
         "na": {
           "status": 200,
           "id": 38,
-          "tier": "rtg"
+          "tier": "guest"
         }
       },
       "oordeel": {
         "stand": "bewezen",
-        "reden": "eigen Lifestyle-account binnen, afzonderlijk geldig RTG-account geweigerd"
+        "reden": "eigen Lifestyle-account binnen, afzonderlijk geldig gratis account geweigerd"
       }
     },
     {
@@ -21613,7 +21728,7 @@
     },
     {
       "route": "POST /api/member/rechterhand/table",
-      "rol": "rtg-pas",
+      "rol": "gratis-account",
       "methode": "POST",
       "pad": "/api/member/rechterhand/table",
       "premium": {
@@ -21629,22 +21744,22 @@
           "tier": "lifestyle"
         }
       },
-      "rtg": {
+      "gratis": {
         "voor": {
           "status": 200,
           "id": 38,
-          "tier": "rtg"
+          "tier": "guest"
         },
         "status": 403,
         "na": {
           "status": 200,
           "id": 38,
-          "tier": "rtg"
+          "tier": "guest"
         }
       },
       "oordeel": {
         "stand": "bewezen",
-        "reden": "eigen Lifestyle-account binnen, afzonderlijk geldig RTG-account geweigerd"
+        "reden": "eigen Lifestyle-account binnen, afzonderlijk geldig gratis account geweigerd"
       }
     },
     {
@@ -24462,6 +24577,90 @@
       "na": 200
     },
     {
+      "route": "POST /api/mijn/abonnement/automatisch/aanbod",
+      "rol": "leverancier",
+      "voor": 200,
+      "antwoord": 401,
+      "na": 200
+    },
+    {
+      "route": "POST /api/mijn/abonnement/automatisch/aanbod",
+      "rol": "kantoor",
+      "voor": 200,
+      "antwoord": 401,
+      "na": 200
+    },
+    {
+      "route": "POST /api/mijn/abonnement/automatisch/betalen",
+      "rol": "leverancier",
+      "voor": 200,
+      "antwoord": 401,
+      "na": 200
+    },
+    {
+      "route": "POST /api/mijn/abonnement/automatisch/betalen",
+      "rol": "kantoor",
+      "voor": 200,
+      "antwoord": 401,
+      "na": 200
+    },
+    {
+      "route": "POST /api/mijn/abonnement/automatisch/herstel",
+      "rol": "leverancier",
+      "voor": 200,
+      "antwoord": 401,
+      "na": 200
+    },
+    {
+      "route": "POST /api/mijn/abonnement/automatisch/herstel",
+      "rol": "kantoor",
+      "voor": 200,
+      "antwoord": 401,
+      "na": 200
+    },
+    {
+      "route": "POST /api/mijn/abonnement/automatisch/intrekken",
+      "rol": "leverancier",
+      "voor": 200,
+      "antwoord": 401,
+      "na": 200
+    },
+    {
+      "route": "POST /api/mijn/abonnement/automatisch/intrekken",
+      "rol": "kantoor",
+      "voor": 200,
+      "antwoord": 401,
+      "na": 200
+    },
+    {
+      "route": "POST /api/mijn/abonnement/automatisch/stand",
+      "rol": "leverancier",
+      "voor": 200,
+      "antwoord": 401,
+      "na": 200
+    },
+    {
+      "route": "POST /api/mijn/abonnement/automatisch/stand",
+      "rol": "kantoor",
+      "voor": 200,
+      "antwoord": 401,
+      "na": 200
+    },
+    {
+      "route": "POST /api/mijn/abonnement/automatisch/teken",
+      "rol": "leverancier",
+      "voor": 200,
+      "antwoord": 401,
+      "na": 200
+    },
+    {
+      "route": "POST /api/mijn/abonnement/automatisch/teken",
+      "rol": "kantoor",
+      "voor": 200,
+      "antwoord": 401,
+      "na": 200
+    },
+    {
       "route": "POST /api/mijn/abonnement/opzeggen",
       "rol": "leverancier",
       "voor": 200,
@@ -25184,6 +25383,34 @@
     },
     {
       "route": "POST /api/move/vooraf",
+      "rol": "kantoor",
+      "voor": 200,
+      "antwoord": 401,
+      "na": 200
+    },
+    {
+      "route": "POST /api/munt/direct",
+      "rol": "leverancier",
+      "voor": 200,
+      "antwoord": 401,
+      "na": 200
+    },
+    {
+      "route": "POST /api/munt/direct",
+      "rol": "kantoor",
+      "voor": 200,
+      "antwoord": 401,
+      "na": 200
+    },
+    {
+      "route": "POST /api/munt/verzoek",
+      "rol": "leverancier",
+      "voor": 200,
+      "antwoord": 401,
+      "na": 200
+    },
+    {
+      "route": "POST /api/munt/verzoek",
       "rol": "kantoor",
       "voor": 200,
       "antwoord": 401,
@@ -28130,6 +28357,48 @@
       "na": 200
     },
     {
+      "route": "POST /api/personalos/complete",
+      "rol": "leverancier",
+      "voor": 200,
+      "antwoord": 401,
+      "na": 200
+    },
+    {
+      "route": "POST /api/personalos/complete",
+      "rol": "kantoor",
+      "voor": 200,
+      "antwoord": 401,
+      "na": 200
+    },
+    {
+      "route": "POST /api/personalos/composition",
+      "rol": "leverancier",
+      "voor": 200,
+      "antwoord": 401,
+      "na": 200
+    },
+    {
+      "route": "POST /api/personalos/composition",
+      "rol": "kantoor",
+      "voor": 200,
+      "antwoord": 401,
+      "na": 200
+    },
+    {
+      "route": "POST /api/personalos/preferences",
+      "rol": "leverancier",
+      "voor": 200,
+      "antwoord": 401,
+      "na": 200
+    },
+    {
+      "route": "POST /api/personalos/preferences",
+      "rol": "kantoor",
+      "voor": 200,
+      "antwoord": 401,
+      "na": 200
+    },
+    {
       "route": "POST /api/pin/check",
       "rol": "leverancier",
       "voor": 200,
@@ -29286,6 +29555,76 @@
     },
     {
       "route": "POST /api/reisbureau/boek",
+      "rol": "kantoor",
+      "voor": 200,
+      "antwoord": 401,
+      "na": 200
+    },
+    {
+      "route": "POST /api/reisbureau/keten",
+      "rol": "leverancier",
+      "voor": 200,
+      "antwoord": 401,
+      "na": 200
+    },
+    {
+      "route": "POST /api/reisbureau/keten",
+      "rol": "kantoor",
+      "voor": 200,
+      "antwoord": 401,
+      "na": 200
+    },
+    {
+      "route": "POST /api/reisbureau/keten/akkoord",
+      "rol": "leverancier",
+      "voor": 200,
+      "antwoord": 401,
+      "na": 200
+    },
+    {
+      "route": "POST /api/reisbureau/keten/akkoord",
+      "rol": "kantoor",
+      "voor": 200,
+      "antwoord": 401,
+      "na": 200
+    },
+    {
+      "route": "POST /api/reisbureau/keten/betaal",
+      "rol": "leverancier",
+      "voor": 200,
+      "antwoord": 401,
+      "na": 200
+    },
+    {
+      "route": "POST /api/reisbureau/keten/betaal",
+      "rol": "kantoor",
+      "voor": 200,
+      "antwoord": 401,
+      "na": 200
+    },
+    {
+      "route": "POST /api/reisbureau/keten/nazorg",
+      "rol": "leverancier",
+      "voor": 200,
+      "antwoord": 401,
+      "na": 200
+    },
+    {
+      "route": "POST /api/reisbureau/keten/nazorg",
+      "rol": "kantoor",
+      "voor": 200,
+      "antwoord": 401,
+      "na": 200
+    },
+    {
+      "route": "POST /api/reisbureau/keten/start",
+      "rol": "leverancier",
+      "voor": 200,
+      "antwoord": 401,
+      "na": 200
+    },
+    {
+      "route": "POST /api/reisbureau/keten/start",
       "rol": "kantoor",
       "voor": 200,
       "antwoord": 401,
@@ -30616,6 +30955,62 @@
     },
     {
       "route": "POST /api/rtfos/portaal/partner/genootschap/erken",
+      "rol": "kantoor",
+      "voor": 200,
+      "antwoord": 401,
+      "na": 200
+    },
+    {
+      "route": "POST /api/rtfos/portaal/partner/opvang",
+      "rol": "leverancier",
+      "voor": 200,
+      "antwoord": 401,
+      "na": 200
+    },
+    {
+      "route": "POST /api/rtfos/portaal/partner/opvang",
+      "rol": "kantoor",
+      "voor": 200,
+      "antwoord": 401,
+      "na": 200
+    },
+    {
+      "route": "POST /api/rtfos/portaal/partner/opvang/aankomst",
+      "rol": "leverancier",
+      "voor": 200,
+      "antwoord": 401,
+      "na": 200
+    },
+    {
+      "route": "POST /api/rtfos/portaal/partner/opvang/aankomst",
+      "rol": "kantoor",
+      "voor": 200,
+      "antwoord": 401,
+      "na": 200
+    },
+    {
+      "route": "POST /api/rtfos/portaal/partner/opvang/besluit",
+      "rol": "leverancier",
+      "voor": 200,
+      "antwoord": 401,
+      "na": 200
+    },
+    {
+      "route": "POST /api/rtfos/portaal/partner/opvang/besluit",
+      "rol": "kantoor",
+      "voor": 200,
+      "antwoord": 401,
+      "na": 200
+    },
+    {
+      "route": "POST /api/rtfos/portaal/partner/opvang/capaciteit",
+      "rol": "leverancier",
+      "voor": 200,
+      "antwoord": 401,
+      "na": 200
+    },
+    {
+      "route": "POST /api/rtfos/portaal/partner/opvang/capaciteit",
       "rol": "kantoor",
       "voor": 200,
       "antwoord": 401,
@@ -35623,6 +36018,9 @@
     "POST /api/bank/bulk",
     "POST /api/bank/hart",
     "POST /api/bank/inzichten",
+    "POST /api/bank/krediet",
+    "POST /api/bank/krediet/aanvraag",
+    "POST /api/bank/krediet/aflossing",
     "POST /api/bank/naar-wallet",
     "POST /api/bank/overboek",
     "POST /api/bank/overzicht",
@@ -36782,6 +37180,12 @@
     "POST /api/metingen/weg",
     "POST /api/metingen/zet",
     "POST /api/mijn/abonnement",
+    "POST /api/mijn/abonnement/automatisch/aanbod",
+    "POST /api/mijn/abonnement/automatisch/betalen",
+    "POST /api/mijn/abonnement/automatisch/herstel",
+    "POST /api/mijn/abonnement/automatisch/intrekken",
+    "POST /api/mijn/abonnement/automatisch/stand",
+    "POST /api/mijn/abonnement/automatisch/teken",
     "POST /api/mijn/abonnement/opzeggen",
     "POST /api/mijn/abonnement/opzegvoorbeeld",
     "POST /api/mijn/gegevens",
@@ -36834,6 +37238,8 @@
     "POST /api/move/reis",
     "POST /api/move/volgende",
     "POST /api/move/vooraf",
+    "POST /api/munt/direct",
+    "POST /api/munt/verzoek",
     "POST /api/muziek/bestand",
     "POST /api/muziek/bestand-ticket",
     "POST /api/muziek/bestand-weg",
@@ -37044,6 +37450,9 @@
     "POST /api/pay/verzoek",
     "POST /api/pay/verzoek/betaal",
     "POST /api/pay/verzoek/intrek",
+    "POST /api/personalos/complete",
+    "POST /api/personalos/composition",
+    "POST /api/personalos/preferences",
     "POST /api/pin/check",
     "POST /api/pin/status",
     "POST /api/pin/vergeten",
@@ -37126,6 +37535,11 @@
     "POST /api/reisbureau/annuleer",
     "POST /api/reisbureau/betaal",
     "POST /api/reisbureau/boek",
+    "POST /api/reisbureau/keten",
+    "POST /api/reisbureau/keten/akkoord",
+    "POST /api/reisbureau/keten/betaal",
+    "POST /api/reisbureau/keten/nazorg",
+    "POST /api/reisbureau/keten/start",
     "POST /api/reisbureau/mijn",
     "POST /api/reisbureau/thuis",
     "POST /api/reisbureau/wijzig",
@@ -37221,6 +37635,10 @@
     "POST /api/rtfos/portaal/partner",
     "POST /api/rtfos/portaal/partner/genootschap",
     "POST /api/rtfos/portaal/partner/genootschap/erken",
+    "POST /api/rtfos/portaal/partner/opvang",
+    "POST /api/rtfos/portaal/partner/opvang/aankomst",
+    "POST /api/rtfos/portaal/partner/opvang/besluit",
+    "POST /api/rtfos/portaal/partner/opvang/capaciteit",
     "POST /api/rtfos/portaal/vrijwilliger",
     "POST /api/rtfos/portaal/vrijwilliger/koppel",
     "POST /api/rtfos/portaal/vrijwilliger/ontkoppel",

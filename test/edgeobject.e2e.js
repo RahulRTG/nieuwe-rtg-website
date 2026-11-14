@@ -31,7 +31,7 @@
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stopHard, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
+const { startServer, maakBetaaldRtgTestaccount, stopHard, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
 
 const pw = laadPlaywright();
 const GEHEIM = 'Inhoud-die-nooit-in-de-Edge-hoort';
@@ -51,7 +51,8 @@ async function object(page) {
 
 test('het blikveld ziet een geopend document en een geopend bestand als verwijzing, zonder inhoud',
   { skip: geenBrowser(pw) }, async () => {
-  const srv = await startServer({ env: { SMTP_URL: '', RTG_AI_UIT: '1' } });
+  const tmp = require('node:fs').mkdtempSync(require('node:path').join(require('node:os').tmpdir(), 'rtg-edgeobject-'));
+  const srv = await startServer({ env: { SMTP_URL: '', RTG_AI_UIT: '1', RTG_DATA_DIR: tmp } });
   let browser;
   try {
     const post = async (pad, body, token) => {
@@ -64,6 +65,7 @@ test('het blikveld ziet een geopend document en een geopend bestand als verwijzi
     const lid = await post('/api/auth/register', { name: 'Object Proef', email: 'obj' + n + '@test.invalid',
       phone: '06' + String(n).slice(-8), password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg' });
     assert.ok(lid.token);
+    maakBetaaldRtgTestaccount(tmp, 'obj' + n + '@test.invalid');
     browser = await pw.chromium.launch(browserOpties(pw));
     const page = await browser.newPage({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
     const fouten = [];
@@ -107,5 +109,6 @@ test('het blikveld ziet een geopend document en een geopend bestand als verwijzi
   } finally {
     if (browser) await browser.close();
     await stopHard(srv.child);
+    require('node:fs').rmSync(tmp, { recursive: true, force: true });
   }
 });

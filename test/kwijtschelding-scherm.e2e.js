@@ -18,7 +18,7 @@
    Draai: npm run e2e */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
+const { startServer, maakBetaaldRtgTestaccount, stop, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -34,7 +34,9 @@ const zegJa = (page, antwoord) => {
 };
 
 async function open(pw, base, token, fouten) {
-  const page = await (await pw.chromium.launch(browserOpties(pw))).newPage();
+  const browser = await pw.chromium.launch(browserOpties(pw));
+  try {
+  const page = await browser.newPage();
   letOpFouten(page, fouten);
   await page.addInitScript(t => { localStorage.setItem('rtg_werk_rijk', t); }, token);
   await page.goto(base + '/apps/belastingkantoor.html', { waitUntil: 'domcontentloaded' });
@@ -42,6 +44,7 @@ async function open(pw, base, token, fouten) {
   await page.click('.tab[data-t="aan"]');
   await page.waitForSelector('#aanLijst .item', { timeout: 15000 });
   return page;
+  } catch (e) { await browser.close(); throw e; }
 }
 
 test('Belastingkantoor: kwijtschelden is voordragen en beslissen, door twee mensen',
@@ -54,6 +57,8 @@ test('Belastingkantoor: kwijtschelden is voordragen en beslissen, door twee mens
     const u = Date.now().toString().slice(-8);
     const lid = (await api(base, '/api/auth/register', { name: 'Inwoner Kwijt', email: 'k' + u + '@x.nl',
       phone: '063' + u.slice(1), password: 'geheim123', geboortedatum: '1985-04-04', tier: 'rtg', pasApp: 'rtg' })).token;
+
+    maakBetaaldRtgTestaccount(TMP, 'k' + u + '@x.nl');
     await api(base, '/api/overheid/aangifte', { inkomen: 90000, aftrek: 1000, ingehouden: 0 }, lid);
 
     // twee inspecteurs

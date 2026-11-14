@@ -18,6 +18,16 @@ for(const route of ['browser','wonen','404'])test('cookie DS '+route+(route==='w
   if(route==='wonen')await page.addScriptTag({url:srv.base+'/shared/cookie.js'});
   const melding=page.locator('.ds-cookie');await melding.waitFor({state:'visible'});
   assert.equal(await melding.count(),1);assert.equal(await melding.getAttribute('role'),'region');
+  if(route==='404'){
+   await page.keyboard.press('Tab');
+   assert.equal(await page.locator('a.skip-link').evaluate(el=>el===document.activeElement),true,'de springlink blijft vóór de opslagmelding bereikbaar');
+   const bron=require('../scripts/a11ykeuring').BRON;
+   const keuring=await page.evaluate('(function(){'+bron+'\nreturn window.__a11yKeur()})()');
+   assert.deepEqual(keuring.overtredingen,[],'de publieke 404 heeft geen structurele toegankelijkheidsfout');
+   await page.keyboard.press('Tab');
+   assert.equal(await melding.getByRole('link',{name:'Privacy',exact:true}).evaluate(el=>el===document.activeElement),true,'daarna volgt de opslagmelding');
+  }
+
   assert.equal(await melding.getByRole('link',{name:'Privacy',exact:true}).getAttribute('href'),'/apps/juridisch/privacy.html');
   for(const width of [390,820,1440])for(const zoom of [100,200]){
    await page.setViewportSize({width,height:1000});await page.evaluate(n=>document.documentElement.style.fontSize=n+'%',zoom);

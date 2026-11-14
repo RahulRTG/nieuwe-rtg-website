@@ -7,7 +7,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { maakBetaaldRtgTestaccount, startServer, stop } = require('./helper');
 const { APPS } = require('../server/kern/appbieb');
 
 function api(base, pad, body, token) {
@@ -24,6 +24,7 @@ test.before(async () => {
   base = srv.base;
   const reg = await api(base, '/api/auth/register', { name: 'App Liefhebber', email: 'apps@x.nl', phone: '0612345678',
     password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' });
+  maakBetaaldRtgTestaccount(TMP, 'apps@x.nl');
   lid = reg.body.token;
   assert.ok(lid, 'lid-registratie geeft een token');
 });

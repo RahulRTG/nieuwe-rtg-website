@@ -7,7 +7,7 @@
    Draai: npm run e2e  (of node --test test/pda-ui.e2e.js) */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
+const { startServer, stop, maakBetaaldRtgTestaccount, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -166,6 +166,7 @@ test('PDA in de browser: een gast vraagt aandacht, het personeel ziet het op Van
     const reg = await api(base, '/api/auth/register', { name: 'Gast Lid', email: 'attn@x.nl', phone: '0612345799',
       password: 'geheim123', geboortedatum: '1990-01-01', tier: 'business', pasApp: 'business' });
     assert.ok(reg.token, 'lid-registratie geeft een token');
+    maakBetaaldRtgTestaccount(TMP, 'attn@x.nl');
     const aandacht = await fetch(base + '/api/aandacht', { method: 'POST',
       headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + reg.token },
       body: JSON.stringify({ supplierCode: 'KIKUNOI', table: 'Tafel 5', reden: 'rekening' }) });

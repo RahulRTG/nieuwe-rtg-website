@@ -7,7 +7,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { maakBetaaldRtgTestaccount, startServer, stop } = require('./helper');
 
 function api(base, pad, body, token) {
   const h = { 'Content-Type': 'application/json' };
@@ -25,6 +25,8 @@ test.before(async () => {
   const u = Date.now().toString().slice(-8);
   const reg = await api(base, '/api/auth/register', { name: 'Reiziger', email: 'r' + u + '@x.nl',
     phone: '06' + u, password: 'geheim123', geboortedatum: '1990-01-01', tier: 'business', pasApp: 'business' });
+  assert.equal(reg.status, 200);
+  maakBetaaldRtgTestaccount(TMP, 'r' + u + '@x.nl');
   lid = { token: reg.body.token };
   /* Het kantoor erbij: de reisbalie is een kamer van het RTG-kantoor, en de
      eigenaar komt daar met zijn eigen account binnen (zie test/kantoren.test.js). */

@@ -25,7 +25,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
-const { startServer, stop } = require('./helper');
+const { maakBetaaldRtgTestaccount, startServer, stop } = require('./helper');
 
 function post(base) {
   return (pad, body, token) => fetch(base + pad, {
@@ -36,13 +36,15 @@ function post(base) {
 }
 
 let teller = 0;
-async function lidOp(base) {
+async function lidOp(base, dataDir) {
   const P = post(base);
   const u = String(Date.now()).slice(-7) + String(++teller).padStart(3, '0');
   const r = await P('/api/auth/register', {
     name: 'Kijker', email: 'kijker' + u + '@x.nl', phone: '06' + u.slice(0, 8),
     password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg'
   });
+  assert.equal(r.status, 200);
+  maakBetaaldRtgTestaccount(dataDir, 'kijker' + u + '@x.nl');
   assert.ok(r.body.token, 'het lid is aangemeld: ' + JSON.stringify(r.body).slice(0, 140));
   return { P, token: r.body.token };
 }
@@ -51,7 +53,7 @@ test('zonder RTG_DEMO staat er geen verzonnen inhoud op het platform', async () 
   const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-geendemo-'));
   const srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP, RTG_DEMO: '' } });
   try {
-    const { P, token } = await lidOp(srv.base);
+    const { P, token } = await lidOp(srv.base, TMP);
 
     // 1. De Salon: geen voorbeeldposts van verzonnen leden
     const st = (await P('/api/state', {}, token)).body.state;
@@ -119,7 +121,7 @@ test('met RTG_DEMO=1 staat de demo er gewoon nog', async () => {
   const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-weldemo-'));
   const srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP, RTG_DEMO: '1' } });
   try {
-    const { P, token } = await lidOp(srv.base);
+    const { P, token } = await lidOp(srv.base, TMP);
     const st = (await P('/api/state', {}, token)).body.state;
     assert.ok((st.posts || []).length >= 3, 'De Salon toont de demo-posts: ' + (st.posts || []).length);
     const zaken = (await P('/api/suppliers', {}, token)).body.suppliers || [];

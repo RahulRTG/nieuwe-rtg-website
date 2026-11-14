@@ -99,8 +99,10 @@ test('onveilige of niet-canonieke surfaces en vrije tekst worden niet opgeslagen
 });
 
 test('echte HTTP-herstelketen behoudt contextisolatie en slaat geen URL-geheim op', async t => {
-  const { startServer, stop } = require('./helper');
-  const server = await startServer({ env: { SMTP_URL: '' } });
+  const { maakBetaaldRtgTestaccount, startServer, stop } = require('./helper');
+  const fs = require('node:fs'), path = require('node:path'), os = require('node:os');
+  const dataDir = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-continuity-'));
+  const server = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: dataDir } });
   t.after(() => stop(server.child));
   const post = async (pad, body, token) => {
     const r = await fetch(server.base + pad, { method: 'POST', headers: {
@@ -111,6 +113,8 @@ test('echte HTTP-herstelketen behoudt contextisolatie en slaat geen URL-geheim o
   const geregistreerd = await post('/api/auth/register', { name: 'Continuity Lid',
     email: 'continuity@rtg.test', phone: '0612345678', password: 'geheim123',
     geboortedatum: '1990-01-01', tier: 'rtg' });
+  assert.equal(geregistreerd.status, 200);
+  maakBetaaldRtgTestaccount(dataDir, 'continuity@rtg.test');
   const token = geregistreerd.body.token;
   assert.ok(token);
   const boot = await post('/api/experience/bootstrap', { world: 'work' }, token);

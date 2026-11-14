@@ -26,7 +26,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { maakBetaaldRtgTestaccount, startServer, stop } = require('./helper');
 
 const dag = (n) => { const x = new Date(); x.setDate(x.getDate() + n); return x.toISOString().slice(0, 10); };
 let srv, base, lid, manager, deur;
@@ -42,6 +42,7 @@ test.before(async () => {
   const u = Date.now().toString().slice(-8);
   lid = (await post('/api/auth/register', { name: 'Reiziger', email: 'ra' + u + '@x.nl',
     phone: '06' + u, password: 'geheim123', geboortedatum: '1990-01-01', tier: 'business', pasApp: 'business' })).body.token;
+  maakBetaaldRtgTestaccount(TMP, 'ra' + u + '@x.nl');
   const roster = (await post('/api/supplier/roster', { code: 'ESVEDRA' })).body;
   const man = roster.staff.find(x => x.role === 'manager');
   const rest = roster.staff.find(x => x.role !== 'manager');

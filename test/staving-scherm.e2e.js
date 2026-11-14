@@ -21,7 +21,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { laadScherm, startServer, stop, browserOpties, geenBrowser, letOpFouten, wachtTot } = require('./helper');
+const { laadScherm, startServer, stop, maakBetaaldRtgTestaccount, browserOpties, geenBrowser, letOpFouten, wachtTot } = require('./helper');
 
 const pw = laadScherm();
 
@@ -36,6 +36,7 @@ test('de Rahul-tab zet onder een antwoord wat niet is teruggevonden, en anders n
         phone: '0612345789', password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg' }) });
     const reg = await r.json();
     assert.ok(reg.token, 'lid-registratie geeft een token');
+    maakBetaaldRtgTestaccount(TMP, 'staving' + process.pid + '@x.nl');
     browser = await pw.chromium.launch(browserOpties(pw));
     const ctx = await browser.newContext({ viewport: { width: 1280, height: 900 } });
     await ctx.addInitScript((t) => {

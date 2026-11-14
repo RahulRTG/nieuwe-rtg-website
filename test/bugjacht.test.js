@@ -17,7 +17,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { maakBetaaldRtgTestaccount, startServer, stop } = require('./helper');
 
 let srv, base;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-bugjacht-'));
@@ -44,6 +44,7 @@ test.before(async () => {
   const u = Date.now().toString().slice(-8);
   lid = (await api('/api/auth/register', { name: 'Bug Jager', email: 'bj' + u + '@x.nl',
     phone: '064' + u.slice(1), password: 'geheim123', geboortedatum: '1985-03-03', tier: 'rtg', pasApp: 'rtg' })).body.token;
+  maakBetaaldRtgTestaccount(TMP, 'bj' + u + '@x.nl');
   assert.ok(lid, 'het testlid is aangemeld');
   /* Een ECHT account zonder geboortedatum. Aanmelden via het formulier vraagt
      er altijd om, maar createUserSync in de opstart doet dat niet: het

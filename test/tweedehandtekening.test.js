@@ -31,7 +31,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop, kantoorKoppelBody } = require('./helper');
+const { maakBetaaldRtgTestaccount, startServer, stop, kantoorKoppelBody } = require('./helper');
 const { kantoorPasskey } = require('./kantoorpasskey');
 
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-tweehand-'));
@@ -99,6 +99,7 @@ test.before(async () => {
   lid = (await api('/api/auth/register', { name: 'Rekeninghouder', email: 'rh' + u + '@voorbeeld.test',
     phone: '06' + String(10000000 + Math.floor(Math.random() * 8e7)), password: 'Geheim123!',
     geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' })).body.token;
+  maakBetaaldRtgTestaccount(TMP, 'rh' + u + '@voorbeeld.test');
   const akk = await api('/api/bank/akkoord', {}, lid);
   assert.equal(akk.status, 200, 'het lid opent een rekening: ' + JSON.stringify(akk.body).slice(0, 140));
   iban = akk.body.rekening.iban;
@@ -204,6 +205,7 @@ test('6. de incassoronde vraagt dezelfde twee mensen, en loopt de hele gouden we
   const lid2 = (await api('/api/auth/register', { name: 'Ontvanger', email: 'ov' + u2 + '@voorbeeld.test',
     phone: '06' + String(10000000 + Math.floor(Math.random() * 8e7)), password: 'Geheim123!',
     geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' })).body.token;
+  maakBetaaldRtgTestaccount(TMP, 'ov' + u2 + '@voorbeeld.test');
   const akk2 = await api('/api/bank/akkoord', {}, lid2);
   assert.equal(akk2.status, 200, 'de tweede rekening: ' + JSON.stringify(akk2.body).slice(0, 140));
   const naarIban = akk2.body.rekening.iban;
@@ -407,6 +409,7 @@ test('12. een incassoronde boven de grens: eerst een risicogoedkeuring van een a
   const lid3 = (await api('/api/auth/register', { name: 'Verhuurder', email: 'vh' + u3 + '@voorbeeld.test',
     phone: '06' + String(10000000 + Math.floor(Math.random() * 8e7)), password: 'Geheim123!',
     geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' })).body.token;
+  maakBetaaldRtgTestaccount(TMP, 'vh' + u3 + '@voorbeeld.test');
   const naarIban = (await api('/api/bank/akkoord', {}, lid3)).body.rekening.iban;
   const vast = await api('/api/bank/terugkerend/zet', { vanIban: iban, naarIban, centen: 300000, interval: 'maand',
     oms: 'Huur (proef 2C)', idem: 'proef-2c-' + u3 }, lid);

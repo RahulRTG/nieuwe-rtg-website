@@ -25,7 +25,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { maakBetaaldRtgTestaccount, startServer, stop } = require('./helper');
 
 const mappen = [];
 const verseMap = () => { const m = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-bnkd-')); mappen.push(m); return m; };
@@ -36,10 +36,13 @@ const post = (basis, pad, body, token) => fetch(basis + '/api/' + pad, {
 }).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
 
 let seq = 0;
+const mapVan = new Map();
 async function nieuwLid(basis) {
   const u = (Date.now() + (++seq)).toString().slice(-8);
   const r = await post(basis, 'auth/register', { name: 'Bank Duurzaam ' + seq, email: 'bnkd' + u + '@x.nl',
     phone: '06' + u, password: 'geheim123', geboortedatum: '1990-03-03', geslacht: 'v', tier: 'rtg', pasApp: 'rtg' });
+  assert.equal(r.status, 200);
+  maakBetaaldRtgTestaccount(mapVan.get(basis), 'bnkd' + u + '@x.nl');
   return r.body.token;
 }
 
@@ -82,7 +85,9 @@ test.before(async () => {
   await weg;
   leugen = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: leugenMap, OFFICE_CODE: 'KANTOOR-BNKD-2',
     RTG_VERRAAD: 'schrijf-verloren' } });
-  eerlijk = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: verseMap(), OFFICE_CODE: 'KANTOOR-BNKD-1' } });
+  const eerlijkMap = verseMap();
+  eerlijk = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: eerlijkMap, OFFICE_CODE: 'KANTOOR-BNKD-1' } });
+  mapVan.set(eerlijk.base, eerlijkMap); mapVan.set(leugen.base, leugenMap);
   await bankLive(eerlijk.base, 'KANTOOR-BNKD-1');
 });
 test.after(() => {

@@ -36,6 +36,7 @@ test('dezelfde persoonlijke Agenda-intrekking geldt via direct HTTP en Experienc
     phone: '0612345679', password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg' });
   assert.equal(ander.status, 200);
   assert.ok(ander.body.token);
+  maakBetaaldRtgTestaccount(TMP, 'experience-ander@rtg.test');
   const invoer = { intent: 'schedule.item.create', version: 1, world: 'work',
     parameters: { title: 'HTTP actuele bevoegdheid', date: new Date(Date.now() + 86400000).toISOString().slice(0, 10) },
     routeBeleid: { allowed: true }, canonicalRoute: '/api/experience/intent/execute' };

@@ -22,7 +22,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop, kantoorAlsPersoon, zaakMensOpNaam } = require('./helper');
+const { startServer, stop, maakBetaaldRtgTestaccount, kantoorAlsPersoon, zaakMensOpNaam } = require('./helper');
 const V = require('../server/kern/namens/versmalling');
 const { maakMandaat } = require('../server/kern/fiscaal/gateway/mandaat');
 
@@ -65,6 +65,7 @@ test.before(async () => {
   base = srv.base;
   lid = (await api('/api/auth/register', { name: 'Versmal Een', email: 'v1@x.nl', phone: '0612350001',
     password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' })).body.token;
+  maakBetaaldRtgTestaccount(TMP, 'v1@x.nl');
   office = (await api('/api/office/login', { code: 'RTG-OFFICE' })).body.token;
   /* DE TEKENAAR IS EEN MENS OP NAAM: de gedeelde code met een getypte naam
      tekent geen app meer af (kern/appstore/vierogen.js, 11 oktober 2026). */

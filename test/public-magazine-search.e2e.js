@@ -125,7 +125,8 @@ test('leeg resultaat, onbetrouwbare invoer en zoeken sturen geen zoekvraag naar 
     assert.equal(await page.locator('#commandDialog').isVisible(), true);
     await page.locator('#commandSearch').fill('schoonheid');
     assert.equal(await page.locator('#commandResults a[href="#artikel-interview"]').count(), 1, 'de letterlijke interviewtekst is ook geïndexeerd');
-    await page.waitForTimeout(100);
+    await page.getByRole('button', { name: 'Zoeken sluiten', exact: true }).click();
+    await page.locator('#commandDialog').waitFor({ state: 'hidden' });
     assert.deepEqual(requests, [], 'geen fetch, externe AI of zoeklog');
     assert.deepEqual(errors, []);
   } finally { await context.close(); }

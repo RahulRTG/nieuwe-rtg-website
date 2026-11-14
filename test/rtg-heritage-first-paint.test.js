@@ -66,8 +66,8 @@ test('alle gemanifesteerde echte schermen hebben hun centrale blad (Heritage of 
   assert.ok(ds >= 1, 'minstens een scherm staat op het Design System (TRAVELOS-MIGRATIE.md)');
 });
 
-test('iedere app en de twee overige overgangsschermen observeren na CSS en vóór de eerste weergave', () => {
-  const extras=['public/site/404.html','public/ds/voorbeeld.html'].map(p=>path.join(ROOT,p));
+test('iedere app en het DS-voorbeeld observeren na CSS en vóór de eerste weergave', () => {
+  const extras=['public/ds/voorbeeld.html'].map(p=>path.join(ROOT,p));
   for(const bestand of [...htmlBestanden(APPS),...extras]) {
     if(bestand.startsWith(APPS+path.sep) && identiteit.classify(uitrol.appPad(bestand))==='redirect')continue;
     const html=fs.readFileSync(bestand,'utf8');

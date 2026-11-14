@@ -171,4 +171,4 @@ function vrijeNamen(bron) {
   return { fout: null, namen, regelVan: (n) => gelezen.get(n) || 0 };
 }
 
-module.exports = { vrijeNamen, GLOBAAL, BROWSERHAAK };
+module.exports = { vrijeNamen, bindingenUit, GLOBAAL, BROWSERHAAK };

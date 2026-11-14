@@ -3195,6 +3195,7 @@ console.log('\n41) BEWIJS.md loopt niet achter op de toetsen');
 console.log('\n42) geen functie die binnen een andere functie staat en erbuiten wordt aangeroepen');
 {
   const { loop: loopKnopen } = require('./ast/walk');
+  const { bindingenUit } = require('./lib/vrijenamen');
   const bundels = require('./bundel').bundels;
   let stuk = 0, gekeken = 0;
   for (const doel of Object.keys(bundels)) {
@@ -3225,13 +3226,20 @@ console.log('\n42) geen functie die binnen een andere functie staat en erbuiten 
        namen die elders gewoon een const zijn. */
     const bindingen = new Map();
     const bind = (naam) => { if (naam) bindingen.set(naam, (bindingen.get(naam) || 0) + 1); };
+    // Een factory-export via const {functie} bindt opnieuw dezelfde naam.
+    // Lees alleen bindingsdoelen: alias-sleutels en default-RHS tellen niet mee.
+    const bindPatroon = (patroon) => {
+      const namen = new Set();
+      bindingenUit(patroon, namen);
+      for (const naam of namen) bind(naam);
+    };
     loopKnopen(ast, (n) => {
       if (n.type === 'FunctionDeclaration' && n.id) bind(n.id.name);
-      else if (n.type === 'VariableDeclarator' && n.id && n.id.name) bind(n.id.name);
+      else if (n.type === 'VariableDeclarator') bindPatroon(n.id);
       else if (n.type === 'FunctionExpression' || n.type === 'ArrowFunctionExpression') {
-        for (const p2 of (n.params || [])) if (p2 && p2.name) bind(p2.name);
+        for (const p2 of (n.params || [])) bindPatroon(p2);
       }
-      if (n.type === 'FunctionDeclaration') for (const p2 of (n.params || [])) if (p2 && p2.name) bind(p2.name);
+      if (n.type === 'FunctionDeclaration') for (const p2 of (n.params || [])) bindPatroon(p2);
     });
 
     /* Elke functieverklaring die BINNEN een andere functie staat, met de grenzen

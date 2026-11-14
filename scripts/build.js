@@ -181,12 +181,16 @@ function stempelServiceWorkers() {
 (async () => {
   require('./workspace-worlds').schrijf();
   require('./world-widgets').schrijf();
-  require('./websitewaarheid').schrijf();
   const gebundeld = schrijfBundels();
   console.log('[build] gebundeld: ' + (gebundeld.length ? gebundeld.join(', ') : 'bundels al actueel'));
+  // Minify moet de definitieve bouwstempel lezen, ook bij de eerste build.
+  stempelBouw();
   await minifyGedeeld();
   await minifyServe();
-  stempelBouw();
   stempelServiceWorkers();
+  /* Beeldbewijs bindt aan de definitieve schermbron. Bij stale bewijs faalt
+     deze build nog steeds, maar staan de bronnen nu klaar voor één echte
+     websitebeelden-meting; de volgende build verandert die bytes niet meer. */
+  require('./websitewaarheid').schrijf();
   console.log('[build] klaar.');
 })().catch((e) => { console.error('[build] mislukt:', e); process.exit(1); });

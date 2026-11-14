@@ -174,6 +174,7 @@ function publicStaff(s) { return s ? { id: s.id, name: s.name, role: s.role, fun
 function makePin() { eisLegacyStaffPin('uitgegeven'); return String(crypto.randomInt(1000, 10000)); }
 
 module.exports = {
+  maakEigenaarEenmaal: (g) => require('./staff-eigenaar')(g),
   createStaff, createStaffSync, createStaffZaai, createAccountStaff,
   legacyStaffPinToegestaan, ACCOUNT_ONLY_HASH, getStaffById, getStaffByIdAny,
   listStaff, countStaff, verifyStaffPin, setStaffPin, activateStaff, deactivateStaff,

@@ -9,8 +9,8 @@ const pw = laadPlaywright();
 const root = path.resolve(__dirname, '..');
 const sourceFaqCount = [...fs.readFileSync(path.join(root, 'index.html'), 'utf8')
  .matchAll(/<details\b[^>]*\bdata-faq=["'][^"']+["']/g)].length;
-async function ready(page){
- await page.waitForSelector('body[data-platform-role="organisatie"]');
+async function ready(page,role='organisatie'){
+ await page.waitForSelector('body[data-platform-role="'+role+'"]');
  await page.waitForSelector('.rtg-experience-edge .rtg-adaptive-bar');
 }
 async function artwork(page, basePath='/'){
@@ -134,7 +134,7 @@ test('De publieke B2B2C-ervaring wisselt van kant, zoekt in de echte app en past
    await page.keyboard.press('Escape');
    assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),true);
    assert.deepEqual(mutations,[]);assert.deepEqual(errors,[]);assert.deepEqual(failed,[]);
-   await page.goto(srv.base+'/',{waitUntil:'domcontentloaded'});await ready(page);
+   await page.goto(srv.base+'/',{waitUntil:'domcontentloaded'});await ready(page,'gebruiker');
    const appHref=new URL(await page.locator('.pp-secure-link').getAttribute('href'),page.url()).href;
    await context.route(appHref,route=>route.fulfill({status:200,contentType:'text/html',body:'<!doctype html><title>Afgeschermde appbestemming</title>'}));
    await Promise.all([page.waitForURL(appHref),page.locator('.pp-feature-copy').getByRole('link',{name:'Open de RTG-app',exact:true}).click()]);

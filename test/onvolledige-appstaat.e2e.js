@@ -4,20 +4,23 @@
    testserver. Geen productieprovider, geen registermutaties. */
 'use strict';
 const test=require('node:test'), assert=require('node:assert/strict');
-const {startServer,stop,laadPlaywright,browserOpties,geenBrowser,letOpFouten}=require('./helper');
+const {startServer,stopHard,maakBetaaldRtgTestaccount,laadPlaywright,browserOpties,geenBrowser,letOpFouten}=require('./helper');
+const fs=require('node:fs'),os=require('node:os'),path=require('node:path');
 const pw=laadPlaywright(), skip=geenBrowser(pw);
-let srv,browser,member,staff;
+let srv,browser,member,staff,tmp;
 async function post(p,b,t){const r=await fetch(srv.base+p,{method:'POST',headers:{'Content-Type':'application/json',...(t?{Authorization:'Bearer '+t}:{})},body:JSON.stringify(b||{})});const d=await r.json();assert.equal(r.status,200,p+': '+JSON.stringify(d));return d;}
 test.before(async()=>{
   if(skip)return;
-  srv=await startServer({env:{SMTP_URL:'',RTG_AI_UIT:'1'}});
+  tmp=fs.mkdtempSync(path.join(os.tmpdir(),'rtg-onvolledige-browser-'));
+  srv=await startServer({env:{SMTP_URL:'',RTG_AI_UIT:'1',RTG_DATA_DIR:tmp}});
   browser=await pw.chromium.launch(browserOpties(pw));
   const n=Date.now();
   member=(await post('/api/auth/register',{name:'UI contract',email:'uic'+n+'@example.test',phone:'06'+String(n).slice(-8),password:'geheim123',geboortedatum:'1980-01-01',tier:'rtg',pasApp:'rtg'})).token;
+  maakBetaaldRtgTestaccount(tmp,'uic'+n+'@example.test');
   const roster=await post('/api/supplier/roster',{code:'TRANSIT'});
   staff=(await post('/api/supplier/login',{code:'TRANSIT',staffId:roster.staff.find(s=>s.role==='manager').id,pin:'1234'})).token;
 });
-test.after(async()=>{if(browser)await browser.close();if(srv)await stop(srv.child);});
+test.after(async()=>{if(browser)await browser.close();if(srv)await stopHard(srv.child);if(tmp)fs.rmSync(tmp,{recursive:true,force:true});});
 const gevallen=[
  {app:'ovroutes',pad:'/api/staff/ov/lijnen',retry:'#ovHerstel',klaar:'#vBeheer',tekst:'routegegevens',state:()=>staff,partieel:{soorten:'bus',lijnen:[],ijkpunten:[]}},
  {app:'residentie',pad:'/api/residentie/betreed',retry:'#residentieHerstel',klaar:'#balk',tekst:'kamergegevens',body:{kamer:'lobby'},state:()=>member,partieel:{kamer:{naam:'Hal'},leden:[]}},

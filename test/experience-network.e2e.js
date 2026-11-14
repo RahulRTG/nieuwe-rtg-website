@@ -1,15 +1,17 @@
 'use strict';
 const test = require('node:test'), assert = require('node:assert/strict');
-const fs = require('node:fs'), path = require('node:path');
+const fs = require('node:fs'), os = require('node:os'), path = require('node:path');
 const h = require('./helper'), pw = h.laadPlaywright();
 test('netwerkplan op mobiel en desktop: zoeken, kiezen, bevestigen, bewaren en herstel zonder AI',
   { skip: h.geenBrowser(pw), timeout: 180000 }, async t => {
-    const srv = await h.startServer({ env: { SMTP_URL: '', RTG_AI_UIT: '1' } }); let browser;
+    const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-network-browser-'));
+    const srv = await h.startServer({ env: { SMTP_URL: '', RTG_AI_UIT: '1', RTG_DATA_DIR: tmp } }); let browser;
     try {
       const response = await fetch(srv.base + '/api/auth/register', { method: 'POST',
         headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name: 'Netwerkbrowser',
           email: 'network-browser@rtg.test', phone: '0612345678', password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg' }) });
       const { token } = await response.json(); assert.ok(token);
+      h.maakBetaaldRtgTestaccount(tmp, 'network-browser@rtg.test');
       browser = await pw.chromium.launch(h.browserOpties(pw));
       for (const width of [390, 1440]) await t.test('breedte ' + width, async () => {
         const context = await browser.newContext({ viewport: { width, height: 900 }, serviceWorkers: 'block' });
@@ -41,5 +43,5 @@ test('netwerkplan op mobiel en desktop: zoeken, kiezen, bevestigen, bewaren en h
         await form.getByText('Nog geen passend aanbod op deze plaats.').waitFor();
         assert.deepEqual(errors, []); await context.close();
       });
-    } finally { if (browser) await browser.close(); await h.stop(srv.child); }
+    } finally { if (browser) await browser.close(); await h.stopHard(srv.child); fs.rmSync(tmp, { recursive: true, force: true }); }
   });

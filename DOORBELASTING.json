@@ -1,11 +1,11 @@
 {
   "stempel": {
-    "op": "2026-10-20T10:05:24.244Z",
-    "commit": "d14f1ae752",
+    "op": "2026-11-12T22:01:05.885Z",
+    "commit": "b99fd4c8ab",
     "boomVuil": false,
-    "boomAnders": 13,
+    "boomAnders": 10,
     "instrument": "scripts/doorbelasting.js",
-    "node": "v26.12.0"
+    "node": "v26.12.1"
   },
   "graad": "gemeten",
   "wat": "of de doorbelasting van RTG aantoonbaar te classificeren is: per vorm en per euro",
@@ -21,14 +21,14 @@
   ],
   "regel": "onbekend is een uitkomst en nooit een aanname: een bedrag zonder aantoonbare herkomst wordt niet naar rtgEigen of derdePartij geduwd, want beide fouten zijn onzichtbaar en komen allebei iemand goed uit",
   "vorm": {
-    "vormenTotaal": 1620,
-    "geldvormen": 220,
-    "volgbaar": 39,
+    "vormenTotaal": 1630,
+    "geldvormen": 224,
+    "volgbaar": 43,
     "perHerkomstveld": {
-      "bron": 20,
+      "bron": 23,
       "provider": 1,
       "herkomst": 4,
-      "aanbieder": 7,
+      "aanbieder": 8,
       "leverancier": 8,
       "economischeHerkomst": 4
     },
@@ -64,8 +64,12 @@
       "server/kern/munten.js",
       "server/kern/onderneming/crediteuren.js",
       "server/kern/ov/operatie.js",
-      "server/kern/reisbureau-betaling.js",
-      "server/kern/reisbureau-betaling.js",
+      "server/kern/reisbureau-betalingsrijen.js",
+      "server/kern/reisbureau-betalingsrijen.js",
+      "server/kern/reisbureau-keten.js",
+      "server/kern/reisbureau-keten.js",
+      "server/kern/reisbureau-ketencontract.js",
+      "server/kern/reisbureau-ketencontract.js",
       "server/kern/reisbureau-teruggave.js",
       "server/kern/reisbureau-teruggave.js",
       "server/kern/rtfos/geld-uitgaven.js",
@@ -311,7 +315,15 @@
         "geldvormen": 2,
         "volgbaar": 0
       },
-      "server/kern/reisbureau-betaling.js": {
+      "server/kern/reisbureau-betalingsrijen.js": {
+        "geldvormen": 2,
+        "volgbaar": 2
+      },
+      "server/kern/reisbureau-keten.js": {
+        "geldvormen": 2,
+        "volgbaar": 2
+      },
+      "server/kern/reisbureau-ketencontract.js": {
         "geldvormen": 2,
         "volgbaar": 2
       },

@@ -18,6 +18,9 @@ test('browserchrome en gepubliceerde blokpresentatie gebruiken DS met dezelfde r
   for(const src of ['rtg-world-desktop','ios','metgezel','uitvoer','basis','adaptief'])assert.ok(html.includes('/shared/'+src+'.js'));
   assert.match(css,/scroll-margin-block-start: 8rem/);
   assert.match(css,/prefers-reduced-motion/);
+  assert.match(html,/ds-browser-tabselect/);
+  assert.doesNotMatch(html,/setAttribute\('role','button'\)/,
+    'tabkeuze bevat geen tweede interactieve knop meer');
   const fouten=require('../scripts/ontwerpsysteem').contractFouten({paginas:{}});
   assert.deepEqual(fouten.filter(x=>/componenten\/(browser|webblok)\.css/.test(x)),[]);
   const tokens=fs.readFileSync(path.join(root,'public/ds/tokens.css'),'utf8');
@@ -35,4 +38,6 @@ test('adresnormalisatie en escaping uit werkelijke browserbron blijven begrensd'
   assert.match(script,/Authorization:'Bearer '\+TOKEN/);
   assert.match(script,/if\(!r.ok\)throw new Error/);
   assert.match(script,/idem=idem\|\|RTGId\('web'\)/);
+  assert.match(script,/b\.dataset\.stand=doel\|\|'home'/,
+    'de interne sitepagina publiceert haar route zodat bediening achter die stand herstelbaar blijft');
 });

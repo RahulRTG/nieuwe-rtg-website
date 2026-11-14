@@ -32,8 +32,8 @@
       return '<span class="pag"><img src="data:image/jpeg;base64,' + p.b64 + '" alt="pagina ' + (i + 1) + '">' +
         '<button class="weg" data-weg="' + i + '" type="button" aria-label="Pagina ' + (i + 1) + ' weghalen">&#10005;</button></span>';
     }).join('');
-    $('#bewaarRij').style.display = paginas.length ? '' : 'none';
-    $('#leegTip').style.display = paginas.length ? 'none' : '';
+    $('#bewaarRij').hidden = !paginas.length;
+    $('#leegTip').hidden = !!paginas.length;
     Array.prototype.forEach.call(document.querySelectorAll('[data-weg]'), function (el) {
       el.addEventListener('click', function () { paginas.splice(Number(el.dataset.weg), 1); teken(); });
     });
@@ -65,7 +65,7 @@
         $('#beeld').srcObject = s; $('#beeld').play();
         $('#beeldWrap').style.display = '';
         $('#cameraKnop').textContent = 'Leg deze pagina vast';
-        $('#cameraStop').style.display = '';
+        $('#cameraStop').hidden = false;
       })
       .catch(function (e) {
         meld(((e.rtg && (e.rtg.kort + '. ' + e.rtg.uitleg)) || 'Geen toegang tot de camera') +
@@ -76,7 +76,7 @@
     if (stream) { stream.getTracks().forEach(function (t) { t.stop(); }); stream = null; }
     $('#beeldWrap').style.display = 'none';
     $('#cameraKnop').textContent = 'Open de camera';
-    $('#cameraStop').style.display = 'none';
+    $('#cameraStop').hidden = true;
   });
 
   /* ---- foto's kiezen (werkt ook zonder camera) ---- */

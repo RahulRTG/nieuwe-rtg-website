@@ -25,7 +25,7 @@ const crypto = require('crypto');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop, stopNet, stroomAdres } = require('./helper');
+const { startServer, stop, stopNet, stroomAdres, maakBetaaldRtgTestaccount } = require('./helper');
 const { registreerGratis } = require('../scripts/lib/gratisaccount');
 
 const PNG = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR4nGNgYGBgAAAABQABh6FO1AAAAABJRU5ErkJggg==';
@@ -65,6 +65,9 @@ async function lid() {
   const r = await api('/api/auth/register', { name: 'Toegang ' + seq, email: 'mt' + u + '@x.nl', phone: '06' + u,
     password: 'geheim123', geboortedatum: '1989-06-06', geslacht: 'm', tier: 'rtg', pasApp: 'rtg' });
   assert.ok(r.body.token, 'registreren lukt');
+  // Deze helper maakt de leden voor de positieve leescontrole. De expliciete
+  // registreerGratis-persona G in N1 blijft buiten deze betaalde fixture.
+  maakBetaaldRtgTestaccount(TMP, 'mt' + u + '@x.nl');
   email[r.body.token] = 'mt' + u + '@x.nl';
   return r.body.token;
 }

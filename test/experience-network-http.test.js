@@ -1,6 +1,8 @@
 'use strict';
 const test = require('node:test'), assert = require('node:assert/strict');
+const fs = require('node:fs'), os = require('node:os'), path = require('node:path');
 const h = require('./helper');
+const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-experience-network-'));
 let srv, token;
 async function post(path, body, auth = token) {
   const r = await fetch(srv.base + path, { method: 'POST', headers: { 'Content-Type': 'application/json',
@@ -8,12 +10,16 @@ async function post(path, body, auth = token) {
   return { status: r.status, headers: r.headers, body: await r.json() };
 }
 test.before(async () => {
-  srv = await h.startServer({ env: { SMTP_URL: '', RTG_AI_UIT: '1' } });
+  srv = await h.startServer({ env: { RTG_DATA_DIR: TMP, SMTP_URL: '', RTG_AI_UIT: '1' } });
   token = (await post('/api/auth/register', { name: 'Netwerkproef', email: 'network@rtg.test',
     phone: '0612345678', password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg' }, null)).body.token;
   assert.ok(token);
+  h.maakBetaaldRtgTestaccount(TMP, 'network@rtg.test');
 });
-test.after(() => h.stop(srv && srv.child));
+test.after(async () => {
+  await h.stopHard(srv && srv.child);
+  fs.rmSync(TMP, { recursive: true, force: true });
+});
 const body = { world: 'living', intent: { goal: 'Mijn plan', needs: ['product', 'verblijf'] } };
 test('één HTTP-contract bedient vier werelden; antwoorden zijn niet cachebaar', async () => {
   for (const world of ['living', 'travel', 'work', 'foundation']) {

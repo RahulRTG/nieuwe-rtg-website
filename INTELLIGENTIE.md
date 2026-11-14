@@ -14,6 +14,48 @@ Waar een getal ontbreekt staat de reden en niet een nul.
 
 ## 0. De lat
 
+### 0.0 RTG Native Intelligence — de architecturale standaard (11 november 2026)
+
+RTG Native Intelligence is geen extra brein naast Rahul, Edge, de werkruimte en
+de domeinen. Het is de eigenschap dat de bestaande architectuur haar
+mogelijkheden, gevolgen, grenzen en bewijs machineleesbaar maakt en daarvoor de
+goedkoopste passende techniek gebruikt.
+
+De standaard bestaat uit vier onderscheiden vormen van systeemkennis:
+
+| vorm | vraag | eigenaar |
+|---|---|---|
+| capability-aware | wat kan RTG? | domeincontract + bestaand beleid |
+| consequence-aware | wat verandert waarschijnlijk? | gevolgmeting + gevolgcontract |
+| constraint-aware | wat moet waar blijven? | waarborgcontract + domeinpoort |
+| evidence-aware | wat is werkelijk gebeurd? | effectbon + nameting + herstelbewijs |
+
+De norm erboven:
+
+> **RTG begrijpt wat mogelijk is, simuleert wat waarschijnlijk verandert,
+> bewaakt wat altijd waar moet blijven, respecteert wat toegestaan is en bewijst
+> wat werkelijk is gebeurd.**
+
+In de technische grammatica:
+
+> **No plan is permission. No simulation is reality. No AI answer is evidence.
+> No execution is complete until its postconditions and invariants have been
+> verified.**
+
+De eerste verticale doorsnede staat in de bestaande uitvoering en niet in een
+nieuw platformregister: `kern/stuur/waarborgcontract.js` projecteert
+`voorwaarden`, `streefstand` en `nooit` uit het gevolgcontract;
+`kern/stuur/plantweeling.js` legt een tijdelijke, schrijfvrije Plan Twin naast
+het gewogen plan; `effectbon.js` controleert de meetbare invarianten na iedere
+handeling; en `kern/ai/substitutie.js` houdt vervanging van AI dicht tot een
+onafhankelijke oracle, nul veiligheidsfouten, voldoende schaduwduur en een
+menselijk besluit aanwezig zijn.
+
+Wat dit nadrukkelijk nog niet beweert: een verklaring is geen geslaagde
+voorcontrole, een Plan Twin met een eerdere gevolgmeting is geen actuele kopie
+van productie, en de huidige contractdekking is geen huisbrede dekking. Onbekend
+blijft een eersteklas uitslag.
+
 De voorgestelde hoofdregel, en hij staat boven de bestaande doctrine in plaats
 van ernaast:
 

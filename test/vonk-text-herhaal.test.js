@@ -11,7 +11,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop, stopNet, kantoorAlsPersoon } = require('./helper');
+const { startServer, stop, stopNet, kantoorAlsPersoon, maakBetaaldRtgTestaccount } = require('./helper');
 
 const PNG = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==';
 const MAP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-vonk-text-'));
@@ -24,8 +24,11 @@ const api = (pad, body, token) => fetch(srv.base + pad, { method: 'POST',
 let seq = 0;
 async function lid(office) {
   const u = (Date.now() + (++seq)).toString().slice(-8);
-  const token = (await api('/api/auth/register', { name: 'Vonklid ' + seq, email: 'vt' + u + '@x.nl', phone: '06' + u,
-    password: 'geheim123', geboortedatum: '1990-05-05', geslacht: 'v', tier: 'rtg', pasApp: 'rtg' })).body.token;
+  const email = 'vt' + u + '@x.nl';
+  const token = (await api('/api/auth/register', { name: 'Vonklid ' + seq, email, phone: '06' + u,
+    password: 'geheim123', geboortedatum: '1990-05-05', geslacht: 'v' })).body.token;
+  assert.ok(token);
+  maakBetaaldRtgTestaccount(MAP, email); // Betaalde Vonk-persona; de echte identiteitskeuring hieronder blijft nodig.
   let codename = (await api('/api/state', {}, token)).body.state.user.codename;
   await api('/api/verify/upload', { image: PNG }, token);
   await api('/api/verify/selfie', { image: PNG }, token);

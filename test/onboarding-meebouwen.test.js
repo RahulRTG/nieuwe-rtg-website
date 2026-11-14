@@ -18,7 +18,9 @@
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer } = require('./helper');
+const { startServer, stopNet } = require('./helper');
+const fs = require('node:fs'), os = require('node:os'), path = require('node:path');
+const historischAccount = require('./lib/historisch-account');
 
 function post(base) {
   return (pad, body, token) => fetch(base + pad, {
@@ -105,11 +107,16 @@ test('het promobeeld gebruikt geen ledenbeeld zonder toestemming', () => {
     [met.photo, partner.photo], 'door elkaar heen blijft de regel dezelfde');
 });
 
-test('een bedrijf komt op naam van het lid, en niets wordt geregeld genoemd', async () => {
-  const { child, base } = await startServer({ env: { SMTP_URL: '' } });
+test('een bedrijf komt op naam van een bestaand betaald lid, zonder fictieve catalogusacceptatie', async () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-meebouwen-'));
+  historischAccount(dir, { email: 'olivier@example.test', name: 'Olivier', tier: 'rtg' });
+  const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: dir } });
   try {
     const P = post(base);
-    const lid = await versLid(P, 'Olivier');
+    const login = await P('/api/auth/login', { login: 'olivier@example.test', password: 'geheim123', pasApp: 'rtg' });
+    assert.equal(login.status, 200);
+    assert.equal(login.body.state.user.tier, 'rtg');
+    const lid = login.body.token;
     const r = await P('/api/onboarding/bedrijf', { naam: 'Bakkerij Olivier', catalogus: true }, lid);
     assert.equal(r.status, 200, JSON.stringify(r.body).slice(0, 160));
     assert.equal(r.body.onderneming.naam, 'Bakkerij Olivier');
@@ -138,5 +145,5 @@ test('een bedrijf komt op naam van het lid, en niets wordt geregeld genoemd', as
     // zonder naam gebeurt er niets, en dat is een nette fout
     const leeg = await P('/api/onboarding/bedrijf', { naam: '' }, lid);
     assert.equal(leeg.status, 400, 'zonder naam geen onderneming');
-  } finally { child.kill('SIGKILL'); }
+  } finally { await stopNet(child); fs.rmSync(dir, { recursive: true, force: true }); }
 });

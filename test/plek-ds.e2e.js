@@ -5,7 +5,7 @@
 'use strict';
 const test = require('node:test'), assert = require('node:assert/strict');
 const fs = require('node:fs'), os = require('node:os'), path = require('node:path');
-const { startServer, stop, laadPlaywright, browserOpties, geenBrowser, letOpFouten } = require('./helper');
+const { startServer, stopHard, laadPlaywright, browserOpties, geenBrowser, letOpFouten } = require('./helper');
 const { alleenDs, beeld } = require('./lib/ds-toets');
 const pw = laadPlaywright(), skip = geenBrowser(pw);
 let srv, browser, token, tmp;
@@ -20,10 +20,11 @@ test.before(async () => {
     body: JSON.stringify({ name: 'Plek Lid', email: 'plek-ds@voorbeeld.test', phone: '0612345678',
       password: 'plekgeheim12', geboortedatum: '1991-02-02', tier: 'rtg', pasApp: 'rtg' }) });
   const j = await r.json(); assert.equal(r.status, 200, JSON.stringify(j)); token = j.token; assert.ok(token);
+  require('./helper').maakBetaaldRtgTestaccount(tmp, 'plek-ds@voorbeeld.test');
   browser = await pw.chromium.launch(browserOpties(pw));
 });
 test.after(async () => {
-  if (browser) await browser.close(); if (srv) await stop(srv.child);
+  if (browser) await browser.close(); if (srv) await stopHard(srv.child);
   if (tmp) fs.rmSync(tmp, { recursive: true, force: true });
 });
 

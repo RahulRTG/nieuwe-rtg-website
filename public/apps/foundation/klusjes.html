@@ -60,6 +60,7 @@
 <link href="/ds/componenten/samen.css" rel="stylesheet">
 <link href="/ds/componenten/cookie.css" rel="stylesheet">
 <link href="/ds/componenten/handenvrij.css" rel="stylesheet">
+<link href="/ds/componenten/presentatierol.css" rel="stylesheet">
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
 <script src="/shared/rtg-heritage-transition.js" blocking="render"></script>
@@ -77,14 +78,14 @@
     <div class="ranglijst" id="ranglijst"><div class="leeg">Nog geen sterren verdiend.</div></div>
   </div>
 
-  <div class="kaart blok" id="geldBlok" style="display:none;border-color:var(--goud);">
+  <div class="kaart blok ds-presentatie-toestand ds-presentatie-accentkaart" id="geldBlok" hidden>
     <h2>De geldschool</h2>
     <div class="intro s-1bqj2a7" id="geldUitleg"></div>
     <div class="ranglijst" id="geldKinderen"></div>
     <div class="fout" id="geldFout"></div>
   </div>
 
-  <div class="kaart blok" id="maakBlok" style="display:none;">
+  <div class="kaart blok ds-presentatie-toestand" id="maakBlok" hidden>
     <h2>Nieuw klusje klaarzetten</h2>
     <input class="veld s-m3b83" id="kTitel" placeholder="Welk klusje? (bijv. tafel dekken)" maxlength="80">
     <div class="rijveld">
@@ -136,7 +137,7 @@ async function laad(){
   try{
     const d = await fetch('/api/foundation/gezin/'+s.code+'/klussen',{headers:{Authorization:'Bearer '+s.token}}).then(r=>r.json());
     magBeheren = d.magBeheren; mijnId = d.mijnId;
-    $('#maakBlok').style.display = magBeheren ? 'block' : 'none';
+    $('#maakBlok').hidden = !magBeheren;
     if (!magBeheren) $('#intro').textContent = 'Help mee in huis en verdien sterren! Tik een klusje aan als je het gedaan hebt; een ouder keurt het goed en de sterren zijn van jou.';
     // ranglijst
     $('#ranglijst').innerHTML = (d.sterren && d.sterren.length)
@@ -174,7 +175,7 @@ async function laadGeld(){
   let d;
   try { d = await api('/gezin/geldschool', { code:s.code, token:s.token }); }
   catch(e){ return; } // een oppas heeft hier niets te zoeken; het blok blijft weg
-  $('#geldBlok').style.display = 'block';
+  $('#geldBlok').hidden = false;
   $('#geldUitleg').textContent = d.magBeheren
     ? 'Weekgeld komt elke week vanzelf in het potje van je kind. Sterren verzilver je voor een bedrag dat jij kiest; de eer op de ranglijst blijft gewoon staan.'
     : 'Je sterren blijven van jou. Een ouder kan er zakgeld van maken; wat je verdient zie je terug in je Zakgeld-app.';

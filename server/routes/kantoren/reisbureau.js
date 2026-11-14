@@ -55,15 +55,15 @@ module.exports = ({ app, officeAuth, veilig, stuur, afdelingen, kern }) => {
      (kern/reisbureau-nazorg.js). Ook hier beslist een mens, en om dezelfde reden
      als bij /besluit: dit zijn toezeggingen aan een lid. WIE beslist komt uit de
      sessie en niet uit de body, en beide besluiten gaan het auditlog in. */
-  app.post('/api/office/reisbureau/wijziging', officeAuth, (req, res) => {
+  app.post('/api/office/reisbureau/wijziging', officeAuth, async (req, res) => {
     const wie = kern.boardroomWie(req) || 'backoffice (gedeelde code)';
-    veilig(res, () => {
-      const r = kern.reisbureau.besluitWijziging(String((req.body || {}).ref || ''),
+    try {
+      const r = await kern.reisbureau.besluitWijziging(String((req.body || {}).ref || ''),
         String((req.body || {}).besluit || ''), wie, (req.body || {}).bericht);
       if (r.ok) afdelingen.audit(wie, 'Reisbureau: wijziging ' + r.aanvraag.ref + ' '
         + ((r.aanvraag.wijziging || {}).stand || '') + ' (' + r.aanvraag.titel + ')');
-      return r;
-    });
+      stuur(res, r);
+    } catch (e) { console.error('[kantoren]', e); res.status(500).json({ error: 'Er ging iets mis. Probeer het opnieuw.' }); }
   });
   app.post('/api/office/reisbureau/afzeggen', officeAuth, async (req, res) => {
     const wie = kern.boardroomWie(req) || 'backoffice (gedeelde code)';
@@ -77,13 +77,13 @@ module.exports = ({ app, officeAuth, veilig, stuur, afdelingen, kern }) => {
   });
 
   // de reis is voorbij (kern/reisbureau-thuis.js): het kantoor meldt hem als het lid dat niet doet
-  app.post('/api/office/reisbureau/thuis', officeAuth, (req, res) => {
+  app.post('/api/office/reisbureau/thuis', officeAuth, async (req, res) => {
     const wie = kern.boardroomWie(req) || 'backoffice (gedeelde code)';
-    veilig(res, () => {
-      const r = kern.reisbureau.markeerThuis({ ref: String((req.body || {}).ref || ''), door: wie });
+    try {
+      const r = await kern.reisbureau.markeerThuis({ ref: String((req.body || {}).ref || ''), door: wie });
       if (r.ok) afdelingen.audit(wie, 'Reisbureau: reis ' + r.aanvraag.ref + ' thuis (' + r.aanvraag.titel + ')');
-      return r;
-    });
+      stuur(res, r);
+    } catch (e) { console.error('[kantoren]', e); res.status(500).json({ error: 'Er ging iets mis. Probeer het opnieuw.' }); }
   });
 
   /* De losse ingangen naast /besluit. Ze bestaan omdat het dossier van het lid
@@ -92,11 +92,12 @@ module.exports = ({ app, officeAuth, veilig, stuur, afdelingen, kern }) => {
      /besluit -- zie kern/reisbureau.js, waar de gedeelde stappen een keer
      staan -- en het verschil is alleen hoe het bericht aan het lid heet. */
   app.post('/api/office/reisbureau/bevestig', officeAuth, (req, res) =>
-    veilig(res, () => kern.reisbureau.bevestig(String((req.body || {}).ref || ''), (req.body || {}).door)));
+    veilig(res, () => kern.reisbureau.bevestig(String((req.body || {}).ref || ''),
+      kern.boardroomWie(req) || 'backoffice (gedeelde code)')));
   app.post('/api/office/reisbureau/afwijzen', officeAuth, async (req, res) => {
     try {
       const r = await kern.reisbureau.wijsAf(String((req.body || {}).ref || ''),
-        (req.body || {}).door, (req.body || {}).reden);
+        kern.boardroomWie(req) || 'backoffice (gedeelde code)', (req.body || {}).reden);
       stuur(res, r);
     } catch (e) { console.error('[kantoren]', e); res.status(500).json({ error: 'Er ging iets mis. Probeer het opnieuw.' }); }
   });

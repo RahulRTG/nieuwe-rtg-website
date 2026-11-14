@@ -42,6 +42,12 @@
     const el = $('#stBody'); if (!el || !state) return;
     $('#stBiz').textContent = S ? S.name : '';
     $('#stLabel').textContent = stationLabel(stationMode) + (stationMode === 'keuken' ? ' \u00b7 ' + T('ks.'+keukenSectie, (KSECTIES[keukenSectie]||['',''])[1]) : '');
+    // Alleen het bewerkte reiscontract behoudt zijn vluchtige concept en
+    // mutatieslot; de bestaande reispoort controleert opnieuw de bevoegdheid.
+    const reis = el.querySelector('#zaakReisContracten');
+    if (stationMode === 'kantoor' && kantoorSec === 'reiscontracten' && reis && reis.querySelector('form') && reis._reisControle) {
+      reis._reisControle(); return;
+    }
     const live = (state.orders||[]).filter(o => !['geserveerd','geweigerd','terugbetaald'].includes(o.status));
     let html = '';
     if (stationMode === 'keuken' || stationMode === 'bar'){ laadWerkvloer(); html += werkvloerBalk(); }

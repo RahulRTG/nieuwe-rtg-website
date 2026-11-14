@@ -31,6 +31,13 @@ module.exports = ({ db, store, sqlite, bundelDoos, bewaar }) => {
       return op.resultaat;
     };
     return {
+      // Een eigenaar kan de bundelpreview lezen zonder daarbij buiten een
+      // bundel het gedeelde snapshot te verversen (lijst en keten blijven één
+      // beeld). Geen opening, migratie of I/O op deze leesweg.
+      voorlopig() {
+        const doos = bundelDoos();
+        return doos?.open ? doos.auditViews?.get(naam) : undefined;
+      },
       view() {
         if (bereid()) return motor.view(naam);
         const waarde = db.data?.[naam];

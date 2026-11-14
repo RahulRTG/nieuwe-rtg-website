@@ -39,7 +39,7 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const { randomUUID } = require('node:crypto');
-const { startServer, stop, kantoorAlsPersoon } = require('./helper');
+const { startServer, stop, kantoorAlsPersoon, maakBetaaldRtgTestaccount } = require('./helper');
 
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-kernroutes-lid-'));
 let srv, base;
@@ -54,13 +54,14 @@ const MINI_PNG = 'data:image/png;base64,' +
   'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==';
 
 let teller = 0;
-async function versLid(metPaspoort) {
+async function versLid(metPaspoort, betaald = false) {
   const t = Date.now() + '-' + (teller++);
   const r = await api('/api/auth/register', {
     name: 'Kern Toets', email: 'kernroutes-' + t + '@toets.example',
     password: 'geheim123', geboortedatum: '1985-05-05', tier: 'rtg'
   });
   assert.ok(r.body.token, 'registreren hoort een token te geven: ' + JSON.stringify(r.body).slice(0, 160));
+  if (betaald) maakBetaaldRtgTestaccount(TMP, 'kernroutes-' + t + '@toets.example');
   if (metPaspoort) {
     const kyc = await api('/api/verify/upload', { image: MINI_PNG }, r.body.token);
     assert.equal(kyc.status, 200, 'het paspoort hoort aangenomen te worden: ' + JSON.stringify(kyc.body).slice(0, 160));
@@ -81,7 +82,7 @@ test.after(() => {
 });
 
 test('geld/pot/weg: een pot gaat weg, maar niet zolang een aanstaande regel erin reserveert', async () => {
-  const tok = await versLid(true);
+  const tok = await versLid(true, true);
   const pot = await api('/api/geld/pot/zet', { naam: 'Vakantie', doelCenten: 50000 }, tok);
   assert.equal(pot.status, 200, JSON.stringify(pot.body).slice(0, 160));
   const id = pot.body.pot.id;

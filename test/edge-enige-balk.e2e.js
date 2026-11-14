@@ -299,3 +299,80 @@ test('de Edge neemt de eigen balk van een scherm over, met knoppen en ruimte',
     await stop(child);
   }
 });
+
+test('leverancier houdt één schil met echte tab-, meldings- en actorbediening',
+  { skip: geenBrowser(pw), timeout: 90000 }, async () => {
+  const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_AI_UIT: '1' } });
+  let browser;
+  try {
+    const post = async (pad, body) => {
+      const r = await fetch(base + pad, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+      const data = await r.json(); assert.equal(r.status, 200, pad + ': ' + JSON.stringify(data)); return data;
+    };
+    const rooster = await post('/api/supplier/roster', { code: 'KIKUNOI' });
+    const manager = rooster.staff.find(p => p.role === 'manager'); assert.ok(manager);
+    const sessie = await post('/api/supplier/login', { code: 'KIKUNOI', staffId: manager.id, pin: '1234' });
+    assert.ok(sessie.token);
+    browser = await pw.chromium.launch(browserOpties(pw));
+    for (const width of [390, 1440]) {
+      const ctx = await browser.newContext({ viewport: { width, height: 900 }, serviceWorkers: 'block', reducedMotion: 'reduce', locale: 'nl-NL' });
+      try {
+        await ctx.addInitScript(token => {
+          localStorage.setItem('rtg_sup_token', token);
+          localStorage.setItem('rtg_lang', 'nl'); localStorage.setItem('rtg_cookieinfo_v1', '1');
+        }, sessie.token);
+        const page = await ctx.newPage();
+        await page.goto(base + '/apps/leverancier.html?sector=restaurant', { waitUntil: 'domcontentloaded' });
+        await page.locator('#app.active').waitFor({ state: 'visible' });
+        await page.waitForFunction(() => document.body.dataset.rtgAdaptiveReady === 'true' && document.body.dataset.rtgEditorialV4 === 'true');
+        assert.equal(await page.locator('.rtg-v4-header:visible').count(), 1, width + ': één globale kop');
+        assert.equal(await page.locator('.rtg-adaptive-bar:visible').count(), 1, width + ': één Edge');
+        assert.equal(await page.locator('#app > .topbar').isVisible(), false, width + ': geen oude merkbalk');
+        assert.equal(await page.locator('#tabbar').isVisible(), false, width + ': het tabmodel is geen tweede onderbalk');
+        assert.equal(await page.locator('#actorName').textContent(), sessie.state.actor.name, 'de echte actor blijft herkenbaar');
+        assert.equal(await page.locator('#actorName').isVisible(), true);
+        assert.equal(await page.locator('#supName').textContent(), sessie.state.supplier.name, 'de volledige zaaknaam blijft zichtbaar, niet alleen het eerste woord uit de begroeting');
+        assert.equal(await page.locator('#supName').isVisible(), true);
+        assert.equal(await page.locator('#supType').isVisible(), true);
+        assert.ok((await page.locator('#supType').textContent()).includes(sessie.state.supplier.city));
+        assert.equal(await page.locator('#supIcon').isVisible(), false, 'de ruwe decoratieve sectorsleutel vervangt geen leesbaar label');
+        const identiteit = await page.evaluate(() => {
+          const naam = document.getElementById('supName').getBoundingClientRect();
+          const soort = document.getElementById('supType').getBoundingClientRect();
+          return { gescheiden: soort.top >= naam.bottom, binnenScherm: naam.left > 0 && naam.right <= innerWidth && soort.right <= innerWidth,
+            naam: naam.toJSON(), soort: soort.toJSON(), breedte: innerWidth };
+        });
+        assert.ok(identiteit.gescheiden, 'zaaknaam en type/plaats staan op eigen regels');
+        assert.ok(identiteit.binnenScherm, 'de identiteit heeft zijruimte en blijft binnen het scherm: ' + JSON.stringify(identiteit));
+        assert.equal(await page.locator('#actorChip').count(), 1); assert.equal(await page.locator('#bell').count(), 1);
+        await page.locator('#bellBadge[hidden]').waitFor({ state: 'attached' });
+        assert.equal(await page.locator('#bellBadge').isVisible(), false, 'nul meldingen geeft geen zichtbaar meldingssignaal');
+        await page.evaluate(() => { window.__partnerActor = document.getElementById('actorChip'); window.__partnerBell = document.getElementById('bell'); });
+
+        /* Meer is het bestaande WerkOS-register, geen tweede onderbalk. De
+           echte menukaart daaruit blijft naast de vier directe tabs werken. */
+        for (const tab of ['kassa', 'ai', 'gchat', 'menu', 'home']) {
+          await page.locator('[data-rtg-adaptive-action="context"]').click();
+          const knop = page.locator('.rtg-adaptive-controls [data-rtg-adaptive-tab="' + tab + '"]').first();
+          await knop.waitFor({ state: 'visible' }); await knop.click();
+          await page.locator('.view.active[data-view="' + tab + '"]').waitFor({ state: 'visible' });
+          assert.equal(await page.locator('#tabbar button.active').getAttribute('data-tab'), tab === 'menu' ? 'meer' : tab);
+        }
+        assert.equal(await page.evaluate(() => document.getElementById('actorChip') === window.__partnerActor && document.getElementById('bell') === window.__partnerBell), true, 'geen gekloonde actor- of meldingsknoppen');
+        await page.locator('#bell').click();
+        await page.locator('#notifPanel.open').waitFor({ state: 'visible' });
+        await page.locator('#notifClose').click();
+        await page.locator('#notifPanel.open').waitFor({ state: 'detached' });
+        await page.locator('#notifScrim').waitFor({ state: 'hidden' });
+        await page.locator('#actorChip').click();
+        await page.locator('#gate').waitFor({ state: 'visible' });
+        assert.equal(await page.evaluate(() => localStorage.getItem('rtg_sup_token')), null, 'de oorspronkelijke gebruikerswissel wist de sessie');
+        assert.equal(await page.locator('#app').isVisible(), false);
+        assert.equal(await page.locator('#actorChip').isVisible(), false, 'actorbediening blijft binnen de gesloten sessiepoort');
+        assert.equal(await page.locator('#bell').isVisible(), false);
+        assert.equal(await page.locator('#supName').isVisible(), false, 'de zaakidentiteit blijft eveneens binnen de gesloten sessiepoort');
+        assert.equal(await page.locator('#supType').isVisible(), false);
+      } finally { await ctx.close(); }
+    }
+  } finally { if (browser) await browser.close(); await stop(child); }
+});

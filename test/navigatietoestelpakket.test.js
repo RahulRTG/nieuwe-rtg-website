@@ -234,7 +234,7 @@ test('10. de server BELOOFT niet wat er op het toestel staat', async () => {
    werkelijk het bestand zijn.
    --------------------------------------------------------------------------- */
 
-const { startServer, stop } = require('./helper');
+const { startServer, stop, maakBetaaldRtgTestaccount } = require('./helper');
 
 let srv, base;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-pakketroutes-'));
@@ -251,6 +251,7 @@ async function nieuwLid() {
   const reg = await post('/api/auth/register', { name: 'Pakketlid ' + seq, email: 'pl' + u + '@x.nl',
     phone: '06' + u, password: 'geheim123', geboortedatum: '1990-05-05', geslacht: 'v',
     tier: 'rtg', pasApp: 'rtg' });
+  maakBetaaldRtgTestaccount(TMP, 'pl' + u + '@x.nl');
   return reg.body.token;
 }
 

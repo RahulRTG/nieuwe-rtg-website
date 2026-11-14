@@ -18,25 +18,6 @@
   };
   var KLASSE = { 'in orde': 'ok', 'niet vast te stellen': 'onbekend', storing: 'storing' };
 
-  function stijl() {
-    if (document.getElementById('obsStijl')) return;
-    var s = document.createElement('style');
-    s.id = 'obsStijl';
-    s.textContent =
-      '#obs .obs-kop{display:flex;align-items:baseline;gap:.75rem;flex-wrap:wrap;margin-bottom:.9rem;}' +
-      '#obs .obs-stand{font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;' +
-        'border:1px solid currentColor;padding:.25rem .6rem;}' +
-      '#obs .ok{color:#4C9A75;}#obs .onbekend{color:#C9A24B;}#obs .storing{color:#C23A5E;}' +
-      '#obs .obs-seinen{display:grid;gap:.75rem;grid-template-columns:repeat(auto-fit,minmax(15rem,1fr));}' +
-      '#obs .sein{border-left:3px solid currentColor;padding:.6rem .8rem;background:rgba(255,255,255,.03);}' +
-      '#obs .sein h4{margin:0 0 .2rem;font-size:.95rem;font-weight:600;color:inherit;}' +
-      '#obs .sein .aantal{font-family:"Bodoni Moda",serif;font-size:1.8rem;line-height:1.1;}' +
-      '#obs .sein p{margin:.35rem 0 0;font-size:.82rem;line-height:1.45;color:var(--rtg-soft,#8A8680);}' +
-      '#obs .sein ul{margin:.4rem 0 0;padding-left:1.1rem;font-size:.82rem;color:var(--rtg-soft,#8A8680);}' +
-      '#obs .obs-niet{margin-top:.9rem;font-size:.8rem;line-height:1.5;color:var(--rtg-soft,#8A8680);}';
-    document.head.appendChild(s);
-  }
-
   /* Een sein toont een AANTAL waar het er een heeft, en anders het bedrag of de
      reden. Waar de server "niet vast te stellen" zegt, komt er geen nul te
      staan: dat is precies het verschil tussen "er is niets" en "we weten het
@@ -68,7 +49,6 @@
   }
 
   function teken(doel, b) {
-    stijl();
     if (!doel) return;
     if (!b || !b.ok) { doel.innerHTML = '<div class="leeg">' + esc((b && b.error) || 'Het bord is niet te peilen.') + '</div>'; return; }
     var kl = KLASSE[b.stand] || 'onbekend';

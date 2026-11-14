@@ -27,6 +27,7 @@
   .ds-samen-banner { position: fixed; inset-inline: var(--ds-ruimte-4); margin-inline: auto; inset-block-end: calc(6.4rem + env(safe-area-inset-bottom, 0px)); z-index: 9982; background: var(--ds-oppervlak); color: var(--ds-inkt); border: 1px solid var(--ds-lijnkleur); border-radius: var(--ds-radius-systeem); padding: var(--ds-ruimte-3); font-family: var(--ds-letter-tekst); font-size: var(--ds-maat-klein); display: flex; flex-wrap: wrap; gap: var(--ds-ruimte-3); align-items: center; box-shadow: var(--ds-schaduw-systeem); max-inline-size: 30rem; }
   .ds-samen-code { font-family: monospace; letter-spacing: .2em; color: var(--ds-accent); font-weight: 700; }
   .ds-samen-doe--breed { inline-size: 100%; }
+  .ds-samen-groei { flex: 1; }
   .ds-samen-codeinvoer { text-transform: uppercase; }
   .ds-samen-chat { font-size: var(--ds-maat-klein); color: var(--ds-inkt-zacht); max-block-size: 26vh; overflow: auto; line-height: 1.5; }
   .ds-samen-host .sb-balk { flex-wrap: wrap; row-gap: var(--ds-ruimte-2); }

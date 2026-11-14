@@ -11,7 +11,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop, kantoorKoppelBody } = require('./helper');
+const { startServer, stop, kantoorKoppelBody, maakBetaaldRtgTestaccount } = require('./helper');
 const { kantoorPasskey } = require('./kantoorpasskey');
 
 let srv, base, lid, office;
@@ -228,6 +228,7 @@ async function versLid(centen) {
     body: JSON.stringify({ name: 'Dubbeltik ' + versTeller, email: 'dt' + u + '@x.nl', phone: '06' + u,
       password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' }) })).json();
   assert.ok(reg.token, 'het verse lid is geregistreerd');
+  maakBetaaldRtgTestaccount(TMP, 'dt' + u + '@x.nl');
   const akk = await api('bank/akkoord', {}, reg.token);
   assert.equal(akk.status, 200, 'akkoord opent de eerste rekening');
   assert.ok(akk.body.rekening, 'en die rekening is er ook echt: ' + JSON.stringify(akk.body).slice(0, 140));

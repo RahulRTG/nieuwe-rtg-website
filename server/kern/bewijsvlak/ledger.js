@@ -154,6 +154,7 @@ function maakLedger(opties) {
     };
     body.hash = hash(body);
     const vast = bevries(body);
+    require('../../lib/immutable-json').certifieer(vast);
     if (transaction && transaction.active()) {
       transaction.stage({ type: 'ledger-append', key: 'ledger:' + vast.evidenceRecordId,
         record: vast,
@@ -174,8 +175,9 @@ function maakLedger(opties) {
       return vast;
     }
     lijst.push(vast);
+    const toegepast = lijst[lijst.length - 1]; // ook correct achter de opslagtracker
     try { save(); }
-    catch (error) { if (lijst[lijst.length - 1] === vast) lijst.pop(); throw error; }
+    catch (error) { if (lijst[lijst.length - 1] === toegepast) lijst.pop(); throw error; }
     return vast;
   }
 

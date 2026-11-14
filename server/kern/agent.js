@@ -8,6 +8,7 @@
 const { dagContext } = require('./context');
 const tijdzone = require('./tijdzone');
 const { maakInplanbaar, naKijken, NIET_GELEZEN } = require('./payroll/inplanbaar');
+const klok = require('../lib/klok');
 /* Het vastgestelde rooster is EEN veld (s.roosterVast), onzichtbaar voor de
    rij-telling van opzet/handeling.js; daarom meldt hij zijn omvang zelf. */
 const handeling = require('../opzet/handeling');
@@ -72,8 +73,9 @@ function maakAgent({ db, crypto, findSupplier, notifySupplier, ghBijbestelVoorst
     if (!basis) return { status: 409, error: 'Geen van de gekoppelde groothandels heeft passende producten.' };
     a.partnerCode = a.partners[0]; // compat: eerste blijft de weergave-partner
     const dms = s.dailyMeps || {};
-    const morgen = new Date(Date.now() + 86400000).toISOString().slice(0, 10);
-    const plan = dms[morgen] || dms[new Date().toISOString().slice(0, 10)];
+    const vandaag = tijdzone.datumIn(klok.datum());
+    const morgen = tijdzone.plusDagen(vandaag, 1);
+    const plan = dms[morgen] || dms[vandaag];
     const stoelen = (s.tables || []).reduce((n, t) => n + (t.seats || 0), 0) || 24;
     // de dagcontext weegt mee: seizoen en temperatuur sturen de aantallen
     const ctx = dagContext();
@@ -91,7 +93,7 @@ function maakAgent({ db, crypto, findSupplier, notifySupplier, ghBijbestelVoorst
       }
     }
     const v = {
-      id: crypto.randomBytes(4).toString('hex'), at: new Date().toISOString(), soort: 'inkoop',
+      id: crypto.randomBytes(4).toString('hex'), at: klok.datum().toISOString(), soort: 'inkoop',
       groothandelCode: basisCode, groothandelNaam: basis.groothandelNaam,
       regels: regels.slice(0, 40), totaal,
       uitleg: basis.uitleg
@@ -137,7 +139,7 @@ function maakAgent({ db, crypto, findSupplier, notifySupplier, ghBijbestelVoorst
     const days = []; let nietGelezen = false, vrijgehouden = 0;
     // voorstel en zichtbaar rooster beginnen op dezelfde lokale zaakdag
     const zone = tijdzone.zaakZoneOfHuis(s);
-    const eersteDag = tijdzone.datumIn(null, zone);
+    const eersteDag = tijdzone.datumIn(klok.datum(), zone);
     for (let d = 0; d < 7; d++) {
       const datum = tijdzone.plusDagen(eersteDag, d);
       const date = tijdzone.moment(datum, 12 * 60, zone);
@@ -156,7 +158,7 @@ function maakAgent({ db, crypto, findSupplier, notifySupplier, ghBijbestelVoorst
       });
       days.push({ date: datum, label, factor, staff: rows });
     }
-    agentVan(s).rooster = { days, status: 'voorstel', at: new Date().toISOString(),
+    agentVan(s).rooster = { days, status: 'voorstel', at: klok.datum().toISOString(),
       afwezigheid: nietGelezen ? NIET_GELEZEN : vrijgehouden + ' dienst(en) vrijgehouden voor wie afwezig is.' };
     save();
     return { status: 200, ok: true, rooster: agentVan(s).rooster };

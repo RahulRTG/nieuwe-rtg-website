@@ -3679,6 +3679,16 @@ ging. De helper rekent nu na dat de intake echt is gezet.
 per organisatie (holdings met dochters eronder), met eigen leden, rollen,
 journaal en startscherm -- zodat dit ook aan een andere organisatie te geven is.
 
+**De gewone RTG-inlog is ook de Work OS-inlog.** Bij het openen probeert het
+scherm eerst `viaLid()` met `rtg_member_token`: de gekoppelde werkruimte en
+persoonlijke werksleutel worden uit de accountbrug gehaald en de gebruiker komt
+zonder tweede login binnen. Alleen een externe medewerker die nog geen
+gekoppeld RTG-account heeft ziet de bestaande werkruimtecode plus persoonlijke
+werksleutel; dat is een andere identiteit, geen terugval naar een gedeelde
+kantoorcode. De RTG-kantoorschermen zelf hebben die code-terugval niet meer:
+zij vragen een gewone accountlogin, een kantoorrol en daarna de bestaande
+passkey/pin-ceremonie.
+
 | Module | Wat erin zit |
 | --- | --- |
 | Werkruimte | leden (aanmelden is niet binnen zijn), rollen met een venster van/tot, journaal, uit dienst |
@@ -4643,6 +4653,81 @@ kantoor-inlog, het besluit landt bij het lid zonder de medewerker mee te sturen,
 een tweede besluit ketst af en afwijzen zonder reden verandert niets) en
 `test/reisbalie.e2e.js` (het scherm liegt niet: de knop raakt alleen zijn eigen
 aanvraag, en een geweigerde afwijzing laat de regel gewoon staan).
+
+### Federatieve reiscontracten: lokale kwalificatieketen
+
+De bestaande reisbureau-, kantoor- en leveranciersdeuren delen nu een
+versievaste contractvorm in **de bestaande `reisAanvragen`-collectie**.
+`server/kern/reisbureau-keten.js` coördineert aanvraag, offerte, klantakkoord,
+afzonderlijke aanbiedersacceptatie, Pay-inning en leveringsverklaringen.
+Dezelfde zaak draagt via `reisbureau-ketennazorg.js` een wijzigings-/
+annuleringsvraag en een antwoord van de eigen verkoper. De reiziger gebruikt
+`POST /api/reisbureau/keten/nazorg`; kantoor en partner gebruiken respectievelijk
+`POST /api/office/reisbureau/keten/nazorg/antwoord` en
+`POST /api/supplier/reisbureau/keten/nazorg/antwoord`. Die handelingen veranderen
+geen oorspronkelijke offerte, levering of betaling. Een getypte bronreferentie
+is een verklaring, geen geverifieerde contractgoedkeuring of uitvoeringsbewijs.
+`reisbureau-ketencontract.js` maakt uitsluitend positieve projecties: de
+reiziger krijgt geen inkoopverdeling, de aanbieder geen klantkey, marge of
+andere leveranciersopdracht. Klassieke RTG-lezers sluiten de `keten`-envelop
+uit. Het is geen tweede boekingsdatabase en geen nieuwe app.
+
+De ingangen zijn `/api/reisbureau/keten`,
+`/api/office/reisbureau/keten` en `/api/supplier/reisbureau/keten`;
+aanbieders gebruiken `/api/supplier/reisbureau/opdrachten` en
+`/api/supplier/reisbureau/opdracht/besluit`. Actor, actuele managementrol,
+tenantbinding en lifecycle volgen uit de bestaande persoonlijke deuren via
+`reisbureau-toegang.js`, nooit uit clientvelden. De browser gebruikt de
+bestaande schermen Reisbureau, Kantoor en Leverancier.
+
+Iedere mutatie vraagt een versie en idempotentiesleutel. De transactionele
+collectiepoort bewaart ontvangsten en gebeurtenissen. Offerteversies zijn
+gehasht met de bestaande canonieke berichtafdruk; na akkoord verandert de
+offerte niet. Een betalingsclaim staat duurzaam vóór de async Pay-aanroep.
+Onbekende afloop blijft geblokkeerd en herstelt uitsluitend met dezelfde
+economische identiteit. De transportcache mag de actuele autorisatie niet
+overslaan. Ook de klassieke reisbetaling heeft nu een bij aanvraag bevroren
+prijsgrond en stabiele financiële projecties. Oude aanvragen zonder geldige
+prijsgrond worden niet achteraf uit de actuele catalogus geprijsd: een
+adviseur moet een nieuwe, gecontroleerde aanvraag voorbereiden. Beide
+betaalpaden toetsen vóór een nieuwe inning de bestaande identiteitspoort en
+huisvrijgave. Alleen exact reeds geboekt bewijs kan na intrekking read-only
+worden aangesloten; onbekend is geen toestemming om opnieuw te innen.
+
+**Vrijgave: NO-GO.** Deze nieuwe contractroutes werken uitsluitend op een
+bewezen lokale ontwikkel-/testinstallatie volgens de bestaande
+`kern/vrijgave/lokaal`-grens. Productie en openbare ontwikkelinstallaties
+krijgen 503; er bestaat geen alternatieve GO-vlag. Een aanbiedersverklaring
+is geen live voorraadgarantie, juridische toets of bankbewijs. Eigen externe
+betaalproviders, settlement, restituties, verstoringsherstel en economische
+afsluiting van deze federatieve contractvorm zijn nog niet gekwalificeerd.
+`afronden` weigert daarom expliciet; levering wordt geen schijnafsluiting.
+
+De bestaande partnerlezingen `/api/supplier/reisbureau/keten` en
+`/api/supplier/reisbureau/opdrachten` accepteren `vorm: uitvoer` (JSON) en
+`vorm: leesbaar` (Markdown). `reisbureau-ketenexport.js` gebruikt de bestaande
+tenantuitgang voor een documentair archief van uitsluitend de eigen huidige
+zaakbevoegdheid, met een checksum en veilige actoraliases. De aanbieder krijgt
+geen klant-, marge- of nazorgdossier. Een org-binding geeft een
+werkruimtebeheerder geen recht op alle reizen. Import herstelt geen actieve
+reizen, oude accountsleutels, RTG-binding of financiële autoriteit. Vertrek na
+sluiting en volledige tenantbrede reisuitgang blijven ongekwalificeerd.
+De importcontrole weigert ongeldige catalogusvormen, dubbele soorten,
+afwijkende aantallen en onveilige documentaire reisrecords vóór opslag.
+De bestaande tenantlevensloop weigert vernietiging zolang federatieve
+reishistorie buiten haar werkruimtecontract valt; zij wist die geschiedenis
+niet en presenteert de tenant niet als volledig vernietigd.
+
+Een actieve Zaakdoos geeft deze contractroutes alleen via de bestaande online
+proxy door. Na proxyuitval weigert zij ze met 503 en `no-store`, vóór
+antwoordcache, handlers en journaling. Ook oudere ondertekende
+reisjournaalregels mogen niet worden nagespeeld. Een lokale kopie verleent
+geen actuele persoonlijke reisbevoegdheid. Dit is een veilige offlinegrens,
+geen geïmplementeerde koude offline reisvoorziening.
+De implementatiekaart
+staat in `TRAVELOS-UITVOERING.md`; de meetvoortgang en resterende blokkades
+staan uitsluitend in het bestaande `AFBOUWPROGRAMMA.md` en de bestaande
+afgeleide registers.
 
 ### RTG Bank & RTG Stad (de eigen infrastructuur)
 
@@ -6210,3 +6295,17 @@ Drie productiegrenzen leveren nu shadow-bewijs: `betaalwaarheid` voor Money
 Integrity, de Vonk-reserveringsnaad voor External Dependency Integrity en de
 Connection-consent/call-naad voor Authority & Revocation Integrity. Provider-
 bevestiging zonder waargenomen fulfilment blijft bewust onvolledig.
+
+## Samengevoegde Deep Green-kandidaat
+
+De consolidatietak combineert Deep Green-herstel, TravelOS en de native
+intelligentieplanning in één kandidaat. De federatieve reisketen is geen tweede
+site of los platform: zij hangt onder het bestaande reisbureau en hergebruikt
+de bestaande identiteit-, tenant-, opslag- en geldpoorten. Een Plan Twin of
+waarborgprojectie kan niets uitvoeren; onbekende dekking blijft onbekend.
+
+De nieuwe bron is structureel op de bestaande ratels teruggebracht en alle 33
+toegevoegde toetsen zijn mutatiegevoelig gemeten. Dat is intern technisch bewijs.
+Een productieclaim volgt pas uit de bestaande volledige lokale CI-, release- en
+stagingpoorten én uit de nog open externe, juridische en operationele besluiten
+die in `TRAVELOS-UITVOERING.md` staan.

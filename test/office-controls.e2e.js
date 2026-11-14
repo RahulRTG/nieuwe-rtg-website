@@ -2,7 +2,8 @@
    persistence; creation, naming, opening and deletion use the actual UI. */
 'use strict';
 const test=require('node:test'),assert=require('node:assert/strict');
-const {startServer,stopHard,laadPlaywright,browserOpties,geenBrowser,veegDoor}=require('./helper');
+const fs=require('node:fs'),os=require('node:os'),path=require('node:path');
+const {startServer,stopHard,maakBetaaldRtgTestaccount,laadPlaywright,browserOpties,geenBrowser,veegDoor}=require('./helper');
 const pw=laadPlaywright();
 test('Office: een oud lijstantwoord brengt geen verwijderd document terug in de drive of RTDocs',{skip:geenBrowser(pw)},async()=>{
  for(const front of [false,true])await fixture(async({browser,base,token,api})=>{
@@ -27,13 +28,14 @@ test('Office: een oud lijstantwoord brengt geen verwijderd document terug in de 
  });
 });
 async function fixture(doe){
- const srv=await startServer({env:{SMTP_URL:'',RTG_AI_UIT:'1'}});let browser;
+ const TMP=fs.mkdtempSync(path.join(os.tmpdir(),'rtg-office-controls-'));
+ const srv=await startServer({env:{SMTP_URL:'',RTG_AI_UIT:'1',RTG_DATA_DIR:TMP}});let browser;
  try{const call=async(p,b,t)=>{const r=await fetch(srv.base+p,{method:'POST',headers:{'Content-Type':'application/json',...(t?{Authorization:'Bearer '+t}:{})},body:JSON.stringify(b||{})});return{status:r.status,...await r.json()}};
  const n=Date.now(),user=await call('/api/auth/register',{name:'Documentcontrole',email:'docs'+n+'@test.invalid',phone:'06'+String(n).slice(-8),password:'geheim123',geboortedatum:'1990-01-01',tier:'rtg'});
- assert.ok(user.token);const api=(p,b)=>call('/api/kantoorpakket/'+p,b,user.token);
+ assert.ok(user.token);maakBetaaldRtgTestaccount(TMP,'docs'+n+'@test.invalid');const api=(p,b)=>call('/api/kantoorpakket/'+p,b,user.token);
  browser=await pw.chromium.launch(browserOpties(pw));
- await doe({browser,api,call,base:srv.base,token:user.token});
- }finally{if(browser)await browser.close();await stopHard(srv.child)}
+ await doe({browser,api,call,base:srv.base,token:user.token,datamap:TMP});
+ }finally{if(browser)await browser.close();await stopHard(srv.child);fs.rmSync(TMP,{recursive:true,force:true})}
 }
 async function pageFor(browser,base,token,width){const page=await browser.newPage({viewport:{width,height:900},isMobile:width<600,hasTouch:width<600,reducedMotion:'reduce'});
  await page.addInitScript(t=>{localStorage.setItem('rtg_member_token',t);localStorage.setItem('rtg_lang','nl');localStorage.setItem('rtg_cookieinfo_v1','1')},token);
@@ -77,9 +79,10 @@ for(const width of [390,1440])test('Office '+width+': alle zes documentsoorten m
  await page.reload();await page.waitForFunction(()=>window.RTGOffice&&window.RTGOffice.stand());assert.equal((await api('mijn')).docs.length,0);
  assert.equal(requestDeletes,6,'precies één verwijderaanvraag per document');await page.close();
 }));
-test('RTDocs: een geweigerde verwijdering blijft zichtbaar en gedeelde documenten bieden geen verwijderactie',{skip:geenBrowser(pw)},async()=>fixture(async({browser,base,token,api,call})=>{
+test('RTDocs: een geweigerde verwijdering blijft zichtbaar en gedeelde documenten bieden geen verwijderactie',{skip:geenBrowser(pw)},async()=>fixture(async({browser,base,token,api,call,datamap})=>{
  const own=await api('maak',{soort:'tekst',titel:'Mijn proefdocument'});assert.ok(own.id);
  const n=Date.now(),other=await call('/api/auth/register',{name:'Andere eigenaar',email:'other'+n+'@test.invalid',phone:'07'+String(n).slice(-8),password:'geheim123',geboortedatum:'1990-01-01',tier:'rtg'});
+ maakBetaaldRtgTestaccount(datamap,'other'+n+'@test.invalid');
  const shared=await call('/api/kantoorpakket/maak',{soort:'tekst',titel:'Alleen gedeeld'},other.token);
  const state=await call('/api/state',{},token);await call('/api/kantoorpakket/deel',{id:shared.id,codenaam:state.state.user.codename,rechten:'bewerken'},other.token);
  const page=await pageFor(browser,base,token,390);

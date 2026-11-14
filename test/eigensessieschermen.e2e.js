@@ -41,11 +41,13 @@ const { startServer, letOpFouten, laadPlaywright, browserOpties, geenBrowser, vo
 const pw = laadPlaywright();
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-eigensessie-'));
 
-/* Per scherm: welke sleutel het mist, en dus wat het hoort te zeggen. De eis is
-   met opzet de NAAM van de sleutel en niet een algemeen "log in" -- wie op het
-   verkeerde scherm staat, moet weten waar hij dan wel moet zijn. */
+/* Per scherm: welke toegang het mist, en dus wat het hoort te zeggen. De eis is
+   met opzet de NAAM van de toegang en niet een algemeen "log in" -- wie op het
+   verkeerde scherm staat, moet weten waar hij dan wel moet zijn. Concierge is
+   accountgebonden geworden: een kantoorrol op het gewone RTG-account vervangt
+   daar de gedeelde kantoorcode. */
 const EIGEN_SLEUTEL = [
-  { app: 'concierge', eist: /kantoorcode|backoffice/i },
+  { app: 'concierge', eist: /RTG-KANTOOR|kantoor-ingang|kantoorrol|werkrol/i },
   { app: 'ghost', eist: /zaak-app|inlog van uw zaak/i },
   { app: 'doos', eist: /doosmodus|zaakdoos/i },
   { app: 'werkplek', eist: /log eerst in|welk huis|waar werk je/i },

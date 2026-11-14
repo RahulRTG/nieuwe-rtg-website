@@ -2,7 +2,14 @@
    Proof verschijnt alleen bij de juiste principal; een afspraak gaat via
    preview + menselijke bevestiging naar de autoritatieve agenda en komt daarna
    als zelfstandig verifieerbaar bewijs terug. De server en data zijn per test
-   geïsoleerd; dit maakt geen afspraak in een echte ledenomgeving. */
+   geïsoleerd; dit maakt geen afspraak in een echte ledenomgeving.
+
+   De open factuur is een expliciet overeengekomen historische RTG-termijn,
+   geen gevolg van gratis registratie en geen nieuwe Business-toelating. De
+   betaling loopt over HTTP door betaalwaarheid en settlement; Economic Proof
+   wordt niet gezaaid. De lokale Magnaat Test-rail bewijst hier geen externe
+   provideracceptatie, externe afdracht of huidige abonnementsprijs. Nieuwe
+   contractacceptatie en activering worden in abonnementen-http.test.js beproefd. */
 'use strict';
 
 const test = require('node:test');
@@ -10,8 +17,9 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
-const { startServer, stop, letOpFouten, laadPlaywright, browserOpties,
+const { startServer, stopHard, letOpFouten, laadPlaywright, browserOpties,
   geenBrowser } = require('./helper');
+const historischAccount = require('./lib/historisch-account');
 
 const pw = laadPlaywright();
 async function api(base, pad, body, token) {
@@ -24,22 +32,53 @@ async function api(base, pad, body, token) {
 test('Experience surface: Economic Proof en bevestigde actie zijn mobiel zichtbaar en verifieerbaar',
   { skip: geenBrowser(pw) }, async () => {
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-experience-surface-'));
-  const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: tmp,
-    RTF_IBAN: '' } });
-  let browser;
+  const email = 'experience-surface-historisch@rtg.test';
+  const invoiceId = 'RTG-2026-09-EXPERIENCEPROEF';
+  let child, base, browser;
   try {
-    const t = Date.now();
-    const reg = await api(base, '/api/auth/register', { name: 'Experience Surface',
-      email: 'experience-surface-' + t + '@rtg.test', phone: '06' + String(t).slice(-8),
-      password: 'geheim123', geboortedatum: '1990-01-01', tier: 'business', pasApp: 'business' });
-    assert.equal(reg.status, 200);
-    const token = reg.body.token;
+    historischAccount(tmp, { name: 'Experience Surface', email, tier: 'rtg',
+      memberState: { invoices: [{ id: invoiceId, desc: 'Historische maandbijdrage lidmaatschap',
+        maand: '2026-09', netto: 0, bijdrage: 78.65, btw: 13.65,
+        status: 'open', date: 'Historische termijn september 2026' }] } });
+    ({ child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: tmp,
+      RTG_STORE: 'sqlite', DATABASE_URL: '', PG_URL: '',
+      RTG_MAGNAAT_TEST: '1', RTG_BETALEN_UIT: '0', RTG_SIMULATIEBANK: '0',
+      STRIPE_SECRET_KEY: '', MOLLIE_API_KEY: '', ADYEN_API_KEY: '',
+      RTF_IBAN: '', RTF_LOKAAL_IBAN: '' } }));
+    const login = await api(base, '/api/auth/login', { login: email, password: 'geheim123', pasApp: 'rtg' });
+    assert.equal(login.status, 200, JSON.stringify(login.body));
+    assert.equal(login.body.state.user.tier, 'rtg', 'een bestaande persoonlijke RTG-pas, zonder Business-autoriteit');
+    const token = login.body.token;
+    assert.ok(token);
     const state = await api(base, '/api/state', {}, token);
-    const invoice = (state.body.state.invoices || []).find(i => i.status === 'open' &&
+    assert.equal(state.status, 200, JSON.stringify(state.body));
+    const invoice = (state.body.state.invoices || []).find(i => i.id === invoiceId && i.status === 'open' &&
       /maandbijdrage|lidmaatschap|jaarbijdrage/i.test(i.desc || ''));
     assert.ok(invoice, 'de golden path heeft een open abonnementsfactuur nodig');
+    assert.equal(invoice.bijdrage, 78.65, 'de historische contractprijs wordt niet herprijsd');
+    const voorBetaling = await api(base, '/api/experience/bootstrap', { world: 'living' }, token);
+    assert.equal(voorBetaling.status, 200, JSON.stringify(voorBetaling.body));
+    assert.deepEqual(voorBetaling.body.projection.view.valueProofs, [], 'een open factuur is nog geen Economic Proof');
     const betaald = await api(base, '/api/pay', { invoiceId: invoice.id }, token);
     assert.equal(betaald.status, 200, JSON.stringify(betaald.body));
+    assert.notEqual(betaald.body.pending, true, 'een wachtende betaling is geen afgeronde betaling');
+    const voldaan = betaald.body.state.invoices.find(i => i.id === invoiceId);
+    assert.ok(voldaan);
+    assert.equal(voldaan.status, 'paid');
+    assert.equal(voldaan.betaalBewijzen.length, 1);
+    assert.equal(voldaan.betaalBewijzen[0].centen, 7865);
+    assert.ok(voldaan.betaalBewijzen[0].id, 'het betaalbewijs komt uit de echte settlementketen');
+    const naBetaling = await api(base, '/api/experience/bootstrap', { world: 'living' }, token);
+    assert.equal(naBetaling.status, 200, JSON.stringify(naBetaling.body));
+    const proofs = naBetaling.body.projection.view.valueProofs;
+    assert.equal(proofs.length, 1, 'alleen de uitgevoerde betaling levert een Economic Proof op');
+    assert.equal(proofs[0].purpose, 'MEMBERSHIP.CONTRIBUTION');
+    assert.deepEqual(proofs[0].requestedValue, { amountMinor: 6500, currency: 'EUR' });
+    assert.deepEqual(Object.fromEntries(proofs[0].components.map(c => [c.component, c.amountMinor])),
+      { platform: 4550, 'local-fund': 1300, foundation: 650 });
+    assert.equal(proofs[0].proof.integrity, true);
+    assert.ok(proofs[0].proof.ledgerTransactions > 0, 'het bewijs verifieert echte economische ledgerboekingen');
+    assert.ok(proofs[0].proof.evidenceItems > 0, 'het bewijs bevat betaal-evidence, niet alleen een status');
 
     browser = await pw.chromium.launch(browserOpties(pw));
     const context = await browser.newContext({ viewport: { width: 320, height: 720 } });
@@ -135,7 +174,7 @@ test('Experience surface: Economic Proof en bevestigde actie zijn mobiel zichtba
     assert.deepEqual(fouten, [], 'geen browserfouten in de golden path');
   } finally {
     if (browser) try { await browser.close(); } catch (e) {}
-    stop(child);
+    await stopHard(child);
     try { fs.rmSync(tmp, { recursive: true, force: true }); } catch (e) {}
   }
 });

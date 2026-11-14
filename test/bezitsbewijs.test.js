@@ -153,13 +153,15 @@ test('5b. een ONGEBONDEN sessie komt er in "aanbevolen" langs, en dat wordt geze
   assert.ok(uit.nietAfgedwongen, 'een gat dat alleen in commentaar staat, is een gat dat niemand kent');
 });
 
-test('5c. in "verplicht" komt een ongebonden sessie er niet langs', async () => {
+test('5c. een eigen account, ook gratis, moet eerst zijn toestel binden', async () => {
   const { b } = await opzet();
-  const metAccount = Object.assign({}, los, { account: { id: 1 }, tier: 'rtg' });
-  const uit = await b.controleer({ sess: metAccount, methode: 'POST', pad: '/api/pay/tik', kop: null, stand: 'verplicht' });
-  assert.equal(uit.stand, 'geweigerd');
-  assert.equal(uit.code, 403);
-  assert.match(uit.reden, /Bevestig dit toestel/);
+  for (const tier of ['rtg', 'guest']) {
+    const metAccount = Object.assign({}, los, { account: { id: 1 }, tier });
+    const uit = await b.controleer({ sess: metAccount, methode: 'POST', pad: '/api/pay/tik', kop: null, stand: 'verplicht' });
+    assert.equal(uit.stand, 'geweigerd');
+    assert.equal(uit.code, 403);
+    assert.match(uit.reden, /Bevestig dit toestel/, tier + ': accountbeveiliging vereist geen betaald abonnement');
+  }
 });
 
 test('5c2. een sessie ZONDER account krijgt geen stil privilege: ook geweigerd, met de weg erheen', async () => {

@@ -42,7 +42,7 @@
   const voertuig = () => { try { return localStorage.getItem('pd_voertuig') || 'auto'; } catch(e){ return 'auto'; } };
   function renderBezorgen(){
     const tabBtn = document.getElementById('tabBezorgen');
-    if (tabBtn) tabBtn.style.display = heeftBezorg() ? '' : 'none';
+    if (tabBtn) tabBtn.classList.toggle('h-weg', !heeftBezorg());
     const wrap = $('#bezorgenWrap');
     if (!wrap) return;
     if (!heeftBezorg()){ wrap.innerHTML = ''; return; }

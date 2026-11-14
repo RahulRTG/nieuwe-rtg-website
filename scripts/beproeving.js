@@ -575,7 +575,38 @@ async function misbruikBeproeving(tok) {
    er anders uitzag. Een instrument hoort te meten als je erom vraagt, niet als
    je ernaar kijkt (scripts/meetkeuring.js, regel `wacht`).
    ============================================================================ */
-if (require.main !== module) { module.exports = { alleRoutes, haal }; return; }
+/* E3 vraagt bewijs voor de HELE aangeboden inventaris. De vroegere standaard
+   van 900 pogingen liet duizenden routes noodzakelijk onbeslist. Nul is de
+   bestaande onbeperkte stand van draaiRolproef; een expliciet kleiner budget
+   blijft een deelmeting en kan het oordeel niet groen maken. */
+function rolproefBudget(env = process.env) {
+  if (env.ROLPROEF_MAX === undefined || env.ROLPROEF_MAX === '') return 0;
+  const n = Number(env.ROLPROEF_MAX);
+  if (!Number.isSafeInteger(n) || n < 0) throw new Error('ROLPROEF_MAX moet een geheel aantal pogingen zijn; nul is onbeperkt.');
+  return n;
+}
+function rolproefGeslaagd(rp) {
+  const b = rp.bevindingen;
+  return !b.meterStuk && b.onbeslist.length === 0 && b.lekken.length === 0 &&
+    b.gewijzigd.length === 0 && b.tweexx.length === 0;
+}
+async function draaiRolcontrole({ post, postT, vraag, routes, tokens, proeflid, basis, kantoorVoor,
+  maxPogingen = rolproefBudget() }) {
+  // Dezelfde positieve controle als rolproef-route, na de destructieve storm
+  // maar vóór de ijking/momentopname. Geen oude eigenRoute of groene status
+  // overnemen: ook een mislukte fixture gaat als werkelijk antwoord mee.
+  const fixtures = await require('./lib/rolproeffixtures').maakRolfixtures({
+    post, basis, tokens, proeflid, kantoorVoor
+  });
+  const uit = await rolproef.draaiRolproef({ post: postT || post, vraag,
+    routes: routes.map(r => ({ ...r, rol: r.rol === 'open' ? 'openbaar' : r.rol })),
+    tokensVoor: () => ({ ...tokens }), maxPogingen,
+    fixtureVoor: r => fixtures[r.methode + ' ' + r.pad] });
+  return { ...uit, maxPogingen: maxPogingen || null };
+}
+if (require.main !== module) {
+  module.exports = { alleRoutes, haal, rolproefBudget, draaiRolcontrole, rolproefGeslaagd }; return;
+}
 (async () => {
   kop('DE BEPROEVING - ' + MODE.toUpperCase() + '-modus - seed ' + RNGSTATE + (MODE === 'postgres' ? ' - ' + nl(LEDEN) + ' leden + activiteit' : ' - sqlite (standaard, draait overal)'));
   const routes = alleRoutes();
@@ -974,22 +1005,23 @@ if (require.main !== module) { module.exports = { alleRoutes, haal }; return; }
   const leeft = async (l) => !!(l.toestel && (await getekend(l.toestel)('/api/pay/overzicht', {}, l.token)).status === 200);
   if (!(await leeft(lidRol))) lidRol = await registreerAccount('rol2');
   rij('lid voor de rol-scheiding', lidRol.toestel ? 'eigen account met gebonden toestel' : '\x1b[31mGEEN -- ' + (lidRol.toestelReden || 'registratie gaf ' + lidRol.status) + '\x1b[0m');
-  const rp = await rolproef.draaiRolproef({
+  const rp = await draaiRolcontrole({
     /* post (= haal) en NIET verzoek: die laatste gooit het antwoordlijf weg en
        geeft alleen de status terug. Daarmee stonden de lekscan en de
        toestandsvergelijking leeg te draaien.
        Op een ZWAAR pad klopt de ledenrol aan als het rol-lid en tekent; op elk
        ander pad blijft het token zoals het was (scripts/lib/proeftoestel.js). */
-    post: lidRol.toestel ? metToestellen(post, { voorLid: { lid: lidRol.toestel, van: () => tokVoor.member } }) : post,
+    post,
+    postT: lidRol.toestel ? metToestellen(post, { voorLid: { lid: lidRol.toestel, van: () => tokVoor.member } }) : post,
     // Kruispogingen en eigen sessiecontroles delen de echte methode/token;
     // de getekende post hierboven blijft uitsluitend de toestandsijking.
     vraag: (methode, pad, lijf, token) => haal(methode, pad, token, lijf),
-    routes: routes.map(r => ({ ...r, rol: r.rol === 'open' ? 'openbaar' : r.rol })), tokensVoor: () => ({
+    routes, tokens: {
       member: rkeuze(tokVoor.member.length ? tokVoor.member : tokVoor.office),
       supplier: rkeuze(tokVoor.supplier.length ? tokVoor.supplier : tokVoor.office),
       office: rkeuze(tokVoor.office.length ? tokVoor.office : tokVoor.member)
-    }),
-    maxPogingen: Number(process.env.ROLPROEF_MAX || 900)
+    },
+    proeflid: lidRol, basis: 'http://127.0.0.1:' + PORT
   });
   rij('schrijfpogingen met een verkeerde rol', nl(rp.pogingen) + ' \x1b[2m(plausibele invoer, niet de rommel uit de gauntlet)\x1b[0m');
   rij('  daarvan 2xx (mag nooit)', rp.bevindingen.tweexx.length ? '\x1b[31m' + rp.bevindingen.tweexx.length + '\x1b[0m' : '\x1b[32m0\x1b[0m');
@@ -998,6 +1030,10 @@ if (require.main !== module) { module.exports = { alleRoutes, haal }; return; }
   for (const l of rp.bevindingen.lekken.slice(0, 6)) rij('    ' + l.slice(0, 100), '');
   rij('  blijvende wijzigingen na afloop', rp.bevindingen.gewijzigd.length ? '\x1b[31m' + rp.bevindingen.gewijzigd.join(', ') + '\x1b[0m' : '\x1b[32mgeen\x1b[0m');
   rij('  onbesliste rolbewijzen', rp.bevindingen.onbeslist.length);
+  for (const sleutel of rp.bevindingen.onbeslist.slice(0, 8)) {
+    const r = rp.perRoute[sleutel];
+    rij('    ' + sleutel, JSON.stringify({ eigenRoute: r.eigenRoute, antwoorden: r.antwoorden }));
+  }
   rij('  gemeten toestand', JSON.stringify(rp.voor));
   if (rp.ijk) rij('  ijking van de vingerafdruk', rp.ijk.gevoelig
     ? '\x1b[32mhij ziet een legitieme wijziging\x1b[0m (' + rp.ijk.bewogen.join(', ') + ')'
@@ -1207,7 +1243,7 @@ if (require.main !== module) { module.exports = { alleRoutes, haal }; return; }
   v('SCHAKELKAST', kastOpen, kastOpen ? 'elke functie stond aan tijdens de hele run'
     : 'de hendel ging niet over (status ' + aan + '): de run draaide tegen de standaardstand');
   v('ROBUUSTHEID', buckets.s5xx === 0, buckets.s5xx + ' onverwachte serverfouten');
-  v('ROL-LEK', !rp.bevindingen.meterStuk && rp.bevindingen.onbeslist.length === 0 && rp.bevindingen.lekken.length === 0 && rp.bevindingen.gewijzigd.length === 0 && rp.bevindingen.tweexx.length === 0,
+  v('ROL-LEK', rolproefGeslaagd(rp),
     rp.bevindingen.meterStuk ? 'DE METER ZELF IS STUK: ' + rp.bevindingen.meterStuk
     : rp.bevindingen.lekken.length || rp.bevindingen.gewijzigd.length || rp.bevindingen.tweexx.length || rp.bevindingen.onbeslist.length
       ? rp.bevindingen.tweexx.length + ' x 2xx, ' + rp.bevindingen.lekken.length + ' lekkende weigering(en), ' + rp.bevindingen.gewijzigd.length + ' blijvende wijziging(en), ' + rp.bevindingen.onbeslist.length + ' onbesliste routes'
@@ -1301,6 +1337,9 @@ if (require.main !== module) { module.exports = { alleRoutes, haal }; return; }
     oordeel: gezakt === 0 ? 'PASS' : 'GEZAKT',
     gezakteDrempels: gezakt,
     gezakteNamen,
+    // Volledige ruwe rolrijen, ook bij budgetuitputting/uitval. De bestaande
+    // CI-producent kopieert dit met LAATSTE_METING mee; geen tweede register.
+    rolproef: rp,
     meters: {
       p50Ms: pctMs(0.50), p95Ms: pctMs(0.95), p99Ms: pctMs(0.99), maxMs: latMax,
       doorvoerPerSec: Math.round(totaal / (stormDuurMs / 1000)),

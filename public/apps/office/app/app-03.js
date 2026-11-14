@@ -2,7 +2,7 @@
   /* ---------- Rahul leest mee ---------- */
   $('#aiBtn').addEventListener('click', function () {
     if (!open) return;
-    $('#aiUit').value = ''; $('#aiToepas').style.display = 'none';
+    $('#aiUit').value = ''; $('#aiToepas').classList.add('h-weg');
     // in een rekenblad is de formule de enige zinnige opdracht
     $('#aiOpdracht').value = open.soort === 'blad' ? 'formule' : 'samenvatten';
     $('#aiScrim').classList.add('open');
@@ -17,7 +17,7 @@
       if (!r) return;
       if (r.body.error) { $('#aiUit').value = ''; return zeg(r.body.error); }
       $('#aiUit').value = r.body.voorstel;
-      $('#aiToepas').style.display = '';
+      $('#aiToepas').classList.remove('h-weg');
     });
   });
   $('#aiToepas').addEventListener('click', function () {

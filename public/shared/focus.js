@@ -26,20 +26,6 @@
   const TOP_N = 3;          // met geschiedenis: zoveel kaarten standaard open
   const LEER_DREMPEL = 10;  // vanaf zoveel interacties gaat de geschiedenis sturen
 
-  /* FocusUI blijft eigenaar van de toestand en leergeschiedenis. Alleen de
-     presentatie komt uit het bestaande Design System. Oude hosts krijgen
-     dat ene centrale blad dynamisch; een DS-host heeft het al. */
-  function laadFocusStijl() {
-    if (document.documentElement.hasAttribute('data-ds')) return;
-    if (document.getElementById('rtgDsRuntimeCss')) return;
-    const focusStijlLink = document.createElement('link');
-    focusStijlLink.id = 'rtgDsRuntimeCss';
-    focusStijlLink.rel = 'stylesheet';
-    focusStijlLink.href = '/ds/rtg-ds.css';
-    document.head.appendChild(focusStijlLink);
-  }
-  laadFocusStijl();
-
   let mem = { score: {}, open: {}, dicht: {}, laatst: {}, gezien: {} };
   try { mem = Object.assign(mem, JSON.parse(localStorage.getItem(KEY) || '{}')); } catch (e) {}
   if (!mem.laatst) mem.laatst = {};

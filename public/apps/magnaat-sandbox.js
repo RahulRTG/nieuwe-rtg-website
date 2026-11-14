@@ -22,20 +22,9 @@
   (function plaatsKeurmerk() {
     function teken() {
       if (!document.body || document.getElementById('rtgMagnaatTestMark')) return;
-      // De sandbox start vóór de DS-shell; alleen de tekening wacht op de pagina.
-      if (!document.documentElement.hasAttribute('data-ds')) {
-        var stijl = document.createElement('style');
-        stijl.textContent =
-      '#rtgMagnaatTestMark{position:fixed;z-index:2147483647;top:max(8px,env(safe-area-inset-top));right:max(8px,env(safe-area-inset-right));' +
-      'display:flex;align-items:center;gap:7px;padding:7px 10px;border:1px solid rgba(207,165,92,.55);border-radius:0;' +
-      'background:rgba(21,5,10,.94);box-shadow:0 10px 34px rgba(0,0,0,.3);color:#f5e8c8;font:700 10px/1.1 system-ui,sans-serif;' +
-      'letter-spacing:.16em;text-transform:uppercase;pointer-events:none;backdrop-filter:blur(14px)}' +
-      '#rtgMagnaatTestMark:before{content:"";width:6px;height:6px;border-radius:50%;background:#d8aa59;box-shadow:0 0 10px rgba(216,170,89,.75)}';
-        (document.head || document.documentElement).appendChild(stijl);
-      }
       var merk = document.createElement('div');
       merk.id = 'rtgMagnaatTestMark';
-      if (document.documentElement.hasAttribute('data-ds')) merk.className = 'ds-magnaatproef';
+      merk.className = 'ds-magnaatproef';
       merk.setAttribute('role', 'status');
       merk.setAttribute('aria-label', 'Magnaat Test. Geen productieomgeving.');
       merk.textContent = 'Magnaat Test';

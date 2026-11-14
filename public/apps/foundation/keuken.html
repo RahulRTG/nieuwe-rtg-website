@@ -65,6 +65,7 @@
 <link href="/ds/componenten/samen.css" rel="stylesheet">
 <link href="/ds/componenten/cookie.css" rel="stylesheet">
 <link href="/ds/componenten/handenvrij.css" rel="stylesheet">
+<link href="/ds/componenten/presentatierol.css" rel="stylesheet">
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
 <script src="/shared/rtg-heritage-transition.js" blocking="render"></script>
@@ -88,7 +89,7 @@
     </div>
     <div class="fout" id="bFout"></div>
     <div id="lijst"><div class="leeg">Laden…</div></div>
-    <div class="regelrij"><button class="knop grijs klein" id="bOpruim" style="display:none;">Afgevinkte opruimen</button></div>
+    <div class="regelrij"><button class="knop grijs klein ds-presentatie-toestand" id="bOpruim" hidden>Afgevinkte opruimen</button></div>
   </div>
 
   <div class="kaart blok">
@@ -182,7 +183,7 @@ async function laad(){
       rij.querySelector('.vink').addEventListener('change', e=> doe('/gezin/keuken/lijst/af', { itemId:id, af:e.target.checked }));
       rij.querySelector('[data-del]').onclick = ()=> doe('/gezin/keuken/lijst/verwijder', { itemId:id }, true);
     });
-    $('#bOpruim').style.display = d.lijst.some(x=>x.af) ? 'inline-flex' : 'none';
+    $('#bOpruim').hidden = !d.lijst.some(x=>x.af);
     // vaste boodschappen: tik = op de lijst; het kruisje haalt hem uit het vaste rijtje
     const opLijst = new Set(d.lijst.filter(x=>!x.af).map(x=>x.wat.toLowerCase()));
     $('#vast').innerHTML = (d.vast||[]).map(v =>

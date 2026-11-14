@@ -3,7 +3,7 @@
   $('#deelBtn').addEventListener('click', function () { if (!open) return; toonDeel(); $('#deelScrim').classList.add('open'); });
   $('#deelDicht').addEventListener('click', function () { $('#deelScrim').classList.remove('open'); });
   if (WERK === 'rtf') {
-    $('#deelForm').style.display = 'none'; $('#gezinBlok').style.display = '';
+    $('#deelForm').style.display = 'none'; $('#gezinBlok').classList.remove('h-weg');
     $('#deelKop').textContent = 'Delen met je gezin';
     $('#deelUitleg').textContent = 'Een document blijft van jou; je kunt je gezin laten meelezen of er samen in schrijven. Buiten het gezin deelt RTF niets.';
   }

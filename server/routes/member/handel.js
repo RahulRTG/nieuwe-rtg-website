@@ -5,9 +5,10 @@
 module.exports = (kern) => {
   const { liveCodename, zorgContact } = kern;
 
-  // koopt het lid echt? dan opent de chatlijn met de zaak (idempotent)
+  // Alleen aangeroepen na een geslaagde bestel-/bezorgaanvraag. Ook een gratis
+  // account krijgt nazorg bij die eigen transactie; een anonieme gast niet.
   const openLijn = (s, req) => {
-    if (!s || req.session.tier === 'guest') return;
+    if (!s || (req.session.tier === 'guest' && !req.session.account)) return;
     try { zorgContact(s, req.session.key, liveCodename(req.session), req.session.tier); } catch (e) {}
   };
 

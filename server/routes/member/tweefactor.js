@@ -20,7 +20,8 @@ module.exports = (kern) => {
   const rem = tweefactor.rem;   // gedeeld met elke deur die een code toetst (kern/identiteit/tweedestap-rem.js)
 
   const eisLid = (req, res) => {
-    if (req.session.tier === 'guest') { res.status(403).json({ error: 'Alleen voor leden.' }); return false; }
+    // Accountbeveiliging is geen betaalde dienst. Ook een gratis account of
+    // een lid na opzegging moet zijn tweede factor kunnen beheren.
     if (!req.session.account) { res.status(403).json({ error: 'Dit hoort bij een eigen RTG-account.' }); return false; }
     return true;
   };

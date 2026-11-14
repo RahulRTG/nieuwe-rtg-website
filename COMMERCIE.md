@@ -7,6 +7,43 @@ boekingen en claims zijn nog niet één systeem.** Dit document beschrijft het
 subsysteem dat ze één maakt. PRIJZEN.md blijft de prijslijst en de lijst gaten;
 dit is de architectuur eronder.*
 
+**Leesstatus, 13 november 2026:** het officiële interne abonnementsbesluit
+`abonnementen-2026-11-13.1` staat in `PRIJZEN.md` §7: de actuele basisprijzen en
+jaarbetaalkeuze in §7.3, de uitsluitend abonnementgedragen begroting in §7.7.
+Na 30% maatschappelijke reservering moeten abonnementen alle begrote RTG-kosten
+dragen, inclusief gratis gebruikers. Andere inkomsten staan op nul in de
+basisbegroting; gerealiseerde netto extra opbrengsten zijn voor RTG, na hun
+eigen kosten en verplichtingen. Het 20%-resultaatdoel is geen winstgarantie.
+Dit vervangt de vorige prijsbasis en de eis dat gratis zichzelf moet financieren;
+de werkelijke cohortmeting blijft gescheiden. Oudere bedragen, de historische
+Lifestyle-bodem en uitvoeringsstanden hieronder zijn architectuur-/runtimehistorie,
+geen actueel prijsbeleid. §8 van hetzelfde document werkt de
+volledige dienstverlening uit als voorstel op deze bestaande Core, met
+menselijke controle, fraudegrenzen en gerichte bronbevindingen. Geen tweede
+catalogus, contractmotor of autorisatiebron toevoegen. Prijsbesluit en ontwerp
+zijn nog geen runtime-migratie, gewijzigde partnerovereenkomst of releasebewijs.
+Ook de publieke HTML en publicatietoetsen dragen nog de vorige beleidsprijzen;
+de open publicatiestap staat in `PRIJZEN.md` §7.8. Geen verkoopvrijgave door dit besluit.
+Het aanvullende besluit `PRIJZEN.md` §9 opent gratis zakelijke basis voor Salon,
+productverkoop en eigen klantenbeheer, met 15% commissie voor die gratis
+ondernemer, ook bij een betaald RTG-lid als koper. Betaalde ondernemers betalen
+5% bij gratis leden en 0% bij betaalde leden binnen de afgesproken dekking.
+Dat beperkt expliciet de eerdere nulcommissiebelofte. §9.3 is op 12 november
+2026 definitief vastgesteld als intern commercieel beleid en legt de concrete
+nettoverkoopgrondslag, uitsluitingen, btw-routes, Stripe/Connect-kostenverdeling
+en correcties bij retour/annulering vast. RTG draagt verantwoordelijkheid voor
+zijn eigen aangeboden en samengestelde reizen; zelfstandig bij andere bureaus
+gekochte reizen vallen buiten die RTG-verkoop en afrekening. De partnermatrix
+is geen commissie op RTG's eigen reissom. Een commerciële regel is nog geen
+geaccepteerde partner-/providerovereenkomst of fiscale dossierbeoordeling.
+De commissieversie, inwerkingtreding, bescherming van bestaande rechten en
+controleerbare voorwaarden voor die commissie staan uitsluitend in die paragraaf;
+de afzonderlijke abonnementsversie staat in §7.
+De historische betaalde partnerpoort en universele nulcommissie hieronder zijn
+daarmee niet het nieuwe beleid, maar blijven runtimebasis tot veilige migratie.
+Geen inning vóór afspraken, routegrenzen en bewijs gereed zijn; bestaande
+getekende rechten niet automatisch wijzigen.
+
 ## 0. De kern, in een zin
 
 > Er is één commerciële bron van waarheid, en catalogusprijs, contractprijs en
@@ -89,7 +126,12 @@ voor een bestaand contract nooit opnieuw de actuele lijstprijs opgehaald.
 | Betaaldienstvergoeding met statussen | `kern/commercie/fee.js`, `test/betaaldienstfee.test.js` (9) |
 | Tarief publiek en live in de voorwaarden | `/api/betaaldiensttarief` |
 
-### De partnervergoeding is nul, en dat is geen knop
+### De partnervergoeding is nul — historische/runtimebasis
+
+De nieuwe commissiematrix voor ondernemers staat in `PRIJZEN.md` §9.3.
+De beschrijving hieronder is geen algemeen toekomstig nulcommissiebeleid.
+De bestaande Core moet het nieuwe regime expliciet dragen; geen losstaande
+commissieknop of tweede afrekening invoeren.
 
 De generieke commissie is verdwenen. Wat RTG een partner in rekening kan
 brengen, valt onder vier **benoemde** soorten, en geen ervan neemt een aandeel

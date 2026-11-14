@@ -27,13 +27,9 @@
       een consumentenabonnement verlengt stilzwijgend, en dat doet de
       commerciele ronde (../commercie/ronde.js). Niet verlengen is hier dus
       hetzelfde als niets doen, en dat mag hij al.
-   2. EEN OPZEGGING TERUGDRAAIEN. De standentabel in ../commercie/contract/vorm.js
-      laat vanuit OPZEGGEND alleen GEEINDIGD toe, en `zegOpLidmaatschap`
-      VERWIJDERT de termijnen na de einddatum in plaats van ze op 'vervallen' te
-      zetten. Terugdraaien is dus geen schakelaar maar twee besluiten (een
-      overgang toevoegen, en de termijnen opnieuw opwekken). Dat hoort een eigen
-      stap te zijn; zie AFSPRAAK.md par. 14. Tot dan zegt het antwoord eerlijk
-      dat een nieuw lidmaatschap een nieuwe afspraak is.
+   2. EEN OPZEGGING TERUGDRAAIEN. OPZEGGEND kan alleen nog GEEINDIGD worden.
+      Een nieuwe afspraak is geen heropening. Reeds gestarte facturen en
+      providerbewijzen blijven behouden door betaalschema-opzeg.js.
 
    TWEE BESTANDEN, TWEE SOORTEN WERK. Dit bestand LEEST en TOONT; het opzeggen
    zelf staat in ./lidabonnement-opzeg.js. De naad lag hier toch al -- de
@@ -46,42 +42,39 @@ const tijdzone = require('../tijdzone');
 
 module.exports = ({ A, B, contracten, PASSEN, eur, zegOpLidmaatschap }) => {
 
-  /* De geaccepteerde aanmelding van DIT account. Nooit op id uit een lichaam.
-
-     Meerdere geaccepteerde aanmeldingen op een account horen niet te bestaan,
-     maar als ze er zijn pakken we de JONGSTE met een lopend contract: dat is de
-     afspraak die vandaag geldt. Stil de eerste uit de lijst pakken zou bij een
-     oud, beeindigd lidmaatschap het verkeerde contract tonen. */
-  function aanmeldingVan(accountId) {
+  /* Eigen aanvraag: expliciet contract indien gekozen, anders eerst het lopende
+     persoonlijke contract. Een zakelijke afspraak vervangt de persoon niet. */
+  function aanmeldingVan(accountId, contractId) {
     const id = accountId == null ? null : Number(accountId);
     if (!Number.isFinite(id)) return null;
-    const mijn = A().filter(a => Number(a.accountId) === id && a.status === 'geaccepteerd');
-    if (!mijn.length) return null;
-    const metLopend = mijn.find(a => {
-      const c = contractVan(a.id);
-      return c && contracten.LOPEND.has(c.status);
-    });
-    return metLopend || mijn[0];
+    const mijn = A().filter(a => Number(a.accountId) === id && a.status === 'geaccepteerd')
+      .filter(a => { const c = contractVan(a.id, contractId); return c && (c.accountId == null || c.accountId === id); })
+      .sort((a, b) => {
+        const ca = contractVan(a.id, contractId), cb = contractVan(b.id, contractId);
+        const prioriteit = c => (contracten.LOPEND.has(c.status) ? 1 : 0) + (!c.aanbod || c.aanbod.scope.soort === 'persoon' ? 2 : 0);
+        return prioriteit(cb) - prioriteit(ca) || Date.parse(cb.startAt) - Date.parse(ca.startAt);
+      });
+    return mijn[0] || null;
   }
 
   /* Het contract achter een aanmelding. Via de betaalschemarij, want die draagt
      het contractId; `contracten.lijst({aanmeldingId})` geeft een PUBLIEKE vorm
      terug en daar kan `zegOp` niet mee werken. */
-  function contractVan(aanmeldingId) {
-    const rij = B().find(r => r.aanmeldingId === String(aanmeldingId || ''));
-    if (!rij || !rij.contractId) return null;
-    return contracten.vind(rij.contractId) || null;
+  function contractVan(aanmeldingId, contractId) {
+    const ids = new Set(B().filter(r => r.aanmeldingId === String(aanmeldingId || '') &&
+      (!contractId || r.contractId === contractId)).map(r => r.contractId));
+    const kandidaten = [...ids].map(id => contracten.vind(id)).filter(c => c && c.aanmeldingId === String(aanmeldingId || ''));
+    const lopend = kandidaten.filter(c => contracten.LOPEND.has(c.status));
+    if (lopend.length > 1) return null; // Nooit gokken tussen gelijktijdige afspraken.
+    return lopend[0] || kandidaten.sort((a, b) => Date.parse(b.startAt) - Date.parse(a.startAt))[0] || null;
   }
 
   /* De termijnen die nog moeten komen, uit de betaalschemarij. Er wordt hier
      niets opnieuw gerekend: wat er staat, staat er. */
-  function komende(aanmeldingId) {
-    const rij = B().find(r => r.aanmeldingId === String(aanmeldingId || ''));
-    if (!rij) return [];
-    const nu = Date.now();
-    return (rij.termijnen || [])
-      .filter(t => t.status !== 'voldaan' && new Date(t.vervalt).getTime() >= nu)
-      .sort((a, b) => new Date(a.vervalt) - new Date(b.vervalt));
+  function komende(aanmeldingId, contractId, eindigtOp) {
+    const gekozen = contractVan(aanmeldingId, contractId);
+    const rij = gekozen && B().find(r => r.aanmeldingId === String(aanmeldingId || '') && r.contractId === gekozen.id);
+    return require('./lidabonnement-termijnen')({ rij, contract: gekozen, contracten, op: Date.now(), eindigtOp });
   }
 
   /* WAT HET LID LEEST. In de stem van zijn eigen pas (CLAUDE.md: "je" bij de
@@ -91,11 +84,11 @@ module.exports = ({ A, B, contracten, PASSEN, eur, zegOpLidmaatschap }) => {
      weg kregen -- een demo-persona, een geseed account, een aanmelding van voor
      de contractmotor -- en die hebben geen afspraak om te tonen. Een 404 zou dat
      als defect laten lezen; het is een eerlijke mededeling met de weg erbij. */
-  function mijn(accountId) {
-    const a = aanmeldingVan(accountId);
+  function mijn(accountId, input = {}) {
+    const a = aanmeldingVan(accountId, input.contractId);
     if (!a) return { ok: true, abonnement: null,
       reden: 'Er is voor dit account geen lidmaatschapsafspraak vastgelegd. Vraag de ledenbalie wat er voor jou geldt.' };
-    const c = contractVan(a.id);
+    const c = contractVan(a.id, input.contractId);
     if (!c) return { ok: true, abonnement: null,
       reden: 'Je aanmelding is goedgekeurd, maar er staat geen contract bij. De ledenbalie kan dat aanvullen.' };
     return { ok: true, abonnement: beeld(a, c) };
@@ -104,7 +97,7 @@ module.exports = ({ A, B, contracten, PASSEN, eur, zegOpLidmaatschap }) => {
   function beeld(a, c) {
     const def = PASSEN[c.pas] || {};
     const u = def.stem === 'u';
-    const k = komende(a.id);
+    const k = komende(a.id, c.id);
     return {
       contractId: c.id,
       pas: c.pas,
@@ -117,7 +110,7 @@ module.exports = ({ A, B, contracten, PASSEN, eur, zegOpLidmaatschap }) => {
          het product mag bewegen, de prijs van de verplichting niet. Is er geen
          bedrag afgesproken (een contractuele trede zonder notering), dan staat
          er null en niet nul -- nul zou "gratis" betekenen. */
-      maandBedrag: c.afgesprokenCenten == null ? null : eur(c.afgesprokenCenten),
+      maandBedrag: c.automatischAbonnement ? eur(c.aanbod.prijs.maand.brutoCenten) : c.afgesprokenCenten == null ? null : eur(c.afgesprokenCenten),
       prijsVastTot: c.prijsVastTot || null,
       begonnenOp: c.startAt,
       minimumMaanden: c.minimumMaanden,
@@ -126,7 +119,7 @@ module.exports = ({ A, B, contracten, PASSEN, eur, zegOpLidmaatschap }) => {
       opzegMaanden: c.opzegMaanden,
       eindigtOp: c.eindigtOp || null,
       volgendeTermijn: k.length ? { vervalt: k[0].vervalt,
-        bedrag: k[0].centen == null ? null : eur(k[0].centen) } : null,
+        bedrag: k[0].centen == null ? null : eur(k[0].brutoCenten ?? k[0].centen) } : null,
       termijnenTeGaan: k.length,
       /* WAT HET LID HIERNA KAN. Een gesloten lijstje, zodat een scherm geen knop
          hoeft te raden -- en zodat een knop die er niet mag zijn, er ook niet
@@ -170,7 +163,10 @@ module.exports = ({ A, B, contracten, PASSEN, eur, zegOpLidmaatschap }) => {
   function stand(accountId) {
     const a = aanmeldingVan(accountId);
     if (!a) return null;
-    return contractVan(a.id);
+    const c = contractVan(a.id);
+    // De ledenpoort beoordeelt persoonlijke rechten. Een bedrijfscontract
+    // houdt geen persoonlijke pas overeind nadat die overeenkomst eindigde.
+    return c && (!c.aanbod || c.aanbod.scope.soort === 'persoon') ? c : null;
   }
 
   return { aanmeldingVan, contractVan, komende, beeld, datum, mijn, stand };

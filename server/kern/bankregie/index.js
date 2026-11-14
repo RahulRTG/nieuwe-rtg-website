@@ -28,31 +28,23 @@ const AUTORISATIE_MS = 10 * 60 * 1000; // de tweede persoon heeft tien minuten
 const normaliseer = require('./stand')({ MODI });
 
 function maakBankregie({ db, save, bijeen }) {
-  /* EEN BESTUURSBESLUIT EN ZIJN SPOOR LANDEN SAMEN, OF GEEN VAN BEIDE.
+  /* BEVESTIGING PAS NA BESLUIT EN UITVOERINGSSPOOR. Een gewone bundel
+     stelde JSON-opslag uit: HTTP 200 kon gevolgd worden door een procescrash
+     waarna besluit EN audit verdwenen. De kritieke ingresspoort bewaart alleen
+     de toestemming vooraf, niet dit uitvoeringsresultaat.
 
-     scripts/crashproef.js mat drie routes als gezakt op ATOMIC: ledenAan stond
-     op true, de oproep stierf bij de eerste bundel, en na de herstart stond hij
-     op false -- terwijl de auditregel NIET landde. De schakelaar die bepaalt of
-     de leden-bank live is, kon dus omgaan zonder spoor van WIE.
-
-     De oorzaak: `d().x = ...; save()` stond in geen bundel, en de bundel kwam
-     pas later met de audit. Nu gaan mutatie en spoor er samen in.
-
-     GEEN DUURZAME bundel, en dat is een correctie op de eerste versie. Die
-     vroeg `{ duurzaam: true }` en deed daarmee meer dan nodig: zo'n bundel
-     GOOIT als de opslag niet bevestigt, dus de knop weigerde op elke opslag die
-     dat niet kan -- test/bankduurzaam.test.js viel erover, en die legt juist
-     vast dat de kantoorhandeling ook op een liegende opslag hoort aan te komen.
-     Het gebrek was samenhang, niet duurzaamheid.
-
-     Het spoor is een CALLBACK: pas de uitkomst zegt of er is uitgevoerd of op
-     een tweede persoon wordt gewacht. De SSE-sync blijft erbuiten -- zie
-     routes/kantoren/bank.js. */
+     Wacht de auditcallback af binnen dezelfde duurzame bundel en laat fouten
+     door. Dit is GEEN rollbacktransactie: bijeen rondt opslag ook in finally
+     af. Een fout betekent geen bevestigde uitkomst, niet dat RAM of een reeds
+     geschreven noodfallback teruggedraaid is. De SSE-sync blijft erbuiten. */
   const besluit = async (doe, audit) => bijeen(async () => {
     const r = doe();
-    if (audit && r && !r.error) { try { audit(r); } catch (e) { /* het spoor mag het besluit niet breken */ } }
+    if (audit && r && !r.error) {
+      const fout = await audit(r);
+      if (fout && fout.error) return fout;
+    }
     return r;
-  });
+  }, { duurzaam: true });
   function d() {
     if (!db.data.bankregie || typeof db.data.bankregie !== 'object') db.data.bankregie = {};
     return normaliseer(db.data.bankregie);

@@ -92,6 +92,7 @@
 <link href="/ds/componenten/samen.css" rel="stylesheet">
 <link href="/ds/componenten/cookie.css" rel="stylesheet">
 <link href="/ds/componenten/handenvrij.css" rel="stylesheet">
+<link href="/ds/componenten/presentatierol.css" rel="stylesheet">
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
 <script src="/shared/rtg-heritage-transition.js" blocking="render"></script>
@@ -111,7 +112,7 @@
 
   <div class="tab" id="tab-schrift">
     <div class="pgstrip" id="pgStrip"></div>
-    <div class="schrijftools" id="tekentools" style="display:none;">
+    <div class="schrijftools ds-presentatie-toestand" id="tekentools" hidden>
       <button class="tbtn aan" data-tool="pen">✏</button>
       <button class="tbtn" data-tool="gum">◻</button>
       <span class="kleur aan s-l3zm56" data-kleur="#111111"></span>
@@ -199,12 +200,12 @@ function tekenStrip(){
   strip.querySelectorAll('[data-add]').forEach(el=> el.addEventListener('click', ()=>{ vangHuidigeTekening(); pages.push(el.dataset.add==='tekening'?{type:'tekening',titel:'',strokes:[]}:{type:'tekst',titel:'',inhoud:''}); huidig=pages.length-1; huidigePagina(); tekenStrip(); markDirty(); }));
 }
 function huidigePagina(){
-  const box=$('#paginabox'), p=pages[huidig]; tekenbord=null; $('#tekentools').style.display='none';
+  const box=$('#paginabox'), p=pages[huidig]; tekenbord=null; $('#tekentools').hidden=true;
   if(!p){ box.innerHTML='<div class="mini">Nog geen bladzijde. Maak er een met T (typen) of ✎ (tekenen).</div>'; $('#pgTitel').value=''; return; }
   $('#pgTitel').value = p.titel||'';
   if(p.type==='tekst'){ box.innerHTML='<textarea class="schrijf" id="schrijf" placeholder="Schrijf hier…"></textarea>'; const ta=$('#schrijf'); ta.value=p.inhoud||''; ta.addEventListener('input', ()=>{ p.inhoud=ta.value; markDirty(); }); }
   else if(p.type==='foto'){ box.innerHTML='<img alt="Foto in je schrift" src="'+(String(p.data).startsWith('data:image/')?p.data:'')+'" class="s-160h9bn">'; }
-  else { box.innerHTML='<div class="tekencanvasbox"><canvas id="schrijfcanvas"></canvas></div>'; $('#tekentools').style.display='flex';
+  else { box.innerHTML='<div class="tekencanvasbox"><canvas id="schrijfcanvas"></canvas></div>'; $('#tekentools').hidden=false;
     setTimeout(()=>{ tekenbord=new TekenBord($('#schrijfcanvas'), { background:'#12110F', kleur:'#111111', onStroke:()=>markDirty() }); tekenbord.kleur='#111111'; tekenbord.dikte=5; tekenbord.setStrokes(p.strokes||[]); },20); }
 }
 $('#pgTitel').addEventListener('input', e=>{ if(pages[huidig]){ pages[huidig].titel=e.target.value; markDirty(); } });

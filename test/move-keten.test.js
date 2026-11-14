@@ -18,7 +18,15 @@
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop } = require('./helper');
+const fs = require('node:fs'), os = require('node:os'), path = require('node:path');
+const { startServer, stop, maakBetaaldRtgTestaccount } = require('./helper');
+
+async function startReisproef(t, env = {}) {
+  const datamap = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-move-keten-'));
+  const srv = await startServer({ env: { SMTP_URL: '', ...env, RTG_DATA_DIR: datamap } });
+  t.after(async () => { await stop(srv); fs.rmSync(datamap, { recursive: true, force: true }); });
+  return { ...srv, datamap };
+}
 
 const morgen = () => new Date(Date.now() + 86400000).toISOString().slice(0, 10);
 
@@ -30,12 +38,12 @@ async function post(base, pad, lijf, tok) {
 }
 
 test('RTG Move: twee echte boekingen worden een naad met een oordeel', async (t) => {
-  const { child, base } = await startServer({ env: { SMTP_URL: '' } });
-  t.after(() => stop(child));
+  const { base, datamap } = await startReisproef(t);
 
   const u = Date.now().toString().slice(-8) + Math.floor(Math.random() * 90 + 10);
   const reg = await post(base, '/api/auth/register', { name: 'Proeflid', email: 'mvk' + u + '@voorbeeld.nl',
     phone: '06' + u.slice(0, 8), password: 'geheim12345', geboortedatum: '1985-05-05', tier: 'rtg' });
+  maakBetaaldRtgTestaccount(datamap, 'mvk' + u + '@voorbeeld.nl');
   const tok = reg.data && reg.data.token;
   assert.ok(tok, 'proeflid aangemaakt');
 
@@ -119,12 +127,12 @@ test('een vlucht wijst naar de LUCHTHAVEN en niet naar zijn bestemming', async (
      Bourget uitrekenen voor iemand die naar de gate moet -- een oordeel dat
      compleet oogt en onzin is. Vandaar dat deze toets het LABEL naleest en niet
      alleen of er een plek is. */
-  const { child, base } = await startServer({ env: { SMTP_URL: '', NODE_ENV: 'test', RTG_DEMO: '1' } });
-  t.after(() => stop(child));
+  const { base, datamap } = await startReisproef(t, { NODE_ENV: 'test', RTG_DEMO: '1' });
 
   const u = Date.now().toString().slice(-8) + Math.floor(Math.random() * 90 + 10);
   const reg = await post(base, '/api/auth/register', { name: 'Proeflid', email: 'mvl' + u + '@voorbeeld.nl',
     phone: '06' + u.slice(0, 8), password: 'geheim12345', geboortedatum: '1985-05-05', tier: 'rtg' });
+  maakBetaaldRtgTestaccount(datamap, 'mvl' + u + '@voorbeeld.nl');
   const tok = reg.data && reg.data.token;
   assert.ok(tok, 'proeflid aangemaakt');
 
@@ -152,12 +160,12 @@ test('een afspraak vóór een vlucht wordt een weegbare naad', async (t) => {
      en dekking 0. Een vlucht draagt als enige van de vijf toegevoegde bronnen
      een datum EN een uur, en is daarmee de enige die een naad echt weegbaar
      maakt -- een verblijf levert alleen een plek. */
-  const { child, base } = await startServer({ env: { SMTP_URL: '', NODE_ENV: 'test', RTG_DEMO: '1' } });
-  t.after(() => stop(child));
+  const { base, datamap } = await startReisproef(t, { NODE_ENV: 'test', RTG_DEMO: '1' });
 
   const u = Date.now().toString().slice(-8) + Math.floor(Math.random() * 90 + 10);
   const reg = await post(base, '/api/auth/register', { name: 'Proeflid', email: 'mvn' + u + '@voorbeeld.nl',
     phone: '06' + u.slice(0, 8), password: 'geheim12345', geboortedatum: '1985-05-05', tier: 'rtg' });
+  maakBetaaldRtgTestaccount(datamap, 'mvn' + u + '@voorbeeld.nl');
   const tok = reg.data && reg.data.token;
   assert.ok(tok, 'proeflid aangemaakt');
 
@@ -185,12 +193,12 @@ test('haalbaarheid VOOR de verkoop weegt een voornemen en weigert niets', async 
   /* De vraag uit de opzet, gesteld voordat er iets vaststaat: past een tafel om
      zeven uur nog bij een reis die er al staat? Move geeft het oordeel MET en
      ZONDER het voornemen; drukken doet de reiziger (MOVE.md grens 5). */
-  const { child, base } = await startServer({ env: { SMTP_URL: '', NODE_ENV: 'test', RTG_DEMO: '1' } });
-  t.after(() => stop(child));
+  const { base, datamap } = await startReisproef(t, { NODE_ENV: 'test', RTG_DEMO: '1' });
 
   const u = Date.now().toString().slice(-8) + Math.floor(Math.random() * 90 + 10);
   const reg = await post(base, '/api/auth/register', { name: 'Proeflid', email: 'mvv' + u + '@voorbeeld.nl',
     phone: '06' + u.slice(0, 8), password: 'geheim12345', geboortedatum: '1985-05-05', tier: 'rtg' });
+  maakBetaaldRtgTestaccount(datamap, 'mvv' + u + '@voorbeeld.nl');
   const tok = reg.data && reg.data.token;
   assert.ok(tok, 'proeflid aangemaakt');
 
@@ -252,12 +260,12 @@ test('haalbaarheid VOOR de verkoop weegt een voornemen en weigert niets', async 
 test('een voornemen zonder plek of tijd levert geen oordeel', async (t) => {
   /* De faalvorm van deze laag: een groen oordeel over iets wat niet gemeten is.
      Zonder plek hoort er `null` te staan en 0% dekking -- niet RUIM. */
-  const { child, base } = await startServer({ env: { SMTP_URL: '', NODE_ENV: 'test', RTG_DEMO: '1' } });
-  t.after(() => stop(child));
+  const { base, datamap } = await startReisproef(t, { NODE_ENV: 'test', RTG_DEMO: '1' });
 
   const u = Date.now().toString().slice(-8) + Math.floor(Math.random() * 90 + 10);
   const reg = await post(base, '/api/auth/register', { name: 'Proeflid', email: 'mvw' + u + '@voorbeeld.nl',
     phone: '06' + u.slice(0, 8), password: 'geheim12345', geboortedatum: '1985-05-05', tier: 'rtg' });
+  maakBetaaldRtgTestaccount(datamap, 'mvw' + u + '@voorbeeld.nl');
   const tok = reg.data && reg.data.token;
 
   /* EN DE DUUR-FOUT, HIER GEMETEN EN NIET IN DE PURE TOETS. `tijdenVan()` woont

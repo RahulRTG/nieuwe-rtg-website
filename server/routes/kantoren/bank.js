@@ -48,16 +48,17 @@ module.exports = (ctx) => {
      zonder spoor van wie hem omzette.
 
      Daarom is dit nu een CALLBACK die de kern binnen zijn duurzame bundel
-     aanroept (zie `besluit` in kern/bankregie/index.js): mutatie en spoor
-     committen heel, of geen van beide. De woorden blijven hier, want pas de
+     afwacht (zie `besluit` in kern/bankregie/index.js): succes volgt pas na
+     opslag van mutatie en spoor. Dit belooft geen rollback bij een auditfout.
+     De woorden blijven hier, want pas de
      uitkomst zegt of er is uitgevoerd of op een tweede persoon wordt gewacht.
 
      De sync() blijft ERBUITEN: dat is een seintje naar schermen en geen opslag,
      en een scherm mag niet horen van een besluit dat nog niet vaststaat. */
   const spoor = (req, wat) => (r) => {
     if (!r || r.error) return;
-    if (r.needsAuth) afdelingen.audit(naam(req), wat + ' AANGEVRAAGD -- wacht op een tweede persoon');
-    else if (!r.ongewijzigd) afdelingen.audit(naam(req), wat + ' uitgevoerd');
+    if (r.needsAuth) return afdelingen.audit(naam(req), wat + ' AANGEVRAAGD -- wacht op een tweede persoon');
+    if (!r.ongewijzigd) return afdelingen.audit(naam(req), wat + ' uitgevoerd');
   };
   async function relais(belofte) {
     const r = await belofte;
@@ -90,13 +91,13 @@ module.exports = (ctx) => {
      het melden van een mislukte clearing (trip automatisch nood bij de drempel). */
   app.post('/api/office/bank/nood', officeAuth, (req, res) => veilig(res, async () => {
     const r = await kern.bankNoodMeld({ reden: req.body.reden, wie: naam(req),
-      audit: (u) => { if (u.ok) afdelingen.audit(naam(req), 'RTG Bank NOODSTOP -- clearing valt terug op de kaart-rails'); } });
+      audit: (u) => { if (u.ok) return afdelingen.audit(naam(req), 'RTG Bank NOODSTOP -- clearing valt terug op de kaart-rails'); } });
     if (r.ok) sync();
     return r;
   }));
   app.post('/api/office/bank/herstel', officeAuth, (req, res) => veilig(res, async () => {
     const r = await kern.bankNoodHerstel({ wie: naam(req),
-      audit: (u) => { if (u.ok) afdelingen.audit(naam(req), 'RTG Bank noodstop hersteld -- clearing volgt weer de stand'); } });
+      audit: (u) => { if (u.ok) return afdelingen.audit(naam(req), 'RTG Bank noodstop hersteld -- clearing volgt weer de stand'); } });
     if (r.ok) sync();
     return r;
   }));
@@ -110,7 +111,7 @@ module.exports = (ctx) => {
   // de leden-bank live zetten (zichtbaar in de app) of weer sluiten
   app.post('/api/office/bank/leden', officeAuth, (req, res) => veilig(res, async () => {
     const r = await kern.bankLedenZet({ aan: req.body.aan === true, wie: naam(req),
-      audit: (u) => { if (u.ok) afdelingen.audit(naam(req), 'RTG Bank voor leden ' + (u.ledenAan ? 'LIVE gezet' : 'gesloten')); } });
+      audit: (u) => { if (u.ok) return afdelingen.audit(naam(req), 'RTG Bank voor leden ' + (u.ledenAan ? 'LIVE gezet' : 'gesloten')); } });
     if (r.ok) sync();
     return r;
   }));

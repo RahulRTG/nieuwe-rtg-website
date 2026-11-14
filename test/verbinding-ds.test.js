@@ -4,17 +4,16 @@ const {fixture,tick}=require('./lib/foundation-ds-fixture');
 const vm=require('node:vm');
 const parts=['01','02'].map(n=>fs.readFileSync('public/shared/verbinding/verbinding-'+n+'.js','utf8'));
 const source='var navigator={onLine:true};\n'+parts.join('');
-for(const ds of [true,false])test('werkelijke verbindingsowner: banner, fout en satelliet '+(ds?'DS':'legacy'),()=>{
+for(const ds of [true,false])test('werkelijke verbindingsowner: banner, fout en satelliet '+(ds?'met':'zonder')+' DS-marker',()=>{
  const f=fixture({ds,source});const net=f.context.RTGNet;
  net.toon('Offline');const banner=f.node('#rtg-net-banner');assert.equal(banner.textContent,'Offline');assert.equal(banner.hidden,false);
- assert.equal(!!banner.style.cssText,!ds);net.verberg();
- if(ds)assert.equal(banner.hidden,true);else assert.equal(banner.style.transform,'translateY(-100%)');
- net.fout('Bewaren mislukt');const toast=ds?f.node('.ds-melding'):f.document.body.children.find(n=>n.textContent==='Bewaren mislukt');
- assert.equal(toast.textContent,'Bewaren mislukt');assert.equal(!!toast.style.cssText,!ds);
- if(ds)assert.equal(toast.classList.contains('toon'),true);
- net.satelliet.zetStand('aan');const sat=f.node('#rtg-sat-balkje');assert.ok(sat);assert.equal(!!sat.style.cssText,!ds);
- assert.equal(!!sat.querySelector('button').style.cssText,!ds);
- if(ds){assert.equal(sat.parentNode,banner.parentNode);assert.equal(f.document.querySelectorAll('.ds-net').length,1);}
+ assert.equal(!!banner.style.cssText,false);net.verberg();assert.equal(banner.hidden,true);
+ net.fout('Bewaren mislukt');const toast=f.node('.ds-melding');
+ assert.equal(toast.textContent,'Bewaren mislukt');assert.equal(!!toast.style.cssText,false);
+ assert.equal(toast.classList.contains('toon'),true);
+ net.satelliet.zetStand('aan');const sat=f.node('#rtg-sat-balkje');assert.ok(sat);assert.equal(!!sat.style.cssText,false);
+ assert.equal(!!sat.querySelector('button').style.cssText,false);
+ assert.equal(sat.parentNode,banner.parentNode);assert.equal(f.document.querySelectorAll('.ds-net').length,1);
  sat.querySelector('button').click();assert.equal(f.node('#rtg-sat-balkje'),null);assert.equal(f.storage.get('rtg_sat'),'uit');
 });
 test('bestaande applicatietoast blijft eerste eigenaar',()=>{
@@ -25,6 +24,7 @@ test('bronparts blijven binnen grens; nieuwe presentatie gebruikt alleen DS-eige
  for(const p of parts)assert.ok(Buffer.byteLength(p)<=10240);
  const css=fs.readFileSync('public/ds/componenten/verbinding.css','utf8');
  assert.match(css,/position: relative/);assert.doesNotMatch(css,/position: fixed/);assert.match(css,/min-block-size: var\(--ds-doel\)/);
+ assert.match(css,/min-inline-size: var\(--ds-doel\)/);
  assert.doesNotMatch(css,/!important|#[a-f0-9]{3,8}\b|\b(?:left|right|bottom|top)\s*:/i);
 });
 

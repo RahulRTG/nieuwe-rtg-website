@@ -51,9 +51,13 @@ for(const breedte of [390,1280])test('browserchrome '+breedte+': adres, geschied
     await page.locator('#bwRij .kaart').first().click();await page.locator('.zaakbalk .zn').waitFor();
     await page.locator('#tabstrip .plus').click();await page.locator('#zoekIn').waitFor();
     assert.equal(await page.locator('#tabstrip .tb').count(),2);
-    await page.locator('#tabstrip .tb').first().focus();await page.keyboard.press('Enter');
+    const eersteTab=page.locator('#tabstrip .tb').first();
+    assert.equal(await eersteTab.locator('button').count(),2,'tabkeuze en sluiten zijn nevengeschikte knoppen');
+    await eersteTab.locator('.ds-browser-tabselect').focus();await page.keyboard.press('Enter');
     await page.locator('.zaakbalk .zn').waitFor();
-    await page.locator('#tabstrip .tb.aan .x').click();await page.locator('#zoekIn').waitFor();
+    const sluit=page.locator('#tabstrip .tb.aan .x');
+    assert.equal(await sluit.getAttribute('aria-label'),'Tab sluiten');
+    await sluit.click();await page.locator('#zoekIn').waitFor();
     assert.equal(await page.locator('#tabstrip .tb').count(),1);
     await page.locator('#zoekIn').fill('Vedra');await page.locator('#zoekGroot button').click();
     await page.locator('#zoekUit .kaart').first().waitFor();

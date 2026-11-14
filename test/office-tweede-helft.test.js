@@ -26,12 +26,12 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop, elevateTier, stroomAdres } = require('./helper');
+const { startServer, stop, elevateTier, stroomAdres, maakBetaaldRtgTestaccount } = require('./helper');
 
 /* De inlog zet de code eerst op HOOFDLETTERS voor hij hem vergelijkt, dus een
    proefcode met kleine letters erin komt er nooit door. */
 const CODE = 'PROEFKANTOOR-' + Date.now().toString(36).toUpperCase();
-let srv, base;
+let srv, base, TMP;
 function post(pad, body, token) {
   return fetch(base + pad, {
     method: 'POST',
@@ -53,7 +53,7 @@ const ko = (pad, body) => post(pad.startsWith('/api/') ? pad : '/api/office/' + 
 const br = (pad, body) => post((pad.startsWith('/api/') ? pad : '/api/office/' + pad), body, eigenaar);
 
 test.before(async () => {
-  const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-off2-'));
+  TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-off2-'));
   srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP, OFFICE_CODE: CODE } });
   base = srv.base;
 
@@ -365,14 +365,13 @@ test('10. een partneraanvraag beslissen: de Boardroom beslist, en een pas is de 
   /* De aanvraagpoort leest het ledenbewijs met resolveSession(): die kent zowel
      een demosessie als een ECHT ledenaccount. Dat laatste is de weg die een
      klant in de praktijk loopt, en die weg toetsen we hier van begin tot eind:
-     de gratis gast komt er niet in, een gewone RTG Pass wel, en een account dat
-     later naar Business gaat blijft die weg gewoon lopen.
+     de gratis gast en de persoonlijke RTG Pass komen er niet in; een account
+     met een goedgekeurde zakelijke pas kan een partneraanvraag indienen.
 
-     DE EIS IS EEN PAS, NIET DE BUSINESS PASS. Hier stond het omgekeerde: alleen
-     Business mocht aanvragen. Een pas is een lidmaatschapsniveau en geen
-     vergunning om te ondernemen; wie met een RTG Pass een zaak runt, is niet
-     minder ondernemer. Wat blijft staan is dat er een LID achter de aanvraag
-     hoort, want er gaat een bedrijfscode en een beheer-inlog de deur uit. */
+     De poort vraagt de zakelijke capability `can_be_partner`, niet uitsluitend
+     de pasnaam Business. Een persoonlijke pas verleent die capability niet.
+     Ook een zakelijke pas vervangt geen akkoord, registercontrole of besluit
+     van de Boardroom voordat een bedrijfscode en beheer-inlog worden uitgegeven. */
   const t = Date.now().toString().slice(-7);
   const gast = await post('/api/auth/register', { name: 'Gratis Gast', email: 'gg' + t + '@rtg.test',
     password: 'Wachtwoord123', geboortedatum: '1988-03-11', tier: 'guest' });
@@ -385,15 +384,13 @@ test('10. een partneraanvraag beslissen: de Boardroom beslist, en een pas is de 
   const gewoon = await post('/api/auth/register', { name: 'Partner Aanvrager', email: 'pa' + t + '@rtg.test',
     phone: '+31612340003', password: 'Wachtwoord123', geboortedatum: '1988-03-11' });
   assert.equal(gewoon.status, 200);
-  assert.equal(gewoon.body.state.user.tier, 'rtg', 'zelf aanmelden levert een RTG Pass');
-  /* EEN CONSUMENTENPAS IS GEEN BEDRIJF. Hier stond dat een gewone RTG Pass een
-     partnerplek mocht aanvragen; dat was het antwoord van 18 augustus 2026 op
-     een poort die toen DE Business Pass eiste -- vanaf 5.000 euro, en daarmee
-     dicht voor het restaurant met acht man uit MARKT.md. Twee dagen later kwam
-     de trede die daar wel voor is: COMMERCIE.md 3b maakt RTG Business Lite
-     (150 euro) de partnerpoort. De poort vraagt sindsdien de capability
-     `can_be_partner` en geen pas-id, zodat een volgende trede zichzelf niet
-     opnieuw buitensluit. */
+  assert.equal(gewoon.body.state.user.tier, 'guest', 'zelf aanmelden levert een gratis account');
+  maakBetaaldRtgTestaccount(TMP, 'pa' + t + '@rtg.test');
+  assert.equal((await post('/api/state', {}, gewoon.body.token)).body.state.user.tier, 'rtg',
+    'alleen de expliciete betaalde testfixture maakt de persoonlijke pas beschikbaar');
+  /* EEN CONSUMENTENPAS IS GEEN BEDRIJF. De oude proef liet een gewone RTG Pass
+     een partnerplek aanvragen; de zakelijke ladder vraagt nu `can_be_partner`.
+     Daarom blijft ook deze expliciet betaalde persoonlijke fixture geweigerd. */
   const metRtg = await post('/api/partner/apply', { company: 'Gewone Pas BV', type: 'restaurant',
     city: 'Rotterdam', contactName: 'A. Vragende', email: 'gp' + t + '@rtg.test', akkoord: true }, gewoon.body.token);
   assert.equal(metRtg.status, 403, 'een RTG Pass is persoonlijk en draagt geen partnerplek: '

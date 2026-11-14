@@ -119,12 +119,12 @@
       });
     }
     var gedeeld = bak ? [] : (stand.gedeeld || []).filter(function (it) { return !q || it.naam.toLowerCase().indexOf(q) >= 0; });
-    $('#gedeeldKop').style.display = gedeeld.length ? '' : 'none';
+    $('#gedeeldKop').hidden = !gedeeld.length;
     $('#gedeeldLijst').innerHTML = gedeeld.map(rijtje).join('');
     var office = bak ? [] : (stand.office || []).filter(function (it) { return !q || (it.titel || '').toLowerCase().indexOf(q) >= 0; });
     var first = !bak && !hier && !q && !(stand.items || []).length && !(stand.mappen || []).length && !(stand.gedeeld || []).length && !(stand.office || []).length;
     window.RTGDaily.render('bestanden', first ? 'empty' : 'ready', { retry: laad });
-    $('#officeKop').style.display = office.length ? '' : 'none';
+    $('#officeKop').hidden = !office.length;
     $('#officeLijst').innerHTML = office.map(function (d) {
       return '<a class="item s-1m37x9n ds-dag-item ds-dag-link" href="/apps/office.html">' +
         '<span class="ext ds-dag-ext" aria-hidden="true">' + esc(d.soort) + '</span>' +

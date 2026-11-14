@@ -93,7 +93,7 @@
     $('#bord').innerHTML = eigen.map(kaart).join('') ||
       '<p class="stil ds-dag-stil">' + (q ? window.RTGDailyCopy.text('noResults') : archief ? 'Het archief is leeg.' : window.RTGDailyCopy.text('emptyNotes')) + '</p>';
     var gedeeld = archief ? [] : (stand.gedeeld || []).filter(zeef);
-    $('#gedeeldKop').style.display = gedeeld.length ? '' : 'none';
+    $('#gedeeldKop').hidden = !gedeeld.length;
     $('#gedeeldBord').innerHTML = gedeeld.map(kaart).join('');
     Array.prototype.forEach.call(document.querySelectorAll('[data-open]'), function (el) {
       el.addEventListener('click', function () { toon(el.dataset.open); });
@@ -115,4 +115,3 @@
     this.textContent = archief ? 'Terug naar het bord' : 'Archief';
     teken();
   });
-

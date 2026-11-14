@@ -4,7 +4,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, maakBetaaldRtgTestaccount } = require('./helper');
 const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-saloon-'));
 let srv, token, ander, bode;
 async function api(pad, body = {}, wie = token) {
@@ -16,8 +16,12 @@ const feed = o => api('/api/wereld/feed', { ervaring: 'saloon', lens: 'all', ...
 const red = (pad, o) => api('/api/supplier/redactie/artikel/' + pad, o, bode);
 test.before(async () => {
   srv = await startServer({ env: { RTG_DATA_DIR: tmp, SMTP_URL: '' } });
-  async function lid(n) { return (await api('/api/auth/register', { name: 'Test Saloon ' + n,
-    email: 'saloon' + n + '@example.test', phone: '0612345678', password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg' }, null)).token; }
+  async function lid(n) {
+    const r = await api('/api/auth/register', { name: 'Test Saloon ' + n,
+      email: 'saloon' + n + '@example.test', phone: '0612345678', password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg' }, null);
+    maakBetaaldRtgTestaccount(tmp, 'saloon' + n + '@example.test');
+    return r.token;
+  }
   token = await lid(1); ander = await lid(2); assert.ok(token && ander);
   const r = await api('/api/supplier/roster', { code: 'BODE' }, null);
   bode = (await api('/api/supplier/login', { code: 'BODE', staffId: r.staff.find(x => x.role === 'manager').id, pin: '1234' }, null)).token;

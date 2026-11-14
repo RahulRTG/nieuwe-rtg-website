@@ -33,14 +33,17 @@ const REDENEN = [
   ['/api/mijn/sessies', 'een gekaapte sessie zelf kunnen sluiten is een noodrem en geen product'],
   ['/api/mijn/herstelkanaal', 'idem: het kanaal waarmee u zichzelf terugkrijgt hoort niet uitschakelbaar te zijn'],
   ['/api/mijn/toestel', 'de toestelbinding is dezelfde eigen beveiliging als /api/toestel/meting hierboven'],
-  /* Het eigen lidmaatschap: wie zich mag verbinden, mag zich losmaken. Bewust
-     NIET onder de functie die de aanmelding schakelt (`tg-aanmeld`) -- die gaat
-     over de INSTROOM, en de inschrijving sluiten mag de bestaande leden niet
-     opsluiten. De afweging staat in AFSPRAAK.md par. 14.2; dezelfde verklaring
-     staat in kern/platformregister/bediening-recht.js, en die twee horen
-     hetzelfde te zeggen. */
+  /* Zeven exacte rechten, geen vrijstelling voor toekomstige onderpaden.
+     Aanbod en tekenen zijn instroom onder tg-aanmeld. Dezelfde begrenzing
+     staat in platformregister/bediening-recht.js; zie AFSPRAAK.md par. 14.2. */
   ['/api/mijn/abonnement', 'een schakelaar op zien en opzeggen houdt een lid in een contract dat hij niet meer wil; ' +
-    'dat is geen dienst die je uitzet maar de andere kant van een afspraak'],
+    'dat is geen dienst die je uitzet maar de andere kant van een afspraak', { exact: true }],
+  ['/api/mijn/abonnement/opzegvoorbeeld', 'een lid moet de gevolgen van zijn eigen opzegging kunnen lezen', { exact: true }],
+  ['/api/mijn/abonnement/opzeggen', 'wie zich mag verbinden mag zich losmaken', { exact: true }],
+  ['/api/mijn/abonnement/automatisch/betalen', 'de eigen getekende verplichting betalen mag niet afhangen van nieuwe instroom', { exact: true }],
+  ['/api/mijn/abonnement/automatisch/herstel', 'een bestaande betaling controleren en herstellen blijft bereikbaar', { exact: true }],
+  ['/api/mijn/abonnement/automatisch/intrekken', 'een eigen voorstel veilig intrekken voorkomt vastzitten bij gesloten instroom', { exact: true }],
+  ['/api/mijn/abonnement/automatisch/stand', 'de eigen overeenkomst en betaalstand inzien blijft bereikbaar', { exact: true }],
   /* Zelf gast worden (besluit C5): dezelfde afweging, en ook hier staat hij in
      kern/platformregister/bediening-recht.js met dezelfde reden. */
   ['/api/mijn/pas/gast', 'een schakelaar op zelf gast worden houdt een lid vast aan een pas die hij niet meer wil'],
@@ -83,7 +86,8 @@ const REDENEN = [
 
 const BUITEN = new Map(REDENEN);
 function redenVoor(pad) {
-  for (const [prefix, reden] of BUITEN) if (pad === prefix || pad.startsWith(prefix + '/')) return reden;
+  for (const [prefix, reden, opties] of REDENEN)
+    if (pad === prefix || !opties?.exact && pad.startsWith(prefix + '/')) return reden;
   return null;
 }
 

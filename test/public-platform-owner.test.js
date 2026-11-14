@@ -2,6 +2,7 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
+const vm = require('node:vm');
 
 const hosts = [
   ['index.html', './public/shared/interface/world-desktop-copy.js'],
@@ -35,4 +36,56 @@ test('publieke platformowners gebruiken native media/ankers en geen runtime-scri
   assert.doesNotMatch(elementen, /createElement\('script'\)/);
   assert.doesNotMatch(detail, /createElement\('script'\)/);
   assert.match(detail, /setAttribute\('href',url\)/);
+});
+
+/* De echte bestaande hostcode met een smalle DOM-adapter. Dit bewijst routering
+   en doelkeuze; de browsertoets bewijst apart zichtbaarheid en native klikken. */
+function publicHost(hash = '') {
+  const shown = [], scrolled = [], events = {}, node = () => ({ dataset: {}, append() {}, setAttribute() {} });
+  const scene = { ...node(), id: 'passen', dataset: { scene: 'Passen' } };
+  const target = (id, tagName, owner = scene) => ({ ...node(), id, tagName, open: false,
+    closest: selector => selector === '[data-scene]' ? owner : null,
+    scrollIntoView: () => scrolled.push(id) });
+  const targets = { passen: scene, prijsbeleid: target('prijsbeleid', 'DIV'),
+    commissie: target('commissie', 'DETAILS'), orphan: target('orphan', 'DIV', null) };
+  const source = { querySelectorAll: () => [scene] };
+  const shell = { show: (id, title, content) => shown.push({ id, title, content }),
+    collapse: () => { shell.collapsed++; }, collapsed: 0, select() {}, refresh() {} };
+  const document = { body: node(), documentElement: node(), createElement: node, addEventListener() {},
+    getElementById: id => id === 'inhoud' ? source : targets[id],
+    querySelector: selector => selector === '.pp-feature-photo' ? null : node() };
+  const window = { location: { hash }, addEventListener: (type, fn) => { events[type] = fn; },
+    RTGPublicPlatform: { init: () => shell, node, button: node },
+    RTGExperience: { choose() {}, permission() {}, snapshot() {}, currentWorld: () => 'living' },
+    RTGPublicContent: { words: {} }, I18N: { en: {} }, RTGPublicEdge() {}, RTGi18n: { apply() {} } };
+  vm.runInNewContext(fs.readFileSync('public/site/platform-app.js', 'utf8'), { window, document, URLSearchParams, URL });
+  return { window, shell, scene, targets, shown, scrolled,
+    hashchange: value => { window.location.hash = value; events.hashchange(); } };
+}
+
+test('nested openbare ankers openen hun bestaande canonieke scene en doel-details', () => {
+  const host = publicHost();
+  host.window.RTGPublicApp.open('prijsbeleid');
+  assert.equal(host.shown[0].id, 'passen');
+  assert.equal(host.shown[0].content, host.scene, 'geen tweede scene of gekopieerde beleidsinhoud');
+  assert.deepEqual(host.scrolled, ['prijsbeleid']);
+  host.hashchange('#commissie');
+  assert.equal(host.shown.at(-1).id, 'passen');
+  assert.equal(host.targets.commissie.open, true);
+  assert.deepEqual(host.scrolled, ['prijsbeleid', 'commissie']);
+  assert.equal(host.shell.collapsed, 0, 'gewone ankers sluiten hun doel niet meteen weer');
+});
+
+test('directe fragments werken, onbekende doelen krijgen geen nieuwe eigenaar en home blijft sluiten', () => {
+  const host = publicHost('#commissie');
+  assert.equal(host.shown.length, 1);
+  assert.equal(host.shown[0].id, 'passen');
+  assert.equal(host.targets.commissie.open, true);
+  host.hashchange('#onbekend');
+  host.hashchange('#orphan');
+  assert.equal(host.shown.length, 1, 'zonder canonieke scene ontstaat geen nieuw route-eigenaarschap');
+  host.hashchange('#rtg?detail=passen');
+  assert.equal(host.shown.length, 2, 'de bestaande detailroute blijft werken');
+  host.hashchange('#platform-home');
+  assert.equal(host.shell.collapsed, 1);
 });

@@ -13,6 +13,7 @@
    kantoor past hem toe of wijst hem af. Zie de kop van ./reisbureau-nazorg.js
    voor de rest van de redenering. */
 'use strict';
+const { lidPrijsbeeld } = require('./reisbureau-prijsgrond');
 
 module.exports = ({ pak, spoor, herbereken, meld, reisNaam, schoon, nu, save }) => {
 
@@ -23,6 +24,7 @@ module.exports = ({ pak, spoor, herbereken, meld, reisNaam, schoon, nu, save }) 
     if (g.error) return g;
     const a = g.aanvraag;
     if (a.customerKey !== key) return { status: 404, error: 'Reisaanvraag niet gevonden.' };
+    if (a.betaald) return { status: 409, error: 'Voor deze reis staat een geslaagde inning geregistreerd. Een adviseur moet eerst de financiële gevolgen en een nieuwe offerte vaststellen; de reis blijft ongewijzigd.' };
 
     const w = wens || {};
     const gevraagd = {};
@@ -49,7 +51,7 @@ module.exports = ({ pak, spoor, herbereken, meld, reisNaam, schoon, nu, save }) 
     a.wijziging = { gevraagd, toelichting: toelichting || null, at: nu(), stand: 'gevraagd' };
     spoor(a, 'wijziging gevraagd', 'lid', { gevraagd, toelichting: toelichting || null });
     save();
-    return { ok: true, aanvraag: a };
+    return { ok: true, aanvraag: lidPrijsbeeld(a) };
   }
 
   /* ---- 2. HET KANTOOR BESLIST OVER DIE WIJZIGING ---- */
@@ -66,6 +68,8 @@ module.exports = ({ pak, spoor, herbereken, meld, reisNaam, schoon, nu, save }) 
     const g = pak(ref, ['wijziging-gevraagd'], 'er ligt geen wijzigingsverzoek op de balie.');
     if (g.error) return g;
     const a = g.aanvraag;
+    if (a.betaald && besluit === 'toegepast')
+      return { status: 409, error: 'Een betaalde reis vereist een afzonderlijke financiële correctie voordat de wijziging kan worden toegepast.' };
     const gevraagd = (a.wijziging && a.wijziging.gevraagd) || {};
 
     if (besluit === 'toegepast') {

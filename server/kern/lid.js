@@ -24,21 +24,9 @@ function maakLid(deps) {
     require('./lid/contact')({ db, PERSONAS });
   const { facturenVoor, reisVoor, eersteBijdrageFactuur } = require('./lid/facturen')({ i18n, deps });
 
-  /* STARTINHOUD VOOR EEN NIEUW ACCOUNT: LEEG.
-
-     Hier stond `JSON.parse(JSON.stringify(db.data.invoices))` en hetzelfde voor
-     db.data.trip. Wie zich echt aanmeldde kreeg daarmee de DEMO-inhoud als zijn
-     eigen persoonlijke gegevens: een reis naar Ibiza die hij nooit boekte, vier
-     facturen op zijn naam, een villa in Cala Jondal. Dat is geen kennismaking
-     maar een leugen -- en precies de leugen die de merkregel verbiedt (nooit
-     claimen dat een boeking verwerkt is).
-
-     De demo blijft bestaan, maar op de plek waar hij hoort: de demo-SESSIES
-     (inloggen op een pas zonder account, alleen als DEMO aanstaat) lezen
-     db.data, en het geseede demo-account krijgt zijn inhoud expliciet mee
-     (demoLidInhoud in server.js). Een echt account begint leeg en vult zich met
-     wat het lid zelf doet. Wat de schermen in die lege stand tonen is geen wit
-     vlak maar een uitleg: wat hier komt te staan, en hoe je het in gang zet. */
+  /* Een nieuw account begint leeg, zonder geerfde demo-reizen of facturen.
+     Alleen demo-sessies lezen db.data; demoLidInhoud in server.js vult het
+     demo-account expliciet. Echte inhoud ontstaat door handelingen van het lid. */
   function memberTemplate() {
     return { invoices: [], trip: null, creatorCredit: 0, creatorLikes: 0 };
   }
@@ -115,28 +103,38 @@ function maakLid(deps) {
         folder: p.folder ? { titel: p.folder.titel, fotos: p.folder.fotos || [], items: p.folder.items || [] } : null
       };
     });
-    const state = { user: { tier: sess.tier, ...persona, lidmaatschap: lidmaatschap.voorSessie(sess) },
+    const state = { user: { ...persona, tier: sess.tier, lidmaatschap: lidmaatschap.voorSessie(sess) },
       posts, creatorCredit: 0, creatorLikes: 0, lang };
     // Ook gratis gebruikers (zonder pas) mogen solliciteren en hun sollicitaties
     // met status terugzien; de rest van het ledenpaneel blijft voor leden.
     state.myApplications = myApplications(sess.key);
+    // Factuurinzage en betaalherstel zijn niet afhankelijk van een betaalde pas.
+    // Het account bepaalt het dossier; een anonieme gast krijgt nooit demo-inhoud.
+    const md = sess.account ? (accounts.getMemberState(sess.account.id) || memberTemplate())
+      : (sess.tier !== 'guest' ? db.data : null);
+    state.invoices = md ? facturenVoor(md, sess.tier, lang) : [];
     if (sess.tier !== 'guest') {
       // Echte accounts hebben hun eigen boekingen/betalingen; demo-sessies delen
       // de vaste demo-inhoud.
-      const md = sess.account ? (accounts.getMemberState(sess.account.id) || memberTemplate()) : db.data;
       // facturen (afboekcode, btw, pasprijs uit de boardroom) en de reis staan in
       // ./lid/facturen.js -- inclusief waarom de prijs daar NIET hard staat
-      state.invoices = facturenVoor(md, sess.tier, lang);
       const reis = reisVoor(md, lang);
       if (reis) state.trip = reis;
       state.creatorCredit = sess.account ? (md.creatorCredit || 0) : (db.data.creatorCredit[sess.tier] || 0);
       state.creatorLikes = sess.account ? (md.creatorLikes || 0) : (db.data.creatorLikes[sess.tier] || 0);
-      // RTFoundation: gezinnen die dit lid als oppas/familie koppelde + hun meldingen
-      if (sess.account) {
-        state.foundation = { gekoppeld: rtf.gekoppeldeGezinnen(sess.account.id), meldingen: md.foundationMeldingen || [] };
-      }
-      // leeftijd uit het paspoort: het lid ziet de eigen groep; partners nooit
-      // (geborenVan las member_state hier een tweede keer; `md` heeft het al)
+    }
+    // Een aanvaarde gezinsbinding hoort bij het account, niet bij een betaalde
+    // pas. Toon alleen de eigen bestaande bindingen/meldingen; dit verleent
+    // geen nieuwe gezinsrechten en opent de productiepoort niet.
+    if (sess.account) {
+      const gekoppeld = rtf.gekoppeldeGezinnen(sess.account.id);
+      const meldingen = md.foundationMeldingen || [];
+      if (sess.tier !== 'guest' || gekoppeld.length || meldingen.length) state.foundation = { gekoppeld, meldingen };
+    }
+    if (sess.account || sess.tier !== 'guest') {
+      // Ook een gratis account ziet de eigen leeftijd en groep. De opgeslagen
+      // datum kan nog zelf opgegeven zijn: dit is geen verificatie of toegangsrecht.
+      // Betaalde demo-persona's behouden hun bestaande geboortedatumbron.
       const lft = leeftijdVan(sess.account ? (md.geboren || null) : geborenVan(sess));
       if (lft != null) { state.user.leeftijd = lft; state.user.leeftijdsgroep = leeftijdsgroepVan(lft); }
     }

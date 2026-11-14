@@ -32,17 +32,19 @@
    Draait alleen waar een browser is. */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, letOpFouten, kantoorAlsPersoon, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
+const { startServer, stopHard, maakBetaaldRtgTestaccount, letOpFouten, kantoorAlsPersoon, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
+const fs = require('node:fs'), os = require('node:os'), path = require('node:path');
 
 const pw = laadPlaywright();
 
-async function nieuwLid(base) {
+async function nieuwLid(base, tmp) {
   const u = Date.now().toString().slice(-8) + Math.floor(Math.random() * 90 + 10);
   const reg = await fetch(base + '/api/auth/register', { method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ name: 'Banklid', email: 'bk' + u + '@x.nl', phone: '06' + u.slice(0, 8),
       password: 'geheim123', geboortedatum: '1990-01-01', geslacht: 'v', tier: 'rtg', pasApp: 'rtg' }) }).then(r => r.json());
   assert.ok(reg.token, 'het lid is aangemeld: ' + JSON.stringify(reg).slice(0, 160));
+  maakBetaaldRtgTestaccount(tmp, 'bk' + u + '@x.nl');
   return reg.token;
 }
 
@@ -84,11 +86,12 @@ async function opScherm(base, token) {
 
 test('bank, schakelaar UIT: het scherm zegt eerlijk dat er nog geen rekening is',
   { skip: geenBrowser(pw) }, async () => {
-  const { child, base } = await startServer({ env: { SMTP_URL: '' } });
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-bankscherm-'));
+  const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: tmp } });
   let browser;
   try {
     if (!await bankZet(base, false)) assert.fail('de ledenbank kon niet dicht worden gezet; deze stand is NIET beproefd');
-    const token = await nieuwLid(base);
+    const token = await nieuwLid(base, tmp);
     const H = { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token };
 
     // de stand waarin dit huis vandaag draait, en dus de stand die telt
@@ -116,13 +119,15 @@ test('bank, schakelaar UIT: het scherm zegt eerlijk dat er nog geen rekening is'
     assert.deepEqual(s.fouten, [], 'paginafouten: ' + s.fouten.join(' | '));
   } finally {
     if (browser) await browser.close();
-    child.kill();
+    await stopHard(child);
+    fs.rmSync(tmp, { recursive: true, force: true });
   }
 });
 
 test('bank, schakelaar AAN: van voorwaarden naar een rekening met het juiste bedrag erop',
   { skip: geenBrowser(pw) }, async () => {
-  const { child, base } = await startServer({ env: { SMTP_URL: '' } });
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-bankscherm-'));
+  const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: tmp } });
   let browser;
   try {
     const live = await bankZet(base, true);
@@ -131,7 +136,7 @@ test('bank, schakelaar AAN: van voorwaarden naar een rekening met het juiste bed
          eerlijk worden beproefd, en dan hoort dat te worden gezegd. */
       assert.fail('de ledenbank kon niet live worden gezet via de backoffice; deze stand is dus NIET beproefd');
     }
-    const token = await nieuwLid(base);
+    const token = await nieuwLid(base, tmp);
     const H = { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token };
 
     const s = await opScherm(base, token);
@@ -171,17 +176,19 @@ test('bank, schakelaar AAN: van voorwaarden naar een rekening met het juiste bed
   } finally {
     await bankZet(base, false).catch(() => {});   // de volgende toets begint schoon
     if (browser) await browser.close();
-    child.kill();
+    await stopHard(child);
+    fs.rmSync(tmp, { recursive: true, force: true });
   }
 });
 
 test('bank, schakelaar AAN: het hart toont de boeking, en meenemen geeft er echte velden van',
   { skip: geenBrowser(pw) }, async () => {
-  const { child, base } = await startServer({ env: { SMTP_URL: '' } });
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-bankscherm-'));
+  const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: tmp } });
   let browser;
   try {
     if (!await bankZet(base, true)) assert.fail('de ledenbank kon niet live worden gezet; deze stand is NIET beproefd');
-    const token = await nieuwLid(base);
+    const token = await nieuwLid(base, tmp);
     const H = { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token };
     await fetch(base + '/api/bank/akkoord', { method: 'POST', headers: H });
     const ov = await fetch(base + '/api/bank/overzicht', { method: 'POST', headers: H }).then(r => r.json());
@@ -222,6 +229,7 @@ test('bank, schakelaar AAN: het hart toont de boeking, en meenemen geeft er echt
   } finally {
     await bankZet(base, false).catch(() => {});   // de volgende toets begint schoon
     if (browser) await browser.close();
-    child.kill();
+    await stopHard(child);
+    fs.rmSync(tmp, { recursive: true, force: true });
   }
 });

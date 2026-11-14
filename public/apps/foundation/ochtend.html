@@ -65,6 +65,7 @@
 <link href="/ds/componenten/samen.css" rel="stylesheet">
 <link href="/ds/componenten/cookie.css" rel="stylesheet">
 <link href="/ds/componenten/handenvrij.css" rel="stylesheet">
+<link href="/ds/componenten/presentatierol.css" rel="stylesheet">
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
 <script src="/shared/rtg-heritage-transition.js" blocking="render"></script>
@@ -95,7 +96,7 @@
     <div id="bord"><div class="leeg">Laden…</div></div>
   </div>
 
-  <div class="kaart blok" id="kinderenBlok" style="display:none;">
+  <div class="kaart blok ds-presentatie-toestand" id="kinderenBlok" hidden>
     <h2>Ritme van de kinderen</h2>
     <div class="intro s-3gbcve">Zet samen het ochtendlijstje van je kind klaar. Zij vinken zelf af op hun eigen scherm.</div>
     <div id="kinderen"></div>
@@ -170,7 +171,7 @@ async function laad(){
     ).join('') || '<div class="leeg">Nog niemand met een ochtendritme.</div>';
     // kinderen (ouder/beheerder)
     if (d.magKinderen && d.kinderen.length){
-      $('#kinderenBlok').style.display = '';
+      $('#kinderenBlok').hidden = false;
       $('#kinderen').innerHTML = d.kinderen.map(k =>
         '<div class="kindkaart" data-pid="'+k.pid+'"><h3>'+esc(k.naam)+'</h3>'
         + (k.stappen.map(x=>'<div class="kindstap"><span class="t">'+esc(x.tekst)+'</span><button class="ikoon" data-kdel="'+x.id+'" title="Weg">×</button></div>').join('') || '<div class="leeg s-ohzj7x">Nog geen stappen.</div>')
@@ -185,7 +186,7 @@ async function laad(){
         kaart.querySelector('.kadd').onclick = voegToe;
         inp.addEventListener('keydown', e=>{ if(e.key==='Enter') voegToe(); });
       });
-    } else { $('#kinderenBlok').style.display = 'none'; }
+    } else { $('#kinderenBlok').hidden = true; }
   }catch(e){ $('#mijnStappen').innerHTML = '<div class="leeg">Kon het ochtendritme niet laden.</div>'; }
 }
 

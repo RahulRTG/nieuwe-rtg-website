@@ -1,8 +1,10 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop } = require('./helper');
+const fs = require('node:fs'), os = require('node:os'), path = require('node:path');
+const { startServer, stopHard, maakBetaaldRtgTestaccount } = require('./helper');
 
 let server, base, token;
+const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-experience-platform-'));
 const post = async (pad, body, authToken) => {
   const r = await fetch(base + pad, { method: 'POST', headers: {
     'Content-Type': 'application/json', ...(authToken ? { Authorization: 'Bearer ' + authToken } : {})
@@ -11,14 +13,18 @@ const post = async (pad, body, authToken) => {
 };
 
 test.before(async () => {
-  server = await startServer({ env: { SMTP_URL: '' } });
+  server = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   base = server.base;
   const r = await post('/api/auth/register', { name: 'Experience Lid', email: 'experience@rtg.test',
     phone: '0612345678', password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg' });
   token = r.body.token;
   assert.ok(token, 'registratie leverde geen token');
+  maakBetaaldRtgTestaccount(TMP, 'experience@rtg.test');
 });
-test.after(() => stop(server && server.child));
+test.after(async () => {
+  await stopHard(server && server.child);
+  fs.rmSync(TMP, { recursive: true, force: true });
+});
 
 test('de vier echte serversprojecties delen één contract zonder domeinwaarheid te kopiëren', async () => {
   let workContext;

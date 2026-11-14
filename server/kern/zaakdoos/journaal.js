@@ -28,9 +28,13 @@
 'use strict';
 const crypto = require('crypto');
 const { isInlogPad } = require('../../middleware/remmen');
+const { isReisketenPad } = require('../../lib/idemsleutels-reisketen');
 
 function journaalPadOk(pad) {
   if (typeof pad !== 'string' || !pad.startsWith('/api/supplier/')) return false;
+  // Persoonlijke reisbesluiten en hun vrije tekst zijn geen doosopdrachten.
+  // Ook reeds gezegelde oude regels vallen bij journaalGeldig alsnog af.
+  if (isReisketenPad(pad)) return false;
   if (isInlogPad(pad) || pad.startsWith('/api/supplier/stream')) return false;
   if (pad.includes('..') || /[\s?#]/.test(pad)) return false;
   return true;

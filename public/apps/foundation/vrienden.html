@@ -141,9 +141,13 @@
 <link rel="stylesheet" href="premium.css">
 <link href="/shared/rtg-worlds-2026.css" rel="stylesheet">
 <link href="/ds/tokens.css" rel="stylesheet">
+<link href="/ds/componenten/dyncode.css" rel="stylesheet">
 <link href="/ds/componenten/samen.css" rel="stylesheet">
+<link href="/ds/componenten/presentatierol.css" rel="stylesheet">
 <link href="/ds/componenten/cookie.css" rel="stylesheet">
 <link href="/ds/componenten/handenvrij.css" rel="stylesheet">
+<link href="/ds/componenten/schermrust.css" rel="stylesheet">
+<link href="/ds/componenten/meelezen.css" rel="stylesheet">
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
 <script src="/shared/rtg-heritage-transition.js" blocking="render"></script>
@@ -233,7 +237,7 @@
   <!-- beschermd profiel (15 of jonger): zoeken staat dicht, de ouder voegt toe -->
   <div id="beschermdBlok" hidden>
     <div class="sec">Vrienden</div>
-    <div class="kaart" style="padding:.9rem 1.1rem;line-height:1.5;font-size:.9rem;">
+    <div class="kaart ds-presentatie-beschermd-uitleg">
       Je ouder of verzorger voegt vrienden voor je toe. Je kunt hier gewoon chatten,
       bellen en snappen met je gezin en met de vrienden die zij hebben toegevoegd.
     </div>
@@ -276,13 +280,13 @@
 <!-- snap kijker -->
 <div class="ov" id="snapOv"><div class="i-l3zldl ovkaart">
   <div class="i-1tafc2 ovkop"><b id="snapVan"></b><button class="ovx" id="snapX">✕</button></div>
-  <div class="i-16w2mv"><img class="snapfull" id="snapImg" alt="" data-rtg-protect data-watermark="RTG Salon"><div id="snapTxt" class="i-1ln2u1"></div><div style="color:#888;font-size:.75rem;margin-top:0.5rem;">Deze snap verdwijnt zodra je sluit.</div></div>
+  <div class="i-16w2mv"><img class="snapfull" id="snapImg" alt="" data-rtg-protect data-watermark="RTG Salon"><div id="snapTxt" class="i-1ln2u1"></div><div class="ds-presentatie-snap-noot">Deze snap verdwijnt zodra je sluit.</div></div>
 </div></div>
 
 <!-- verhaal kijker -->
 <div class="ov" id="storyOv"><div class="i-l3zldl ovkaart">
   <div class="i-1tafc2 ovkop"><b id="storyVan"></b><button class="ovx" id="storyX">✕</button></div>
-  <div class="i-16w2mv"><img class="snapfull" id="storyImg" alt="" data-rtg-protect data-watermark="RTG Salon"><div id="storyTxt" class="i-1ln2u1"></div><div id="storyOpdracht" style="color:var(--goud2);font-size:.8rem;margin-top:0.5rem;"></div></div>
+  <div class="i-16w2mv"><img class="snapfull" id="storyImg" alt="" data-rtg-protect data-watermark="RTG Salon"><div id="storyTxt" class="i-1ln2u1"></div><div id="storyOpdracht" class="ds-presentatie-story-opdracht"></div></div>
 </div></div>
 
 <!-- belscherm -->
@@ -301,28 +305,28 @@
 </div></div>
 
 <!-- inkomende oproep -->
-<div class="ov" id="inkOv"><div class="ovkaart" style="max-width:22rem;text-align:center;padding:1.4rem;">
-  <div class="belav" id="inkAv" style="margin:0 auto 1.25rem;">•</div>
-  <b id="inkNaam"></b><div class="beltijd" id="inkSoort" style="margin:0.25rem 0 1.25rem;"></div>
-  <div style="display:flex;gap:1rem;justify-content:center;">
+<div class="ov" id="inkOv"><div class="ovkaart ds-presentatie-inkomend">
+  <div class="belav ds-presentatie-belavatar" id="inkAv">•</div>
+  <b id="inkNaam"></b><div class="beltijd ds-presentatie-belsoort" id="inkSoort"></div>
+  <div class="ds-presentatie-belacties">
     <button class="knop" id="inkJa">Opnemen</button>
     <button class="knop grijs" id="inkNee">Weiger</button>
   </div>
 </div></div>
 
 <!-- snap-studio: tekenen, stickers en filters voor je snap of verhaal -->
-<div class="ov" id="studioOv" aria-label="Snap-studio"><div class="ovkaart" style="background:#0C0C0B;max-width:30rem;">
+<div class="ov" id="studioOv" aria-label="Snap-studio"><div class="ovkaart ds-presentatie-studio">
   <div class="ovkop"><b id="studioTitel">Snap-studio</b><button class="ovx" id="studioX" aria-label="Sluiten">✕</button></div>
-  <div style="padding:.7rem;overflow-y:auto;">
+  <div class="ds-presentatie-studio-inhoud">
     <canvas class="studio-cv" id="stCv" aria-label="Bewerk je foto"></canvas>
     <div class="strij" id="stFilters" role="group" aria-label="Filters"></div>
-    <div class="strij"><span style="color:var(--zacht);font-size:.8rem;"></span><span id="stKleuren" style="display:flex;gap:.4rem;"></span><span class="h-flex1"></span><button class="stchip" id="stWis" type="button">↶ wis laatste</button></div>
+    <div class="strij"><span class="ds-presentatie-studio-label"></span><span id="stKleuren" class="ds-presentatie-studio-kleuren"></span><span class="h-flex1"></span><button class="stchip" id="stWis" type="button">↶ wis laatste</button></div>
     <div class="strij" id="stEmojis" role="group" aria-label="Stickers"></div>
     <input class="veld h-mt50" id="stTekst" placeholder="Tekst erbij (mag leeg)" maxlength="120">
-    <button class="knop" id="stStuur" type="button" style="width:100%;margin-top:0.5rem;">Versturen</button>
+    <button class="knop ds-presentatie-studio-stuur" id="stStuur" type="button">Versturen</button>
   </div>
 </div></div>
-<input type="file" id="fotoIn" accept="image/*" style="display:none;">
+<input type="file" id="fotoIn" class="h-weg" accept="image/*">
 
 <script src="/apps/util.js"></script>
 <script src="/shared/glyf.js" defer></script>

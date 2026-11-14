@@ -11,7 +11,7 @@
    Draai los: node --test test/gegevenspoort.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop, stopNet } = require('./helper');
+const { startServer, stop, stopNet, maakBetaaldRtgTestaccount } = require('./helper');
 const fs = require('fs'); const os = require('os'); const path = require('path');
 
 async function api(base, pad, body, token) {
@@ -31,6 +31,7 @@ test('Rahul vraagt pas om je gegevens als er een derde partij bij komt', async (
       name: 'Pia Poort', email, password: 'poortgeheim12', geboortedatum: '1991-02-02', tier: 'rtg', pasApp: 'rtg'
     });
     assert.equal(reg.status, 200, 'aanmelden lukt met vier velden');
+    assert.equal(reg.body.state.user.tier, 'guest', 'registratie is gratis');
     const token = reg.body.token;
 
     // 1) rondkijken hoeft niets: pas bij een handeling met een derde partij
@@ -50,6 +51,9 @@ test('Rahul vraagt pas om je gegevens als er een derde partij bij komt', async (
       'en al helemaal geen paspoort');
 
     // 2) bestellen zonder nummer: geen weigering, maar netjes wat er mist
+    // Deze ledenroute vraagt een betaalpas, maar de fixture voegt bewust
+    // geen telefoon, adres of identiteitsbewijs toe.
+    maakBetaaldRtgTestaccount(TMP, email);
     const order1 = await api(base, '/api/order', { supplierCode: 'KIKUNOI', items: [] }, token);
     assert.equal(order1.status, 428, 'de bestelling wacht op wat er nog nodig is');
     assert.ok(Array.isArray(order1.body.ontbreekt) && order1.body.ontbreekt[0].veld === 'telefoon');
@@ -123,6 +127,9 @@ test('Rahul vraagt pas om je gegevens als er een derde partij bij komt', async (
       name: 'Derde Partij', email: 'derde@voorbeeld.test', password: 'derdegeheim12',
       geboortedatum: '1988-04-04', tier: 'rtg', pasApp: 'rtg'
     });
+    assert.equal(vers.status, 200);
+    assert.equal(vers.body.state.user.tier, 'guest');
+    maakBetaaldRtgTestaccount(TMP, 'derde@voorbeeld.test');
     const vt = vers.body.token;
     const paden = [
       ['/api/reserveer', { supplierCode: 'KIKUNOI', personen: 2 }],
@@ -174,6 +181,9 @@ test('ook Rahul komt niet om de gegevenspoort heen', async () => {
       name: 'Ria Rahul', email: 'rahulpoort@voorbeeld.test', password: 'rahulgeheim12',
       geboortedatum: '1987-07-07', tier: 'rtg', pasApp: 'rtg'
     });
+    assert.equal(reg.status, 200);
+    assert.equal(reg.body.state.user.tier, 'guest');
+    maakBetaaldRtgTestaccount(TMP, 'rahulpoort@voorbeeld.test');
     const token = reg.body.token;
     const zaak = (await api(base, '/api/suppliers', {}, token)).body.suppliers.find(s => s.type === 'restaurant');
     assert.ok(zaak, 'er is een restaurant om bij te reserveren');
@@ -211,6 +221,8 @@ test('ook Rahul komt niet om de gegevenspoort heen', async () => {
       name: 'Stop Sara', email: 'stop@voorbeeld.test', password: 'stopgeheim12',
       geboortedatum: '1993-03-03', tier: 'rtg', pasApp: 'rtg'
     });
+    assert.equal(twee.status, 200);
+    maakBetaaldRtgTestaccount(TMP, 'stop@voorbeeld.test');
     const t2 = twee.body.token;
     await api(base, '/api/fluister', { q: vraag }, t2);
     const gestopt = await api(base, '/api/fluister', { q: 'laat maar' }, t2);
@@ -242,6 +254,9 @@ test('wat je Rahul vertelt komt niet in zijn gespreksgeheugen terecht', async ()
       name: 'Stil Lid', email: 'stil@voorbeeld.test', password: 'stilgeheim12',
       geboortedatum: '1989-09-09', tier: 'rtg', pasApp: 'rtg'
     });
+    assert.equal(reg.status, 200);
+    assert.equal(reg.body.state.user.tier, 'guest');
+    maakBetaaldRtgTestaccount(TMP, 'stil@voorbeeld.test');
     const token = reg.body.token;
     const zaak = (await api(base, '/api/suppliers', {}, token)).body.suppliers.find(s => s.type === 'restaurant');
     assert.ok(zaak, 'er is een restaurant om bij te reserveren');

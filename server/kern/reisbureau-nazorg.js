@@ -38,6 +38,7 @@
    wereldpatroon (REIZEN.md par. 6) op het enige object dat hier van stand
    verandert. */
 'use strict';
+const { lidPrijsbeeld } = require('./reisbureau-prijsgrond');
 
 // de standen waarin nog iets van het kantoor wordt verwacht
 const OPEN_STANDEN = ['aangevraagd', 'wijziging-gevraagd'];
@@ -65,8 +66,10 @@ module.exports = ({ rij, save, nu, dossier, visum, meldLid, terugboeken }) => {
   }
 
   function pak(ref, standen, watMag) {
-    const a = rij().find(x => x.ref === String(ref || '').trim());
+    const a = rij().find(x => !x.keten && x.ref === String(ref || '').trim());
     if (!a) return { status: 404, error: 'Reisaanvraag niet gevonden.' };
+    if (a.inning && a.inning.stand === 'bezig')
+      return { status: 409, error: 'De betaaluitkomst wordt nog vastgesteld. Herstel eerst dezelfde betaling voordat u deze reis wijzigt of afzegt.' };
     if (!standen.includes(a.status))
       return { status: 409, error: 'Deze reis is ' + a.status + '; ' + watMag };
     return { aanvraag: a };
@@ -96,7 +99,7 @@ module.exports = ({ rij, save, nu, dossier, visum, meldLid, terugboeken }) => {
      weet hij het al en komt de afzegging op de balie te liggen. Beide kanten
      eisen een reden: een lid dat "afgezegd" leest zonder te weten waarom belt,
      en een medewerker die een lege afzegging ziet ook. */
-  async function zegAf({ ref, doorLid, key, door, reden }) {
+  function zegAf({ ref, doorLid, key, door, reden }) {
     const tekst = schoon(reden, 300);
     if (!tekst) return { status: 400, error: 'Afzeggen kan alleen met een reden.' };
     const wie = doorLid ? 'lid' : schoon(door, 60);
@@ -125,10 +128,11 @@ module.exports = ({ rij, save, nu, dossier, visum, meldLid, terugboeken }) => {
     // een reis die niet doorgaat hoort niet meer in het dossier en niet in de agenda
     if (dossier) dossier.weghalen(a.customerKey, a.ref);
     const vt = visum && visum();
-    if (vt) await vt.bijAnnulering(a.customerKey, a.ref);
-
-    if (!doorLid) meld(a, { title: 'Uw reis gaat niet door', body: reisNaam(a) + ': ' + tekst });
-    return { ok: true, aanvraag: a };
+    const rond = () => {
+      if (!doorLid) meld(a, { title: 'Uw reis gaat niet door', body: reisNaam(a) + ': ' + tekst });
+      return { ok: true, aanvraag: doorLid ? lidPrijsbeeld(a) : a };
+    };
+    return vt ? Promise.resolve(vt.bijAnnulering(a.customerKey, a.ref)).then(rond) : rond();
   }
 
   /* ---- het bericht aan het lid ---- */
@@ -147,25 +151,7 @@ module.exports = ({ rij, save, nu, dossier, visum, meldLid, terugboeken }) => {
     catch (e) { console.error('[reisbureau-nazorg] melding niet bezorgd'); return null; }
   }
 
-  /* ---- wat het lid van de nazorg ziet ----
-
-     Dezelfde regel als bij het besluit in ./reisbureau-besluit.js: het lid ziet
-     WAT er is gebeurd en WANNEER, niet WIE er in het kantoor op de knop drukte.
-     Die naam is een interne sleutel ('user-3', of "backoffice (gedeelde code)")
-     en hoort in het kantoor te blijven. Zijn eigen handelingen ziet hij wel als
-     de zijne. */
-  function lidBeeld(a) {
-    if (!a.geschiedenis) return a;
-    return Object.assign({}, a, {
-      geschiedenis: a.geschiedenis.map(r => {
-        const uit = { wat: r.wat, at: r.at, door: r.door === 'lid' ? 'u' : 'het reisbureau' };
-        for (const veld of ['reden', 'bericht', 'toelichting', 'gevraagd', 'was', 'werd']) {
-          if (r[veld] != null) uit[veld] = r[veld];
-        }
-        return uit;
-      })
-    });
-  }
+  const lidBeeld = require('./reisbureau-nazorgbeeld');
 
   const { vraagWijziging, besluitWijziging } =
     require('./reisbureau-wijziging')({ pak, spoor, herbereken, meld, reisNaam, schoon, nu, save });

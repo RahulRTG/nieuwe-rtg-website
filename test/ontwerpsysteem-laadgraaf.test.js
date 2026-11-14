@@ -550,13 +550,14 @@ test('werkelijke Ondertitelband-owner gebruikt de centrale DS-component',()=>{
  const bron=lees('public/shared/ondertitelband.js');
  const a=os.scriptLaadAnalyse(bron,{ds:false});
  assert.deepEqual(a.onzeker,[]);assert.equal(a.injecties+a.mogelijkeInjecties,0);
- assert.ok(a.verwijzingen.some(v=>v.href==='/ds/rtg-ds.css'&&v.soort==='dom'));
+ assert.equal(a.verwijzingen.length,0);
  assert.doesNotMatch(bron,/createElement\(['"]style['"]\)|\.textContent\s*=\s*STIJL|ondertitelband\.css/);
  assert.match(lees('public/ds/rtg-ds.css'),/componenten\/ondertitelband\.css/);
  for(const app of ['clips','media','salon','theater','wereld']){
   const html=lees('public/apps/'+app+'.html');
   assert.equal((html.match(/\/shared\/ondertitelband\.css/g)||[]).length,0,app);
   assert.equal((html.match(/\/shared\/ondertitelband\.js/g)||[]).length,1,app);
+  assert.equal((html.match(/\/ds\/componenten\/ondertitelband\.css/g)||[]).length,1,app);
  }
 });
 
@@ -966,14 +967,14 @@ test('werkelijke FocusUI-owner gebruikt de centrale DS-component',()=>{
  const bron=fs.readFileSync(path.join(__dirname,'../public/shared/focus.js'),'utf8');
  const analyse=os.scriptLaadAnalyse(bron,{ds:true});
  assert.equal(analyse.injecties+analyse.mogelijkeInjecties,0);assert.deepEqual(analyse.onzeker,[]);
- assert.doesNotMatch(bron,/createElement\(['"]style['"]\)|fxStijl/);
- assert.match(bron,/focusStijlLink\.href = '\/ds\/rtg-ds\.css'/);
+ assert.doesNotMatch(bron,/createElement\(['"](?:style|link)['"]\)|fxStijl|rtgDsRuntimeCss/);
  const ds=fs.readFileSync(path.join(__dirname,'../public/ds/rtg-ds.css'),'utf8');
  assert.match(ds,/componenten\/focus\.css/);
  for(const app of ['app','backoffice','leverancier','personeel']){
   const html=fs.readFileSync(path.join(__dirname,'../public/apps/'+app+'.html'),'utf8');
   assert.equal((html.match(/\/shared\/focus\.css/g)||[]).length,0,app);
   assert.equal((html.match(/\/shared\/focus\.js/g)||[]).length,1,app);
+  assert.equal((html.match(/\/ds\/componenten\/focus\.css/g)||[]).length,1,app);
  }
 });
 

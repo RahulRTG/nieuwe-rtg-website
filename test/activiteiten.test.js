@@ -10,10 +10,11 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const { startServer } = require('./helper');
+const tijdzone = require('../server/kern/tijdzone');
 
 let BASE;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-act-'));
-const VANDAAG = new Date().toISOString().slice(0, 10);
+const VANDAAG = tijdzone.datumIn();
 let child, lidToken, deurToken, managerToken;
 
 async function api(pad, body, token) {

@@ -8,7 +8,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer } = require('./helper');
+const { startServer, maakBetaaldRtgTestaccount } = require('./helper');
 const I = require('../server/kern/muziek-instrumenten');
 
 let BASE, child, maker, ander, trackId;
@@ -24,8 +24,12 @@ const t0 = Date.now();
 let seq = 0;
 async function lid(naam) {
   const u = String(t0 + (++seq)).slice(-8);
-  return (await api('/api/auth/register', { name: naam, email: 'mz' + u + '@m.test', phone: '06' + u,
-    password: 'geheim123', geboortedatum: '1991-01-01', tier: 'rtg' })).body.token;
+  const email = 'mz' + u + '@m.test';
+  const reg = await api('/api/auth/register', { name: naam, email, phone: '06' + u,
+    password: 'geheim123', geboortedatum: '1991-01-01' });
+  assert.equal(reg.status, 200);
+  maakBetaaldRtgTestaccount(TMP, email); // Beide makers hebben toegang; eigendom van het stuk blijft de grens.
+  return reg.body.token;
 }
 
 test.before(async () => {

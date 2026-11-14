@@ -10,7 +10,7 @@ module.exports = (kern) => {
     paspoortStatus, paspoortMijn, paspoortBeslis, paspoortTrekIn,
     reisbureau, logies, uitgaan, gegevensStop } = kern;
 
-// de koop- en bibliotheek-ingangen van de Mall staan apart (winkel klein houden)
+// koop- en bibliotheekingangen van de Mall staan apart
 require('./winkel-bieb')(kern);
 // de vindlaag van de Mall: zoeken, plekken, lijsten en de vraagkant
 require('./mall-vindlaag')(kern);
@@ -61,8 +61,9 @@ app.post('/api/reisbureau/mijn', auth, (req, res) => {
    en is een gok. */
 app.post('/api/reisbureau/betaal', auth, async (req, res) => {
   if (req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor leden.' });
-  const r = await kern.reisbetaling.betaal(req.session, liveCodename(req.session), String(req.body.ref || ''));
-  if (r.error) return res.status(r.status || 400).json({ error: r.error, hoe: r.hoe || undefined });
+  const r = await kern.reisbetaling.betaal(req.session, liveCodename(req.session), String(req.body.ref || ''),
+    () => kern.onboarding && kern.onboarding.payGate && kern.onboarding.payGate(req.session));
+  if (r.error) return res.status(r.status || 400).json({ error: r.error, hoe: r.hoe || undefined, kyc: r.kyc || undefined });
   res.json(r);
 });
 // een eigen reisaanvraag intrekken zolang die openstaat
@@ -78,8 +79,8 @@ app.post('/api/reisbureau/annuleer', auth, async (req, res) => {
    geen mutatie: het lid mag een toezegging niet zelf omschrijven, dus een mens
    van het kantoor beslist erover (routes/kantoren/reisbureau.js). */
 // een wijziging vragen op een bevestigde reis (datum, personen of een toelichting)
-app.post('/api/reisbureau/wijzig', auth, (req, res) => {
-  const r = reisbureau.vraagWijziging(req.session.key, String((req.body || {}).ref || ''), req.body || {});
+app.post('/api/reisbureau/wijzig', auth, async (req, res) => {
+  const r = await reisbureau.vraagWijziging(req.session.key, String((req.body || {}).ref || ''), req.body || {});
   if (r.error) return res.status(r.status || 400).json({ error: r.error });
   res.json(r);
 });
@@ -92,8 +93,8 @@ app.post('/api/reisbureau/afzeggen', auth, async (req, res) => {
   res.json(r);
 });
 // de reis is voorbij en je bent terug (kern/reisbureau-thuis.js) -- alleen je eigen reis
-app.post('/api/reisbureau/thuis', auth, (req, res) => {
-  const r = reisbureau.markeerThuis({ ref: String((req.body || {}).ref || ''), doorLid: true, key: req.session.key });
+app.post('/api/reisbureau/thuis', auth, async (req, res) => {
+  const r = await reisbureau.markeerThuis({ ref: String((req.body || {}).ref || ''), doorLid: true, key: req.session.key });
   if (r.error) return res.status(r.status || 400).json({ error: r.error });
   res.json(r);
 });

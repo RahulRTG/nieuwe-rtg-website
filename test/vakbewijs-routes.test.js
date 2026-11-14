@@ -28,7 +28,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, kantoorAlsPersoon } = require('./helper');
+const { startServer, stopHard, kantoorAlsPersoon } = require('./helper');
 
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-vakb-'));
 let child, BASE, mgr, office, gedeeldeCode, lid, staffId, bedrijf;
@@ -65,9 +65,12 @@ test.before(async () => {
   gedeeldeCode = (await api('/api/office/login', { code: 'RTG-OFFICE' })).body.token;
   assert.ok(gedeeldeCode, 'de gedeelde code komt gewoon binnen; hij mag alleen minder');
 
-  // een echt RTG-lid dat hier komt werken
-  lid = (await api('/api/auth/register', { name: 'Sanne Bergman', email: 'sanne@x.nl', phone: '0612345699',
-    password: 'geheim123', geboortedatum: '1994-06-06', tier: 'rtg', pasApp: 'rtg' })).body.token;
+  // Een gratis account dat hier komt werken; de werknemer hoeft geen pas te kopen.
+  const reg = await api('/api/auth/register', { name: 'Sanne Bergman', email: 'sanne@x.nl', phone: '0612345699',
+    password: 'geheim123', geboortedatum: '1994-06-06', tier: 'rtg', pasApp: 'rtg' });
+  assert.equal(reg.status, 200, JSON.stringify(reg.body));
+  assert.equal(reg.body.state.user.tier, 'guest');
+  lid = reg.body.token;
   assert.ok(lid, 'het lid heeft een eigen RTG-account');
 
   const inv = await api('/api/supplier/staff/invite', { name: 'Sanne Bergman', role: 'staff', func: 'Pedagogisch medewerker' }, mgr);
@@ -76,9 +79,9 @@ test.before(async () => {
   assert.equal(join.status, 200, 'de uitnodiging is ingewisseld');
   staffId = join.body.staffId;
 });
-test.after(() => {
-  if (child) try { child.kill('SIGKILL'); } catch (e) {}
-  try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
+test.after(async () => {
+  await stopHard(child);
+  fs.rmSync(TMP, { recursive: true, force: true });
 });
 
 const inloggen = () => api('/api/supplier/login', { code: 'NIDO', staffId, pin: PIN });
@@ -259,6 +262,36 @@ test('9. het nummer gaat alleen open met een reden, en dat staat in het journaal
   assert.match(String(b.belofte), new RegExp(String(b.dagen) + ' dagen'),
     'de belofte noemt de termijn die zij waarmaakt');
   assert.equal(b.volledig, true, 'de noodrem heeft niet gebeten');
+});
+
+test('eigen vakbewijs blijft accountgebonden, ook met een vreemde sleutel in de body', async () => {
+  for (const route of ['/api/vakbewijs', '/api/vakbewijs/zet']) {
+    assert.equal((await api(route, {})).status, 401);
+    for (const tier of ['guest', 'rtg']) {
+      const demo = await api('/api/login', { tier });
+      assert.ok(demo.body.token);
+      assert.equal((await api(route, {}, demo.body.token)).status, 403);
+    }
+  }
+  const mijn = await api('/api/vakbewijs', {}, lid);
+  assert.equal(mijn.status, 200);
+  const vog = mijn.body.vakbewijzen.find(v => v.wat === 'vog');
+  assert.ok(vog && vog.nummer, 'de vreemde kaart bevat daadwerkelijk een documentnummer');
+  const ander = await api('/api/auth/register', { name: 'Andere Medewerker', email: 'vakbewijs-ander@x.nl',
+    phone: '0612345698', password: 'geheim123', geboortedatum: '1990-01-01' });
+  assert.equal(ander.status, 200, JSON.stringify(ander.body));
+  assert.equal(ander.body.state.user.tier, 'guest');
+  const vals = { sleutel: vog.sleutel, key: vog.sleutel, account: vog.sleutel };
+  const leeg = await api('/api/vakbewijs', vals, ander.body.token);
+  assert.equal(leeg.status, 200);
+  assert.deepEqual(leeg.body.vakbewijzen, [], 'vreemde documentgegevens worden niet gelezen');
+  assert.deepEqual(leeg.body.eisen, [], 'een ander erft geen werkgeversrelatie');
+  const eigen = await api('/api/vakbewijs/zet', { ...vals, wat: 'vog', nummer: 'ALLEEN-VAN-ANDER', tot: '2030-01-01' }, ander.body.token);
+  assert.equal(eigen.status, 200, JSON.stringify(eigen.body));
+  assert.notEqual(eigen.body.vakbewijs.sleutel, vog.sleutel, 'de server schrijft uitsluitend op de eigen accountsleutel');
+  assert.equal(eigen.body.vakbewijs.gezien, false, 'zelf opschrijven verleent geen aftekening');
+  const ongewijzigd = await api('/api/vakbewijs', {}, lid);
+  assert.deepEqual(ongewijzigd.body.vakbewijzen, mijn.body.vakbewijzen, 'het bestaande document is niet overschreven');
 });
 
 /* ============================================================================

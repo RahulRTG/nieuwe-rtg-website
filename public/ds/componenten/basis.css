@@ -55,6 +55,17 @@
 /* Bewuste gebruikersvoorkeuren winnen binnen het bestaande lagencontract.
    Contrast en rustige accenttokens bestaan al in tokens.css. */
 @layer rtg.scherm {
+  /* De premium-doelmaat geldt voor iedere werkelijke bediening, ook wanneer
+     een nog niet geconsolideerde appklasse binnen een DS-scherm staat. Dit
+     hoort in de bestaande hoogste DS-laag: veldcomponenten mogen de vorm
+     bepalen, maar een focusbaar element nooit kleiner maken dan het centrale
+     bedieningscontract. Inline tekstlinks houden hun regelmaat omdat minimum-
+     maten niet op een gewone inline box werken. */
+  .ds-scherm :where(a[href], button, input:not([type="hidden"]), select, textarea, [role="button"], [tabindex]:not([tabindex="-1"])) {
+    min-inline-size: var(--ds-doel);
+    min-block-size: var(--ds-doel);
+    box-sizing: border-box;
+  }
   .ds-basis.rtg-tekst-groot { font-size: 118%; }
   .ds-basis.rtg-tekst-groter { font-size: 135%; }
   .ds-basis.rtg-stil *, .ds-basis.rtg-stil *::before, .ds-basis.rtg-stil *::after {

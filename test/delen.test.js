@@ -679,10 +679,15 @@ test('de vijf schermdelen draaien, worden samengevoegd en reizen mee in het bewi
   const wortel = path.join(__dirname, '..');
   const yml = fs.readFileSync(path.join(wortel, '.github', 'workflows', 'ci.yml'), 'utf8');
   const verzamelaar = fs.readFileSync(path.join(wortel, 'scripts', 'outputcollect.js'), 'utf8');
+  const planner = fs.readFileSync(path.join(wortel, 'scripts', 'outputproof.js'), 'utf8');
+  const { requiredJournals } = require('../scripts/lib/outputartifact');
   assert.match(yml, /name: Schermtoetsen deel \$\{\{ matrix\.deel \}\} van 5/);
   assert.match(yml, /deel: \[1, 2, 3, 4, 5\]/);
   assert.match(yml, /npm run e2e -- --deel=\$\{\{ matrix\.deel \}\}\/5/);
   assert.match(yml, /for deel in 1 2 3 4 5; do/);
-  assert.match(verzamelaar, /\[1, 2, 3, 4, 5\]\.map\(n => \(\{ artifact: 'schermjournaal-deel-'/);
-  assert.match(verzamelaar, /job: 'Schermtoetsen deel ' \+ n \+ ' van 5'/);
+  assert.match(verzamelaar, /requiredJournals: required/);
+  assert.match(planner, /verifyJournalSources\(provenance\.sources\)/);
+  assert.deepEqual(requiredJournals.filter(r => r.artifact.startsWith('schermjournaal-deel-'))
+    .map(r => [r.artifact, r.job]), [1, 2, 3, 4, 5].map(n =>
+      ['schermjournaal-deel-' + n, 'Schermtoetsen deel ' + n + ' van 5']));
 });

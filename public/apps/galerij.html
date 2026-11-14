@@ -88,6 +88,7 @@
 <link href="/ds/componenten/cookie.css" rel="stylesheet">
 <link href="/ds/componenten/samen.css" rel="stylesheet">
 <link href="/ds/componenten/handenvrij.css" rel="stylesheet">
+<link href="/ds/componenten/presentatierol.css" rel="stylesheet">
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
 <script src="/shared/rtg-heritage-transition.js" blocking="render"></script>
@@ -108,12 +109,12 @@
 <div class="rtg-duimbalk"><button class="knop vol" id="nieuwAlbum" data-rtg-edge-bar type="button" data-hoofdactie>+ Album</button></div>
 <input type="file" id="eersteFoto" accept="image/*" hidden aria-label="Kies een foto voor uw galerij">
 <main>
-  <div id="terugblikWrap" style="display:none;">
+  <div id="terugblikWrap" class="ds-presentatie-toestand" hidden>
     <div class="kop">Dezelfde maand, eerdere jaren</div>
     <div id="terugblik"></div>
   </div>
-  <div id="albumPad" class="kop" style="display:none;"></div>
-  <div id="albums" style="display:none;"></div>
+  <div id="albumPad" class="kop ds-presentatie-toestand" hidden></div>
+  <div id="albums" class="ds-presentatie-toestand" hidden></div>
   <div id="tijdlijn" aria-live="polite"></div>
   <p class="stil h-mt90 gallery-explanation">De galerij leest je eigen Salon-posts en de beelden in RTG Bestanden;
     er wordt niets dubbel opgeslagen. Geen gezichtsherkenning, geen slimme sortering: de tijdlijn is de kalender.</p>

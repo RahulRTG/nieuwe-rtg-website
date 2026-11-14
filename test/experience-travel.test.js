@@ -2,14 +2,20 @@
    Een ledenlogin geeft nooit de bevoegdheid van een reisadviseur mee. */
 'use strict';
 const test=require('node:test'),assert=require('node:assert/strict'),h=require('./helper');
+const fs=require('node:fs'),os=require('node:os'),path=require('node:path');
+const TMP=fs.mkdtempSync(path.join(os.tmpdir(),'rtg-experience-travel-'));
 let srv,member,other,office;
 const day=n=>new Date(Date.now()+n*86400000).toISOString().slice(0,10);
 async function api(route,body={},token=member){const r=await fetch(srv.base+route,{method:'POST',headers:{'content-type':'application/json',...(token?{Authorization:'Bearer '+token}:{})},body:JSON.stringify(body)});return {status:r.status,body:await r.json()};}
-async function register(suffix){const r=await api('/api/auth/register',{name:'Reisproef '+suffix,email:'travel-proof-'+suffix+'-'+Date.now()+'@example.test',phone:'0612345678',password:'geheim12345',geboortedatum:'1980-01-01',tier:'rtg',pasApp:'rtg'},null);assert.equal(r.status,200);return r.body.token;}
+async function register(suffix){
+ const email='travel-proof-'+suffix+'-'+Date.now()+'@example.test';
+ const r=await api('/api/auth/register',{name:'Reisproef '+suffix,email,phone:'0612345678',password:'geheim12345',geboortedatum:'1980-01-01'},null);
+ assert.equal(r.status,200);h.maakBetaaldRtgTestaccount(TMP,email);return r.body.token;
+}
 async function request(n){const r=await api('/api/reisbureau/boek',{tripId:'ibiza-jetset',personen:3,vertrek:day(n)});assert.equal(r.status,200,JSON.stringify(r.body));return r.body.aanvraag;}
 async function agenda(token=member){const r=await api('/api/agenda/mijn',{},token);assert.equal(r.status,200);return r.body.dagen.flatMap(d=>d.items);}
-test.before(async()=>{srv=await h.startServer({env:{SMTP_URL:'',RTG_AI_UIT:'1'}});member=await register('one');other=await register('two');office=await h.kantoorAlsPersoon(srv.base);assert.ok(office);});
-test.after(async()=>{if(srv)await h.stop(srv.child);});
+test.before(async()=>{srv=await h.startServer({env:{SMTP_URL:'',RTG_AI_UIT:'1',RTG_DATA_DIR:TMP}});member=await register('one');other=await register('two');office=await h.kantoorAlsPersoon(srv.base);assert.ok(office);});
+test.after(async()=>{if(srv)await h.stopHard(srv.child);fs.rmSync(TMP,{recursive:true,force:true});});
 test('Travel-aanvraag, besluit in Work en actuele reisagenda: identiteit en status blijven gescheiden',async()=>{
  const a=await request(30);assert.equal(a.status,'aangevraagd');
  assert.equal((await agenda()).find(i=>i.ref===a.ref).status,'aangevraagd');

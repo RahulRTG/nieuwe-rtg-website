@@ -206,6 +206,7 @@ async function startEchteServer() {
     }
   }
   console.log('[a11y] browser:', waarmee);
+  const browserVersie = browser.version();
 
   /* Een echt proeflid, zodat de tweede ronde een ECHTE sessie heeft en niet een
      verzonnen token dat de server toch weigert. */
@@ -347,6 +348,16 @@ async function startEchteServer() {
 
   let totaal = 0, contrastTotaal = 0;
   const perRonde = [];
+  /* Het totaaloordeel alleen kan niet aantonen WELK scherm werkelijk is
+     bekeken. Bewaar daarom dezelfde waarneming ook per route. Dit is geen
+     tweede scanner en geen extra oordeel: de bestaande rondes blijven eigenaar
+     van de meting; deze projectie maakt hun bereik controleerbaar voor
+     EXPERIENCEWERKT en voorkomt dat een groen totaal als 316 schermbewijzen
+     wordt uitgelegd. */
+  const routes = Object.fromEntries(PAGINAS.map(route => [route, {
+    states: {}, mobile: {}, touchTargets: {}, tablet: null, themes: {}
+  }]));
+  const aantal = lijst => (lijst || []).reduce((n, item) => n + Number(item.aantal || 0), 0);
   /* De dekking van deze poort, opgeteld over alles wat hij bekijkt. Zie de kop
      bij `dekking` in a11ykeuring.js: dit getal stond met de hand geteld in twee
      documenten en was mis. */
@@ -361,7 +372,7 @@ async function startEchteServer() {
     { naam: 'ingelogd', sleutels: { rtg_member_token: lid.token } },
     { naam: 'zaak', sleutels: { rtg_sup_token: zaak.token } }
   ]) {
-    const context = await browser.newContext({ serviceWorkers: 'block' });
+    const context = await browser.newContext({ viewport:{width:1440,height:900}, locale:'nl-NL', serviceWorkers: 'block' });
     if (ronde.sleutels) {
       await context.addInitScript((s) => {
         try {
@@ -378,6 +389,7 @@ async function startEchteServer() {
       const misging = await ga(page, basis + pad);
       if (misging) {
         console.error(`[a11y] ${pad} (${ronde.naam}): niet te openen -- ${misging}`);
+        routes[pad].states[ronde.naam] = { measured: false, error: misging };
         struct += 1; continue;
       }
       await page.waitForTimeout(600); // laat intro-animaties (opacity) uitlopen
@@ -385,8 +397,12 @@ async function startEchteServer() {
       try { res = await hermeet(page, KEUR, (r) => r.overtredingen.length || r.contrast.length); }
       catch (e) {
         console.error(`[a11y] ${pad} (${ronde.naam}): de keuring kon niet draaien -- ${e.message.split('\n')[0]}`);
+        routes[pad].states[ronde.naam] = { measured: false, error: e.message.split('\n')[0] };
         struct += 1; continue;
       }
+      routes[pad].states[ronde.naam] = {
+        measured: true, structural: aantal(res.overtredingen), contrast: aantal(res.contrast)
+      };
       telDekking(res.dekking);
       if (res.overtredingen.length) {
         struct += res.overtredingen.reduce((n, v) => n + v.aantal, 0);
@@ -428,6 +444,7 @@ async function startEchteServer() {
      opmerking bij die tweede meting hieronder voor waarom het GEEN wachten op
      alle animaties is geworden. */
   const RAAK = '(function(){' + raakvlak.BRON + '\nreturn window.__a11yRaakvlak(' + raakvlak.GRENS + ')})()';
+  const PREMIUM_RAAK = '(function(){' + raakvlak.BRON + '\nreturn window.__a11yRaakvlak(44)})()';
   const MOB = (hand) => '(function(){' + mobiel.BRON + '\nreturn window.__mobielKeur(' + JSON.stringify({
     hand, maat: mobiel.MAAT, onder: mobiel.ONDER, smal: mobiel.SMAL, kwart: mobiel.ANKERKWART
   }) + ')})()';
@@ -443,7 +460,7 @@ async function startEchteServer() {
      twee keer meten zou hem dubbel tellen. */
   const mobiu = { breed: [], leeg: [], balk: [], duim: [], geenHoofd: [], gemeten: 0 };
   for (const hand of ['rechts', 'links']) {
-  const telefoon = await browser.newContext({ viewport: { width: 390, height: 844 }, serviceWorkers: 'block' });
+  const telefoon = await browser.newContext({ viewport: { width: 390, height: 844 }, locale:'nl-NL', serviceWorkers: 'block' });
   await telefoon.addInitScript((z) => {
     try {
       localStorage.setItem('rtg_member_token', z.token);
@@ -482,7 +499,12 @@ async function startEchteServer() {
        en terugzetten in localStorage blijft bij dit ene scherm. */
     const eigen = EIGEN_SESSIE[pad];
     const telMis = await ga(tel, basis + (EIGEN_PAD[pad] || pad));
-    if (telMis) { console.error(`[a11y] ${pad} (telefoon): niet te openen -- ${telMis}`); continue; }
+    if (telMis) {
+      console.error(`[a11y] ${pad} (telefoon): niet te openen -- ${telMis}`);
+      routes[pad].mobile[hand] = { measured: false, error: telMis };
+      if (hand === 'rechts') routes[pad].touchTargets.mobile = { measured: false, error: telMis };
+      continue;
+    }
     if (eigen) {
       try {
         await tel.evaluate((z) => { try { localStorage.setItem('rtf_sessie', JSON.stringify(z)); } catch (e) {} }, eigen);
@@ -520,6 +542,15 @@ async function startEchteServer() {
         try { m = await tel.evaluate(MOB(hand)); } catch (e) { /* de eerste meting blijft staan */ }
       }
       mobiu.gemeten++;
+      routes[pad].mobile[hand] = {
+        measured: true,
+        viewportWidth: m.venster,
+        overflow: m.venster !== 390 || m.inhoud > m.venster + 2,
+        empty: Boolean(m.leeg),
+        barsOutside: m.balkenBuiten.length,
+        mainActionDeclared: Boolean(m.hoofd),
+        mainActionDefects: m.hoofd ? m.gebreken.length : 0
+      };
       const waar = pad + ' [' + hand + ']';
       if (m.venster !== 390) mobiu.breed.push(waar + ': het venster is ' + m.venster + ' en niet 390 -- deze meting zegt niets');
       else if (m.inhoud > m.venster + 2) mobiu.breed.push(waar + ': ' + m.inhoud + 'px' + (m.dwinger ? ' door ' + m.dwinger : ''));
@@ -531,6 +562,7 @@ async function startEchteServer() {
       else if (m.gebreken.length) mobiu.duim.push(waar + ' \u2014 ' + m.hoofd.naam + ' (' + m.hoofd.merk + '): ' + m.gebreken.join('; '));
     } catch (e) {
       mobiu.breed.push(pad + ' [' + hand + ']: de mobiele meting kon niet draaien -- ' + e.message.split('\n')[0]);
+      routes[pad].mobile[hand] = { measured: false, error: e.message.split('\n')[0] };
     }
     if (eigen) {
       try { await tel.evaluate((z) => { try { localStorage.setItem('rtf_sessie', JSON.stringify(z)); } catch (e) {} }, RTF_SESSIE); } catch (e) {}
@@ -540,14 +572,27 @@ async function startEchteServer() {
     try { res = await hermeet(tel, RAAK, (r) => r.klein.length); }
     catch (e) {
       console.error(`[a11y] ${pad} (raakvlak): de meting kon niet draaien -- ${e.message.split('\n')[0]}`);
+      routes[pad].touchTargets.mobile = { measured: false, error: e.message.split('\n')[0] };
       continue;
     }
-    /* De tweede meting zit in hermeet() hierboven; hier stond een eigen kopie. */
+    /* Een extra premium-meting mag een al gemeten WCAG-fout niet wissen.
+       Tel de bestaande ondergrens voordat de extra meting kan mislukken. */
     if (res.klein.length) {
       raakTotaal += res.klein.length;
       console.log(`\n[a11y] ${pad} (raakvlak): ${res.klein.length} onder ${raakvlak.GRENS}x${raakvlak.GRENS}`);
       for (const w of res.klein.slice(0, 6)) console.log(`  · ${w}`);
     }
+    let premium;
+    try { premium = await hermeet(tel, PREMIUM_RAAK, (r) => r.klein.length); }
+    catch (e) {
+      routes[pad].touchTargets.mobile = {
+        measured: false, belowWcagMinimum: res.klein.length, error: e.message.split('\n')[0]
+      };
+      continue;
+    }
+    routes[pad].touchTargets.mobile = {
+      measured: true, belowWcagMinimum: res.klein.length, belowPremiumMinimum: premium.klein.length
+    };
   }
   await telefoon.close();
   }
@@ -573,7 +618,7 @@ async function startEchteServer() {
      WAT HIER NIET GEMETEN WORDT: leegte en duimbereik. Die twee gaan over een
      hand aan een telefoon (GRAMMATICA.md), en een tablet ligt op tafel. Breedte
      en raakvlak gaan wel over elk toestel dat je aanraakt. */
-  const tabletC = await browser.newContext({ viewport: { width: 834, height: 1112 }, serviceWorkers: 'block' });
+  const tabletC = await browser.newContext({ viewport: { width: 834, height: 1112 }, locale:'nl-NL', serviceWorkers: 'block' });
   await tabletC.addInitScript((z) => {
     try {
       localStorage.setItem('rtg_member_token', z.token);
@@ -587,17 +632,32 @@ async function startEchteServer() {
   const tabu = { breed: [], klein: [], gemeten: 0 };
   for (const pad of PAGINAS) {
     const tabMis = await ga(tab, basis + (EIGEN_PAD[pad] || pad));
-    if (tabMis) { console.error(`[a11y] ${pad} (tablet): niet te openen -- ${tabMis}`); continue; }
+    if (tabMis) {
+      console.error(`[a11y] ${pad} (tablet): niet te openen -- ${tabMis}`);
+      routes[pad].tablet = { measured: false, error: tabMis };
+      routes[pad].touchTargets.tablet = { measured: false, error: tabMis };
+      continue;
+    }
     await tab.waitForTimeout(600);
     try {
       const m = await tab.evaluate(MOB('rechts'));
       tabu.gemeten++;
+      routes[pad].tablet = {
+        measured: true, viewportWidth: m.venster,
+        overflow: m.venster !== 834 || m.inhoud > m.venster + 2
+      };
       if (m.venster === 834 && m.inhoud > m.venster + 2) {
         tabu.breed.push(pad + ': ' + m.inhoud + 'px' + (m.dwinger ? ' door ' + m.dwinger : ''));
       }
-    } catch (e) { /* dit scherm meet niet; de breedte-teller blijft eerlijk */ }
+    } catch (e) {
+      routes[pad].tablet = { measured: false, error: e.message.split('\n')[0] };
+    }
     let res;
-    try { res = await tab.evaluate(RAAK); } catch (e) { continue; }
+    try { res = await tab.evaluate(RAAK); }
+    catch (e) {
+      routes[pad].touchTargets.tablet = { measured: false, error: e.message.split('\n')[0] };
+      continue;
+    }
     if (res.klein.length) {
       /* wie iets vindt, meet nog een keer -- zelfde reden als hierboven */
       try {
@@ -613,6 +673,26 @@ async function startEchteServer() {
         for (const w of res.klein.slice(0, 6)) console.log(`  \u00b7 ${w}`);
       }
     }
+    let premium;
+    try { premium = await tab.evaluate(PREMIUM_RAAK); }
+    catch (e) {
+      routes[pad].touchTargets.tablet = {
+        measured: false, belowWcagMinimum: res.klein.length, error: e.message.split('\n')[0]
+      };
+      continue;
+    }
+    if(premium.klein.length) {
+      try {
+        await tab.waitForFunction(
+          () => !document.getAnimations || document.getAnimations().every(a => a.playState !== 'running'),
+          null,{timeout:1500});
+      } catch(e) {}
+      await tab.waitForTimeout(300);
+      try { premium=await tab.evaluate(PREMIUM_RAAK); } catch(e) {}
+    }
+    routes[pad].touchTargets.tablet = {
+      measured: true, belowWcagMinimum: res.klein.length, belowPremiumMinimum: premium.klein.length
+    };
   }
   await tabletC.close();
   console.log(`[a11y] ronde tablet: ${tabu.gemeten} schermen op 834 \u2014 ` +
@@ -654,7 +734,7 @@ async function startEchteServer() {
   const perThema = [];
   console.log(`\n[a11y] ===== ronde THEMA'S (${THEMAS.length} x ${PAGINAS.length} schermen, ingelogd) =====`);
   for (const thema of THEMAS) {
-    const ctx = await browser.newContext({ serviceWorkers: 'block' });
+    const ctx = await browser.newContext({ viewport:{width:1440,height:900}, locale:'nl-NL', serviceWorkers: 'block' });
     await ctx.addInitScript((o) => {
       try {
         localStorage.setItem('rtg_member_token', o.t);
@@ -668,6 +748,7 @@ async function startEchteServer() {
       const misging = await ga(pg, basis + pad);
       if (misging) {
         console.error(`[a11y] ${pad} (${thema}): niet te openen -- ${misging}`);
+        routes[pad].themes[thema] = { measured: false, error: misging };
         struct += 1; continue;
       }
       await pg.waitForTimeout(600);
@@ -675,8 +756,12 @@ async function startEchteServer() {
       try { res = await hermeet(pg, KEUR, (r) => r.overtredingen.length || r.contrast.length); }
       catch (e) {
         console.error(`[a11y] ${pad} (${thema}): de keuring kon niet draaien -- ${e.message.split('\n')[0]}`);
+        routes[pad].themes[thema] = { measured: false, error: e.message.split('\n')[0] };
         struct += 1; continue;
       }
+      routes[pad].themes[thema] = {
+        measured: true, structural: aantal(res.overtredingen), contrast: aantal(res.contrast)
+      };
       telDekking(res.dekking);
       if (res.overtredingen.length) {
         struct += res.overtredingen.reduce((n, v) => n + v.aantal, 0);
@@ -855,7 +940,8 @@ async function startEchteServer() {
      hieronder blijft staan zoals hij is: hij leest het getal uit het register,
      dus als iemand ooit weer ruimte nodig heeft moet hij dat DAAR opschrijven,
      met een reden, en niet hier in de code wegwerken. */
-  const meting = { perRonde, totaal, raakTotaal, paginas: PAGINAS.length,
+  const meting = { schemaVersion: 2, browser: { name: 'chromium', version: browserVersie },
+    perRonde, totaal, raakTotaal, paginas: PAGINAS.length, routes,
     deel: deel ? deel.nr + '/' + deel.totaal : 'heel' };
 
   /* EEN DEEL OORDEELT NIET. Het schrijft wat het gezien heeft en zwijgt verder;

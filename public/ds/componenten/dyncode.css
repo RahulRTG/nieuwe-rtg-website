@@ -1,0 +1,17 @@
+/* Levende RTG-code: de codec tekent pixels; het Design System bezit de vorm. */
+@layer rtg.component {
+  .ds-dyncode { text-align: center; }
+  .ds-dyncode__ring {
+    display: block;
+    inline-size: min(15rem, 60%);
+    block-size: 4px;
+    margin: var(--ds-ruimte-3) auto 0;
+    border-radius: 0;
+  }
+  .ds-dyncode__beeld {
+    inline-size: min(16rem, 80vw);
+    block-size: auto;
+    image-rendering: pixelated;
+    border-radius: 0;
+  }
+}

@@ -83,7 +83,11 @@ module.exports = (ctx) => {
     f.betaaldAt = f.betaald ? nu() : null;
     f.vervaldatum = new Date(Date.parse(f.at) + f.betaaltermijn * 86400000).toISOString().slice(0, 10);
     s.facturen.unshift(f);
-    s.facturen = s.facturen.slice(0, 100000);
+    /* Een slice van de bewaakte lijst draagt de kinderproxies mee terug in
+       de opslagarray. Onder de grens is die kopie overbodig en maakt zij elke
+       volgende native JSON-save duurder. Boven de grens blijft de bestaande
+       rootvervanging staan, inclusief de begrotingspoort voor grote krimp. */
+    if (s.facturen.length > 100000) s.facturen = s.facturen.slice(0, 100000);
     factuurSave();
     return { uit: { ok: true, factuur: publiek(f) }, seinen: () => seinNaBoeking(f) };
   }

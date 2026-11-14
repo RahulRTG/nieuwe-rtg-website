@@ -27,6 +27,7 @@
    openzet, doet dat op één plek en deze lijst verandert mee. */
 const register = require('../../seed/genres');
 const GENRES = register.aanvraagbareGenres();
+const planZaak = require('./bedrijf-plan');
 
 /* De fabriek, met de genrelijst er los naast: het proefpubliek in
    test/gezelschap.js zet voor elk genre een lid neer en moet die lijst kunnen
@@ -77,14 +78,6 @@ module.exports = Object.assign((ctx) => {
     return { ok: true, bedrijf: true };
   }
 
-  // een leesbare, unieke zaakcode uit de bedrijfsnaam
-  function codeVoor(naam) {
-    let basis = String(naam).toUpperCase().replace(/[^A-Z]/g, '').slice(0, 10) || 'ZAAK';
-    let code = basis, n = 2;
-    while ((db.data.suppliers || []).some(s => s.code === code)) code = basis + n++;
-    return code;
-  }
-
   /* De provisioning zelf: zaak + aan het persoonlijke RTG-account gebonden
      eigenaarsplek + wensen. Idempotent: een tweede aanroep doet niets. */
   /* De bewijspoort voor de gereguleerde genres (./bewijs.js). Hij staat HIER en
@@ -94,6 +87,8 @@ module.exports = Object.assign((ctx) => {
   const bewijs = require('./bewijs')({ save, kap, nu });
 
   function provisioneer(a) {
+    if ((db.data.contracten || []).some(c => c.aanmeldingId === a.id && c.automatischAbonnement))
+      return { status: 409, error: 'Deze zaak wordt alleen via de getekende overeenkomst en geverifieerde betaling geactiveerd.' };
     if (!a.bedrijf || a.gezaakt) return a.gezaakt || null;
     /* GEEN ZAAK VOOR EEN GEREGULEERD BEROEP ZONDER AFGETEKEND STUK. De aanvraag
        mocht binnenkomen -- een plan indienen is geen beroepsuitoefening -- maar
@@ -107,7 +102,7 @@ module.exports = Object.assign((ctx) => {
         uitleg: 'Laat de eigenaar de bedrijfsaanvraag opnieuw indienen terwijl die met het eigen RTG-account is ingelogd.' };
     }
     if (!Array.isArray(db.data.suppliers)) db.data.suppliers = [];
-    const code = codeVoor(a.bedrijf.naam);
+    const plan = planZaak(a, db.data.suppliers, nu()), code = plan.code;
     /* `online: false` IS DE POORT, EN HIJ STOND HIER NIET.
 
        kern/ondernemerpoort.js belooft letterlijk: "Zo staat er nooit een lege of
@@ -125,8 +120,7 @@ module.exports = Object.assign((ctx) => {
 
        Gevonden door scripts/zaakliveproef.js schakel 5, die precies die zin uit
        de kop van ondernemerpoort.js toetst aan de LEDENkant. */
-    db.data.suppliers.push({ code, name: a.bedrijf.naam, type: a.bedrijf.type,
-      city: a.bedrijf.plaats || '', loc: null, rate: 0, menu: [], photos: [], online: false });
+    db.data.suppliers.push(plan.supplier);
     const pin = legacyPin ? accounts.makePin() : null;
     let staffId = null;
     try {
@@ -142,9 +136,9 @@ module.exports = Object.assign((ctx) => {
       return { status: 503, error: 'De zaak is niet klaargezet omdat de persoonlijke eigenaarswerkplek niet veilig kon worden gemaakt.' };
     }
     // de behoeften uit de intake landen als open wensen bij de nieuwe zaak
-    if (a.bedrijf.behoeften.length) {
+    if (plan.wensen.length) {
       if (!db.data.bedrijfsWensen) db.data.bedrijfsWensen = {};
-      db.data.bedrijfsWensen[code] = a.bedrijf.behoeften.map(w => ({ wens: w, status: 'open', at: nu() }));
+      db.data.bedrijfsWensen[code] = plan.wensen;
     }
     a.gezaakt = { code, staffId, at: nu() };
     a.bijgewerkt = nu();
@@ -157,6 +151,8 @@ module.exports = Object.assign((ctx) => {
      administratieve bevestiging). Bij de eerste voldane termijn van een
      geaccepteerde ondernemersaanmelding wordt de zaak klaargezet. */
   function termijnVoldaan(B, a, maand, door) {
+    if ((db.data.contracten || []).some(c => c.aanmeldingId === a.id && c.automatischAbonnement))
+      return { status: 409, error: 'Een automatische abonnementstermijn vereist betaalbewijs; herstel de bestaande betaling.' };
     const rij = B().find(r => r.aanmeldingId === a.id);
     if (!rij) return { status: 404, error: 'Geen betaalschema voor deze aanmelding.' };
     const t = (rij.termijnen || []).find(x => x.maand === Number(maand));
@@ -180,5 +176,6 @@ module.exports = Object.assign((ctx) => {
     return { ok: true, maand: t.maand, zaak };
   }
 
-  return Object.assign({ normaliseer, zetBedrijf, provisioneer, termijnVoldaan, GENRES }, bewijs);
+  const provisioneerAutomatisch = require('./bedrijf-automatisch')({ ...ctx, bewijsKlaar: bewijs.bewijsKlaar });
+  return Object.assign({ normaliseer, zetBedrijf, provisioneer, provisioneerAutomatisch, termijnVoldaan, GENRES }, bewijs);
 }, { GENRES });

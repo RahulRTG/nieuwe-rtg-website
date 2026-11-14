@@ -22,7 +22,12 @@
      omdat er zo meteen in geschreven wordt -- de vorm die de schrijvers
      altijd al gebruikten.
    - `reizen()` / `aanvragen()` maken NIETS aan; een ontbrekende lijst is leeg.
-   - `zetAanvragen(lijst)` vervangt de lijst, voor de kap op 5000.
+   - `zetAanvragen(lijst)` vervangt de klassieke aanvragen, voor de kap op 5000.
+
+   De federatieve reisketen deelt deze collectie maar heeft eigen contracten
+   en tenantpoorten. Rijen met `keten` blijven daarom buiten ALLE klassieke
+   lezers; vervangen van hun lijst bewaart de actuele ketenrijen ongewijzigd.
+   Deze deur verleent geen toegang tot de federatieve keten.
 
    WAT DIT BESTAND MET OPZET NIET DOET: geen prijslogica (de nettoprijs-projectie
    blijft reisAanbod() in ./reisbureau.js, LAT-regel 4), geen standen (de
@@ -41,14 +46,23 @@ module.exports = function maakReisOpslag({ db }) {
 
   const lees = (naam) => (db.data && Array.isArray(db.data[naam]) ? db.data[naam] : []);
   const pak = (naam) => (Array.isArray(db.data[naam]) ? db.data[naam] : (db.data[naam] = []));
+  const klassiek = (lijst) => lijst.filter(a => a && !a.keten);
+
+  function zetAanvragen(lijst) {
+    if (!Array.isArray(lijst)) throw new TypeError('Reisaanvragen moeten een lijst zijn.');
+    const eigen = klassiek(lijst);
+    const keten = lees('reisAanvragen').filter(a => a && a.keten);
+    db.data.reisAanvragen = eigen.concat(keten);
+    return eigen;
+  }
 
   return {
     REGISTER,
     reizen: () => lees('partnerTrips'),
     pakReizen: () => pak('partnerTrips'),
-    aanvragen: () => lees('reisAanvragen'),
-    pakAanvragen: () => pak('reisAanvragen'),
-    zetAanvragen: (lijst) => (db.data.reisAanvragen = lijst)
+    aanvragen: () => klassiek(lees('reisAanvragen')),
+    pakAanvragen: () => klassiek(pak('reisAanvragen')),
+    zetAanvragen
   };
 };
 

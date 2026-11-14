@@ -39,7 +39,9 @@ app.post('/api/groothandel/bestel', auth, (req, res) => {
   const koper = { soort: 'lid', id: req.session.key, naam: liveCodename(req.session) };
   const r = ghPlaatsBestelling(String(req.body.groothandelCode || ''), koper, req.body.regels, { bezorgen: req.body.bezorgen !== false, idem: req.body.idem });
   if (r.error) return res.status(r.status).json({ error: r.error });
-  openLijn(findSupplier(req.body.groothandelCode), req);
+  // Een idempotente herhaling kan de oude order teruggeven. Alleen die zaak
+  // heeft de bewezen relatie, nooit een nieuw meegestuurde groothandelCode.
+  openLijn(findSupplier(r.order.groothandelCode), req);
   res.json({ ok: true, order: r.order });
 });
 app.post('/api/groothandel/mijn', auth, (req, res) => {

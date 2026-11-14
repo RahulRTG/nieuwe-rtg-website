@@ -22,9 +22,11 @@
   .ds-browser-kop { margin-block: var(--ds-ruimte-4) var(--ds-ruimte-3); }
   .ds-browser-leeg { text-align: center; color: var(--ds-inkt-zacht); padding: var(--ds-ruimte-8); }
   .ds-browser-tabs { display: flex; align-items: center; gap: var(--ds-ruimte-2); padding: var(--ds-ruimte-2) var(--ds-ruimte-3); overflow-x: auto; border-block-end: 1px solid var(--ds-lijnkleur); background: var(--ds-grond); }
-  .ds-browser-tab { display: flex; align-items: center; gap: var(--ds-ruimte-2); flex: 0 0 auto; max-inline-size: 16rem; min-block-size: var(--ds-doel); padding-inline: var(--ds-ruimte-3); border: 1px solid var(--ds-lijnkleur); border-radius: var(--ds-radius-knop); color: var(--ds-inkt-zacht); background: var(--ds-oppervlak-sterk); cursor: pointer; }
+  .ds-browser-tab { display: flex; align-items: center; gap: var(--ds-ruimte-1); flex: 0 0 auto; max-inline-size: 16rem; min-block-size: var(--ds-doel); border: 1px solid var(--ds-lijnkleur); border-radius: var(--ds-radius-knop); color: var(--ds-inkt-zacht); background: var(--ds-oppervlak-sterk); }
   .ds-browser-tab.aan { color: var(--ds-inkt); border-color: var(--ds-focus); }
   .ds-browser-tabtitel { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .ds-browser-tabselect { min-block-size: var(--ds-doel); min-inline-size: var(--ds-doel); max-inline-size: 12rem; padding-inline: var(--ds-ruimte-3); border: 0; border-radius: var(--ds-radius-knop); color: inherit; background: transparent; font: inherit; cursor: pointer; }
+  .ds-browser-tabselect:focus-visible { outline: 2px solid var(--ds-focus); outline-offset: -2px; }
   .ds-browser-zaak { display: flex; align-items: center; gap: var(--ds-ruimte-3); flex-wrap: wrap; padding: var(--ds-ruimte-3); background: var(--ds-oppervlak-sterk); border-block-end: 1px solid var(--ds-lijnkleur); }
   .ds-browser-zaaknaam { font-family: var(--ds-letter-display); font-size: var(--ds-maat-kop); }
   .ds-browser-acties { margin-inline-start: auto; display: flex; flex-wrap: wrap; gap: var(--ds-ruimte-2); }

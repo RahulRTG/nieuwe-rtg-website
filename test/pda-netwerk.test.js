@@ -11,7 +11,7 @@ const { spawn } = require('node:child_process');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer } = require('./helper');
+const { startServer, maakBetaaldRtgTestaccount, elevateTier } = require('./helper');
 
 let BASE;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-net-'));
@@ -32,8 +32,11 @@ async function login(code, rol, pin) {
 test.before(async () => {
   ({ child, base: BASE } = await startServer({ env: { RTG_DATA_DIR: TMP, SMTP_URL: '' } }));
   const reg = await json(await api('/api/auth/register', { name: 'Gast Lid', email: 'net@x.nl', phone: '0612345730',
-    password: 'geheim123', geboortedatum: '1990-01-01', tier: 'business', pasApp: 'business' }));
+    password: 'geheim123', geboortedatum: '1990-01-01' }));
   lidToken = reg.token;
+  maakBetaaldRtgTestaccount(TMP, 'net@x.nl');
+  // Business blijft een aanvraag met een besluit van de herleidbare eigenaar.
+  await elevateTier(BASE, lidToken, 'business');
   kikMan = await login('KIKUNOI', 'manager', '1234'); kikBal = await login('KIKUNOI', 'staff', '5678');
   ponMan = await login('PONTO', 'manager', '1234'); ponBal = await login('PONTO', 'staff', '5678');
   hosMan = await login('HOSHI', 'manager', '1234');

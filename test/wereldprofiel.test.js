@@ -13,7 +13,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, elevateTier } = require('./helper');
+const { startServer, elevateTier, maakBetaaldRtgTestaccount } = require('./helper');
 
 let BASE, child;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-wprofiel-'));
@@ -25,28 +25,44 @@ function post(pad, body, token) {
 }
 const json = r => r.json();
 
+async function ontvangen(pad, body, token) {
+  const r = await post(pad, body, token);
+  const d = await json(r);
+  assert.equal(r.status, 200, pad + ': ' + JSON.stringify(d));
+  return d;
+}
+async function gewijzigd(pad, body, token) {
+  const d = await ontvangen(pad, body, token);
+  assert.equal(d.ok, true, pad + ' bevestigt de wijziging');
+  return d;
+}
+
 async function lid(naam, email, tier) {
   const regTier = (tier === 'lifestyle' || tier === 'business') ? 'rtg' : tier;
-  const d = await json(await post('/api/auth/register', {
+  const d = await ontvangen('/api/auth/register', {
     name: naam, email, phone: '0612345678', password: 'geheim123',
     geboortedatum: '1990-01-01', tier: regTier
-  }));
+  });
   assert.ok(d.token, 'registratie geeft een sessietoken');
+  assert.equal(d.state.user.tier, 'guest', 'registreren verleent geen betaalde pas');
+  // Alleen de bedoelde RTG-profieleigenaar krijgt een betaalde testpersona;
+  // dit is geen betaalbewijs. Gratis kijkers blijven werkelijk gratis.
+  if (tier === 'rtg') maakBetaaldRtgTestaccount(TMP, email);
   if (regTier !== tier) {
     const office = (await json(await post('/api/office/login', { code: 'RTG-OFFICE' }))).token;
     await elevateTier(BASE, d.token, tier, office);
   }
-  const mij = await json(await post('/api/member/connections', {}, d.token));
+  const mij = await ontvangen('/api/member/connections', {}, d.token);
   /* De LIVE codenaam (via /api/metier/ik), niet die uit het registratie-antwoord.
      Dat is de naam die de gids kent en die de app zelf toont -- dus ook de naam
      waar een gebruiker op tikt. Op de registratienaam toetsen zou iets anders
      bewijzen dan wat er in het echt gebeurt. */
-  const p = await json(await post('/api/metier/ik', {}, d.token));
+  const p = await ontvangen('/api/metier/ik', {}, d.token);
   return { token: d.token, codenaam: p.profiel.codenaam, key: mij.me };
 }
 const verbind = async (a, b) => {
-  await post('/api/member/connect', { key: b.key }, a.token);
-  await post('/api/member/connect/respond', { key: a.key, action: 'accept' }, b.token);
+  await gewijzigd('/api/member/connect', { key: b.key }, a.token);
+  await gewijzigd('/api/member/connect/respond', { key: a.key, action: 'accept' }, b.token);
 };
 
 test.before(async () => {
@@ -60,18 +76,18 @@ test.after(() => {
 test('het profiel leest uit de bestaande apps en bewaart zelf geen kopie', async () => {
   const l = await lid('Profiel Lid', 'p1@x.nl', 'lifestyle');
   // de bio wordt in DE SALON gezet, niet hier
-  await post('/api/salon/bio', { bio: 'Ik vaar graag.', plaats: 'Ibiza' }, l.token);
-  await post('/api/zakelijk/profiel/zet', { naam: 'P', kop: 'Schipper', sector: 'Maritiem' }, l.token);
+  await gewijzigd('/api/salon/bio', { bio: 'Ik vaar graag.', plaats: 'Ibiza' }, l.token);
+  await gewijzigd('/api/zakelijk/profiel/zet', { naam: 'P', kop: 'Schipper', sector: 'Maritiem' }, l.token);
 
-  const p = await json(await post('/api/wereld/profiel', {}, l.token));
+  const p = await ontvangen('/api/wereld/profiel', {}, l.token);
   const veld = (pad) => p.lagen.flatMap(x => x.velden).find(v => v.pad === pad);
 
   assert.equal(veld('persoonlijk.over').waarde, 'Ik vaar graag.', 'de Salon-bio komt door');
   assert.equal(veld('professioneel.kop').waarde, 'Schipper', 'de zakelijke kop komt door');
 
   // en het is echt een LEESLAAG: wijzig de bron, en het profiel volgt meteen
-  await post('/api/salon/bio', { bio: 'Toch liever bergen.', plaats: 'Ibiza' }, l.token);
-  const p2 = await json(await post('/api/wereld/profiel', {}, l.token));
+  await gewijzigd('/api/salon/bio', { bio: 'Toch liever bergen.', plaats: 'Ibiza' }, l.token);
+  const p2 = await ontvangen('/api/wereld/profiel', {}, l.token);
   assert.equal(p2.lagen.flatMap(x => x.velden).find(v => v.pad === 'persoonlijk.over').waarde,
     'Toch liever bergen.', 'het profiel houdt geen eigen kopie aan');
 
@@ -80,57 +96,66 @@ test('het profiel leest uit de bestaande apps en bewaart zelf geen kopie', async
   assert.equal(laag.bron.app, '/apps/salon.html', 'de bron van de laag wijst naar De Salon');
 });
 
-test('de profiellagen volgen de pas: een gratis lid heeft er één, Business vier', async () => {
-  const g = await lid('Laag Gratis', 'p2@x.nl', 'rtg');
+test('een gratis account krijgt geen eigen betaalde wereldprofiellagen', async () => {
+  const g = await lid('Laag Gratis', 'p0@x.nl', 'guest');
+  const r = await post('/api/wereld/profiel', {}, g.token);
+  const d = await json(r);
+  assert.equal(r.status, 403, 'de eigen wereldprofiellaag vraagt een betaalde pas');
+  assert.equal(d.error, 'RTG Wereld is er voor leden met een pas.');
+  assert.equal(Object.hasOwn(d, 'lagen'), false, 'de weigering bevat geen profiellagen');
+});
+
+test('de profiellagen volgen de pas: betaalde RTG heeft er één, Business vier', async () => {
+  const g = await lid('Laag RTG', 'p2@x.nl', 'rtg');
   const b = await lid('Laag Baas', 'p3@x.nl', 'business');
-  const lagen = async t => (await json(await post('/api/wereld/profiel', {}, t))).lagen.map(l => l.laag);
+  const lagen = async t => (await ontvangen('/api/wereld/profiel', {}, t)).lagen.map(l => l.laag);
 
   assert.deepEqual(await lagen(g.token), ['persoonlijk']);
   assert.deepEqual(await lagen(b.token), ['persoonlijk', 'professioneel', 'creator', 'ondernemer']);
 
   // en zichtbaarheid zetten op een laag die je niet hebt, mag niet
   const r = await post('/api/wereld/profiel/zicht', { pad: 'professioneel.kop', niveau: 'iedereen' }, g.token);
-  assert.equal(r.status, 400, 'een gratis pas zet niets op de professionele laag');
+  assert.equal(r.status, 400, 'de betaalde RTG Pass zet niets op de professionele laag');
   assert.match((await json(r)).error, /andere pas/);
 });
 
 test('de vijf zichtbaarheden wijzen elk een ANDERE groep aan', async () => {
   /* Eén opstelling, vier kijkers, en per niveau kijken we wie het veld ziet.
      Ik (I) heeft:
-       - C  een contact, zonder zakelijk profiel
+       - C  een gratis contact, zonder zakelijk profiel
        - Z  een contact MET zakelijk profiel
-       - G  geen contact, maar wel samen in een genootschap
-       - V  een vreemde
+       - G  een gratis account, geen contact, maar wel samen in een genootschap
+       - V  een gratis vreemde
      Zou 'zakelijk' hetzelfde betekenen als 'contacten', dan zag C hem ook --
      dat is precies de dubbeling die hier moet zakken. */
   const I = await lid('Zicht Ik', 'z0@x.nl', 'business');
-  const C = await lid('Zicht Contact', 'z1@x.nl', 'rtg');
+  const C = await lid('Zicht Contact', 'z1@x.nl', 'guest');
   const Z = await lid('Zicht Zakelijk', 'z2@x.nl', 'business');
-  const G = await lid('Zicht Genoot', 'z3@x.nl', 'rtg');
-  const V = await lid('Zicht Vreemde', 'z4@x.nl', 'rtg');
+  const G = await lid('Zicht Genoot', 'z3@x.nl', 'guest');
+  const V = await lid('Zicht Vreemde', 'z4@x.nl', 'guest');
 
   await verbind(I, C);
   await verbind(I, Z);
-  await post('/api/salon/bio', { bio: 'Mijn verhaal.', plaats: 'Ibiza' }, I.token);
+  await gewijzigd('/api/salon/bio', { bio: 'Mijn verhaal.', plaats: 'Ibiza' }, I.token);
   // I en Z hebben allebei een zakelijk profiel; C bewust niet
-  await post('/api/zakelijk/profiel/zet', { naam: 'I', kop: 'Oprichter' }, I.token);
-  await post('/api/zakelijk/profiel/zet', { naam: 'Z', kop: 'Investeerder' }, Z.token);
+  await gewijzigd('/api/zakelijk/profiel/zet', { naam: 'I', kop: 'Oprichter' }, I.token);
+  await gewijzigd('/api/zakelijk/profiel/zet', { naam: 'Z', kop: 'Investeerder' }, Z.token);
 
   // I en G zitten samen in een genootschap
-  const gen = await json(await post('/api/genootschap/richt-op',
-    { naam: 'De Zeilers', soort: 'besloten' }, I.token));
+  const gen = await ontvangen('/api/genootschap/richt-op',
+    { naam: 'De Zeilers', soort: 'besloten' }, I.token);
   const groep = gen.groep && gen.groep.id;
   assert.ok(groep, 'het genootschap is opgericht: ' + JSON.stringify(gen).slice(0, 140));
-  const uitn = await json(await post('/api/genootschap/nodig-uit', { groep, wie: G.codenaam }, I.token));
+  const uitn = await ontvangen('/api/genootschap/nodig-uit', { groep, wie: G.codenaam }, I.token);
   assert.ok(!uitn.error, 'G is uitgenodigd: ' + JSON.stringify(uitn).slice(0, 140));
-  const binnen = await json(await post('/api/genootschap/binnen', { groep }, G.token));
+  const binnen = await ontvangen('/api/genootschap/binnen', { groep }, G.token);
   assert.ok(!binnen.error, 'G treedt binnen: ' + JSON.stringify(binnen).slice(0, 140));
 
   const ziet = async (kijker) => {
-    const r = await json(await post('/api/wereld/profiel/van', { codenaam: I.codenaam }, kijker.token));
+    const r = await ontvangen('/api/wereld/profiel/van', { codenaam: I.codenaam }, kijker.token);
     return r.lagen.flatMap(l => l.velden).some(v => v.pad === 'persoonlijk.over');
   };
-  const zet = (niveau) => post('/api/wereld/profiel/zicht', { pad: 'persoonlijk.over', niveau }, I.token);
+  const zet = (niveau) => gewijzigd('/api/wereld/profiel/zicht', { pad: 'persoonlijk.over', niveau }, I.token);
 
   await zet('iedereen');
   assert.deepEqual([await ziet(C), await ziet(Z), await ziet(G), await ziet(V)], [true, true, true, true],
@@ -153,7 +178,7 @@ test('de vijf zichtbaarheden wijzen elk een ANDERE groep aan', async () => {
     'alleenik: niemand');
 
   // en ik zie mijn eigen veld in elke stand
-  const eigen = await json(await post('/api/wereld/profiel/van', { codenaam: I.codenaam }, I.token));
+  const eigen = await ontvangen('/api/wereld/profiel/van', { codenaam: I.codenaam }, I.token);
   assert.ok(eigen.lagen.flatMap(l => l.velden).some(v => v.pad === 'persoonlijk.over'),
     'op alleenik zie ik mijn eigen veld nog steeds');
 });
@@ -162,14 +187,24 @@ test('een afgeschermd veld is niet te onderscheiden van een leeg veld', async ()
   /* Anders is de zichtbaarheid zelf een lek: "hij heeft wel iets ingevuld, maar
      niet voor jou" is ook informatie. */
   const A = await lid('Lek A', 'l1@x.nl', 'rtg');
-  const B = await lid('Lek B', 'l2@x.nl', 'rtg');   // vreemde
+  const B = await lid('Lek B', 'l2@x.nl', 'guest');   // gratis vreemde
   const leeg = await lid('Lek Leeg', 'l3@x.nl', 'rtg');  // vult niets in
 
-  await post('/api/salon/bio', { bio: 'Een geheim.', plaats: 'Ibiza' }, A.token);
-  await post('/api/wereld/profiel/zicht', { pad: 'persoonlijk.over', niveau: 'alleenik' }, A.token);
+  await gewijzigd('/api/salon/bio', { bio: 'Een geheim.', plaats: 'Ibiza' }, A.token);
+  await gewijzigd('/api/wereld/profiel/zicht', { pad: 'persoonlijk.over', niveau: 'alleenik' }, A.token);
 
-  const vanA = await json(await post('/api/wereld/profiel/van', { codenaam: A.codenaam }, B.token));
-  const vanLeeg = await json(await post('/api/wereld/profiel/van', { codenaam: leeg.codenaam }, B.token));
+  // Twee lege profielen vergelijken bewijst geen afscherming. Het geheim moet
+  // aantoonbaar bestaan, en de lege tegenhanger moet echt dezelfde RTG-laag hebben.
+  const eigen = await ontvangen('/api/wereld/profiel', {}, A.token);
+  const geheim = eigen.lagen.flatMap(l => l.velden).find(v => v.pad === 'persoonlijk.over');
+  assert.equal(geheim.waarde, 'Een geheim.', 'de eigenaar leest het opgeslagen geheim');
+  assert.equal(geheim.zicht, 'alleenik', 'de gekozen afscherming is opgeslagen');
+  const eigenLeeg = await ontvangen('/api/wereld/profiel', {}, leeg.token);
+  assert.equal(eigenLeeg.lagen.flatMap(l => l.velden).find(v => v.pad === 'persoonlijk.over').waarde,
+    null, 'de tegenhanger heeft een persoonlijke laag zonder ingevulde bio');
+
+  const vanA = await ontvangen('/api/wereld/profiel/van', { codenaam: A.codenaam }, B.token);
+  const vanLeeg = await ontvangen('/api/wereld/profiel/van', { codenaam: leeg.codenaam }, B.token);
   const paden = r => r.lagen.flatMap(l => l.velden).map(v => v.pad);
 
   assert.ok(!paden(vanA).includes('persoonlijk.over'), 'het afgeschermde veld ontbreekt');
@@ -181,12 +216,12 @@ test('een afgeschermd veld is niet te onderscheiden van een leeg veld', async ()
 
 test('de standaarden zijn een besluit: persoonlijk staat dicht, professioneel open', async () => {
   const I = await lid('Std Ik', 's1@x.nl', 'business');
-  const V = await lid('Std Vreemde', 's2@x.nl', 'rtg');
-  await post('/api/salon/bio', { bio: 'Persoonlijk.', plaats: 'Ibiza' }, I.token);
-  await post('/api/zakelijk/profiel/zet', { naam: 'I', kop: 'Oprichter' }, I.token);
+  const V = await lid('Std Vreemde', 's2@x.nl', 'guest');
+  await gewijzigd('/api/salon/bio', { bio: 'Persoonlijk.', plaats: 'Ibiza' }, I.token);
+  await gewijzigd('/api/zakelijk/profiel/zet', { naam: 'I', kop: 'Oprichter' }, I.token);
 
   // niets ingesteld: de standaarden gelden
-  const r = await json(await post('/api/wereld/profiel/van', { codenaam: I.codenaam }, V.token));
+  const r = await ontvangen('/api/wereld/profiel/van', { codenaam: I.codenaam }, V.token);
   const paden = r.lagen.flatMap(l => l.velden).map(v => v.pad);
   assert.ok(!paden.includes('persoonlijk.over'), 'over mij staat standaard niet open voor een vreemde');
   assert.ok(paden.includes('professioneel.kop'), 'de functiekop staat standaard wel open');

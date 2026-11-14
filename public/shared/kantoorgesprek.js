@@ -1,4 +1,4 @@
-/* De kantoor-inlog als gesprek met Rahul, in plaats van een codeveld.
+/* De kantoor-inlog via het gewone RTG-account.
 
    Een eigen module en geen veld op drie schermen: een inlog die op drie plekken
    los is nagebouwd, raakt op twee ervan achter (dat gebeurde bij de tweede
@@ -6,20 +6,12 @@
 
    Twee dingen die anders zijn dan bij een gewone chat, en allebei met opzet:
 
-   - VRAAGT RAHUL OM EEN CODE, DAN WORDT DE INVOER GEMASKEERD (`verborgen`
-     van de server): een kantoorcode hoort niet leesbaar in beeld te staan.
-
-   - WAT JE TYPT BLIJFT NERGENS STAAN. Het gaat naar de server en verdwijnt uit
-     het veld; er komt geen bellenrij met je code erin, en de browser krijgt
-     autocomplete="off" zodat hij hem niet onthoudt.
-
-   - DE SLEUTELBOS GAAT VOOR DE CODE. Hangt de kantoorsleutel al aan het
+   Hangt de kantoorsleutel aan het
      RTG-account waarmee dit toestel is ingelogd (kern/eenaccount.js; bij de
-     eigenaar is die AFGELEID en koppelt hij niets), dan probeert dit gesprek
-     eerst /api/account/start en vraagt het pas iets als dat niet gaat.
+     eigenaar is die AFGELEID en koppelt hij niets), dan gebruikt dit gesprek
+     /api/account/start. Een gedeelde kantoorcode is geen terugvalroute meer.
 
-     Een inlogvraag die niet nodig is, leert mensen hun code intypen waar dat
-     niet hoeft. De algemene pin en (in productie) de passkey blijven gelden;
+     De algemene pin en (in productie) de passkey blijven gelden;
      het ene account is geen achterdeur (kern/eenaccount/starten.js).
 
    Gebruik:  RTGKantoorGesprek.toon(element, function (token, state) { ... })  */
@@ -46,13 +38,6 @@
     if (stijlGezet) return;
     stijlGezet = true;
     laadKantoorGesprekStijl('/ds/componenten/kantoorgesprek.css');
-  }
-
-  function post(pad, lijf) {
-    return fetch('/api/kantoor/gesprek/' + pad, {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(lijf || {})
-    }).then(function (r) { return r.json().catch(function () { return {}; }); });
   }
 
   // de kantoordeur op naam (/shared/kantoordeur.js); passkey pas bij een ceremonie
@@ -86,7 +71,6 @@
 
   function toon(doel, klaar) {
     stijl();
-    var id = null;
     doel.innerHTML =
       '<div class="kg ds-kantoorgesprek"><h2>Kantoor-inlog</h2>' +
       '<p class="kg-zegt" aria-live="polite">Een moment...</p>' +
@@ -100,7 +84,7 @@
 
     function vraag(d) {
       zegt.textContent = d.tekst || '';
-      // de server bepaalt of dit gemaskeerd hoort: een code wel, een gewone vraag niet
+      // de kantoordeur bepaalt of de algemene pin gemaskeerd hoort
       veld.type = d.verborgen ? 'password' : 'text';
       veld.value = '';                       // nooit laten staan
       veld.disabled = false; knop.disabled = false;
@@ -114,9 +98,7 @@
       veld.focus();
     }
 
-    /* WAT "VERDER" NU DOET: de code van het kantoor of de algemene pin bij het
-       ene account; ze verschillen alleen in waar het antwoord heen gaat. */
-    var ontvanger = zegCode;
+    var ontvanger = function () {};
 
     function stuur() {
       var tekst = veld.value;
@@ -127,49 +109,32 @@
       ontvanger(tekst);
     }
 
-    function zegCode(tekst) {
-      if (!id) { melden(''); return; }
-      post('zeg', { id: id, tekst: tekst }).then(function (d) {
-        if (d.token) { zegt.textContent = d.tekst || 'U bent binnen.'; return klaar(d.token, d.state); }
-        if (d.gestopt) { zegt.textContent = d.tekst || 'Goed.'; veld.disabled = true; knop.disabled = true; return; }
-        if (d.error) { melden(d.error); if (!d.veld) codeGesprek(); return; }
-        if (d.id) id = d.id;
-        vraag(d);
-      }).catch(function () { melden('Dat lukte even niet. Probeer het opnieuw.'); });
+    function geenToegang(tekst) {
+      zegt.textContent = tekst || 'Dit RTG-account heeft geen kantoorzetel.';
+      fout.textContent = 'Vraag de eigenaar om de juiste werkrol aan uw gewone RTG-account te koppelen.';
+      veld.value = ''; veld.disabled = true; knop.disabled = true;
     }
 
-    function codeGesprek() {
-      ontvanger = zegCode;
-      post('start', {}).then(function (d) {
-        if (d.error) { zegt.textContent = d.error; veld.disabled = true; knop.disabled = true; return; }
-        id = d.id;
-        vraag(d);
-      }).catch(function () { zegt.textContent = 'Het kantoor is even niet bereikbaar.'; });
-    }
-
-    /* DE SLEUTELBOS EERST (/api/account/start). Lukt dat niet, dan valt het
-       gesprek terug op de code -- en NIET stil: de reden komt in het foutvak. */
+    /* DE SLEUTELBOS IS DE ENIGE INGANG (/api/account/start). */
     function viaAccount() {
       var lt = lidToken();
-      if (!lt) return codeGesprek();
+      if (!lt) return geenToegang('Meld u eerst aan met uw gewone RTG-account.');
       if (sleutelGebruikt) {
-        codeGesprek();
-        fout.textContent = 'Uw RTG-account opende deze deur al eerder en het was niet genoeg. Daarom nu de kantoorcode.';
-        return;
+        return geenToegang('Uw RTG-account heeft deze deur niet geopend.');
       }
       zegt.textContent = 'Een moment, ik kijk of uw eigen RTG-account hier al toegang heeft...';
       // tegelijk met de rollenvraag: geen extra stap
       var deurLaadt = kantoordeur();
       accountPost('rollen', {}, lt).then(function (d) {
         var heeft = (d.rollen || []).some(function (r) { return r && r.rol === 'kantoor'; });
-        if (!heeft) return codeGesprek();
+        if (!heeft) return geenToegang('Dit RTG-account heeft geen kantoorrol.');
         start(null);
-      }).catch(function () { codeGesprek(); });
+      }).catch(function () { geenToegang('Uw RTG-account kon niet worden gecontroleerd.'); });
 
       // de ene kantoordeur: pin voor passkey; weigert Safari buiten een tik, dan een knop
       function start(pin) {
         deurLaadt.then(function (D) {
-          if (!D) { codeGesprek(); fout.textContent = 'De kantoordeur kon hier niet laden.'; return; }
+          if (!D) { geenToegang('De kantoordeur kon hier niet laden.'); return; }
           return D.binnen(lt, { pin: pin, vraagTik: D.tikDialoog('Bevestig met uw passkey, dan zet ik het kantoor open.') }).then(function (s) {
             if (s.token) {
               sleutelGebruikt = true;
@@ -184,11 +149,9 @@
               veld.disabled = true; knop.disabled = true;
               return;
             }
-            // geen sleutel (meer), of iets anders mis: de code, met de reden erbij
-            codeGesprek();
-            fout.textContent = s.error || '';
+            geenToegang(s.error || 'Dit RTG-account heeft geen toegang tot het kantoor.');
           });
-        }).catch(function () { codeGesprek(); });
+        }).catch(function () { geenToegang('De kantoordeur kon niet worden geopend.'); });
       }
 
       function vraagPin(reden) {

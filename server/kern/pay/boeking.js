@@ -108,15 +108,16 @@ module.exports = ({ saldi, saldoVan, grootboek, payBoekingenVoegToe, save, id, s
      fsync voor de 200) de herhaling herkent die de JS-opslag na een crash niet
      meer kent. Pas na zijn bevestiging neemt de spiegel de saldi over. Weigert
      de motor of is hij onbereikbaar, dan verandert er NIETS aan de JS-saldi. */
-  async function boekAsync({ van, naar, centen, soort, oms, ref, genre, dagBesteed, economischeSleutel }) {
+  async function boekAsync({ van, naar, centen, soort, oms, ref, genre, dagBesteed, economischeSleutel, nieuweDienstFout }) {
     if (betalingenUit) return uitFout();
     const k = sleutelVan(economischeSleutel);
     if (geldModus !== 'motor') {
+      if (nieuweDienstFout) return nieuweDienstFout;
       const args = { van, naar, centen, soort, oms, ref, genre, dagBesteed };
       if (!k) return boek(args);
       return boekOpSleutel({ domein: 'pay', grootboek, boek, boekEenmaal, sleutel: k.sleutel, args });
     }
-    const dicht = waardePoort({ van, naar, centen: Math.round(Number(centen)), soort, genre, dagBesteed });
+    const dicht = nieuweDienstFout || waardePoort({ van, naar, centen: Math.round(Number(centen)), soort, genre, dagBesteed });
     /* Een weigering van de poort kan een HERHALING zijn: na een crash staat de
        spiegel al op het afgeboekte saldo. Kent de motor deze sleutel met deze
        beweging, dan is de boeking er al en komt het eerste antwoord terug --
@@ -131,6 +132,10 @@ module.exports = ({ saldi, saldoVan, grootboek, payBoekingenVoegToe, save, id, s
       r = await motorklant.boekGuard({ van, naar, centen, soort, oms, ref, economischeSleutel: k.sleutel });
     }
     if (!r || r.error) return { status: (r && r.status) || 502, error: (r && r.error) || 'Motor onbereikbaar.' };
+    return bevestigMotor(r);
+  }
+
+  function bevestigMotor(r) {
     // Neem de door de motor bevestigde boeking exact over (id, at, bedragen).
     const b = r.boeking;
     const rij = { id: b.id, van: b.van, naar: b.naar, centen: Math.round(Number(b.centen)), soort: b.soort || 'boeking', oms: b.oms || '', ref: b.ref || null, at: b.at || nu() };
@@ -146,6 +151,7 @@ module.exports = ({ saldi, saldoVan, grootboek, payBoekingenVoegToe, save, id, s
   /* De sleutel van de VOLGENDE boeking vooraf vastleggen (./dekking.js boekt
      twee keer met dezelfde). Buiten motorstand: null, en dan telt er niets. */
   const reserveerSleutel = () => { const k = sleutelVan(undefined); return k ? k.sleutel : null; };
+  const boekBekend = require('./boeking-bekend')({ geldModus, motorklant, grootboek, boekEenmaal, bevestigMotor });
 
-  return { pasToe, boek, boekAsync, reserveerSleutel };
+  return { pasToe, boek, boekAsync, boekBekend, reserveerSleutel };
 };

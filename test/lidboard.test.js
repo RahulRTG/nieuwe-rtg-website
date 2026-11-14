@@ -21,12 +21,12 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, maakBetaaldRtgTestaccount } = require('./helper');
 
+const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-lidboard-'));
 let srv, BASE, techToken;
 const OWNER = 'roellie.i@gmail.com'; // standaard-eigenaar (RTG_OWNER_EMAIL)
 test.before(async () => {
-  const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-lidboard-'));
   srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   BASE = srv.base;
   // de eigenaar, voor de toets op platform-breed uitgezette functies
@@ -42,10 +42,12 @@ const json = r => r.json();
 function api(pad, body) { return fetch(BASE + '/api/foundation' + pad, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body || {}) }); }
 function soc(pad, body) { return fetch(BASE + '/api/rtf/social' + pad, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body || {}) }); }
 async function lid(naam) {
+  const email = naam.replace(/\s/g, '') + Date.now() + Math.random().toString(36).slice(2, 6) + '@voorbeeld.test';
   const reg = await json(await fetch(BASE + '/api/auth/register', {
     method: 'POST', headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ name: naam, email: naam.replace(/\s/g, '') + Date.now() + '@voorbeeld.test', phone: '0611122233', password: 'geheim123', geboortedatum: '1990-05-05', tier: 'rtg' })
+    body: JSON.stringify({ name: naam, email, phone: '0611122233', password: 'geheim123', geboortedatum: '1990-05-05' })
   }));
+  maakBetaaldRtgTestaccount(TMP, email);
   const call = (pad, body) => fetch(BASE + '/api' + pad, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + reg.token }, body: JSON.stringify(body || {}) });
   return { token: reg.token, call };
 }

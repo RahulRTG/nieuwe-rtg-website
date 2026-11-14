@@ -8,7 +8,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop, stroomAdres } = require('./helper');
+const { startServer, stop, stroomAdres, maakBetaaldRtgTestaccount } = require('./helper');
 
 let srv, base, office, maker, kijker, videoId;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-thuis-'));
@@ -24,6 +24,8 @@ async function lid() {
   const u = (Date.now() + (++seq)).toString().slice(-8);
   const reg = await api('/api/auth/register', { name: 'Lid ' + seq, email: 'h' + u + '@x.nl', phone: '06' + u,
     password: 'geheim123', geboortedatum: '1990-05-05', geslacht: 'v', tier: 'rtg', pasApp: 'rtg' });
+  assert.ok(reg.body.token, 'het Theateraccount is geregistreerd');
+  maakBetaaldRtgTestaccount(TMP, 'h' + u + '@x.nl');
   return reg.body.token;
 }
 

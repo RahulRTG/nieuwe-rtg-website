@@ -47,6 +47,13 @@ module.exports = (kern) => {
   // het AI-weekrooster: voorstellen en vaststellen (alleen de gemachtigde)
   app.post('/api/supplier/rooster/voorstel', supplierAuth, (req, res) => {
     if (!managerOnly(req, res)) return;
+    // Hier begint nieuw betaald roosterwerk. Een al gemaakt voorstel lezen,
+    // afronden of afwijzen blijft via de bestaande eigenaar bereikbaar.
+    if (kern.zaakAbonnement?.magDienst?.(req.supplier.code,
+      { capability: 'can_use_workos', nieuweBetaaldeDienst: true }) === false) {
+      const r = require('../../kern/aanmeldingen/abonnementsdiensten').fout();
+      return res.status(r.status).json({ error: r.error });
+    }
     const r = roosterVoorstel(req.supplier);
     if (r.error) return res.status(r.status).json({ error: r.error });
     res.json(r);

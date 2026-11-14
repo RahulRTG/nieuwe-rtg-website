@@ -10,7 +10,7 @@ module.exports = (kern) => {
   const devVelden = () => process.env.RTG_DEV_LINKS === '1';
   const stuur = (res, r) => r.error ? res.status(r.status || 400).json({ error: r.error }) : res.json(r);
   const echtAccount = (req, res) => {
-    if (req.session.tier === 'guest' || !req.session.account) {
+    if (!req.session.account) {
       res.status(403).json({ error: 'De algemene pin hoort bij een echt RTG-account.' });
       return false;
     }

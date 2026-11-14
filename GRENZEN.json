@@ -145,11 +145,11 @@
       "bureau",
       "concernMagTekenen",
       "eigenaar",
+      "employmentVanPersoon",
       "entiteitBetaal",
       "entiteitRekening",
       "entiteitVind",
       "findSupplier",
-      "employmentVanPersoon",
       "loopFabric",
       "rtmailTeam",
       "rtmailVak",
@@ -818,10 +818,15 @@
       "sessionFor"
     ],
     "livinglab": [
+      "GEEN_ACCOUNT",
+      "bewoner",
+      "codeUit",
       "id",
       "labfonds",
       "lijf",
       "livinglab",
+      "remBron",
+      "remCode",
       "remLezen",
       "remSchrijf",
       "resolveSession",
@@ -915,6 +920,7 @@
       "PERSONAS",
       "STEMMINGEN",
       "ZZP",
+      "aanmeldingen",
       "aantal",
       "accounts",
       "afhaalcode",
@@ -1158,6 +1164,7 @@
       "noteerBeurt",
       "notify",
       "notifySupplier",
+      "onboarding",
       "ondernemingAandeelWeg",
       "ondernemingAandeelZet",
       "ondernemingAanvraag",
@@ -1373,6 +1380,7 @@
       "weefsel",
       "werkgeversVan",
       "wishlistToggle",
+      "zaakAbonnement",
       "zetOpWachtlijst",
       "zetVoorkeur",
       "zijnVrienden",
@@ -1427,8 +1435,10 @@
       "matchGewichtenZet",
       "mobAanbod",
       "mobAnnuleer",
+      "mobEigenToegang",
       "mobMijn",
       "mobVraag",
+      "mobVraagToegang",
       "modAan",
       "modBord",
       "modStoring",
@@ -1711,6 +1721,7 @@
     "payroll-os-zaak": [
       "payrollOS"
     ],
+    "personalos": [],
     "plaats": [
       "plaats",
       "werkbeleidPauzeStand",
@@ -1884,6 +1895,7 @@
       "servicePatronen",
       "servicePersoonlijk",
       "servicePost",
+      "serviceRahul",
       "serviceZaken",
       "spraaktekst",
       "supplierAuth"
@@ -1901,7 +1913,10 @@
       "serviceZaken"
     ],
     "service-kantoor-ai": [
-      "serviceOnderzoeker"
+      "serviceLoop",
+      "serviceOnderzoeker",
+      "serviceRahul",
+      "serviceZaken"
     ],
     "service-kantoor-borden": [
       "balieAuth",
@@ -2059,7 +2074,8 @@
       "teamVerlaat",
       "toernooiAntwoord",
       "toernooiNieuw",
-      "toernooiStaat"
+      "toernooiStaat",
+      "veilig"
     ],
     "spellen-rondom": [
       "arcadeBord",
@@ -2338,6 +2354,7 @@
       "isFavoriet",
       "isVastgoed",
       "isVerhuur",
+      "kaartPerGroep",
       "kamerplanning",
       "kasInnen",
       "kassaRetourGrens",
@@ -2420,6 +2437,7 @@
       "pushLive",
       "rampbeeld",
       "receptie",
+      "reisbureau",
       "releaseDrop",
       "rememberSession",
       "reserveerSlot",

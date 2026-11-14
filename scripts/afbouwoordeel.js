@@ -119,9 +119,28 @@ function lees(hier) {
       return Object.assign({}, v, { stand: 'ontbreekt', commit,
         waarom: 'bewijs hoort bij ' + commit.slice(0, 8) + ', deze commit is ' + String(nu).slice(0, 8) });
     }
-    if (j.geslaagd === false) {
+    const bron = j && (j.bron || j.stempel || j.gemeten);
+    if (!bron || bron.boomVuil !== false) {
+      return Object.assign({}, v, { stand: 'ontbreekt', commit,
+        waarom: v.bestand + ' bewijst geen meting op ongewijzigde code' });
+    }
+    // SUITE heeft geen top-level geslaagd: de canonieke schrijver bewaart zijn
+    // uitslag in gemeten.groen. Afwezigheid van false is nooit een positieve proef.
+    const geslaagd = v.id === 'suite' ? j.gemeten && j.gemeten.groen : j.geslaagd;
+    if (geslaagd === false) {
       return Object.assign({}, v, { stand: 'gezakt', commit,
-        waarom: v.bestand + ' meldt geslaagd: false' });
+        waarom: v.bestand + ' meldt ' + (v.id === 'suite' ? 'gemeten.groen' : 'geslaagd') + ': false' });
+    }
+    if (geslaagd !== true) {
+      return Object.assign({}, v, { stand: 'ontbreekt', commit,
+        waarom: v.bestand + ' draagt geen expliciet geslaagde uitslag' });
+    }
+    if (v.id === 'suite') {
+      try { require('./registerratels').controleer('SUITE.json', j); }
+      catch (e) {
+        return Object.assign({}, v, { stand: 'gezakt', commit,
+          waarom: v.bestand + ' heeft een ongeldige groene telling: ' + e.message });
+      }
     }
     return Object.assign({}, v, { stand: 'geleverd', commit });
   });

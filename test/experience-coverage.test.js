@@ -4,7 +4,10 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const path = require('node:path');
 const fs = require('node:fs');
+const os = require('node:os');
+const cp = require('node:child_process');
 const coverage = require('../scripts/lib/experience/coverage');
+const evidence = require('../scripts/lib/experience/evidence');
 
 const ROOT = path.join(__dirname,'..');
 const contract = JSON.parse(fs.readFileSync(path.join(ROOT,'experience-architecture/coverage-contract.json')));
@@ -14,6 +17,20 @@ test('EXPERIENCEWERKT.json is exact uit de actuele inventaris afgeleid', () => {
   const stored = fs.readFileSync(path.join(ROOT,'EXPERIENCEWERKT.json'),'utf8');
   const report = coverage.build(ROOT,{contract,signatures});
   assert.equal(stored,coverage.serializeRegistry(report));
+});
+
+test('Experience-generatie herkent onbekende broninvoer voordat die een onreproduceerbare hash maakt', () => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(),'rtg-experience-input-'));
+  try {
+    fs.mkdirSync(path.join(root,'server'),{recursive:true});
+    fs.writeFileSync(path.join(root,'server','basis.js'),'module.exports = true;\n');
+    cp.execFileSync('git',['init','-q'],{cwd:root});
+    cp.execFileSync('git',['add','server/basis.js'],{cwd:root});
+    fs.writeFileSync(path.join(root,'server','tijdelijke-diagnostiek.js'),'niet voor de kandidaat\n');
+    assert.deepEqual(evidence.untrackedInputs(root),['server/tijdelijke-diagnostiek.js']);
+  } finally {
+    fs.rmSync(root,{recursive:true,force:true});
+  }
 });
 
 test('register is volledig afgeleid uit alle logische apps en alle fysieke schermen', () => {
@@ -36,6 +53,19 @@ test('register is volledig afgeleid uit alle logische apps en alle fysieke scher
   assert.equal(report.releaseReadiness.qualificationGates.length,8);
   assert.equal(report.releaseReadiness.status,'NOT_TESTED');
   assert.equal(report.status,'NOT_TESTED','schermbewijs alleen mag de operationele vrijgavepoorten niet omzeilen');
+});
+
+test('uitvoeringsprojectie bewaart bewijs voor apps en schermen zonder het zelf te maken',()=>{
+  const appScope={subjectType:'app',subjectId:'app:test'};
+  const screenScope={subjectType:'screen',subjectId:'screen:/apps/test.html'};
+  const matrix={runs:[{runId:'r'}],status:'NOT_TESTED'};
+  const report={
+    logicalApps:[{id:'app:test',dimensions:[{id:'identity',scopedProofs:[{scope:appScope}]},{id:'continuity',configurationCoverage:[matrix]}]}],
+    screens:[{id:'screen:/apps/test.html',dimensions:[{id:'identity',scopedProofs:[{scope:screenScope}]}]}]
+  };
+  const projected=coverage.executionProjection(report);
+  assert.deepEqual(projected.scopedProofs.map(row=>row.scope),[appScope,screenScope]);
+  assert.deepEqual(projected.configurationCoverage,[{subjectId:'app:test',dimension:'continuity',...matrix}]);
 });
 
 test('de acht Deep Green-vrijgavepoorten en Experience-budgetten zijn fail-closed', () => {

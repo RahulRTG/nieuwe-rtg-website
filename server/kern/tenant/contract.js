@@ -54,6 +54,7 @@ const NIET_AFGEDWONGEN = [
 ];
 
 module.exports = ({ db, save, schoon }) => {
+  const diensten = require('../aanmeldingen/abonnementsdiensten')({ db });
   const nu = () => klokDatum().toISOString();
   const eigen = (o, k) => (o && Object.prototype.hasOwnProperty.call(o, String(k)) ? o[String(k)] : null);
   const haal = (org) => eigen(db.data.tenants || {}, String(org || '').trim().toUpperCase());
@@ -135,6 +136,8 @@ module.exports = ({ db, save, schoon }) => {
   function magWerkruimteErbij(org) {
     const t = haal(org);
     if (!t) return { ok: true };                       // geen tenant: geen contractgrens
+    const abo = magInrichting(org);
+    if (!abo.ok) return abo;
     const c = pot(t);
     const g = grenzenVan(c);
     if (!loopt(c))
@@ -142,6 +145,15 @@ module.exports = ({ db, save, schoon }) => {
     if (t.werkruimtes.length >= g.werkruimtes)
       return { ok: false, reden: 'Het pakket "' + c.pakket + '" geeft ' + g.werkruimtes + ' werkruimte(s), en die zijn in gebruik.' };
     return { ok: true };
+  }
+
+  // De getekende organisatieafspraak begrenst alleen NIEUWE inrichting.
+  // Dagelijks werk, afhandeling, beveiliging en uitvoer blijven beschikbaar;
+  // bestaande pakketquota en rollen worden door Business niet overschreven.
+  function magInrichting(org) {
+    return diensten.organisatie(org, { nieuweBetaaldeDienst: true }) ? { ok: true }
+      : { ok: false, reden: 'Nieuwe inrichting is voor dit organisatieabonnement niet beschikbaar.' +
+        ' Bestaand werk, facturen, betalen, opzeggen en noodzakelijke nazorg blijven bereikbaar.' };
   }
 
   /* ---------- het quotum ---------- */
@@ -184,5 +196,5 @@ module.exports = ({ db, save, schoon }) => {
     return { ok: true, gebruikt: teller.n, grens: g.apiPerUur };
   }
 
-  return { van, zet, magWerkruimteErbij, tel, PAKKETTEN, NIET_AFGEDWONGEN, VLOEDLIJN };
+  return { van, zet, magWerkruimteErbij, magInrichting, tel, PAKKETTEN, NIET_AFGEDWONGEN, VLOEDLIJN };
 };

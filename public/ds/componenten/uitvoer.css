@@ -72,6 +72,8 @@
       max-inline-size: 100%;
       margin-block: 0;
       margin-inline: 0;
+      /* Een vaste schermactie mag geen achterliggende inhoud doorlaten. */
+      background: var(--ds-oppervlak-sterk);
     }
   }
 }

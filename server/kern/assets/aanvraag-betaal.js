@@ -30,6 +30,9 @@ module.exports = (ctx, { lijst, publiek, SOORT }) => {
   if (betaalWaarheid) betaalWaarheid.registreerAfhandeling(SOORT, async (w) => {
     const x = lijst().find(y => y.id === (w.context && w.context.aanvraagId));
     if (!x) throw new Error('De aanvraag bij deze betaling bestaat niet.');
+    // Ticketuitgifte kan in RAM staan na een mislukte eigenaarsave.
+    // Bevestig dezelfde opslag opnieuw zonder tickets of kas te verdubbelen.
+    if (x.status === 'betaald') { save(); return; }
     if (x.status === 'goedgekeurd' || x.status === 'betaling-loopt') maakTickets(x);
   });
 
@@ -38,7 +41,10 @@ module.exports = (ctx, { lijst, publiek, SOORT }) => {
   async function betaal(sess, id, idem) {
     const x = lijst().find(y => y.id === String(id || '') && y.key === sess.key);
     if (!x) return { status: 404, error: 'Aanvraag niet gevonden.' };
-    if (x.status === 'betaald') return { ok: true, aanvraag: publiek(x), herhaald: true };
+    if (x.status === 'betaald') {
+      save();
+      return { ok: true, aanvraag: publiek(x), herhaald: true };
+    }
     if (!['goedgekeurd', 'betaling-loopt'].includes(x.status)) return { status: 409, error: x.status === 'aangevraagd' ? 'Een mens van RTG beoordeelt deze aanvraag nog; betalen kan daarna.' : 'Deze aanvraag kan niet (meer) betaald worden.' };
     if (!betaalWaarheid) return { status: 503, error: 'De betaalwaarheid is niet aangesloten; er is niets afgeschreven.' };
     // de pool is 300: tickets en lopende betalingen van anderen tellen mee, en vol is vol VOOR er geld gaat

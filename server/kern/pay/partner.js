@@ -32,14 +32,19 @@ module.exports = (ctx) => {
      kasInt. De zaak ontvangt de kaartwaarde en draagt de transactiekosten, net
      als bij elke andere ontvangst; hier een andere regel maken zou betekenen dat
      dezelfde euro verschillend kost afhankelijk van welke knop hem verstuurde. */
-  async function partnerIn({ supplierCode, codenaam, centen, oms, ref, soort, idem }) {
+  async function partnerIn({ supplierCode, codenaam, centen, oms, ref, soort, idem, magNieuweDienst }) {
     const c = Math.round(Number(centen));
     if (!Number.isFinite(c) || c < MIN_CENTEN || c > MAX_CENTEN) return { status: 400, error: 'Dat bedrag kan niet.' };
     if (!supplierCode || !codenaam) return { status: 400, error: 'Van wie, naar welke zaak?' };
     return metIdem(idem ? 'partnerin:' + codenaam + ':' + idem : null,
       'partnerin|' + codenaam + '|' + supplierCode + '|' + c, async () => {
+        // De motor kan al betaald hebben vóór de JS-ontvangst vaststond.
+        // Laat de boeking die herhaling herkennen, maar nooit nieuw geld innen.
+        const nieuweDienstFout = magNieuweDienst && magNieuweDienst() === false
+          ? { ...require('../aanmeldingen/abonnementsdiensten').fout(), code: 'ABONNEMENT_NIEUWE_DIENST' } : null;
         const { z, b } = await betaalMetDekking({ codenaam, centen: c, idem, boeking: { van: rekLid(codenaam),
-          naar: rekPartner(supplierCode), centen: c, soort: soort || 'verkoop', oms: oms || 'Betaling', ref: ref || null } });
+          naar: rekPartner(supplierCode), centen: c, soort: soort || 'verkoop', oms: oms || 'Betaling', ref: ref || null,
+          nieuweDienstFout } });
         if (z.error) return z;
         if (b.error) return b;
         let kosten = 0;

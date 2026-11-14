@@ -192,6 +192,14 @@ test('9. twee lagen op dezelfde kop gooien elkaar niet weg', () => {
 
 let srv, base;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-lidpoort-'));
+const historischAccount = require('./lib/historisch-account');
+async function bestaandLid(email, name, tier = 'rtg') {
+  historischAccount(TMP, { email, name, tier });
+  const r = await api('/api/auth/login', { login: email, password: 'geheim123', pasApp: tier });
+  assert.equal(r.status, 200, JSON.stringify(r.body));
+  assert.equal(r.body.state.user.tier, tier);
+  return r.body;
+}
 
 async function api(pad, body, token) {
   const h = { 'Content-Type': 'application/json' };
@@ -205,9 +213,7 @@ test.after(() => stop(srv));
 
 test('10. een betalend lid ZONDER contract komt gewoon binnen, en wordt geteld', async () => {
   const u = Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
-  const reg = (await api('/api/auth/register', { name: 'Poort ' + u, email: u + '@x.nl',
-    phone: '06' + u.replace(/\D/g, '').padEnd(8, '1').slice(0, 8),
-    password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' })).body;
+  const reg = await bestaandLid(u + '@x.nl', 'Poort ' + u);
   assert.ok(reg.token, 'het lid bestaat');
 
   /* Dit lid heeft een betalende pas en geen enkele aanmelding -- precies het geval
@@ -244,9 +250,7 @@ test('10. een betalend lid ZONDER contract komt gewoon binnen, en wordt geteld',
 test('11. een lid MET een lopende afspraak levert geen bezwaar op', async () => {
   const office = await kantoorAlsPersoon(base, api);
   const u = Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
-  const reg = (await api('/api/auth/register', { name: 'Loopt ' + u, email: u + '@x.nl',
-    phone: '06' + u.replace(/\D/g, '').padEnd(8, '1').slice(0, 8),
-    password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' })).body;
+  const reg = await bestaandLid(u + '@x.nl', 'Loopt ' + u);
   const aanvraag = (await api('/api/aanmelding/aanvraag',
     { idem: randomUUID(), pas: 'rtg', naam: 'Loopt ' + u, contact: u + '@x.nl' }, reg.token)).body;
   const id = aanvraag.ontvangst && aanvraag.ontvangst.aanvraagId;
@@ -299,16 +303,15 @@ test('13. over de echte server: contract voorbij -> basislaag, zonder opnieuw in
   const office = await kantoorAlsPersoon(base, api);
   const u = Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
   const email = u + '@x.nl';
-  const reg = (await api('/api/auth/register', { name: 'Voorbij ' + u, email,
-    phone: '06' + u.replace(/\D/g, '').padEnd(8, '1').slice(0, 8),
-    password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' })).body;
+  const reg = await bestaandLid(email, 'Voorbij ' + u);
   const aanvraag = (await api('/api/aanmelding/aanvraag', { idem: randomUUID(), pas: 'rtg', naam: 'Voorbij ' + u, contact: email }, reg.token)).body;
   const id = aanvraag.ontvangst && aanvraag.ontvangst.aanvraagId;
   assert.equal((await api('/api/aanmelding/beslis', { id, besluit: 'geaccepteerd' }, office)).status, 200);
   const nu = await api('/api/mijn/abonnement', {}, reg.token);
   assert.equal(nu.status, 200);
   assert.equal(nu.kop.get('rtg-contract'), null, 'een lopend contract draagt geen basislaagkop');
-  assert.equal((await api('/api/mijn/abonnement/opzeggen', {}, reg.token)).status, 200, 'het lid zegt op');
+  const opzeg = (await api('/api/mijn/abonnement/opzegvoorbeeld', {}, reg.token)).body;
+  assert.equal((await api('/api/mijn/abonnement/opzeggen', opzeg, reg.token)).status, 200, 'het lid zegt op');
   const nogLopend = await api('/api/mijn/abonnement', {}, reg.token);
   assert.equal(nogLopend.kop.get('rtg-contract'), null, 'een opzegging met einddatum in de toekomst loopt nog');
 
@@ -332,9 +335,7 @@ async function lidMetContract(pas = 'rtg') {
   const office = await kantoorAlsPersoon(base, api);
   const u = Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
   const email = u + '@x.nl';
-  const reg = (await api('/api/auth/register', { name: 'Bestaand ' + u, email,
-    phone: '06' + u.replace(/\D/g, '').padEnd(8, '2').slice(0, 8),
-    password: 'geheim123', geboortedatum: '1990-01-01', tier: pas, pasApp: pas })).body;
+  const reg = await bestaandLid(email, 'Bestaand ' + u, pas);
   const aanvraag = (await api('/api/aanmelding/aanvraag', { idem: randomUUID(), pas, naam: 'Bestaand ' + u, contact: email }, reg.token)).body;
   assert.equal((await api('/api/aanmelding/beslis', { id: aanvraag.ontvangst.aanvraagId, besluit: 'geaccepteerd' }, office)).status, 200);
   const login = (await api('/api/auth/login', { login: email, password: 'geheim123', pasApp: pas })).body;
@@ -343,10 +344,17 @@ async function lidMetContract(pas = 'rtg') {
 }
 
 test('14. dezelfde bearer na een verstreken afspraak: de betaalde capability weigert, zonder nieuwe login', async () => {
+  // Toets 13 liet de server op +400d staan. Een daar nieuw gesloten contract
+  // is na opnieuw +400d niet verstreken: eerst expliciet terug naar de basis.
+  stop(srv);
+  srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP, RTG_KLOK: '' } }); base = srv.base;
   const lid = await lidMetContract();
   const voor = await api(BETAALD, {}, lid.token);
   assert.ok(!isBetaaldGeweigerd(voor), 'met een lopende afspraak is de capability open: ' + JSON.stringify(voor.body));
-  assert.equal((await api('/api/mijn/abonnement/opzeggen', {}, lid.token)).status, 200);
+  const opzeg = (await api('/api/mijn/abonnement/opzegvoorbeeld', {}, lid.token)).body;
+  assert.ok(Date.parse(opzeg.eindigtOp) > Date.now(), 'positieve controle: de opzegging loopt nu nog');
+  assert.ok(Date.parse(opzeg.eindigtOp) < Date.now() + 400 * 86400000, 'de gekozen testklok ligt echt voorbij deze einddatum');
+  assert.equal((await api('/api/mijn/abonnement/opzeggen', opzeg, lid.token)).status, 200);
   stop(srv);
   srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP, RTG_KLOK: '+400d' } }); base = srv.base;
   const na = await api(BETAALD, {}, lid.token);   // DEZELFDE token, niet opnieuw ingelogd

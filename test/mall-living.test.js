@@ -6,7 +6,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, maakBetaaldRtgTestaccount } = require('./helper');
 const projectie = require('../server/kern/mall/levende-etalage');
 
 function api(base, route, body, token) {
@@ -50,6 +50,7 @@ test.before(async () => {
   });
   member = registration.body.token;
   assert.ok(member);
+  maakBetaaldRtgTestaccount(tmp, 'living-mall@x.nl');
 });
 test.after(() => stop(server && server.child));
 

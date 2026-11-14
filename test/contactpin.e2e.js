@@ -215,10 +215,16 @@ test('de levende code wordt getekend, en de schakelaar maakt de vaste pin onvind
       null, { timeout: 30000 });
     const live = await page.evaluate(() => {
       const cs = document.querySelectorAll('#scPinLiveDoek canvas');
-      return { aantal: cs.length, breed: cs[0] ? cs[0].width : 0 };
+      return { aantal: cs.length, breed: cs[0] ? cs[0].width : 0,
+        host: document.getElementById('scPinLiveDoek').classList.contains('ds-dyncode'),
+        beeld: cs[0] && cs[0].classList.contains('ds-dyncode__beeld'),
+        ring: cs[1] && cs[1].classList.contains('ds-dyncode__ring'),
+        inline: Array.from(cs).map(c => c.style.cssText) };
     });
     assert.equal(live.aantal, 2, 'de code en de aftelring staan er allebei');
     assert.ok(live.breed > 40, 'de code is echt getekend (' + live.breed + 'px)');
+    assert.equal(live.host && live.beeld && live.ring, true, 'de levende code gebruikt het centrale presentatiecontract');
+    assert.deepEqual(live.inline, ['', ''], 'de codec schrijft geen presentatie in het canvas');
 
     /* 2. de schakelaar. Het scherm bevestigt met een confirm(); dat is hier de
           mens die ja zegt. Daarna hoort de vaste pin voor een ANDER lid

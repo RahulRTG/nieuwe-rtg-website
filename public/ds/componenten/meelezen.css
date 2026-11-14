@@ -1,0 +1,14 @@
+@layer rtg.component {
+  .ds-meelezen { margin-block-start: var(--ds-ruimte-3); color: inherit; font-family: var(--ds-letter-tekst); }
+  .ds-meelezen .meelees-kop { display: flex; flex-wrap: wrap; align-items: center; gap: var(--ds-ruimte-2); margin-block-end: var(--ds-ruimte-1); }
+  .ds-meelezen :is(.meelees-knop, .meelees-auto) { min-block-size: var(--ds-doel); padding: var(--ds-ruimte-2) var(--ds-ruimte-3); border: 1px solid var(--ds-lijnkleur); border-radius: 0; background: transparent; color: inherit; font: inherit; font-size: var(--ds-maat-klein); cursor: pointer; }
+  .ds-meelezen .meelees-baan { max-block-size: 9rem; overflow-y: auto; padding: var(--ds-ruimte-2) var(--ds-ruimte-3); border-radius: 0; background: var(--ds-oppervlak-zacht); color: var(--ds-inkt); font-size: var(--ds-maat-klein); line-height: 1.45; }
+  .ds-meelezen .meelees-rij { display: flex; gap: var(--ds-ruimte-2); margin-block-start: var(--ds-ruimte-2); }
+  .ds-meelezen .meelees-rij[hidden], .ds-meelezen .meelees-baan[hidden], .ds-meelezen .meelees-auto[hidden] { display: none; }
+  .ds-meelezen .meelees-veld { flex: 1; min-inline-size: 0; min-block-size: var(--ds-doel); padding: var(--ds-ruimte-2) var(--ds-ruimte-3); border: 1px solid var(--ds-lijnkleur); border-radius: 0; background: var(--ds-oppervlak); color: var(--ds-inkt); font: inherit; }
+  .ds-meelezen .meelees-zend { min-block-size: var(--ds-doel); padding: var(--ds-ruimte-2) var(--ds-ruimte-3); border: 0; border-radius: 0; background: var(--ds-accent); color: var(--ds-accent-inkt); font: inherit; cursor: pointer; }
+  .ds-meelezen .meelees-regel { margin: 0 0 var(--ds-ruimte-1); }
+  .ds-meelezen .meelees-wie { font-weight: 600; }
+  .ds-meelezen .meelees-machine { opacity: .6; font-size: .85em; }
+  .ds-meelezen .meelees-geenauto { margin: var(--ds-ruimte-1) 0 0; font-size: var(--ds-maat-meta); opacity: .75; }
+}

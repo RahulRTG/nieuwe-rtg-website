@@ -8,7 +8,9 @@ async function api(route,body={},auth=token){const r=await fetch(srv.base+route,
 test.before(async()=>{
  assert.ok(pw,'Een echte browser is vereist voor Experience Proof.');
  srv=await h.startServer({env:{SMTP_URL:'',RTG_AI_UIT:'1'}});
- token=(await api('/api/auth/register',{name:'Avondproef',email:'experience-browser-'+Date.now()+'@example.test',phone:'0612345678',password:'geheim12345',geboortedatum:'1980-01-01',tier:'rtg',pasApp:'rtg'},null)).token;
+ const reg=await api('/api/auth/register',{name:'Avondproef',email:'experience-browser-'+Date.now()+'@example.test',phone:'0612345678',password:'geheim12345',geboortedatum:'1980-01-01',tier:'rtg',pasApp:'rtg'},null);
+ token=reg.token;assert.equal(reg.state.user.tier,'guest');
+ await h.keurLidGoed(srv.base,token,reg.state.user.codename,'1980-01-01');
  const status=await api('/api/onboarding/status');await api('/api/onboarding/teken',{naam:'Avondproef',akkoord:true,contractVersion:status.contract.versie});
  const roster=await api('/api/supplier/roster',{code:'KIKUNOI'},null),manager=roster.staff.find(x=>x.role==='manager');
  supplier=(await api('/api/supplier/login',{code:'KIKUNOI',staffId:manager.id,pin:'1234'},null)).token;

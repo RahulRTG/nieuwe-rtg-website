@@ -35,7 +35,7 @@
   }
   function renderBevPda(){
     const tabBtn = document.getElementById('tabBevPda');
-    if (tabBtn) tabBtn.style.display = heeftBeveiliging() ? '' : 'none';
+    if (tabBtn) tabBtn.classList.toggle('h-weg', !heeftBeveiliging());
     const wrap = $('#bevPdaWrap'); if (!wrap) return;
     if (!heeftBeveiliging()){ wrap.innerHTML = ''; return; }
     if (!pdBev){ wrap.innerHTML = '<div class="card">…</div>'; laadBevPda(); return; }

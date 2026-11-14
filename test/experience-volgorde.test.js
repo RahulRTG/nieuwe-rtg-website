@@ -87,8 +87,9 @@ test('6. tegen een echte server: dezelfde objecten, een uitleg erbij, en de hash
   try {
     const u = String(Date.now()).slice(-8);
     const reg = await post('/api/auth/register', { name: 'Volgorde ' + u, email: 'volgorde' + u + '@voorbeeld.nl',
-      phone: '06' + u, password: 'geheim12345', geboortedatum: '1985-05-05', tier: 'rtg' });
+      phone: '06' + u, password: 'geheim12345', geboortedatum: '1985-05-05' });
     assert.equal(reg.status, 200);
+    require('./helper').maakBetaaldRtgTestaccount(srv.datamap, 'volgorde' + u + '@voorbeeld.nl');
     const tok = reg.data.token;
     const voor = await post('/api/experience/projection', { world: 'living' }, tok);
     assert.equal(voor.status, 200, JSON.stringify(voor.data).slice(0, 200));

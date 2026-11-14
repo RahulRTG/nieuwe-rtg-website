@@ -2,10 +2,11 @@
    redactie controleren. Geen transportcache mag eerder antwoorden. */
 'use strict';
 const documentOperatie = require('./document-operatiepad');
+const { isReisketenPad } = require('./idemsleutels-reisketen');
 const paden = new Set([
   '/api/aanmelding/aanvraag', '/api/member/bureau/zaak/open',
   '/api/office/bank/rekening/open', '/api/werkplek/taak',
   '/api/labfonds/scheidsrechter', '/api/office/magnaat/scan',
   '/api/rtf/onboarding/teken'
 ]);
-module.exports = pad => documentOperatie(pad) || paden.has(String(pad || '').toLowerCase().replace(/\/$/, ''));
+module.exports = pad => documentOperatie(pad) || isReisketenPad(pad) || paden.has(String(pad || '').toLowerCase().replace(/\/$/, ''));

@@ -26,7 +26,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, keurLidGoed } = require('./helper');
+const { startServer, keurLidGoed, maakBetaaldRtgTestaccount } = require('./helper');
 
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-avond-'));
 
@@ -48,6 +48,8 @@ async function nieuwLid(P, naam, base) {
     password: 'geheim123', geboortedatum: geboren, geslacht: 'v', tier: 'rtg', pasApp: 'rtg'
   });
   assert.ok(r.body.token, naam + ' is aangemeld: ' + JSON.stringify(r.body).slice(0, 140));
+  // Bestaande volwassen RTG-persona; de losse leeftijdsproeven blijven apart.
+  maakBetaaldRtgTestaccount(TMP, naam.toLowerCase() + u + '@x.nl');
   /* Door de keuring als de toets de basis meegeeft. idGeverifieerd() nam
      hiervoor aan dat elke pas-houder geballoteerd was; nu wordt het gevraagd,
      en zonder deze stap valt een lid aan de bar af op de VERIFICATIE in plaats

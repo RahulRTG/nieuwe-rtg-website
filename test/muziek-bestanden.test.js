@@ -6,7 +6,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop, wachtOpWaarde } = require('./helper');
+const { startServer, stop, wachtOpWaarde, maakBetaaldRtgTestaccount } = require('./helper');
 const { soortVanBuffer } = require('../server/media/bestand');
 
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-muziek-bestand-'));
@@ -36,9 +36,12 @@ async function post(pad, body, token) {
   return { status: r.status, body: await r.json().catch(() => ({})) };
 }
 async function lid(naam, n) {
-  return (await post('/api/auth/register', { name: naam, email: 'muziekbestand' + n + '@x.test',
+  const token = (await post('/api/auth/register', { name: naam, email: 'muziekbestand' + n + '@x.test',
     phone: '0612345' + String(n).padStart(3, '0'), password: 'geheim123',
     geboortedatum: '1990-01-01', tier: 'rtg' })).body.token;
+  assert.ok(token, 'het muziekaccount is geregistreerd');
+  maakBetaaldRtgTestaccount(TMP, 'muziekbestand' + n + '@x.test');
+  return token;
 }
 
 test.before(async () => {

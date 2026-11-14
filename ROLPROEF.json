@@ -1,9 +1,9 @@
 {
  "stempel": {
-  "op": "2026-10-30T12:45:53.592Z",
-  "commit": "39f5705b6e",
+  "op": "2026-11-09T15:25:54.431Z",
+  "commit": "94548d8f64",
   "boomVuil": false,
-  "boomAnders": 1,
+  "boomAnders": 0,
   "instrument": "scripts/rolproef-route.js",
   "node": "v26.12.1"
  },

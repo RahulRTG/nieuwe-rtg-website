@@ -23,7 +23,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, maakBetaaldRtgTestaccount } = require('./helper');
 
 let srv, base, lid, ander, gast, office;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-bankbeheer-'));
@@ -42,12 +42,14 @@ const api = (pad, body, token) => fetch(base + '/api/' + pad, {
 let teller = 0;
 async function nieuwLid(naam) {
   const u = (Date.now() + (++teller) * 7919).toString().slice(-9);  // louter cijfers: het telefoonnummer moet geldig zijn
+  const email = 'bb' + u + '@x.nl';
   const r = await fetch(base + '/api/auth/register', {
     method: 'POST', headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ name: naam, email: 'bb' + u + '@x.nl', phone: '06' + u.slice(0, 8),
-      password: 'geheim12345', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' })
+    body: JSON.stringify({ name: naam, email, phone: '06' + u.slice(0, 8),
+      password: 'geheim12345', geboortedatum: '1990-01-01' })
   }).then(x => x.json());
   assert.ok(r.token, 'lid ' + naam + ' geregistreerd');
+  maakBetaaldRtgTestaccount(TMP, email); // Alleen de bankleden; de aparte guest blijft buiten deze fixture.
   return { token: r.token };
 }
 const inloggen = (tier) => fetch(base + '/api/login', {

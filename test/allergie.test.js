@@ -8,7 +8,7 @@
    Draai los: node --test test/allergie.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, maakBetaaldRtgTestaccount } = require('./helper');
 const fs = require('fs'); const os = require('os'); const path = require('path');
 
 function verseDataDir() { return fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-alg-')); }
@@ -17,12 +17,15 @@ async function api(base, pad, body, token) {
   const r = await fetch(base + pad, { method: 'POST', headers: h, body: JSON.stringify(body || {}) });
   return { status: r.status, body: await r.json() };
 }
-async function registreer(base) {
+async function registreer(base, dataDir) {
   const u = Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
-  return (await api(base, '/api/auth/register', {
+  const reg = await api(base, '/api/auth/register', {
     name: 'Allergie Lid', email: u + '@x.nl', phone: '06' + u.replace(/\D/g, '').padEnd(8, '1').slice(0, 8),
     password: 'geheim123', geboortedatum: '1990-01-01', tier: 'business', pasApp: 'business'
-  })).body.token;
+  });
+  // Betaalde toegang stelt geen zorgprofiel of deeltoestemming in.
+  maakBetaaldRtgTestaccount(dataDir, u + '@x.nl');
+  return reg.body.token;
 }
 // vind een gerecht (geen bar) met een bepaald allergeen en eentje zonder
 async function menuVan(base, token, code) {
@@ -34,7 +37,7 @@ test('1. botsend gerecht wordt tegengehouden, doorzetten mag met allergieAkkoord
   const TMP = verseDataDir();
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   try {
-    const lid = await registreer(base);
+    const lid = await registreer(base, TMP);
     const menu = await menuVan(base, lid, 'KIKUNOI');
     const metVis = menu.find(m => (m.allergens || []).includes('vis') && m.station !== 'bar');
     const zonder = menu.find(m => !(m.allergens || []).length && m.station !== 'bar');
@@ -69,13 +72,14 @@ test('2. zonder delen-toestemming reist het profiel niet mee en wordt niets tege
   const TMP = verseDataDir();
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   try {
-    const lid = await registreer(base);
+    const lid = await registreer(base, TMP);
     const menu = await menuVan(base, lid, 'KIKUNOI');
     const metVis = menu.find(m => (m.allergens || []).includes('vis') && m.station !== 'bar');
     assert.ok(metVis, 'demozaak heeft een visgerecht');
 
     // wel een visallergie, maar delen staat uit: privacy by design, niets reist mee
-    await api(base, '/api/zorgprofiel/zet', { allergenen: ['vis'], delen: false }, lid);
+    const zet = await api(base, '/api/zorgprofiel/zet', { allergenen: ['vis'], delen: false }, lid);
+    assert.equal(zet.status, 200, 'het niet-gedeelde profiel is werkelijk opgeslagen');
     const res = await api(base, '/api/order', { supplierCode: 'KIKUNOI', items: [{ id: metVis.id, qty: 1 }] }, lid);
     assert.equal(res.status, 200, 'zonder delen wordt er niets geblokkeerd');
   } finally {

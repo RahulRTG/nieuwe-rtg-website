@@ -31,8 +31,10 @@ let n = 0;
 async function rtgAccount(naam) {
   n += 1;
   const u = (Date.now() + n * 7919).toString().slice(-8);
-  const r = (await api('/api/auth/register', { name: naam, email: 'mix' + u + '@voorbeeld.test', phone: '06' + u,
-    password: 'geheim123', geboortedatum: '1985-05-05', tier: 'rtg', pasApp: 'rtg' })).body;
+  const email = 'mix' + u + '@voorbeeld.test';
+  require('./lib/historisch-account')(TMP, { name: naam, email, phone: '06' + u,
+    password: 'geheim123', tier: 'rtg' });
+  const r = (await api('/api/auth/login', { login: email, password: 'geheim123', pasApp: 'rtg' })).body;
   const me = (await api('/api/auth/me', {}, r.token)).body;
   return { token: r.token, codenaam: me.user.codename };
 }

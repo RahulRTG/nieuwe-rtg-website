@@ -374,11 +374,15 @@ function envelopen({ routes, graaf, functieVoorPad, onbekendeRanden = new Set(),
 
 /* ------------------------------------------------------------------ meten -- */
 
+function isBediening(pad) {
+  const { prefixLengte } = require(path.join(WORTEL, 'server', 'functies', 'toegangpad'));
+  const BEDIENING = require(path.join(WORTEL, 'server', 'kern', 'platformregister', 'bediening'));
+  return BEDIENING.some(b => b[4]?.exact ? pad === b[0] : prefixLengte(pad, b[0]) > 0);
+}
+
 function meet() {
   const herkomst = require('./lib/routeherkomst').lees();
   const { functieVoorPad } = require(path.join(WORTEL, 'server', 'functies', 'toegangpad'));
-  const { prefixLengte } = require(path.join(WORTEL, 'server', 'functies', 'toegangpad'));
-  const BEDIENING = require(path.join(WORTEL, 'server', 'kern', 'platformregister', 'bediening'));
 
   const verstrengeling = V.meet();
   const onbekendeRanden = new Set(verstrengeling.alle.filter(r => r.soort === 'ONBEKEND').map(r => r.van + ' -> ' + r.naar));
@@ -413,7 +417,6 @@ function meet() {
      inventaris voor stap 4 (default-dicht) en hoort niet als een getal langs
      te komen: een route die nergens uit te zetten is, is een voordeur zonder
      naam. */
-  const isBediening = pad => BEDIENING.some(b => prefixLengte(pad, b[0]) > 0);
   const bediening = r.zonderFunctie.filter(x => isBediening(x.pad));
   const onbenoemd = r.zonderFunctie.filter(x => !isBediening(x.pad));
 
@@ -546,4 +549,4 @@ if (require.main === module) {
   process.exit(0);
 }
 
-module.exports = { resolveer, bestandsgraaf, sluiting, envelopen, meet, rapport, kernSleutelsVan, isBedrading, herleidSleutel };
+module.exports = { resolveer, bestandsgraaf, sluiting, envelopen, meet, rapport, kernSleutelsVan, isBedrading, herleidSleutel, isBediening };

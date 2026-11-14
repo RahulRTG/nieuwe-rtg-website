@@ -20,13 +20,14 @@
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop, laadPlaywright, browserOpties, geenBrowser, letOpFouten } = require('./helper');
+const fs = require('node:fs'), os = require('node:os'), path = require('node:path');
+const { startServer, stopHard, maakBetaaldRtgTestaccount, laadPlaywright, browserOpties, geenBrowser, letOpFouten } = require('./helper');
 const { alleenDs, edgeActies, geenOverloop, beeld } = require('./lib/ds-toets');
 
 const pw = laadPlaywright(), skip = geenBrowser(pw);
 const PAPIEREN_OK = { kenteken: '2030-01-01', verzekering: '2030-01-01', apk: '2030-01-01',
   taxivergunning: '2030-01-01', boordcomputer: '2030-01-01' };
-let srv, browser, pda, lid;
+let srv, browser, pda, lid, TMP;
 
 async function post(pad, body, token) {
   const r = await fetch(srv.base + pad, { method: 'POST', headers: { 'Content-Type': 'application/json',
@@ -46,7 +47,8 @@ async function open(breedte, hoogte, taal = 'nl', token = pda, zoek = '') {
 
 test.before(async () => {
   if (skip) return;
-  srv = await startServer({ env: { SMTP_URL: '', RTG_AI_UIT: '1' } });
+  TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-chauffeur-ds-'));
+  srv = await startServer({ env: { RTG_DATA_DIR: TMP, SMTP_URL: '', RTG_AI_UIT: '1' } });
   browser = await pw.chromium.launch(browserOpties(pw));
   const roster = await post('/api/supplier/roster', { code: 'MKKX' });
   const m = (roster.body.staff || []).find(x => x.role === 'manager');
@@ -61,8 +63,9 @@ test.before(async () => {
   lid = (await post('/api/auth/register', { name: 'Reiziger', email: 'dsc' + u + '@x.nl', phone: '06' + u,
     password: 'geheim12345', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' })).body.token;
   assert.ok(lid, 'het lid is aangemeld');
+  maakBetaaldRtgTestaccount(TMP, 'dsc' + u + '@x.nl');
 });
-test.after(async () => { if (browser) await browser.close(); if (srv) await stop(srv.child); });
+test.after(async () => { if (browser) await browser.close(); if (srv) await stopHard(srv.child); if (TMP) fs.rmSync(TMP, { recursive: true, force: true }); });
 
 test('alleen het Design System: geen erfenisblad, de ds-poort klopt, de Edge staat', { skip }, async () => {
   const { ctx, page, fouten } = await open(390, 844);
@@ -114,6 +117,10 @@ test('de Magnaat-proef blijft zichtbaar een proef en raakt de API niet', { skip 
   await page.goto(srv.base + '/apps/chauffeur.html?magnaat=1', { waitUntil: 'domcontentloaded' });
   await page.waitForSelector('#werkstapel [data-rit="nieuw"]');
   assert.equal(await page.locator('#rtgMagnaatTestMark').isVisible(), true, 'het keurmerk Magnaat Test staat in beeld');
+  assert.equal(await page.locator('#rtgMagnaatTestMark').getAttribute('class'), 'ds-magnaatproef',
+    'de trainingsgrens gebruikt op de echte host de centrale eigenaar');
+  assert.equal(await page.locator('style').evaluateAll((stijlen) => stijlen.some((s) => s.textContent.includes('#rtgMagnaatTestMark'))), false,
+    'de trainingsgrens injecteert geen eigen presentatie');
   assert.equal((await page.textContent('#modusLabel')).trim(), 'MAGNAAT TEST');
   assert.match(await page.textContent('#werkstapel'), /Ibiza Airport/, 'de synthetische rit');
   await page.locator('[data-naar="hulp"]').click();

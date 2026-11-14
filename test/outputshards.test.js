@@ -7,6 +7,47 @@ const { aggregate } = require('../scripts/lib/outputaggregate');
 const { fixture } = require('./lib/outputshards-fixture');
 const debt = require('../scripts/bewijsschuld').POSTEN;
 const debtCount = (register, id) => debt.find(p => p.id === id).uit({ output: register });
+
+test('planRun requires all fifteen distinct successful CI journal sources', t => {
+  // Synthetic candidate isolates the planner contract; it is not runtime proof.
+  const candidate = fs.realpathSync(temporary(t)), sha = 'a'.repeat(40);
+  fs.mkdirSync(path.join(candidate, 'scripts/lib'), { recursive: true });
+  fs.writeFileSync(path.join(candidate, 'scripts/lib/outputbinding.js'),
+    "exports.binding = journal => ({ id: 'synthetic-binding', journal });\n");
+  fs.writeFileSync(path.join(candidate, 'scripts/outputproef.js'),
+    'exports.koppeling = () => ({ perRoute: new Map(), perToets: new Map() });\n' +
+    'exports.gevoeligheid = () => ({ gevoelig: new Set() });\n' +
+    'exports.teDun = () => null; exports.infrastructuur = () => new Set();\n');
+  fs.writeFileSync(path.join(candidate, 'scripts/mutatie.js'), "exports.DEUREN = '/api/auth';\n");
+  S.write(path.join(candidate, 'OUTPUTPROEF.json'), { perRoute: {} });
+  t.mock.method(S, 'identity', cwd => ({ commit: cwd === candidate ? sha : (process.env.GITHUB_SHA || 'b'.repeat(40)), tree: 'c'.repeat(40) }));
+  const sources = [
+    ...[1, 2, 3, 4].map(n => ({ artifact: 'routejournaal-scherf-' + n,
+      jobName: 'Toetsscherf ' + n + ' van 4', testStep: 'Deze scherf, met dekking als lcov' })),
+    ...['boot-smoke', 'grens-sweep', 'keuring', 'klok', 'meterijk', 'zaakdoos'].map(n => ({ artifact: 'routejournaal-ijking-' + n,
+      jobName: 'De ijking - ' + n, testStep: 'De ijking draaien (een bestand, alleen op deze machine)' })),
+    ...[1, 2, 3, 4, 5].map(n => ({ artifact: 'schermjournaal-deel-' + n,
+      jobName: 'Schermtoetsen deel ' + n + ' van 5', testStep: 'Scherm-tests (PDA in de browser)' }))
+  ].map(s => ({ ...s, testConclusion: 'success' }));
+  const journal = path.join(candidate, 'journal.log');
+  const plan = rows => {
+    S.write(journal + '.provenance.json', { sources: rows });
+    return require('../scripts/outputproof').planRun(candidate, sha, journal, path.join(candidate, 'plan'));
+  };
+  assert.equal(plan(sources).candidate.commit, sha, 'the complete producer inventory reaches planning');
+  for (const change of [rows => rows.pop(), rows => { rows[14] = { ...rows[13] }; },
+    rows => rows.push({ ...rows[0], artifact: 'unexpected' }),
+    rows => { rows[14].artifact = 'unexpected'; },
+    rows => { rows[14].testConclusion = 'failure'; },
+    rows => { delete rows[14].testConclusion; },
+    rows => { rows[14].jobName = rows[13].jobName; },
+    rows => { rows[14].testStep = 'Other execution'; }]) {
+    const changed = structuredClone(sources); change(changed);
+    assert.throws(() => plan(changed), /CI journals/, 'missing, duplicated, unknown or failed evidence cannot replace a required source');
+  }
+  assert.throws(() => plan(null), /CI journals/);
+});
+
 function temporary(t) {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-outputshards-'));
   t.after(() => fs.rmSync(dir, { recursive: true, force: true })); return dir;

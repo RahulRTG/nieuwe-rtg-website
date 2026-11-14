@@ -13,7 +13,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
+const { startServer, stopHard, maakBetaaldRtgTestaccount, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
 const { lees } = require('../server/kern/office/zip');
 
 const pw = laadPlaywright();
@@ -31,6 +31,7 @@ test('Office: exporteren als XLSX met de classificatie erin, en een XLSX inlezen
     const t = Date.now();
     const reg = await api(base, '/api/auth/register', { name: 'Formaat E2E', email: 'fe' + t + '@e.test',
       phone: '06' + String(t).slice(-8), password: 'geheim123', geboortedatum: '1988-01-01', tier: 'rtg' });
+    maakBetaaldRtgTestaccount(TMP, 'fe' + t + '@e.test');
     const m = await api(base, '/api/kantoorpakket/maak', { soort: 'blad', titel: 'Kwartaal' }, reg.token);
     await api(base, '/api/kantoorpakket/bewaar', { id: m.id, inhoud: { cellen: { A1: '4', A2: '=SOM(A1;1)', A3: '=JAAR("2026-01-01")' }, rijen: 20, kolommen: 8 } }, reg.token);
     await api(base, '/api/kantoorpakket/beheer', { id: m.id, classificatie: 'vertrouwelijk' }, reg.token);
@@ -87,7 +88,7 @@ test('Office: exporteren als XLSX met de classificatie erin, en een XLSX inlezen
     assert.deepEqual(fouten, [], 'geen fouten in de console: ' + fouten.join(' | '));
   } finally {
     if (browser) await browser.close();
-    stop(child);
+    await stopHard(child);
     fs.rmSync(TMP, { recursive: true, force: true });
   }
 });

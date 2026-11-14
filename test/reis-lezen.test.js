@@ -73,6 +73,7 @@ function nepModel() {
   });
 }
 
+const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-reislezen-'));
 let model, server, base, A, B;
 const api = (pad, body, token, koppen) => fetch(base + pad, { method: 'POST',
   headers: Object.assign({ 'Content-Type': 'application/json' }, token ? { Authorization: 'Bearer ' + token } : {}, koppen || {}),
@@ -96,7 +97,7 @@ async function beurt(lid, scenario, ref) {
 
 test.before(async () => {
   model = await nepModel();
-  server = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-reislezen-')),
+  server = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP,
     LOCAL_AI_URL: model.base, LOCAL_AI_MODEL: 'proefmodel', RTG_EXTERNE_AI_UIT: '1' } });
   base = server.base;
   const u = Date.now().toString(36);
@@ -104,6 +105,7 @@ test.before(async () => {
     const reg = await api('/api/auth/register', { name: 'Lezer ' + n, email: 'lezer-' + n + u + '@voorbeeld.test',
       password: 'geheim-' + n + '-123', geboortedatum: '1988-04-04', phone: tel, pasApp: 'rtg' });
     assert.equal(reg.status, 200);
+    require('./helper').maakBetaaldRtgTestaccount(TMP, 'lezer-' + n + u + '@voorbeeld.test');
     return { token: reg.body.token, refs: [] };
   };
   A = await lid('a', '0612340301'); B = await lid('b', '0612340302');

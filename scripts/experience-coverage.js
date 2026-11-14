@@ -3,7 +3,7 @@
 
 const fs = require('node:fs');
 const path = require('node:path');
-const {candidate} = require('./lib/experience/evidence');
+const {candidate,untrackedInputs} = require('./lib/experience/evidence');
 const {build,validate,serializeRegistry} = require('./lib/experience/coverage');
 
 const ROOT = path.join(__dirname,'..');
@@ -16,6 +16,14 @@ if (['--write','--check','--gate'].filter(arg=>args.has(arg)).length > 1) {
 }
 const evidencePath = process.env.RTG_EXPERIENCE_EVIDENCE;
 const evidence = evidencePath && fs.existsSync(evidencePath) ? JSON.parse(fs.readFileSync(evidencePath,'utf8')) : {version:1,records:[]};
+if (args.has('--write')) {
+  const untracked = untrackedInputs(ROOT);
+  if (untracked.length) {
+    console.error('BLOCKED: Experience-register bevat onbekende broninvoer; voeg deze bewust toe of verwijder haar:\n' +
+      untracked.map(file => ' - ' + file).join('\n'));
+    process.exit(2);
+  }
+}
 const clean = args.has('--gate') ? candidate(ROOT) : null;
 if (clean && !clean.ok) { console.error('BLOCKED: ' + clean.reason); process.exit(2); }
 const candidateCommit = clean ? clean.commit : null;

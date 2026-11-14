@@ -100,7 +100,7 @@
   function boerPdaToe(r){ if (r && r.overzicht) pdBoer = r.overzicht; renderBoer(); }
   function renderBoer(){
     const tabBtn = document.getElementById('tabBoer');
-    if (tabBtn) tabBtn.style.display = heeftBoer() ? '' : 'none';
+    if (tabBtn) tabBtn.classList.toggle('h-weg', !heeftBoer());
     const wrap = $('#boerPdaWrap'); if (!wrap) return;
     if (!heeftBoer()){ wrap.innerHTML = ''; return; }
     if (!pdBoer){ wrap.innerHTML = '<div class="card">…</div>'; laadBoer(); return; }

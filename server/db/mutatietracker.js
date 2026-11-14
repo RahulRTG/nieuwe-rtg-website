@@ -44,7 +44,10 @@ const ruw = v => ontdoe.get(v) || v;
    van 7,5 MB 43,75 ms per collectiebeeld. De ruwe target is geen tweede staat:
    alle Proxy-writes landen juist op dit object. Alleen de JSON-tekst komt naar
    buiten, zodat geen aanroeper de aanwijzer via een ruwe mutatie kan omzeilen. */
-function serialiseerVoorOpslag(waarde) { return JSON.stringify(ruw(waarde)); }
+function serialiseerVoorOpslag(waarde, collectie) {
+  return collectie === 'trustEvidence'
+    ? require('../lib/immutable-json').serialiseer(waarde, ruw) : JSON.stringify(ruw(waarde));
+}
 
 function meld(wortel, naam, voor, na) {
   if (wortel !== actieveWortel || typeof naam !== 'string') return;

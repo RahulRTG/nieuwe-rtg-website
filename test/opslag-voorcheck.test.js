@@ -72,6 +72,110 @@ function grootBlok(n, extra) {
   return uit;
 }
 
+function telLengtemetingen(t, waarden) {
+  const doelen = new Set(waarden), keys = Object.keys;
+  let aantal = 0;
+  t.mock.method(Object, 'keys', function(waarde) {
+    if (doelen.has(waarde)) aantal++;
+    return keys(waarde);
+  });
+  return () => aantal;
+}
+
+test('onthoud telt kleine en exact verplichte collecties niet', t => {
+  const v = require('../server/db/voorcheck');
+  const gevallen = [
+    { sleutel: 'paySaldi', bytes: v.GROOT_BYTES + 1, waarde: { lid: { centen: 100 } } },
+    { sleutel: 'betaalTegoed', bytes: v.GROOT_BYTES + 1, waarde: { lid: { centen: 100 } } },
+    { sleutel: 'voorcheckKlein', bytes: v.GROOT_BYTES, waarde: { lid: { gezien: 1 } } }
+  ];
+  const metingen = telLengtemetingen(t, gevallen.map(g => g.waarde));
+  t.after(() => { for (const g of gevallen) v.vergeet(g.sleutel); });
+  for (const g of gevallen) {
+    v.vergeet(g.sleutel);
+    v.onthoud(g.sleutel, g.bytes, g.waarde, 1000);
+    assert.equal(v.magOverslaan(g.sleutel, g.waarde, false, 1001), false);
+    assert.equal(v.magOverslaan(g.sleutel, g.waarde, true, 1001), false);
+  }
+  assert.equal(metingen(), 0, 'geen Object.keys voor een ongebruikte lengtemaat');
+});
+
+test('onthoud meet direct wanneer een kleine collectie boven de grens groeit', t => {
+  const v = require('../server/db/voorcheck'), sleutel = 'voorcheckGroei';
+  const waarde = { a: 1 }, metingen = telLengtemetingen(t, [waarde]);
+  v.vergeet(sleutel); t.after(() => v.vergeet(sleutel));
+  v.onthoud(sleutel, v.GROOT_BYTES, waarde, 1000);
+  assert.equal(metingen(), 0);
+  assert.equal(v.magOverslaan(sleutel, waarde, false, 1001), false);
+  waarde.b = 2;
+  v.onthoud(sleutel, v.GROOT_BYTES + 1, waarde, 1002);
+  assert.equal(metingen(), 1, 'boven de grens wordt de actuele lengte gemeten');
+  assert.equal(v.magOverslaan(sleutel, waarde, false, 1003), true);
+  waarde.c = 3;
+  assert.equal(v.magOverslaan(sleutel, waarde, false, 1004), false,
+    'toevoegen blijft onmiddellijk zichtbaar');
+});
+
+test('groot naar klein naar groot gebruikt geen oude lengtemaat', t => {
+  const v = require('../server/db/voorcheck'), sleutel = 'voorcheckKrimpGroei';
+  const waarde = { a: 1, b: 2 }, metingen = telLengtemetingen(t, [waarde]);
+  v.vergeet(sleutel); t.after(() => v.vergeet(sleutel));
+  v.onthoud(sleutel, v.GROOT_BYTES + 1, waarde, 1000);
+  assert.equal(metingen(), 1);
+  delete waarde.b;
+  v.onthoud(sleutel, v.GROOT_BYTES, waarde, 1001);
+  assert.equal(metingen(), 1, 'klein worden vraagt geen nieuwe lengtescan');
+  assert.equal(v.magOverslaan(sleutel, waarde, false, 1002), false);
+  Object.assign(waarde, { b: 2, c: 3, d: 4 });
+  v.onthoud(sleutel, v.GROOT_BYTES + 1, waarde, 1003);
+  assert.equal(metingen(), 2, 'opnieuw groot meet vier items, niet de oude twee');
+  assert.equal(v.magOverslaan(sleutel, waarde, false, 1004), true);
+  assert.equal(v.magOverslaan(sleutel, waarde, true, 1004), false);
+  delete waarde.d;
+  assert.equal(v.magOverslaan(sleutel, waarde, false, 1005), false,
+    'verwijderen blijft onmiddellijk zichtbaar');
+});
+
+test('conditioneel tellen behoudt exacte geldserialisatie en geforceerde opslag', () => {
+  const o = verseOpslag({ RTG_SQLITE_GROOT_BYTES: 128, RTG_SQLITE_GROOT_MS: 60000 });
+  const namen = ['paySaldi', 'betaalTegoed'];
+  const scans = { paySaldi: 0, betaalTegoed: 0 };
+  try {
+    for (const naam of namen) {
+      o.db.data[naam] = { lid: { centen: 100, vul: 'x'.repeat(200) } };
+      Object.defineProperty(o.db.data[naam], 'toJSON', {
+        value() {
+          scans[naam]++;
+          return { lid: { centen: this.lid.centen, vul: this.lid.vul } };
+        }
+      });
+    }
+    o.db.data.sessions = grootBlok(1);
+    o.dbmod.save();
+    for (const naam of namen) {
+      scans[naam] = 0;
+      o.db.data[naam].lid.centen = 200;
+    }
+    o.db.data.sessions.t0.gezien = 9999;
+    o.dbmod.save();
+    for (const naam of namen) {
+      assert.equal(scans[naam], 1, naam + ' wordt eenmaal volledig geserialiseerd');
+      assert.equal(o.opSchijf(naam).lid.centen, 200,
+        naam + ' bewaart een wijziging-op-zijn-plaats direct');
+      scans[naam] = 0;
+    }
+    assert.equal(o.opSchijf('sessions').t0.gezien, 1000,
+      'de bestaande uitstelregel voor grote niet-geldcollecties blijft gelden');
+    require('../server/db/sqlite').saveSqlite(true);
+    for (const naam of namen) {
+      assert.equal(scans[naam], 1, 'force slaat ook ongewijzigd geld niet over');
+      assert.equal(o.opSchijf(naam).lid.centen, 200);
+    }
+    assert.equal(o.opSchijf('sessions').t0.gezien, 9999,
+      'force bewaart de uitgestelde wijziging onmiddellijk');
+  } finally { o.op(); }
+});
+
 test('gerichte spoorsave raakt geen andere collectie; gewone en geforceerde saves bewaren nog alles', () => {
   const o = verseOpslag();
   try {

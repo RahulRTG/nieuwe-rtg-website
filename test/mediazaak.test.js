@@ -26,7 +26,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop, stroomAdres } = require('./helper');
+const { startServer, stop, stroomAdres, maakBetaaldRtgTestaccount } = require('./helper');
 
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-mediazaak-'));
 let srv, base, office;
@@ -48,6 +48,9 @@ async function lid(naam) {
   const reg = await api('/api/auth/register', { name: naam, email, phone: '06' + u,
     password: wachtwoord, geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' });
   assert.ok(reg.body.token, naam + ' is aangemeld');
+  // Ook de buitenstaander heeft een ledenpas: de afwijzingen moeten de
+  // zaak-/personeelsgrens bewijzen, niet eerder op de betaalpoort stranden.
+  maakBetaaldRtgTestaccount(TMP, email);
   const st = await api('/api/state', {}, reg.body.token);
   return { token: reg.body.token, email, wachtwoord, naam, codenaam: st.body.state.user.codename };
 }

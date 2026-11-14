@@ -9,7 +9,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop, kantoorAlsPersoon } = require('./helper');
+const { startServer, stop, kantoorAlsPersoon, maakBetaaldRtgTestaccount } = require('./helper');
 
 const PNG = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+M8AAAMCAoHf3ZQAAAAASUVORK5CYII=';
 
@@ -20,14 +20,17 @@ function api(base, pad, body, token) {
     .then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
 }
 
-let srv, base, brand, office, lid;
+let srv, base, brand, office, lid, TMP;
 let seq = 0;
 
 // een geverifieerd lid: registreren, paspoort + selfie uploaden, RTG keurt goed
 async function nieuwGeverifieerdLid() {
   const u = (Date.now() + (++seq)).toString().slice(-8);
   const reg = await api(base, '/api/auth/register', { name: 'Jamie de Vries', email: 'p' + u + '@x.nl',
-    phone: '06' + u, password: 'geheim123', geboortedatum: '1991-03-12', tier: 'business', pasApp: 'business' });
+    phone: '06' + u, password: 'geheim123', geboortedatum: '1991-03-12', pasApp: 'rtg' });
+  assert.equal(reg.status, 200, JSON.stringify(reg.body));
+  // Alleen het bestaande abonnement is fixture; identiteit en toestemming gaan echt via de routes.
+  maakBetaaldRtgTestaccount(TMP, 'p' + u + '@x.nl');
   const token = reg.body.token;
   const st = await api(base, '/api/state', {}, token);
   const codename = st.body.state.user.codename;
@@ -41,7 +44,7 @@ async function nieuwGeverifieerdLid() {
 }
 
 test.before(async () => {
-  const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-paspoort-'));
+  TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-paspoort-'));
   srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP, RTG_ENC_KEY: 'test-encryptiesleutel-1234567890' } });
   base = srv.base;
   const login = await api(base, '/api/supplier/login', { username: 'rahul', password: 'Imran' });

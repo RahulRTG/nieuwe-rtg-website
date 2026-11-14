@@ -26,6 +26,9 @@
    regels met een graad, en hooguit één knop. Status geeft geen voorrang. */
 'use strict';
 
+const tijdzone = require('./tijdzone');
+const klok = require('../lib/klok');
+
 const OPEN_LEVERING = ['bevestigd', 'onderweg'];
 const TELT_GAST = ['aangevraagd', 'bevestigd', 'aangekomen'];
 
@@ -35,7 +38,7 @@ function maakOchtendkaart({ db, scheduleFor, klokVan, inplanbaar, vrij, vandaag 
     const ip = inplanbaar ? inplanbaar(code, id, dag) : { onbekend: true };
     return ip.onbekend ? { stand: 'onbekend' } : ip.plan ? { stand: 'inplanbaar' } : { stand: 'afwezig', wat: ip.wat };
   };
-  const dagVan = vandaag || (() => new Date().toISOString().slice(0, 10));
+  const dagVan = vandaag || (() => tijdzone.datumIn(klok.datum()));
 
   function regelDienst(ik, rooster) {
     const graad = rooster.vast ? 'gemeten' : 'vermoed';

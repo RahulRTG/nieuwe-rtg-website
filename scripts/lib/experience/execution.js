@@ -15,6 +15,8 @@ function scoped(record,root) {
 }
 function execute(root,proof) {
   if (!/^[a-z][a-z0-9-]*$/.test(proof.id) || !/^test\/[\w.-]+\.js$/.test(proof.test)) throw new Error('Ongeldige Experience-proef');
+  const timeoutMs=proof.timeoutMs===undefined?240000:proof.timeoutMs;
+  if(!Number.isInteger(timeoutMs)||timeoutMs<1000||timeoutMs>3600000) throw new Error('Ongeldige Experience-proeftijd');
   const before = evidence.candidate(root);
   if (!before.ok) throw new Error('Experience-uitvoering vereist een schone kandidaat');
   const source = evidence.fingerprint(root),runId=randomUUID();
@@ -23,7 +25,7 @@ function execute(root,proof) {
   const sourceHash = require('./coverage').sourceHash(root,contract,signatures);
   const run = cp.spawnSync(process.execPath,['--test','--test-concurrency=1','--test-reporter=tap',proof.test],
     {cwd:root,env:{...process.env,RTG_EXPERIENCE_SOURCE:sourceHash,RTG_EXPERIENCE_COMMIT:before.commit},
-      encoding:'utf8',timeout:240000,maxBuffer:8*1024*1024});
+      encoding:'utf8',timeout:timeoutMs,maxBuffer:64*1024*1024});
   const log = (run.stdout||'')+'\n'+(run.stderr||'')+(run.error?'\n'+run.error.message:'');
   const number = n=>Number(((run.stdout||'').match(new RegExp('^# '+n+' (\\d+)$','m'))||[])[1])||0;
   const after = evidence.candidate(root);

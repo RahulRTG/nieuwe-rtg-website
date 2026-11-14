@@ -26,7 +26,7 @@ function lijnVan(req, res) {
   /* bestaand() en niet gesprek(): opzoeken mag de lijn niet aanleggen -- zie
      de opmerking daar. Zonder dat bestaat elke sleutel die je verzint. */
   lijn.gesprek = commGast.bestaand(lijn.code, lijn.lidKey, lijn.dept);
-  if (!lijn.gesprek || !comm.magErin(comm.gesprekVan(lijn.gesprek.id), wie.zaak(lijn.code))) {
+  if (!lijn.gesprek || !comm.magErin(lijn.gesprek, wie.zaak(lijn.code)) || !comm.magErin(lijn.gesprek, lijn.lidKey)) {
     res.status(404).json({ error: 'Gesprek niet gevonden.' }); return null;
   }
   return lijn;

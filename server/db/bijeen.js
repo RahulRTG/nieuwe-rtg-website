@@ -136,13 +136,11 @@ module.exports = ({ save, saveDuurzaam }) => {
             const sleutels = doos.volledig ? undefined : [...doos.sleutels];
             if (duurzaam) {
               const uit = saveDuurzaam(sleutels);
-          /* DE BUNDEL FAALT ALS HIJ NIET BEVESTIGD KON WORDEN, en alleen daar waar
-             bevestigen mogelijk is. Zonder dit gooien meldt saveDuurzaam netjes
-             dat het misging en gaat de route toch met 200 verder -- precies de
-             valse bevestiging waar deze hele ronde over ging. En met een
-             onvoorwaardelijk gooien zou een opslag die niet kan tellen elke
-             transactie laten mislukken; dat brak eerder vier geldtoetsen. */
-              if (uit.bevestigbaar && !uit.duurzaam) {
+              /* Geen 200 na een afwijzing of onbevestigde meetbare commit.
+                 Een bekende verloren write faalt ook zonder transactieteller.
+                 Alleen het ontbreken van zo'n teller is geen afwijzing: PG
+                 bevestigt aan de antwoordgrens. Verzin daarvoor geen stand. */
+              if (uit.afgewezen || (uit.bevestigbaar && !uit.duurzaam)) {
                 throw new Error('[duurzaam] de commit is niet vastgelegd: ' + uit.reden);
               }
             } else if (sleutels && sleutels.length) save.sleutels(sleutels);

@@ -23,8 +23,8 @@
   }
   function vul() {
     $('#ntTitel').value = open.titel || '';
-    $('#ntTekstWrap').style.display = open.soort === 'notitie' ? '' : 'none';
-    $('#ntLijstWrap').style.display = open.soort === 'lijst' ? '' : 'none';
+    $('#ntTekstWrap').hidden = open.soort !== 'notitie';
+    $('#ntLijstWrap').hidden = open.soort !== 'lijst';
     $('#ntTekst').value = open.tekst || '';
     $('#ntDatum').value = open.herinnerOp || '';
     $('#ntTijd').value = open.herinnerTijd || '';

@@ -82,6 +82,10 @@
     script.src = pad; script.async = false;
     document.head.appendChild(script);
   }
+  /* Het blikveld ontleent de vaste wereld eerst aan het centrale
+     routecontract. Basis laadt dit contract ook, maar pas als deferred script;
+     dan kon een vroeg Edge-oordeel tijdelijk op het pagina-attribuut vallen. */
+  laadScript('/shared/rtg-world-identity.js');
   laadScript('/shared/edge/actiestaat.js');
   laadScript('/shared/edge/blikveld-hoofdactie.js');
   laadScript('/shared/edge/blikveld.js');

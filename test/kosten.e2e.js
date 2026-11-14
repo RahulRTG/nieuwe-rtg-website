@@ -129,6 +129,16 @@ test('het kostenbord is vanuit de boardroom te bereiken', { skip: vereist('brows
     const page = await browser.newPage({ viewport: { width: 1100, height: 900 } });
     await page.addInitScript((t) => { try { localStorage.setItem('rtg_member_token', t); } catch (e) {} }, eig.token);
     await page.goto(base + '/apps/boardroom.html', { waitUntil: 'networkidle' });
+    await page.waitForSelector('.ds-eigenaarszetel', { state: 'visible', timeout: 15000 });
+    assert.equal(await page.locator('style').evaluateAll(stijlen => stijlen.some(stijl =>
+      stijl.textContent.includes('.ez-kop') || stijl.textContent.includes('.ez-betaal'))), false,
+    'de eigenaarszetel injecteert geen runtime-stijl');
+    assert.equal(await page.locator('.ds-eigenaarszetel [style]').count(), 0,
+      'de eigenaarszetel draagt geen inline presentatie');
+    const zetelKnoppen = await page.locator('.ds-eigenaarszetel .ez-knop:visible').evaluateAll(knoppen =>
+      knoppen.map(knop => ({ breedte: knop.getBoundingClientRect().width, hoogte: knop.getBoundingClientRect().height })));
+    assert.ok(zetelKnoppen.length > 0 && zetelKnoppen.every(knop => knop.breedte >= 44 && knop.hoogte >= 44),
+      'zichtbare zetelacties behouden minimaal 44 bij 44 px: ' + JSON.stringify(zetelKnoppen));
     await page.waitForSelector('#boKostprijs a', { state: 'visible', timeout: 15000 });
     const href = await page.getAttribute('#boKostprijs a', 'href');
     assert.equal(href, '/apps/kosten.html', 'de verwijzing wijst niet naar het kostenbord');

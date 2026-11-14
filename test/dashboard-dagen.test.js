@@ -20,6 +20,104 @@ const { startServer } = require('./helper');
 
 const WORTEL = path.join(__dirname, '..');
 
+function backofficeDagFixture(t, klok, data = {}) {
+  const tz = require('../server/kern/tijdzone'), origineel = tz.omzetdag;
+  t.mock.method(tz, 'omzetdag', zaak => origineel(zaak, new Date(klok)));
+  const zaak = { code: 'DAG', name: 'Dagproef', tijdzone: 'Europe/Amsterdam' };
+  let handler;
+  require('../server/routes/supplier/backoffice')({
+    app: { post(pad, auth, fn) { assert.equal(pad, '/api/supplier/backoffice'); handler = fn; } },
+    supplierAuth() {}, db: { data: { rides: data.rides || [], posSales: { DAG: data.kassa || [] }, klok: { DAG: data.klok || [] } } },
+    ordersVanZaak: () => data.orders || [], boekingenVanZaak: () => data.boekingen || [],
+    zaakcommand: { voor: () => ({ signalen: { alerts: () => [] } }) }
+  });
+  return { zaak, lees() {
+    let antwoord;
+    handler({ actor: { manager: true }, supplier: zaak, body: {} }, { json(value) { antwoord = value; } });
+    return antwoord;
+  } };
+}
+
+test('backoffice berekent 300 verschillende transactietijden eenmaal per verzoek', t => {
+  const orders = Array.from({ length: 300 }, (_, i) => ({ paid: true, total: 1,
+    at: new Date(Date.parse('2026-03-29T02:57:30Z') + i * 1000).toISOString() }));
+  const p = backofficeDagFixture(t, '2026-03-29T12:00:00Z', { orders });
+  const tz = require('../server/kern/tijdzone'), dagVan = tz.omzetdagVan;
+  const teller = t.mock.method(tz, 'omzetdagVan', (zaak, at) => dagVan(zaak, at));
+  const uit = p.lees();
+  assert.deepEqual(uit.week.slice(5).map(d => [d.date, d.omzet, d.aantal]),
+    [['2026-03-28', 150, 150], ['2026-03-29', 150, 150]]);
+  assert.equal(uit.stats.omzetWeek, 300);
+  assert.equal(teller.mock.callCount(), 300, 'ieder tijdstip exact eenmaal, ook boven de formattercachegrens');
+});
+
+for (const [datum, voor, na] of [
+  ['2026-01-16', '2026-01-16T03:59:59Z', '2026-01-16T04:00:00Z'],
+  ['2026-03-29', '2026-03-29T02:59:59Z', '2026-03-29T03:00:00Z'],
+  ['2026-10-25', '2026-10-25T03:59:59Z', '2026-10-25T04:00:00Z']
+]) test('backoffice behoudt alle omzetbakken rond 05:00 op ' + datum, t => {
+  const tijden = [voor, na], p = backofficeDagFixture(t, datum + 'T12:00:00Z', {
+    orders: tijden.map(at => ({ at, paid: true, total: 10 })),
+    rides: tijden.map(at => ({ at, paid: true, supplierCode: 'DAG', quote: 20 })),
+    boekingen: tijden.map(at => ({ at, paid: true, kind: 'ticket', price: 30 })),
+    kassa: tijden.map(at => ({ at, method: 'contant', total: 40 })),
+    klok: tijden.map((at, i) => ({ in: at, name: 'Medewerker ' + i }))
+  });
+  const uit = p.lees(), gisteren = require('../server/kern/tijdzone').plusDagen(datum, -1);
+  assert.deepEqual(uit.week.slice(5).map(d => [d.date, d.omzet, d.aantal]),
+    [[gisteren, 100, 4], [datum, 100, 4]]);
+  assert.deepEqual(uit.stats, { omzetVandaag: 100, transactiesVandaag: 4,
+    kassaVandaag: 40, omzetWeek: 200, binnenNu: 1, openActies: 0 });
+  assert.deepEqual(uit.toppers, [{ naam: 'ticket', aantal: 2, omzet: 60 }]);
+});
+
+test('beide herhaalde DST-uren blijven dezelfde omzetdag', t => {
+  const p = backofficeDagFixture(t, '2026-10-25T12:00:00Z', {
+    orders: ['2026-10-25T00:30:00Z', '2026-10-25T01:30:00Z'].map(at => ({ at, paid: true, total: 10 }))
+  });
+  assert.deepEqual(p.lees().week.slice(5).map(d => [d.date, d.omzet, d.aantal]),
+    [['2026-10-24', 20, 2], ['2026-10-25', 0, 0]]);
+});
+
+test('ongeldige tijden tellen niet mee en paidAt houdt zijn bestaande voorrang', t => {
+  const tijden = ['rommel', '', null, undefined], geldig = '2026-01-16T04:00:00Z';
+  const p = backofficeDagFixture(t, '2026-01-16T12:00:00Z', {
+    orders: [...tijden.map(at => ({ at, paid: true, total: 100 })),
+      { paidAt: '', at: geldig, paid: true, total: 10 },
+      { paidAt: 'rommel', at: geldig, paid: true, total: 100 }],
+    rides: tijden.map(at => ({ at, paid: true, supplierCode: 'DAG', quote: 100 })),
+    boekingen: tijden.map(at => ({ at, paid: true, price: 100 })),
+    kassa: tijden.map(at => ({ at, method: 'contant', total: 100 })),
+    klok: tijden.map((at, i) => ({ in: at, name: 'Ongeldig ' + i }))
+  });
+  const tz = require('../server/kern/tijdzone'), dagVan = tz.omzetdagVan;
+  const teller = t.mock.method(tz, 'omzetdagVan', (zaak, at) => dagVan(zaak, at));
+  assert.deepEqual(p.lees().stats, { omzetVandaag: 10, transactiesVandaag: 1,
+    kassaVandaag: 0, omzetWeek: 10, binnenNu: 0, openActies: 0 });
+  assert.equal(teller.mock.calls.filter(c => c.arguments[1] === 'rommel').length, 1);
+  assert.equal(teller.mock.calls.filter(c => c.arguments[1] === '').length, 1);
+});
+
+test('omzetdaghergebruik eindigt bij het verzoek en volgt een nieuwe zaakzone', t => {
+  const p = backofficeDagFixture(t, '2026-01-16T12:00:00Z', {
+    orders: [{ at: '2026-01-16T00:00:00Z', paid: true, total: 10 }]
+  });
+  assert.deepEqual(p.lees().week.slice(5).map(d => d.omzet), [10, 0]);
+  p.zaak.tijdzone = 'Asia/Tokyo';
+  assert.deepEqual(p.lees().week.slice(5).map(d => d.omzet), [0, 10]);
+});
+
+test('numerieke tijden en Date-objecten behouden de ongecachete tijdzoneweg', t => {
+  const getal = Date.parse('2026-01-16T04:00:00Z'), datum = new Date(getal);
+  const p = backofficeDagFixture(t, '2026-01-16T12:00:00Z', {
+    orders: [{ at: getal, paid: true, total: 4 }, { at: datum, paid: true, total: 5 }]
+  });
+  const tz = require('../server/kern/tijdzone'), dagVan = tz.omzetdagVan;
+  const teller = t.mock.method(tz, 'omzetdagVan', (zaak, at) => dagVan(zaak, at));
+  assert.equal(p.lees().stats.omzetVandaag, 9);
+  for (const at of [getal, datum]) assert.equal(teller.mock.calls.filter(c => c.arguments[1] === at).length, 14);
+});
+
 test('kantooroverzicht om 00:30 in Amsterdam: vandaag is de nieuwe dag, 23:30 hoort bij gisteren', () => {
   const uit = execFileSync(process.execPath, ['-e', `
     const m = require('./server/kern/kantoor/metrics-week')({ invoices: () => [], fondsAfdrachten: () => [], muntOntvangsten: () => [] });

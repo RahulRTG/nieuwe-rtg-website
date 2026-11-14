@@ -15,7 +15,11 @@ test('juridische reis hergebruikt de publieke Living-eigenaar en bestaande proof
     .map(n=>JSON.parse(fs.readFileSync(path.join(root,'experience',n),'utf8')));
   const graph=compile(root,require('../experience/constitution.json'),journeys);
   assert.deepEqual(graph.errors,[]);
-  const proofs=journeys.flatMap(j=>j.proofs),bindings=typed.required(contract,signatures,proofs);
+  const proofs=journeys.flatMap(j=>j.proofs);
+  for(const binding of contract.executedProofs) if(!proofs.some(proof=>proof.id===binding.proof)) {
+    proofs.push({id:binding.proof,test:binding.instrument,timeoutMs:binding.timeoutMs});
+  }
+  const bindings=typed.required(contract,signatures,proofs);
   assert.equal(bindings.filter(b=>b.proof==='hotels-destination').length,5);
   const legal=bindings.filter(b=>b.proof==='juridisch-destination');assert.equal(legal.length,4);
   assert.equal(journey.audience,'public');assert.equal(journey.steps[0].capability,'site.juridisch');

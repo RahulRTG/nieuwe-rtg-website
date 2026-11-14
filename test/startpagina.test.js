@@ -127,15 +127,9 @@ test('iedere wereld heeft vanaf de startpagina een eigen verhaalpagina', () => {
 });
 
 test('iedere pas heeft vanaf de startpagina een eigen verhaalpagina', () => {
-  const passen = {
-    community: '/apps/app.html?pas=guest',
-    'rtg-pass': '/apps/app.html?pas=rtg',
-    'business-lite': '/apps/kantoor.html',
-    'business-pass': '/apps/app.html?pas=business',
-    'lifestyle-pass': '/apps/app.html?pas=lifestyle'
-  };
+  const passen = ['community', 'rtg-pass', 'business-lite', 'business-pass', 'lifestyle-pass'];
 
-  for (const [pas, appPad] of Object.entries(passen)) {
+  for (const pas of passen) {
     const relatiefPad = './public/site/passen/' + pas + '.html';
     assert.ok(HTML.includes('href="' + relatiefPad + '"'),
       pas + ' is vanaf zijn prijskaart bereikbaar');
@@ -151,8 +145,12 @@ test('iedere pas heeft vanaf de startpagina een eigen verhaalpagina', () => {
       pas + ' gebruikt het gedeelde pasontwerp');
     assert.match(pasHtml, /href="\.\.\/\.\.\/\.\.\/#passen"/,
       pas + ' wijst terug naar het passenoverzicht');
-    assert.ok(pasHtml.includes('https://app.rahultravelgroup.com' + appPad),
-      pas + ' opent zijn passende RTG-ingang');
+    assert.match(pasHtml, /data-commercial-policy="2026-11-12\.1"/,
+      pas + ' benoemt de gepubliceerde beleidsversie');
+    assert.match(pasHtml, /href="#beschikbaarheid"/,
+      pas + ' verklaart eerst de beschikbaarheid; beleidspublicatie is geen checkout');
+    assert.match(pasHtml, /id="beschikbaarheid"/,
+      pas + ' heeft een werkend lokaal doel voor die uitleg');
   }
 });
 

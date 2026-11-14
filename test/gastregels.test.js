@@ -9,7 +9,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, kantoorAlsPersoon } = require('./helper');
+const { startServer, kantoorAlsPersoon, maakBetaaldRtgTestaccount } = require('./helper');
 
 let BASE;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-gast-'));
@@ -32,6 +32,7 @@ test.before(async () => {
   // een betalend lid ter vergelijking
   lidToken = (await json(await api('/api/auth/register', { name: 'Betalend Lid', email: 'lid@x.nl', phone: '0612345676',
     password: 'geheim123', geboortedatum: '1990-01-01', tier: 'business', pasApp: 'business' }))).token;
+  maakBetaaldRtgTestaccount(TMP, 'lid@x.nl'); // De beide gratis gasten krijgen geen betaalpas.
   // Sal de Mar: bezorgdienst aan
   const roster = await json(await api('/api/supplier/roster', { code: 'KIKUNOI' }));
   const man = roster.staff.find(x => x.role === 'manager');

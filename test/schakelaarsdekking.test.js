@@ -243,7 +243,15 @@ test('4. elke route hoort bij een functie of bij de bediening', () => {
      al eerder in kern/platformregister/bediening.js), en test/platformregister.test.js
      en test/schakelkast-dekking.test.js waren groen voordat dit getal werd verzet.
      `onverklaard` ging in dezelfde stap OMLAAG, van 10 naar 9. */
-  assert.ok(zonder.length <= 155,
+  /* Eigenaarsbesluit 14 november 2026: precies vier eigen contractrechten
+     blijven bereikbaar bij gesloten instroom. De oude grens blijft voor alle
+     andere routes 155; aanbod en tekenen vallen NIET onder deze uitzondering.
+     Toets 5 benoemt de zes nieuwe deuren uitputtend, dus een zevende erft niets. */
+  const contractrechten = new Set(['betalen', 'herstel', 'intrekken', 'stand']
+    .map(actie => '/api/mijn/abonnement/automatisch/' + actie));
+  assert.ok(zonder.filter(r => !contractrechten.has(r.pad)).length <= 155,
+    'de bestaande bedieningsgrens blijft 155 buiten de vier goedgekeurde contractrechten');
+  assert.ok(zonder.length <= 159,
     zonder.length + ' routes hangen aan geen enkele functie. Dat is de bediening van ' +
     'het platform (boardroom, techniek, gezondheid, isolatie) en die hoort niet schakelbaar ' +
     'te zijn, maar bij deze aantallen is er iets anders aan de hand.');
@@ -251,4 +259,26 @@ test('4. elke route hoort bij een functie of bij de bediening', () => {
   /* EN HET RUWE GETAL MAG NIET NUL ZIJN: nul zou betekenen dat de meting stuk
      is, niet dat het huis dicht is. */
   assert.ok(zonder.length > 0, 'nul zou betekenen dat de meting stuk is, niet dat het huis dicht is');
+});
+
+test('5. alleen de vier benoemde contractrechten blijven buiten de instroomschakelaar', () => {
+  const { redenVoor } = require('../server/kern/bestuursroutes');
+  const prefix = '/api/mijn/abonnement/automatisch/';
+  const instroom = ['aanbod', 'teken'];
+  const rechten = ['betalen', 'herstel', 'intrekken', 'stand'];
+  assert.deepEqual(alleRoutes().filter(r => r.pad.startsWith(prefix)).map(r => r.pad).sort(),
+    [...instroom, ...rechten].map(actie => prefix + actie).sort(),
+    'een nieuwe abonnementsroute vraagt een eigen functie- of rechtenbesluit');
+  for (const actie of instroom) {
+    assert.equal(functies.functieVoorPad(prefix + actie)?.id, 'tg-aanmeld', actie + ' is nieuwe instroom');
+    assert.equal(redenVoor(prefix + actie), null, actie + ' is geen onuitschakelbaar contractrecht');
+  }
+  for (const actie of rechten) {
+    assert.ok(!functies.functieVoorPad(prefix + actie), actie + ' blijft buiten de instroomschakelaar');
+    assert.ok(redenVoor(prefix + actie), actie + ' heeft een verklaarde grond');
+  }
+  assert.equal(redenVoor(prefix + 'onbekende-nieuwe-actie'), null,
+    'een toekomstige route erft niet stilzwijgend dezelfde uitzondering');
+  assert.equal(redenVoor(prefix + 'herstel/nieuw'), null,
+    'ook een nieuw onderpad erft het exacte herstelrecht niet');
 });

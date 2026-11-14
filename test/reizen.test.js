@@ -30,7 +30,7 @@ const os = require('os');
 const path = require('path');
 const { maakReiswereld } = require('../server/kern/reiswereld');
 const { maakReizen } = require('../server/kern/reizen');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, maakBetaaldRtgTestaccount } = require('./helper');
 
 const dag = (n) => { const x = new Date(); x.setDate(x.getDate() + n); return x.toISOString().slice(0, 10); };
 
@@ -257,6 +257,7 @@ test('11. /api/reis/reizen: dicht zonder inlog, en een echte aanvraag komt eruit
     const u = Date.now().toString().slice(-8);
     const reg = await post('/api/auth/register', { name: 'Reiziger', email: 'j' + u + '@x.nl',
       phone: '06' + u, password: 'geheim123', geboortedatum: '1990-01-01', tier: 'business', pasApp: 'business' });
+    maakBetaaldRtgTestaccount(TMP, 'j' + u + '@x.nl');
     const lid = reg.body.token;
     const cat = await post('/api/reisbureau', {}, lid);
     const trip = cat.body.reizen[0];

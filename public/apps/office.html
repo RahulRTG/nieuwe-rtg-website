@@ -365,6 +365,7 @@
 <link href="/ds/componenten/cookie.css" rel="stylesheet">
 <link href="/ds/componenten/samen.css" rel="stylesheet">
 <link href="/ds/componenten/handenvrij.css" rel="stylesheet">
+<link href="/ds/componenten/presentatierol.css" rel="stylesheet">
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
 <script src="/shared/rtg-heritage-transition.js" blocking="render"></script>
@@ -412,7 +413,7 @@
 <header class="kop">
   <a href="/apps/app.html" class="terug" id="terug" aria-label="Terug">←</a>
   <h1>RTG Office</h1>
-  <span class="werk" id="werkChip" style="display:none;"></span>
+  <span class="werk h-weg" id="werkChip"></span>
   <span class="rek"></span>
   <span class="staat" id="staat"></span>
 </header>
@@ -481,15 +482,15 @@
       <span class="rek"></span>
       <button class="office-fase" id="faseBadge" type="button">Concept</button>
       <button class="knop vol office-hoofdactie" id="faseHoofd" type="button">Ter beoordeling</button>
-      <button class="knop" id="presBtn" type="button" style="display:none;">Presenteer</button>
+      <button class="knop h-weg" id="presBtn" type="button">Presenteer</button>
       <button class="office-presence" id="samenBtn" type="button" aria-label="Samenwerking openen">
         <span id="samenBol"></span><span id="samenLabel">Alleen u</span>
       </button>
       <details class="office-opmaak" id="officeOpmaak">
         <summary class="knop">Opmaak</summary>
         <div class="office-opmaakmenu">
-          <span id="tekstTools" style="display:none;"></span>
-          <span id="bladTools" style="display:none;"></span>
+          <span class="ds-presentatie-inline-acties h-weg" id="tekstTools"></span>
+          <span class="ds-presentatie-inline-acties h-weg" id="bladTools"></span>
         </div>
       </details>
       <details class="office-meer" id="officeMeer">
@@ -503,20 +504,20 @@
         </div>
       </details>
     </div>
-    <div class="formbalk" id="formBalk" style="display:none;">
+    <div class="formbalk h-weg" id="formBalk">
       <span class="ref" id="celRef">A1</span>
       <input id="celInvoer" aria-label="Inhoud of formule van de cel" placeholder="Waarde of formule, bijvoorbeeld =SOM(B2:B9)">
     </div>
     <div class="vlak" id="vlak">
       <div id="tekst" contenteditable="true" data-leeg="Begin te typen…" role="textbox" aria-multiline="true" aria-label="Documenttekst"></div>
-      <div id="bladWrap" style="display:none;"><table id="blad"></table></div>
-      <div id="presWrap" style="display:none;">
+      <div class="h-weg" id="bladWrap"><table id="blad"></table></div>
+      <div class="h-weg" id="presWrap">
         <div id="diaRail"></div>
         <div id="diaVlak"></div>
       </div>
-      <div id="formWrap" style="display:none;"></div>
-      <div id="schetsWrap" style="display:none;"></div>
-      <div id="bordWrap" style="display:none;"></div>
+      <div class="h-weg" id="formWrap"></div>
+      <div class="h-weg" id="schetsWrap"></div>
+      <div class="h-weg" id="bordWrap"></div>
     </div>
     <div class="voetbalk" id="voetbalk"></div>
   </section>
@@ -540,7 +541,7 @@
       <select id="deelRechten" aria-label="Rechten"><option value="lezen">Alleen lezen</option><option value="bewerken">Meeschrijven</option></select>
       <button class="knop vol" type="submit">Deel</button>
     </form>
-    <div id="gezinBlok" style="display:none;">
+    <div class="h-weg" id="gezinBlok">
       <select id="gezinRechten" aria-label="Delen met het gezin">
         <option value="uit">Alleen voor mij</option>
         <option value="lezen">Het gezin leest mee</option>
@@ -620,7 +621,7 @@
     <button class="knop vol" id="aiVraagBtn" type="button">Vraag voorstel</button>
     <textarea id="aiUit" rows="7" readonly aria-label="Voorstel"></textarea>
     <div class="s-10ksllx">
-      <button class="knop vol" id="aiToepas" type="button" style="display:none;">Voeg toe aan het document</button>
+      <button class="knop vol h-weg" id="aiToepas" type="button">Voeg toe aan het document</button>
       <button class="knop" id="aiDicht" type="button">Sluit</button>
     </div>
   </div>

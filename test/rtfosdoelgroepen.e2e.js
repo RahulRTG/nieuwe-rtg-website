@@ -325,7 +325,8 @@ test('de coordinator geeft de code uit en bevestigt de gemelde uren, vanaf het b
     // 2. de vier gemelde uren staan in de rij van die vrijwilliger, met de zin
     //    erbij dat ze nog niet meetellen
     const voor = await page.evaluate(() => document.body.innerText.replace(/\s+/g, ' '));
-    assert.match(voor, /Bevestig 4 uur op 2026-11-03/, 'de gemelde uren staan niet bij de vrijwilliger');
+    assert.match(await page.textContent('[data-vuren]'), /Bevestig 4 uur op 2026-11-03/,
+      'de semantische knoptekst bevat de gemelde uren niet');
     assert.match(voor, /telt pas mee na uw bevestiging/, 'er staat niet bij dat gemelde uren nog niet meetellen');
     // /i, want de pil met het urentotaal staat in kapitalen op het scherm
     assert.match(voor, /\b0 uur\b/i, 'de gemelde uren tellen al mee voor de bevestiging');

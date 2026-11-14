@@ -1279,7 +1279,12 @@ jobs:
     runs-on: ubuntu-latest
     needs: preflight
     if: needs.preflight.outputs.mode == 'full'
-    timeout-minutes: 30
+    # De drie geslaagde delen van de bevroren run 42780106784 gebruikten
+    # 24:37-25:21 inclusief installatie. Deel 2 werd na 30:16 door de
+    # jobtermijn afgebroken terwijl de scan nog liep. Dit vergroot geen
+    # foutbudget: dezelfde volledige scan en hetzelfde oordeel blijven
+    # verplicht, maar krijgen net als de schermscherven tijd om af te ronden.
+    timeout-minutes: 45
     strategy:
       fail-fast: false
       matrix:

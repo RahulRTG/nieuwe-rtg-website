@@ -70,9 +70,12 @@ const OVERSLAAN = (() => {
   return new Set(fs.readFileSync(bron, 'utf8').split(/\s+/).filter(Boolean));
 })();
 
-/* De stukken buiten <script>. Een style-attribuut in een JavaScript-string is
-   een ander soort ding: het komt pas op het scherm na een aanroep, en de proef
-   ernaast kan het niet zien. Wat niet te bewijzen valt, wordt niet omgezet. */
+/* De stukken buiten <script>, <style> en HTML-commentaar. Een style-attribuut
+   in JavaScript, CSS-uitleg of documentcommentaar is brontekst en geen DOM-
+   attribuut. De ronde van 9 november 2026 telde `style="..."` uit drie CSS-
+   commentaren als zes echte attributen en maakte daar `.i-z8u{...}` van. De
+   berekende-stijlproef bleef terecht gelijk, want geen element was veranderd;
+   zonder deze bronzeef leek dat toch op afgeloste presentatieschuld. */
 /* HIER STOND `<\/script>` EN DAT MISTE `</script >`. HTML staat witruimte toe
    voor de sluithaak, en dan liep dit blok door tot de volgende sluiter -- met als
    gevolg dat markup als script gold en niet werd omgezet, of erger: dat een stuk
@@ -83,17 +86,30 @@ const OVERSLAAN = (() => {
    commentaar-verwijderaar wordt gebruikt: dezelfde vraag hoort niet op drie
    plekken anders beantwoord te worden (LAT.md regel 4). */
 function markupStukken(bron) {
-  const uit = [];
-  const open = /<script\b[^>]*>/gi;
+  const blokvrij = [];
+  const open = /<(script|style)\b[^>]*>/gi;
   let laatste = 0, m;
   while ((m = open.exec(bron))) {
-    const dicht = eindTag(bron, 'script', m.index + m[0].length);
+    const dicht = eindTag(bron, m[1].toLowerCase(), m.index + m[0].length);
     if (!dicht) break;
-    uit.push([laatste, m.index]);
+    blokvrij.push([laatste, m.index]);
     laatste = dicht.eind;
     open.lastIndex = dicht.eind;
   }
-  uit.push([laatste, bron.length]);
+  blokvrij.push([laatste, bron.length]);
+
+  const uit = [];
+  for (const [begin, eind] of blokvrij) {
+    let cursor = begin;
+    while (cursor < eind) {
+      const commentaar = bron.indexOf('<!--', cursor);
+      if (commentaar < 0 || commentaar >= eind) { uit.push([cursor, eind]); break; }
+      if (commentaar > cursor) uit.push([cursor, commentaar]);
+      const sluit = bron.indexOf('-->', commentaar + 4);
+      if (sluit < 0 || sluit >= eind) { cursor = eind; break; }
+      cursor = sluit + 3;
+    }
+  }
   return uit;
 }
 
@@ -131,15 +147,18 @@ function isToestand(waarde) {
 function verzamel(bron) {
   const stukken = markupStukken(bron);
   const tel = new Map();
+  let alle = 0, toestanden = 0;
   const re = /\sstyle="([^"]*)"/g;
   let m;
   while ((m = re.exec(bron))) {
     if (!inMarkup(stukken, m.index)) continue;
+    alle++;
     const waarde = m[1].trim().replace(/;\s*$/, '');
-    if (!waarde || isToestand(waarde)) continue;
+    if (!waarde) continue;
+    if (isToestand(waarde)) { toestanden++; continue; }
     tel.set(waarde, (tel.get(waarde) || 0) + 1);
   }
-  return { tel, stukken };
+  return { tel, stukken, alle, toestanden };
 }
 
 function zet(bestand) {
@@ -156,7 +175,7 @@ function zet(bestand) {
   }
   const vol = path.isAbsolute(bestand) ? bestand : path.join(WORTEL, bestand);
   const bron = fs.readFileSync(vol, 'utf8');
-  const { tel, stukken } = verzamel(bron);
+  const { tel, stukken, alle, toestanden } = verzamel(bron);
   const eigenStijl = idsMetStijlSchrijven(bron);
 
   /* Meer dan eens, en niet iets wat een browser als losse eigenschap anders
@@ -182,7 +201,9 @@ function zet(bestand) {
   if (afgekeurd) console.log('  ' + afgekeurd + ' klasse(n) overgeslagen: de proef wees ze af');
   if (TOON || !kandidaten.length) {
     console.log('\n' + bestand);
-    console.log('  style-attributen in de markup : ' + [...tel.values()].reduce((a, b) => a + b, 0));
+    console.log('  werkelijke attributen         : ' + alle);
+    console.log('  toestand (bewust overgeslagen): ' + toestanden);
+    console.log('  presentatie-attributen        : ' + [...tel.values()].reduce((a, b) => a + b, 0));
     console.log('  unieke waarden                : ' + tel.size);
     console.log('  waarden die vaker voorkomen   : ' + kandidaten.length);
     console.log('  attributen die dan verdwijnen : ' + winst + ' (' + kandidaten.length + ' klassen ervoor terug)');

@@ -20,6 +20,7 @@ module.exports = (mctx) => {
     const inv = (md.invoices || []).find(i => i.id === req.body.invoiceId);
     if (!inv) return res.status(404).json({ error: 'Factuur niet gevonden.' });
     if (inv.status === 'paid') return res.status(409).json({ error: 'Deze factuur is al betaald.' });
+    if (inv.abonnement) return res.status(409).json({ error: 'Gebruik voor deze termijn de gekoppelde betaalroute bij Lidmaatschap.' });
     const euroCenten = Math.max(1, Math.round((inv.bijdrage || 0) * 100));
     const wie = own ? ('acc:' + req.session.account.id) : ('sess:' + req.session.tier);
     try {

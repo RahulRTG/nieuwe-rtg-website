@@ -190,7 +190,8 @@ test('19. een nieuwe medewerker krijgt een account -- en NOOIT een betaalde pas'
   const claims = Object.assign(BASIS(), { sub: 'nieuw-1', email: 'nieuw@klantje.test' });
   const r = await sso.aanmelden(accounts, k, claims);
   assert.equal(r.nieuw, true);
-  assert.equal(r.user.tier, 'rtg', 'hooguit RTG, net als zelf-registreren');
+  assert.equal(r.user.tier, 'guest', 'gratis account: SSO is geen aanvaard en betaald abonnement');
+  assert.notEqual(r.user.tier, 'rtg');
   assert.notEqual(r.user.tier, 'business');
   assert.notEqual(r.user.tier, 'lifestyle');
   // de echte naam hoort in de kluis, niet in een operationele kolom

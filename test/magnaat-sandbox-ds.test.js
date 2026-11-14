@@ -1,6 +1,6 @@
 'use strict';
 const test = require('node:test'), assert = require('node:assert/strict');
-const fs = require('node:fs'), path = require('node:path'), crypto = require('node:crypto');
+const fs = require('node:fs'), path = require('node:path');
 const { fixture, bron } = require('./lib/magnaat-sandbox-fixture');
 
 test('zonder expliciete Magnaat-1 blijven opslag, apparaten, transport en DOM ongemoeid', () => {
@@ -13,7 +13,7 @@ test('zonder expliciete Magnaat-1 blijven opslag, apparaten, transport en DOM on
   }
 });
 
-test('sandbox vóór DS-shell blokkeert direct maar tekent later het DS-keurmerk zonder injectie', async () => {
+test('sandbox blokkeert direct en tekent later het centrale DS-keurmerk zonder injectie', async () => {
   const f = fixture();
   assert.equal(f.marker(), null); assert.equal(f.styles().length, 0);
   assert.equal((await f.window.fetch('/api/staff/ritten')).status, 409);
@@ -33,13 +33,11 @@ test('reeds opgebouwde DS-pagina toont hetzelfde keurmerk onmiddellijk zonder le
   assert.equal(f.styles().length, 0); assert.equal(f.events.DOMContentLoaded, undefined);
 });
 
-test('legacy behoudt exact het oorspronkelijke keurmerkblad en maakt één marker', () => {
+test('iedere host gebruikt hetzelfde centrale keurmerk zonder runtime-stijl', () => {
   for (const ready of ['loading', 'complete']) {
     const f = fixture({ ready }); f.ready(); f.ready();
-    assert.equal(f.styles().length, 1); assert.equal(f.marker().className, '');
+    assert.equal(f.styles().length, 0); assert.equal(f.marker().className, 'ds-magnaatproef');
     assert.equal(f.marker().textContent, 'Magnaat Test'); assert.equal(f.marker().hidden, false);
-    assert.equal(crypto.createHash('sha256').update(f.styles()[0].textContent).digest('hex'),
-      '7db8124ed0663b7d330039c0f7a95bcabdb1decfb2a789e94e1f32b438e92a51');
     assert.equal(f.document.body.children.length, 1);
   }
 });

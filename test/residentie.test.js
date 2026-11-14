@@ -8,7 +8,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, maakBetaaldRtgTestaccount } = require('./helper');
 
 function api(base, pad, body, token) {
   const h = { 'Content-Type': 'application/json' };
@@ -18,15 +18,17 @@ function api(base, pad, body, token) {
 }
 const ECHT = 'Reinout Testenaar';
 
-let srv, base, a, b, gast;
+let srv, base, a, b, gast, TMP;
 test.before(async () => {
-  const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-residentie-'));
+  TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-residentie-'));
   srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP, OFFICE_CODE: 'KANTOOR-RES' } });
   base = srv.base;
   const reg = async (n) => {
     const u = (Date.now() + n).toString().slice(-8);
-    const r = await api(base, '/api/auth/register', { name: ECHT + ' ' + n, email: 'res' + n + u + '@x.nl',
-      phone: '06' + u, password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' });
+    const email = 'res' + n + u + '@x.nl';
+    const r = await api(base, '/api/auth/register', { name: ECHT + ' ' + n, email,
+      phone: '06' + u, password: 'geheim123', geboortedatum: '1990-01-01', pasApp: 'rtg' });
+    maakBetaaldRtgTestaccount(TMP, email);
     return { token: r.body.token, codenaam: r.body.member && r.body.member.codename };
   };
   a = await reg(1); b = await reg(2);
@@ -89,8 +91,10 @@ test('een nieuwe suite begint dicht: niet in de gids van een ander lid tot het l
   /* Bevoegd vond dat een suite met open:true ontstond: wie hem inrichtte,
      stond in de openbare gids zonder dat zelf te hebben gekozen. */
   const u = (Date.now() + 9).toString().slice(-8);
-  const c = (await api(base, '/api/auth/register', { name: ECHT + ' 9', email: 'res9' + u + '@x.nl',
-    phone: '06' + u, password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' })).body.token;
+  const email = 'res9' + u + '@x.nl';
+  const c = (await api(base, '/api/auth/register', { name: ECHT + ' 9', email,
+    phone: '06' + u, password: 'geheim123', geboortedatum: '1990-01-01', pasApp: 'rtg' })).body.token;
+  maakBetaaldRtgTestaccount(TMP, email);
   const su = await api(base, '/api/residentie/suite', {}, c);
   assert.equal(su.body.suite.open, false, 'nieuw is dicht');
   const inGids = async () => ((await api(base, '/api/residentie/gids', {}, b.token)).body.suites || []).some(s => s.adres === su.body.suite.adres);

@@ -5,7 +5,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop, kantoorAlsPersoon } = require('./helper');
+const { startServer, stop, kantoorAlsPersoon, maakBetaaldRtgTestaccount } = require('./helper');
 
 function api(base, pad, body, token) {
   const h = { 'Content-Type': 'application/json' };
@@ -22,14 +22,15 @@ async function bevestigAi(voorstel, token) {
 }
 
 let srv, base, lid, lidCode, rijk, partner;
+const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-overheid-'));
 test.before(async () => {
-  const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-overheid-'));
   srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   base = srv.base;
   const u = Date.now().toString().slice(-8);
   const reg = await api(base, '/api/auth/register', { name: 'Inwoner', email: 'o' + u + '@x.nl',
     phone: '06' + u, password: 'geheim123', geboortedatum: '1988-03-03', tier: 'rtg', pasApp: 'rtg' });
   lid = reg.body.token;
+  maakBetaaldRtgTestaccount(TMP, 'o' + u + '@x.nl');
   lidCode = (await api(base, '/api/state', {}, lid)).body.state.user.codename;
   // rijksambtenaar: log in als de rijks-partner (manager, PIN 1234)
   const roster = await api(base, '/api/supplier/roster', { code: 'RIJK' });
@@ -210,6 +211,8 @@ test('6c. een ingetrokken verificatie trekt ook het stemrecht in', async () => {
   const reg = await api(base, '/api/auth/register', { name: 'Twijfel', email: 'tw' + u + '@x.nl',
     phone: '06' + u, password: 'geheim123', geboortedatum: '1985-05-05', tier: 'rtg', pasApp: 'rtg' });
   const twijfel = reg.body.token;
+  // De intrekking moet het identiteitsbewijs testen, niet een ontbrekende pas.
+  maakBetaaldRtgTestaccount(TMP, 'tw' + u + '@x.nl');
   const code = (await api(base, '/api/state', {}, twijfel)).body.state.user.codename;
   const office = await kantoorAlsPersoon(base, 'RTG-OFFICE');
   const PNG = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+M8AAAMCAoHf3ZQAAAAASUVORK5CYII=';
@@ -248,6 +251,8 @@ test('6d. een gekeurde zestienjarige stemt niet', async () => {
     phone: '06' + u, password: 'geheim123', geboortedatum: jaar + '-01-01', tier: 'rtg', pasApp: 'rtg' });
   const jong = reg.body.token;
   assert.ok(jong, 'het lidmaatschap kan vanaf 15');
+  // Alleen de pas; de minderjarigheid en echte keuringsroute blijven intact.
+  maakBetaaldRtgTestaccount(TMP, 'jo' + u + '@x.nl');
   const code = (await api(base, '/api/state', {}, jong)).body.state.user.codename;
   const office = await kantoorAlsPersoon(base, 'RTG-OFFICE');
   const PNG = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+M8AAAMCAoHf3ZQAAAAASUVORK5CYII=';
@@ -499,6 +504,7 @@ test('13. berichten afvinken, een voertuig schorsen en de eigen subsidies: allee
   const u = Date.now().toString().slice(-8);
   const ander = (await api(base, '/api/auth/register', { name: 'Buurvrouw', email: 'ob' + u + '@x.nl',
     phone: '06' + u, password: 'geheim123', geboortedatum: '1988-03-03', tier: 'rtg', pasApp: 'rtg' })).body.token;
+  maakBetaaldRtgTestaccount(TMP, 'ob' + u + '@x.nl');
 
   // Berichtenbox: toets 1 zette er een aanslag in
   let bx = (await api(base, '/api/overheid/berichten', {}, lid)).body;

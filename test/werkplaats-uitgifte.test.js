@@ -8,7 +8,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, maakBetaaldRtgTestaccount } = require('./helper');
 
 function api(base, pad, body, token) {
   const h = { 'Content-Type': 'application/json' };
@@ -28,6 +28,7 @@ test.before(async () => {
     password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' });
   lid = reg.body.token;
   assert.ok(lid, 'lid-registratie geeft een token');
+  maakBetaaldRtgTestaccount(TMP, 'wp@x.nl');
 });
 test.after(() => stop(srv && srv.child));
 

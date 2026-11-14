@@ -62,9 +62,9 @@
     $('#gcCode').textContent = o.pickup ? T('app.gc.bon','Bon') + ' ' + o.pickup : '';
     const qh = $('#gcQr');
     if (qh){
-      qh.innerHTML = ''; qh.style.display = 'none';
+      qh.innerHTML = ''; qh.classList.add('h-weg');
       if (window.RTGQRteken && d && d.code){
-        try { qh.appendChild(RTGQRteken.teken(String(d.code), { schaal: 4, ecc: 'M' })); qh.style.display = 'inline-block'; } catch(e){}
+        try { qh.appendChild(RTGQRteken.teken(String(d.code), { schaal: 4, ecc: 'M' })); qh.classList.remove('h-weg'); } catch(e){}
       }
     }
     $('#glowCode').classList.add('open');

@@ -34,7 +34,7 @@ module.exports = ({ rij, save, nu, dossier, visum, meldLid }) => {
      Er wordt niets geboekt en niets betaald: dat loopt langs de facturen,
      zoals overal in dit huis. */
   function pakAanvraag(ref) {
-    const a = rij().find(x => x.ref === String(ref || '').trim());
+    const a = rij().find(x => !x.keten && x.ref === String(ref || '').trim());
     if (!a) return { status: 404, error: 'Reisaanvraag niet gevonden.' };
     if (a.status !== 'aangevraagd') return { status: 409, error: 'Deze aanvraag is al ' + a.status + '.' };
     return { aanvraag: a };

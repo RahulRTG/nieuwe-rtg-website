@@ -30,7 +30,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, maakBetaaldRtgTestaccount } = require('./helper');
 
 let srv, base, mgr, guardTok, lidToken, post, buitenstaander, gezaaid, gezaaidTok;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-plaatspost-'));
@@ -68,6 +68,7 @@ test.before(async () => {
   const reg = await api('/api/auth/register', { name: 'Wil Wacht', email: 'ww' + u + '@voorbeeld.test',
     password: 'wachtgeheim123', geboortedatum: '1990-05-05', tier: 'rtg', pasApp: 'rtg' });
   lidToken = reg.body.token;
+  maakBetaaldRtgTestaccount(TMP, 'ww' + u + '@voorbeeld.test');
   const koppel = await api('/api/account/koppel', { soort: 'personeel', code: 'AEGIS', staffId: st.id, pin: staffPin }, lidToken);
   assert.equal(koppel.status, 200, 'de bewaker is aan zijn RTG-account gekoppeld');
   guardTok = (await api('/api/supplier/login', { code: 'AEGIS', staffId: st.id, pin: staffPin })).body.token;
@@ -76,6 +77,8 @@ test.before(async () => {
   const b = await api('/api/auth/register', { name: 'Bea Buiten', email: 'bb' + u + '@voorbeeld.test',
     password: 'buitengeheim123', geboortedatum: '1991-06-06', tier: 'rtg', pasApp: 'rtg' });
   buitenstaander = b.body.token;
+  // Een geldige andere pashouder moet op de teamgrens worden geweigerd.
+  maakBetaaldRtgTestaccount(TMP, 'bb' + u + '@voorbeeld.test');
 
   // een post met een echte plek
   const zet = await api('/api/supplier/beveiliging/post', { naam: 'Proefobject', klant: 'Toets',

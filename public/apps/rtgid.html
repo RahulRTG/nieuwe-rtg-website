@@ -69,6 +69,7 @@
 <link href="/ds/componenten/cookie.css" rel="stylesheet">
 <link href="/ds/componenten/samen.css" rel="stylesheet">
 <link href="/ds/componenten/handenvrij.css" rel="stylesheet">
+<link href="/ds/componenten/presentatierol.css" rel="stylesheet">
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
 <script src="/shared/rtg-heritage-transition.js" blocking="render"></script>
@@ -90,16 +91,16 @@
         placeholder="Koppelcode (ID.…)" aria-label="Koppelcode" class="s-1ifdfke">
       <button class="knop vol hoofd" type="submit" data-hoofdactie>Zoek op</button>
     </form>
-    <div id="koppelKaart" style="display:none;margin-top:0.5rem;border-top:1px solid var(--line);padding-top:0.6rem;">
+    <div class="ds-presentatie-koppelkaart h-weg" id="koppelKaart">
       <b class="groot" id="kDienst"></b>
       <div id="kAttr" class="s-9vyt3z"></div>
-      <select id="kNamens" style="display:none;" aria-label="Inloggen als"></select>
+      <select class="h-weg" id="kNamens" aria-label="Inloggen als"></select>
       <p class="i-9ex6ps stil" id="kNiveau"></p>
       <p class="i-9ex6ps stil" id="kNiveauWeg" hidden><a href="/apps/verificatie.html">Uw identiteit laten zien &rsaquo;</a></p>
       <p class="i-9ex6ps stil" id="kSleutel"></p>
-      <div class="rij" style="margin-top:0.4rem;">
+      <div class="rij h-mt40">
         <button class="knop vol" id="kBevestig" type="button">Bevestig met passkey</button>
-        <button class="knop" id="kMaak" type="button" style="display:none;">Passkey aanmaken</button>
+        <button class="knop h-weg" id="kMaak" type="button">Passkey aanmaken</button>
         <button class="knop rood" id="kWeiger" type="button">Weiger</button>
       </div>
     </div>
@@ -226,7 +227,7 @@
        scherm noemde een eis en liet de lezer zoeken. /apps/verificatie.html is
        sinds deze ronde de plek waar je dat niveau haalt. */
     $('#kNiveauWeg').hidden = haalt;
-    $('#kMaak').style.display = (!heeft && eigen && haalt) ? '' : 'none';
+    $('#kMaak').classList.toggle('h-weg', !(!heeft && eigen && haalt));
     $('#kBevestig').disabled = !heeft || !haalt;
     $('#kSleutel').textContent = !haalt ? ''
       : heeft
@@ -248,11 +249,11 @@
     const m = r.body.machtigingen || [];
     const sel = $('#kNamens');
     if (m.length){
-      sel.style.display = '';
+      sel.classList.remove('h-weg');
       sel.innerHTML = '<option value="">Als mijzelf</option>' + m.map(x => '<option value="' + x.id + '">Namens ' + esc(x.van) + '</option>').join('');
-    } else sel.style.display = 'none';
+    } else sel.classList.add('h-weg');
     toonSleutelstand();
-    $('#koppelKaart').style.display = '';
+    $('#koppelKaart').classList.remove('h-weg');
   });
   $('#kMaak').addEventListener('click', maakPasskey);
   $('#kBevestig').addEventListener('click', async () => {
@@ -270,7 +271,7 @@
         ceremonie: bewijs.ceremonie, antwoord: bewijs.antwoord });
       if (r.status !== 200) return zeg(r.body.error || 'Bevestigen lukte niet.');
       zeg('Ingelogd bij ' + r.body.dienst + (r.body.namens ? ' (namens een ander)' : '') + '.');
-      $('#koppelKaart').style.display = 'none'; $('#codeIn').value = ''; koppel = null;
+      $('#koppelKaart').classList.add('h-weg'); $('#codeIn').value = ''; koppel = null;
       laad();
     } finally { knop.disabled = false; }
   });
@@ -278,7 +279,7 @@
     if (!koppel) return;
     await api('weiger', { koppelId: koppel.koppelId });
     zeg('Geweigerd; er is niets gedeeld.');
-    $('#koppelKaart').style.display = 'none'; $('#codeIn').value = ''; koppel = null;
+    $('#koppelKaart').classList.add('h-weg'); $('#codeIn').value = ''; koppel = null;
   });
 
   /* ---- namens wie U mag inloggen ----

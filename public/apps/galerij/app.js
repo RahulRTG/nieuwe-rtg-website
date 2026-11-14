@@ -99,14 +99,14 @@
     if (!stand) return;
     var eerste = weergave === 'tijdlijn' && !openAlbum && !(stand.beelden || []).length;
     document.body.classList.toggle('rtg-first-page', eerste);
-    $('#albums').style.display = weergave === 'albums' ? '' : 'none';
-    $('#tijdlijn').style.display = weergave === 'albums' ? 'none' : '';
-    $('#albumPad').style.display = openAlbum ? '' : 'none';
+    $('#albums').hidden = weergave !== 'albums';
+    $('#tijdlijn').hidden = weergave === 'albums';
+    $('#albumPad').hidden = !openAlbum;
     $('#toonFav').classList.toggle('aan', weergave === 'fav');
     $('#toonAlbums').classList.toggle('aan', weergave === 'albums');
     // de terugblik alleen op de gewone tijdlijn: een rustige rij, geen pop-up
     var terug = weergave === 'tijdlijn' && !openAlbum ? (stand.terugblik || []) : [];
-    $('#terugblikWrap').style.display = terug.length ? '' : 'none';
+    $('#terugblikWrap').hidden = !terug.length;
     $('#terugblik').innerHTML = terug.map(thumb).join('');
     if (weergave === 'albums') {
       $('#albums').innerHTML = (stand.albums || []).map(function (a) {

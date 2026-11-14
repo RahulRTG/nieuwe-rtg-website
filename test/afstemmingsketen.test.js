@@ -29,7 +29,7 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs'); const os = require('os'); const path = require('path');
 const { DatabaseSync } = require('node:sqlite');
-const { startServer, stop, stopNet, kantoorKoppelBody } = require('./helper');
+const { startServer, stop, stopNet, kantoorKoppelBody, maakBetaaldRtgTestaccount } = require('./helper');
 const { kantoorPasskey } = require('./kantoorpasskey');
 
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-afstemketen-'));
@@ -44,12 +44,13 @@ function api(pad, body, token) {
     .then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
 }
 const uniek = (n) => (Date.now() + n * 7919).toString(36) + n;
-async function registreer(n, naam) {
+async function registreer(n, naam, betaald = false) {
   const u = uniek(n);
   const r = await api('/api/auth/register', { name: naam, email: 'af' + u + '@voorbeeld.test',
     phone: '06' + String(10000000 + Math.floor(Math.random() * 8e7)), password: 'Geheim123!',
     geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' });
   assert.ok(r.body.token, naam + ' geregistreerd');
+  if (betaald) maakBetaaldRtgTestaccount(TMP, 'af' + u + '@voorbeeld.test');
   return r.body.token;
 }
 async function medewerker(n) {
@@ -83,7 +84,7 @@ test.before(async () => {
   base = srv.base;
   const gedeeld = (await api('/api/office/login', { code: CODE })).body.token;
   assert.equal((await api('/api/office/bank/leden', { aan: true, naam: 'RTG' }, gedeeld)).status, 200, 'de leden-bank staat live');
-  lid = await registreer(1, 'Rekeninghouder');
+  lid = await registreer(1, 'Rekeninghouder', true);
   const akk = await api('/api/bank/akkoord', {}, lid);
   assert.equal(akk.status, 200, 'het lid opent een rekening: ' + JSON.stringify(akk.body).slice(0, 140));
   iban = akk.body.rekening.iban;

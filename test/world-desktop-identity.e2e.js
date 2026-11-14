@@ -45,14 +45,20 @@ test('family widgets use the selected profile: parent without lesson preview, ch
       headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ code: f.code, token: f.token }) });
     assert.equal(denied.status, 403); await denied.arrayBuffer();
 
-    const childResponse = page.waitForResponse(r => new URL(r.url()).pathname === '/api/rtf/leerling/dag' &&
-      r.request().method() === 'POST' && r.request().postDataJSON().token === f.kind.token);
-    await page.evaluate(({ code, kind }) => {
-      window.__oldDesktop = true;
-      window.Sessie.zet({ code, token: kind.token, profiel: kind.profiel });
-    }, { code: f.code, kind: f.kind });
-    await page.waitForFunction(() => !window.__oldDesktop && !!document.body.dataset.rtgDesktop);
-    const lesson = await childResponse;
+    // Tijdens de echte herlaadstap kan document.body nog ontbreken. Dat is
+    // wachten, geen paginafout. Verbind de respons en de overgang meteen,
+    // zodat opruimen een oorspronkelijke fout niet met een losse belofte maskeert.
+    const [lesson] = await Promise.all([
+      page.waitForResponse(r => new URL(r.url()).pathname === '/api/rtf/leerling/dag' &&
+        r.request().method() === 'POST' && r.request().postDataJSON().token === f.kind.token),
+      (async () => {
+        await page.evaluate(({ code, kind }) => {
+          window.__oldDesktop = true;
+          window.Sessie.zet({ code, token: kind.token, profiel: kind.profiel });
+        }, { code: f.code, kind: f.kind });
+        await page.waitForFunction(() => !window.__oldDesktop && !!document.body?.dataset.rtgDesktop);
+      })()
+    ]);
     assert.equal(lesson.status(), 200, 'bevestigd kind bereikt het echte leerlingendpoint');
     assert.equal(lesson.request().postDataJSON().code, f.code);
     assert.ok(Array.isArray((await lesson.json()).stukken), 'echte leerlinginhoud, geen gemockt succes');
@@ -66,7 +72,7 @@ test('family widgets use the selected profile: parent without lesson preview, ch
     await page.evaluate(({ code, token, profiel }) => {
       window.__oldDesktop = true; window.Sessie.zet({ code, token, profiel });
     }, { code: f.code, token: f.token, profiel: f.profiel });
-    await page.waitForFunction(() => !window.__oldDesktop && !!document.body.dataset.rtgDesktop);
+    await page.waitForFunction(() => !window.__oldDesktop && !!document.body?.dataset.rtgDesktop);
     await page.waitForSelector('.wd-favorites [data-widget="foundation-agenda"] [data-state="ready"]', { state: 'attached' });
     assert.match(await page.locator('.wd-greeting').innerText(), /Ouder/);
     assert.doesNotMatch(await page.locator('.wd-greeting').innerText(), /Milan/);
@@ -76,7 +82,7 @@ test('family widgets use the selected profile: parent without lesson preview, ch
     assert.deepEqual(memberRequests, []);
     // Logging out the family clears the old surfaces, even while the member token remains.
     await page.evaluate(() => { window.__oldDesktop = true; window.Sessie.uitloggen(); });
-    await page.waitForFunction(() => !window.__oldDesktop && !!document.body.dataset.rtgDesktop);
+    await page.waitForFunction(() => !window.__oldDesktop && !!document.body?.dataset.rtgDesktop);
     await page.waitForSelector('.wd-favorites [data-widget="foundation-agenda"] [data-state="guest"]', { state: 'attached' });
     assert.doesNotMatch(await page.locator('.wd-greeting').innerText(), /Milan|Ouder account/);
     assert.deepEqual(memberRequests, []); assert.deepEqual(errors, []);

@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-10-30T13:08:40.855Z",
-    "commit": "0afc8afa15",
+    "op": "2026-11-09T15:20:01.546Z",
+    "commit": "acf193db3e",
     "boomVuil": false,
-    "boomAnders": 1,
+    "boomAnders": 0,
     "instrument": "scripts/liegronde.js",
     "node": "v26.12.1"
   },
@@ -300,8 +300,8 @@
       "ingang": "/apps/juridisch.html",
       "persona": "lid",
       "status": "BEWEZEN",
-      "reden": "8 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
-      "gelogen": 8,
+      "reden": "1 antwoord(en) gelogen, en geen verzonnen zekerheid, geen rommel en geen JS-fout; alleen een LEEG antwoord is beproefd; een backend die iets verkeerds antwoordt, wordt hier niet betrapt",
+      "gelogen": 1,
       "klachten": []
     },
     {

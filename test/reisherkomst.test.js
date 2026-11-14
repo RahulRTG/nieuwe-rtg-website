@@ -18,7 +18,9 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');
-const { startServer, stop, kantoorAlsPersoon, keurLidGoed } = require('./helper');
+const os = require('os');
+const path = require('path');
+const { startServer, stop, stopHard, kantoorAlsPersoon, keurLidGoed, maakBetaaldRtgTestaccount } = require('./helper');
 
 const sam = require('../server/kern/reisbureau-samenstelling.js');
 const { geldrijenVoor } = require('../server/kern/reisbureau-geldrijen.js');
@@ -251,13 +253,21 @@ async function post(base, pad, body, token) {
 }
 
 test('12. een reis ZONDER samenstelling wordt geweigerd met de reden', async () => {
-  const srv = await startServer({ env: { SMTP_URL: '', OFFICE_CODE: 'RTG-OFFICE' } });
+  const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-reisherkomst-grens-'));
+  const srv = await startServer({ env: { SMTP_URL: '', OFFICE_CODE: 'RTG-OFFICE', RTG_DATA_DIR: TMP } });
   try {
     const reg = await post(srv.base, '/api/auth/register', {
       name: 'Reis Lid', email: 'reisherkomst1@x.nl', phone: '0612345001',
       password: 'geheim123', geboortedatum: '1990-01-01', pasApp: 'rtg' });
     const token = reg.body.token;
     assert.ok(token, 'registratie mislukt: ' + JSON.stringify(reg.body).slice(0, 200));
+    maakBetaaldRtgTestaccount(TMP, 'reisherkomst1@x.nl');
+    // Deze proef meet de ontbrekende reisgrond, niet de identiteitspoort.
+    // Gebruik dezelfde bestaande persoonlijke keuring als de positieve keten;
+    // de afzonderlijke financiële grensproef eist juist 403 na intrekking.
+    await keurLidGoed(srv.base, token, reg.body.state.user.codename, '1990-01-01');
+    const geldVoor = await post(srv.base, '/api/pay/overzicht', {}, token);
+    assert.equal(geldVoor.status, 200);
 
     const aanvraag = await post(srv.base, '/api/reisbureau/boek', { tripId: 'lissabon-nieuw', personen: 1 }, token);
     assert.equal(aanvraag.status, 200, JSON.stringify(aanvraag.body).slice(0, 200));
@@ -274,17 +284,25 @@ test('12. een reis ZONDER samenstelling wordt geweigerd met de reden', async () 
       'herkomst in het grootboek, en die ziet er in de meter uit als een meting.');
     assert.ok(String(betaal.body.hoe || '').length > 40,
       'de weigering draagt geen reden; dan weet niemand wat er moet gebeuren');
-  } finally { await stop(srv); }
+    assert.deepEqual((await post(srv.base, '/api/pay/overzicht', {}, token)).body, geldVoor.body,
+      'de geweigerde inning mag geen geld of grootboekhistorie wijzigen');
+  } finally {
+    stop(srv);
+    await stopHard(srv.child);
+    fs.rmSync(TMP, { recursive: true, force: true });
+  }
 });
 
 test('13. de hele keten op een ECHTE server: een lid betaalt een bevestigde reis', async () => {
-  const srv = await startServer({ env: { SMTP_URL: '', OFFICE_CODE: 'RTG-OFFICE' } });
+  const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-reisherkomst-keten-'));
+  const srv = await startServer({ env: { SMTP_URL: '', OFFICE_CODE: 'RTG-OFFICE', RTG_DATA_DIR: TMP } });
   try {
     const reg = await post(srv.base, '/api/auth/register', {
       name: 'Reis Lid Twee', email: 'reisherkomst2@x.nl', phone: '0612345002',
       password: 'geheim123', geboortedatum: '1990-01-01', pasApp: 'rtg' });
     const token = reg.body.token;
     assert.ok(token, 'registratie mislukt: ' + JSON.stringify(reg.body).slice(0, 200));
+    maakBetaaldRtgTestaccount(TMP, 'reisherkomst2@x.nl');
     await keurLidGoed(srv.base, token, reg.body.state.user.codename, '1990-01-01');
 
     const op = await post(srv.base, '/api/pay/oplaad', { centen: 300000, idem: 'reisherkomst-op' }, token);
@@ -361,7 +379,11 @@ test('13. de hele keten op een ECHTE server: een lid betaalt een bevestigde reis
       { ref, reden: 'nog een keer' }, otok);
     assert.equal(weerTerug.status >= 400, true,
       'dezelfde reis werd twee keer teruggedraaid; dan loopt het dubbele terug');
-  } finally { await stop(srv); }
+  } finally {
+    stop(srv);
+    await stopHard(srv.child);
+    fs.rmSync(TMP, { recursive: true, force: true });
+  }
 });
 
 /* ============================================================================

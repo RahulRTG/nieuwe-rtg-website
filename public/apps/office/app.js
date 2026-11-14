@@ -70,7 +70,7 @@
 
   $('#terug').href = opzet.terug;
   $('#kopMijn').textContent = opzet.mijnKop;
-  if (opzet.chip) { $('#werkChip').textContent = opzet.chip; $('#werkChip').style.display = ''; }
+  if (opzet.chip) { $('#werkChip').textContent = opzet.chip; $('#werkChip').classList.remove('h-weg'); }
   Array.prototype.forEach.call(document.querySelectorAll('[data-glyf]'), function (el) {
     el.innerHTML = glyf(el.dataset.glyf);
   });
@@ -355,6 +355,12 @@
     return api('open', { id: id }).then(function (r) {
       if (volgorde !== openVolgorde) return false;
       if (r.status !== 200) return zeg(r.body.error || 'Kon niet openen.');
+      // Een hulpvenster hoort bij het document waarin het werd geopend. Laat
+      // zoeken, filteren of grafieken niet als vaste laag boven het volgende
+      // document liggen en daar de bediening onderscheppen.
+      Array.prototype.forEach.call(document.querySelectorAll('.bladpaneel'), function (paneel) {
+        paneel.remove();
+      });
       open = r.body; magBewerken = !!r.body.magBewerken; vuil = false;
       zetTab(open);
       $('#titel').value = r.body.titel; $('#titel').disabled = !r.body.eigenaar;
@@ -363,12 +369,12 @@
       $('#deelBtn').style.display = r.body.eigenaar ? '' : 'none';
       // Rahul leest tekst en dia's; op een formulier of schets heeft hij niets te zoeken
       $('#aiBtn').style.display = magBewerken && r.body.soort !== 'formulier' && r.body.soort !== 'schets' && r.body.soort !== 'bord' ? '' : 'none';
-      $('#presBtn').style.display = r.body.soort === 'presentatie' ? '' : 'none';
-      $('#formBalk').style.display = r.body.soort === 'blad' ? '' : 'none';
-      $('#tekstTools').style.display = 'none'; $('#bladTools').style.display = 'none';
-      $('#tekst').style.display = 'none'; $('#bladWrap').style.display = 'none'; $('#presWrap').style.display = 'none';
-      $('#formWrap').style.display = 'none'; $('#schetsWrap').style.display = 'none';
-      $('#bordWrap').style.display = 'none';
+      $('#presBtn').classList.toggle('h-weg', r.body.soort !== 'presentatie');
+      $('#formBalk').classList.toggle('h-weg', r.body.soort !== 'blad');
+      $('#tekstTools').classList.add('h-weg'); $('#bladTools').classList.add('h-weg');
+      $('#tekst').style.display = 'none'; $('#bladWrap').classList.add('h-weg'); $('#presWrap').classList.add('h-weg');
+      $('#formWrap').classList.add('h-weg'); $('#schetsWrap').classList.add('h-weg');
+      $('#bordWrap').classList.add('h-weg');
       if (r.body.soort === 'blad') toonBlad(r.body.inhoud);
       else if (r.body.soort === 'presentatie') toonPres(r.body.inhoud);
       else if (r.body.soort === 'formulier') toonFormulier(r.body.inhoud);
@@ -424,7 +430,7 @@
     $('#tekst').innerHTML = (inhoud && inhoud.tekst) || '';
     $('#tekst').contentEditable = magBewerken ? 'true' : 'false';
     if (magBewerken) {
-      $('#tekstTools').style.display = 'flex';
+      $('#tekstTools').classList.remove('h-weg');
       RTGOfficeTekst.bouwBalk($('#tekstTools'), $('#tekst'), markeer);
     }
     telBij();
@@ -437,28 +443,28 @@
 
   /* ---------- rekenblad ---------- */
   function toonBlad(inhoud) {
-    $('#bladWrap').style.display = '';
+    $('#bladWrap').classList.remove('h-weg');
     if (!blad) blad = RTGOfficeBlad.maak({ tabel: $('#blad'), refVak: $('#celRef'), invoer: $('#celInvoer'),
       voet: $('#voetbalk'), onWijzig: markeer });
     blad.laad(inhoud, magBewerken);
-    if (magBewerken) { $('#bladTools').style.display = 'flex'; blad.bouwBalk($('#bladTools')); }
+    if (magBewerken) { $('#bladTools').classList.remove('h-weg'); blad.bouwBalk($('#bladTools')); }
   }
 
   /* ---------- formulier en schets ---------- */
   function toonFormulier(inhoud) {
-    $('#formWrap').style.display = '';
+    $('#formWrap').classList.remove('h-weg');
     if (!formulier) formulier = RTGOfficeFormulier.maak({ wrap: $('#formWrap'), api: api, onWijzig: markeer, meld: zeg });
     formulier.laad(inhoud, magBewerken, open.id);
     var n = ((inhoud && inhoud.vragen) || []).length;
     $('#voetbalk').textContent = n + (n === 1 ? ' vraag' : ' vragen');
   }
   function toonSchets(inhoud) {
-    $('#schetsWrap').style.display = '';
+    $('#schetsWrap').classList.remove('h-weg');
     if (!schets) schets = RTGOfficeSchets.maak({ wrap: $('#schetsWrap'), onWijzig: markeer, meld: zeg, voet: $('#voetbalk') });
     schets.laad(inhoud, magBewerken);
   }
   function toonBord(inhoud) {
-    $('#bordWrap').style.display = '';
+    $('#bordWrap').classList.remove('h-weg');
     if (!bord) bord = RTGOfficeBord.maak({ wortel: $('#bordWrap'), onWijzig: markeer, meld: zeg });
     bord.laad(inhoud, magBewerken);
     var n = ((inhoud && inhoud.lijsten) || []).reduce(function (a, l) { return a + ((l.kaarten || []).length); }, 0);
@@ -467,7 +473,7 @@
 
   /* ---------- presentatie ---------- */
   function toonPres(inhoud) {
-    $('#presWrap').style.display = 'grid';
+    $('#presWrap').classList.remove('h-weg');
     if (!pres) pres = RTGOfficePres.maak({ rail: $('#diaRail'), vlak: $('#diaVlak'), onWijzig: markeer, meld: zeg });
     pres.laad(inhoud, magBewerken);
     $('#voetbalk').textContent = pres.dias().length + ' dia\'s';
@@ -662,7 +668,7 @@
   $('#deelBtn').addEventListener('click', function () { if (!open) return; toonDeel(); $('#deelScrim').classList.add('open'); });
   $('#deelDicht').addEventListener('click', function () { $('#deelScrim').classList.remove('open'); });
   if (WERK === 'rtf') {
-    $('#deelForm').style.display = 'none'; $('#gezinBlok').style.display = '';
+    $('#deelForm').style.display = 'none'; $('#gezinBlok').classList.remove('h-weg');
     $('#deelKop').textContent = 'Delen met je gezin';
     $('#deelUitleg').textContent = 'Een document blijft van jou; je kunt je gezin laten meelezen of er samen in schrijven. Buiten het gezin deelt RTF niets.';
   }
@@ -892,7 +898,7 @@
   /* ---------- Rahul leest mee ---------- */
   $('#aiBtn').addEventListener('click', function () {
     if (!open) return;
-    $('#aiUit').value = ''; $('#aiToepas').style.display = 'none';
+    $('#aiUit').value = ''; $('#aiToepas').classList.add('h-weg');
     // in een rekenblad is de formule de enige zinnige opdracht
     $('#aiOpdracht').value = open.soort === 'blad' ? 'formule' : 'samenvatten';
     $('#aiScrim').classList.add('open');
@@ -907,7 +913,7 @@
       if (!r) return;
       if (r.body.error) { $('#aiUit').value = ''; return zeg(r.body.error); }
       $('#aiUit').value = r.body.voorstel;
-      $('#aiToepas').style.display = '';
+      $('#aiToepas').classList.remove('h-weg');
     });
   });
   $('#aiToepas').addEventListener('click', function () {

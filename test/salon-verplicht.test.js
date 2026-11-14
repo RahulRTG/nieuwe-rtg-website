@@ -7,7 +7,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, maakBetaaldRtgTestaccount } = require('./helper');
 
 const FOTO = 'data:image/jpeg;base64,' + Buffer.from('demo-salon-foto').toString('base64');
 
@@ -30,6 +30,8 @@ test.before(async () => {
   const reg = await api(base, '/api/auth/register', { name: 'Salon Lid', email: 's' + u + '@x.nl',
     phone: '06' + u, password: 'geheim123', geboortedatum: '1990-01-01', tier: 'business', pasApp: 'business' });
   lid = reg.body.token;
+  assert.ok(lid, 'het Salonaccount is geregistreerd');
+  maakBetaaldRtgTestaccount(TMP, 's' + u + '@x.nl');
 });
 test.after(() => stop(srv && srv.child));
 

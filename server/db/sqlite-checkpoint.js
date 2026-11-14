@@ -3,15 +3,21 @@
    De verbinding wordt pas bij gebruik gelezen: een nooit geopende opslag
    blijft ongemoeid. Backups moeten ook nog gewijzigde RAM bewaren. */
 module.exports = ({ verbinding, saveSqlite }) => {
-  function vouwWalSqlite() {
+  function checkpoint(modus) {
     if (!verbinding()) return false;
     try {
-      const r = verbinding().prepare('PRAGMA wal_checkpoint(TRUNCATE)').get();
+      const r = verbinding().prepare('PRAGMA wal_checkpoint(' + modus + ')').get();
       return r?.busy === 0 && Number.isInteger(r.log) && Number.isInteger(r.checkpointed)
         && r.log >= 0 && r.checkpointed === r.log;
     }
     catch (e) { return false; } // andere lezer: de backup neemt de WAL mee
   }
+  // Een duurzame netto-noop hoeft het bestand niet te verkleinen of actuele
+  // lezers weg te wachten. FULL checkpoint synchroniseert alle WAL-frames en
+  // de database; alleen een volledig bevestigd resultaat telt. Backup en
+  // afsluiten houden TRUNCATE. https://sqlite.org/pragma.html#pragma_wal_checkpoint
+  function bevestigWalSqlite() { return checkpoint('FULL'); }
+  function vouwWalSqlite() { return checkpoint('TRUNCATE'); }
 
   function checkpointSqlite() {
     if (!verbinding()) return false;
@@ -26,5 +32,5 @@ module.exports = ({ verbinding, saveSqlite }) => {
     vouwWalSqlite();
   }
 
-  return { checkpointSqlite, vouwWalSqlite, afrondSqlite };
+  return { checkpointSqlite, vouwWalSqlite, bevestigWalSqlite, afrondSqlite };
 };

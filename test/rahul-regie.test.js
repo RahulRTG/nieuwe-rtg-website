@@ -9,7 +9,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, maakBetaaldRtgTestaccount } = require('./helper');
 
 let srv, base, tech, office, lid, genre;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-rahul-'));
@@ -31,6 +31,7 @@ test.before(async () => {
   const u = Date.now().toString().slice(-8);
   lid = (await api('/api/auth/register', { name: 'Rahultest', email: 'rah' + u + '@x.nl', phone: '06' + u,
     password: 'geheim123', geboortedatum: '1990-05-05', geslacht: 'v', tier: 'rtg', pasApp: 'rtg' })).body.token;
+  maakBetaaldRtgTestaccount(TMP, 'rah' + u + '@x.nl');
   genre = (await api('/api/office/geld', {}, office)).body.zaken.find(z => z.code === 'KIKUNOI').genre;
   assert.ok(tech && office && lid && genre, 'eigenaar, kantoor en lid zijn ingelogd');
 });

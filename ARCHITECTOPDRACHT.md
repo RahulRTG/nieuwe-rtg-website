@@ -343,6 +343,58 @@ de eigenaar besluit elke trede apart.
 relatie `mogelijk-verouderd`, dan vervalt het recht direct en draait de volle
 ronde. Het intrekken vraagt geen besluit, het toekennen wel.
 
+### Fase 7a — Adviserende Proof Envelope-preflight
+
+`codearchitect preflight` verbindt de bestaande contextmeting vóór een
+wijziging met Git, `SCHERMEIGENAAR.json`, letterlijke browserimports,
+regressiehistorie, het bestaande evidence-plan en een optionele PR-snapshot.
+Hij schrijft geen register, bewijs, branch, lock of taakstatus. De uitvoer is
+een vluchtig contract met formaat `rtg-proof-envelope-v1`.
+
+Voorbeeld:
+
+```sh
+npm run codearchitect -- preflight \
+  --task=ds-browser-tabs \
+  --agent=codex \
+  --class=scherm-wijzigen \
+  --subject=public/apps/browser.html \
+  --allow=public/apps/browser.html,public/ds/componenten/browser.css \
+  --budget-minutes=30 --budget-tokens=12000 --budget-ci-minutes=8 \
+  --pr-snapshot=.evidence/open-prs.json --json
+```
+
+De PR-snapshot is een invoer en geen nieuw register:
+
+```json
+{
+  "capturedAt": "2026-11-09T12:00:00.000Z",
+  "pullRequests": [
+    { "number": 702, "branch": "voorbeeld", "head": "<40 hex>",
+      "files": ["public/apps/browser.html"] }
+  ]
+}
+```
+
+De snapshot is hoogstens vijftien minuten bruikbaar. Ontbrekende of oude
+PR-informatie, een vuile werkboom, een achterlopende integratiebasis, onbekende
+testafhankelijkheden of ontbrekend eigenaarschap geven
+`INSUFFICIENT_CONTEXT`. Een overlap geeft `CONFLICT`. Alleen de validator leidt
+deze status af; een agent kan geen `VALID` afvinken. Bij een kennisgat blijven
+de volledige verplichte CI en de bestaande APPWERKT- en EXPERIENCEWERKT-
+herkwalificatie in het contract staan.
+
+De aanvullende runtimeprojectie volgt alleen letterlijke paden in getrackte
+`public/`-bron. Een appscherm is een eindbestemming: links naar dat scherm
+worden niet als afhankelijkheid teruggevolgd. Gedeelde `public/shared/`- en
+`public/ds/`-lagen worden begrensd omhoog gevolgd naar hun schermowners. Deze
+projectie vult de bestaande registers aan en maakt hun kennisgaten niet
+onzichtbaar.
+
+De preflight is in deze fase adviserend. Hij wordt pas een verplichte poort na
+representatieve vergelijking, nul gemiste verplichte tests en een afzonderlijk
+eigenaarsbesluit.
+
 ---
 
 ## 4. Parallel, en niet in deze opdracht

@@ -3,8 +3,8 @@
 
    Wat hier bewust WEL wordt getoetst en waarom (LAT-regel 9): niet "de route
    geeft iets terug", maar per bewering het verschil dat hij hoort te maken.
-   Een gratis pas MOET buiten Business blijven, een Business-post MOET in de
-   feed van een Lifestyle-lid staan en MOET uit die van een gratis lid blijven,
+   Een RTG Pass MOET buiten Business blijven, een Business-post MOET in de
+   feed van een Lifestyle-lid staan en MOET uit die van een RTG-lid blijven,
    en een onbekende verwijzing MOET 404 geven in plaats van een gokje.
 
    De belangrijkste toets staat onderaan: `zakelijkPro` en de echte PRO-poort
@@ -19,7 +19,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, elevateTier } = require('./helper');
+const { startServer, elevateTier, maakBetaaldRtgTestaccount } = require('./helper');
 
 const rechten = require('../server/kern/wereld/rechten');
 const koppel = require('../server/kern/wereld/koppel');
@@ -44,6 +44,8 @@ async function lid(naam, email, tier) {
     geboortedatum: '1990-01-01', tier: regTier
   }));
   assert.ok(d.token, 'registratie geeft een sessietoken');
+  assert.equal(d.state.user.tier, 'guest', 'registratie geeft alleen een gratis account');
+  if (tier === 'rtg') maakBetaaldRtgTestaccount(TMP, email);
   if (regTier !== tier) {
     const office = (await json(await post('/api/office/login', { code: 'RTG-OFFICE' }))).token;
     await elevateTier(BASE, d.token, tier, office);
@@ -64,8 +66,20 @@ test.after(() => {
 
 /* ---------- de schakelaar: één app, verschillende werelden ---------- */
 
-test('de gratis pas krijgt Lifestyle en Communities, maar Business blijft dicht', async () => {
-  const g = await lid('Gratis Lid', 'gratis@x.nl', 'rtg');
+test('een gratis registratie krijgt geen betaalde Wereld- of Business-toegang', async () => {
+  const r = await post('/api/auth/register', { name: 'Gratis Wereld', email: 'wereld-gratis@x.nl',
+    phone: '0612345678', password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg' });
+  assert.equal(r.status, 200);
+  const d = await json(r);
+  assert.equal(d.state.user.tier, 'guest');
+  for (const [pad, body] of [['/api/wereld/state', {}], ['/api/wereld/feed', { modus: 'alles' }],
+    ['/api/wereld/modus', { modus: 'business' }], ['/api/zakelijk/feed', {}]]) {
+    assert.equal((await post(pad, body, d.token)).status, 403, pad + ' kent geen betaalrecht door registratie toe');
+  }
+});
+
+test('RTG Pass krijgt Lifestyle en Communities, maar Business blijft dicht', async () => {
+  const g = await lid('RTG Lid', 'rtg@x.nl', 'rtg');
   const st = await json(await post('/api/wereld/state', {}, g.token));
 
   assert.equal(st.ik.pas, 'rtg');
@@ -77,7 +91,7 @@ test('de gratis pas krijgt Lifestyle en Communities, maar Business blijft dicht'
   assert.deepEqual(st.lenzen.filter(l => !l.open).map(l => l.id), ['dating', 'business']);
   const open = st.modi.filter(m => m.open).map(m => m.id);
   assert.deepEqual(open.sort(), ['alles', 'genootschap', 'lifestyle', 'prive'],
-    'precies deze vier staan open voor de gratis pas');
+    'precies deze vier staan open voor RTG Pass');
   const bus = st.modi.find(m => m.id === 'business');
   assert.equal(bus.open, false, 'Business staat dicht');
   assert.match(bus.reden, /Lifestyle en Business/, 'en zegt waarom');
@@ -102,11 +116,11 @@ test('Lifestyle en Business krijgen alle vijf de werelden', async () => {
 });
 
 test('de profiellagen lopen met de pas mee', async () => {
-  const g = await lid('Lagen Gratis', 'lagen1@x.nl', 'rtg');
+  const g = await lid('Lagen RTG', 'lagen1@x.nl', 'rtg');
   const b = await lid('Lagen Baas', 'lagen2@x.nl', 'business');
   const lagen = async t => (await json(await post('/api/wereld/state', {}, t))).lagen.map(l => l.id);
 
-  assert.deepEqual(await lagen(g.token), ['persoonlijk'], 'de gratis pas heeft één laag');
+  assert.deepEqual(await lagen(g.token), ['persoonlijk'], 'RTG Pass heeft één laag');
   assert.deepEqual(await lagen(b.token), ['persoonlijk', 'professioneel', 'creator', 'ondernemer'],
     'Business heeft ze alle vier');
 });
@@ -174,9 +188,9 @@ test('een doelgebonden Salon-publiek geldt ook in de samengestelde Wereld-feed',
     'volgen omzeilt Alleen ik niet via de samengestelde feed');
 });
 
-test('een zakelijke post blijft uit de feed van de gratis pas -- ook in "Alles"', async () => {
+test('een zakelijke post blijft uit de feed van RTG Pass -- ook in "Alles"', async () => {
   const b = await lid('Zakelijk Baas', 'zbaas@x.nl', 'business');
-  const g = await lid('Zakelijk Gratis', 'zgratis@x.nl', 'rtg');
+  const g = await lid('Zakelijk RTG', 'zrtg@x.nl', 'rtg');
 
   await post('/api/zakelijk/profiel/zet', { naam: 'Baas', kop: 'Oprichter' }, b.token);
   const p = await json(await post('/api/zakelijk/post', { tekst: 'Wij zoeken een operations manager.' }, b.token));
@@ -187,9 +201,9 @@ test('een zakelijke post blijft uit de feed van de gratis pas -- ook in "Alles"'
   assert.ok(vanBaas.items.some(i => i.tekst === 'Wij zoeken een operations manager.'),
     'en de post staat er echt in');
 
-  const vanGratis = await json(await post('/api/wereld/feed', { modus: 'alles' }, g.token));
-  assert.ok(!vanGratis.bronnen.includes('zakelijk'), 'de gratis pas krijgt de zakelijke bron niet');
-  assert.ok(!vanGratis.items.some(i => i.bron === 'zakelijk'),
+  const vanRtg = await json(await post('/api/wereld/feed', { modus: 'alles' }, g.token));
+  assert.ok(!vanRtg.bronnen.includes('zakelijk'), 'RTG Pass krijgt de zakelijke bron niet');
+  assert.ok(!vanRtg.items.some(i => i.bron === 'zakelijk'),
     'en er lekt geen enkel zakelijk item in zijn "Alles"');
 });
 
@@ -314,10 +328,10 @@ test('een onthouden modus die niet meer mag, valt terug op Alles', async () => {
   assert.equal((await json(await post('/api/wereld/state', {}, l.token))).modus, 'business',
     'de keuze wordt onthouden');
 
-  // dezelfde opgeslagen keuze, maar nu gelezen als een gratis pas: de functie
+  // dezelfde opgeslagen keuze, maar nu gelezen als RTG Pass: de functie
   // die de route gebruikt, moet hem weigeren en niet doorlaten omdat hij er ooit stond
   assert.equal(rechten.modusOpen('rtg', 'business'), false,
-    'dezelfde onthouden waarde is voor een gratis pas geen geldige modus meer');
+    'dezelfde onthouden waarde is voor RTG Pass geen geldige modus meer');
   assert.equal(rechten.modusOpen('business', 'business'), true);
 });
 
@@ -376,7 +390,7 @@ test('zakelijkPro zegt hetzelfde als de echte PRO-poort van routes/zakelijk.js',
      vergelijken, dan toetsten we twee kopieën tegen elkaar en zou de toets ook
      slagen als beide fout zijn. */
   const passen = [
-    ['rtg', await lid('Poort Gratis', 'poort1@x.nl', 'rtg')],
+    ['rtg', await lid('Poort RTG', 'poort1@x.nl', 'rtg')],
     ['lifestyle', await lid('Poort Lief', 'poort2@x.nl', 'lifestyle')],
     ['business', await lid('Poort Baas', 'poort3@x.nl', 'business')]
   ];

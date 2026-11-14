@@ -122,10 +122,14 @@ function maakLid(deps) {
       if (reis) state.trip = reis;
       state.creatorCredit = sess.account ? (md.creatorCredit || 0) : (db.data.creatorCredit[sess.tier] || 0);
       state.creatorLikes = sess.account ? (md.creatorLikes || 0) : (db.data.creatorLikes[sess.tier] || 0);
-      // RTFoundation: gezinnen die dit lid als oppas/familie koppelde + hun meldingen
-      if (sess.account) {
-        state.foundation = { gekoppeld: rtf.gekoppeldeGezinnen(sess.account.id), meldingen: md.foundationMeldingen || [] };
-      }
+    }
+    // Een aanvaarde gezinsbinding hoort bij het account, niet bij een betaalde
+    // pas. Toon alleen de eigen bestaande bindingen/meldingen; dit verleent
+    // geen nieuwe gezinsrechten en opent de productiepoort niet.
+    if (sess.account) {
+      const gekoppeld = rtf.gekoppeldeGezinnen(sess.account.id);
+      const meldingen = md.foundationMeldingen || [];
+      if (sess.tier !== 'guest' || gekoppeld.length || meldingen.length) state.foundation = { gekoppeld, meldingen };
     }
     if (sess.account || sess.tier !== 'guest') {
       // Ook een gratis account ziet de eigen leeftijd en groep. De opgeslagen

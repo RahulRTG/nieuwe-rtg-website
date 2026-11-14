@@ -13,11 +13,11 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop, stopNet } = require('./helper');
+const { startServer, stopHard, stopNet } = require('./helper');
 
 const MAP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-gezin-herhaal-'));
 let srv;
-test.after(() => { stop(srv && srv.child); try { fs.rmSync(MAP, { recursive: true, force: true }); } catch (e) {} });
+test.after(async () => { await stopHard(srv && srv.child); fs.rmSync(MAP, { recursive: true, force: true }); });
 const api = (pad, body, token) => fetch(srv.base + pad, { method: 'POST',
   headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: 'Bearer ' + token } : {}) },
   body: JSON.stringify(body || {}) }).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
@@ -28,11 +28,23 @@ const lid = async () => { const u = Date.now().toString().slice(-7) + (n++);
 
 test('dezelfde sleutel na een herstart is hetzelfde bericht; een nieuwe sleutel een tweede', async () => {
   srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: MAP } });
-  const ouder = await lid(), oppas = await lid();
+  const ouder = await lid(), oppas = await lid(), ander = await lid();
+  const voor = await api('/api/state', {}, oppas);
+  assert.equal(voor.status, 200);
+  assert.equal(voor.body.state.user.tier, 'guest');
+  assert.equal(Object.hasOwn(voor.body.state, 'foundation'), false, 'een gratis account zonder binding krijgt geen Foundation-inhoud');
   const g = await api('/api/rtf/eigen-gezin/maak', { gezinsnaam: 'Gezin Herhaal', naam: 'Beheerder', bevoegdGezin: true, privacyAkkoord: true }, ouder);
   const s = (await api('/api/rtf/eigen-gezin/sessie', { profielId: g.body.profielen[0].id }, ouder)).body;
   const u = (await api('/api/foundation/gezin/uitnodiging/maak', { code: s.code, token: s.token, naam: 'Oppas', rol: 'gast', relatie: 'oppas' })).body;
   assert.equal((await api('/api/rtf/uitnodiging/accepteer', { uitnodiging: u.uitnodiging }, oppas)).status, 200);
+  const gekoppeld = await api('/api/state', {}, oppas);
+  assert.equal(gekoppeld.status, 200);
+  assert.equal(gekoppeld.body.state.user.tier, 'guest', 'de uitnodiging verleent geen betaalde pas');
+  assert.equal(gekoppeld.body.state.foundation?.gekoppeld.length, 1, 'de echte aanvaarde binding verschijnt ook bij een gratis account');
+  assert.equal(gekoppeld.body.state.foundation.gekoppeld[0].code, s.code);
+  const vreemd = await api('/api/state', { code: s.code, account: voor.body.state.user.id }, ander);
+  assert.equal(vreemd.status, 200);
+  assert.equal(Object.hasOwn(vreemd.body.state, 'foundation'), false, 'een vreemde bodycode schept geen gezinsbinding');
   const lijf = { code: s.code, tekst: 'Ze slapen.', idem: 'toets-gezin-1' };
   assert.equal((await api('/api/rtf/bericht', lijf, oppas)).status, 200);
   await stopNet(srv.child, 15000);
@@ -43,4 +55,8 @@ test('dezelfde sleutel na een herstart is hetzelfde bericht; een nieuwe sleutel 
   const berichten = (await r.json()).berichten || [];
   assert.equal(berichten.filter(b => b.tekst === 'Ze slapen.').length, 2, 'een herhaling na de herstart telt niet, een nieuwe sleutel wel');
   assert.ok(!JSON.stringify(berichten).includes('toets-gezin-1'), 'de sleutel gaat niet naar de lezer');
+  assert.equal((await api('/api/rtf/ontkoppel', { code: s.code }, oppas)).status, 200);
+  const los = await api('/api/state', {}, oppas);
+  assert.deepEqual(los.body.state.foundation?.gekoppeld || [], [], 'na intrekken verdwijnt de binding ook uit de eigen projectie');
+  assert.equal((await api('/api/rtf/kanaal', { code: s.code }, oppas)).status, 403, 'de projectie geeft geen blijvend gezinsrecht');
 });

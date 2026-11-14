@@ -1,11 +1,11 @@
 {
  "stempel": {
-  "op": "2026-11-14T11:02:32.074Z",
-  "commit": "01319f65b",
-  "boomVuil": true,
-  "boomAnders": 27,
+  "op": "2026-11-14T17:20:19.389Z",
+  "commit": "594b13ce6",
+  "boomVuil": false,
+  "boomAnders": 11,
   "instrument": "scripts/mutatiecontract.js",
-  "node": "v26.13.1"
+  "node": "v24.22.1"
  },
  "uitleg": "Per schrijfroute vijf assen: semantiek (kern/mutatie.js), duplicaatgedrag (lib/idemsleutels.js), bewijs (IDEMPROEF.json), toegang en stand (kern/mutatiecontract.js). Afgeleid uit die bronnen; alleen de BEDOELING komt uit server/lib/mutatiecontracten.js, want die is geen waarneming.",
  "grens": "Een stand wordt nooit afgeleid uit bewijs. Het bewijs draagt hooguit een VOORSTEL; de stand komt uit een verklaring van een mens. Zonder die regel staat dit register binnen een uur op 100% en weet niemand meer wat dat betekent.",
@@ -57900,7 +57900,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": "geen anonieme demo-gast",
+    "uitHandler": null,
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -58089,7 +58089,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": "geen anonieme demo-gast",
+    "uitHandler": null,
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -58116,7 +58116,7 @@
    "duplicaatregel": "nietIdempotent",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": "geen anonieme demo-gast",
+    "uitHandler": null,
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -58137,7 +58137,7 @@
    "duplicaatregel": "nietIdempotent",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": "geen anonieme demo-gast",
+    "uitHandler": null,
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -58347,7 +58347,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": "geen anonieme demo-gast",
+    "uitHandler": null,
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -58374,7 +58374,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": "geen anonieme demo-gast",
+    "uitHandler": "ja",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"

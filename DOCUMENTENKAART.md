@@ -1633,7 +1633,7 @@ mórgen nog klopt. Lees die vóór je een begrip introduceert, een register aanl
 of een scorecard bouwt. De opzet vraagt een semantisch register naar aanleiding
 van de twee `VERMOGENS`; de vraag ervóór is gemeten (`scripts/semantiek.js`,
 `SEMANTIEK.json`) en het was **geen incident**: van de <!--getal:semantiek.namen-->136<!--/getal--> namen die in meer dan
-één domein staan, dragen er **<!--getal:semantiek.betekenissen-->118<!--/getal--> meer dan één betekenis** — samen <!--getal:semantiek.betekenissenTotaal-->441<!--/getal-->
+één domein staan, dragen er **<!--getal:semantiek.betekenissen-->118<!--/getal--> meer dan één betekenis** — samen <!--getal:semantiek.betekenissenTotaal-->442<!--/getal-->
 betekenissen, met `SOORTEN` op **39**. Daarnaast **29** betekenissen die op meer
 dan één plek wonen én **106** paren die dezelfde waarheid onder een ándere naam
 dragen — die tweede ronde bestaat omdat de eerste ze miste, en de duurste
@@ -1892,7 +1892,7 @@ NORM.json en geen achteruitgang. Daarnaast vond ronde 0
 luisterde en die geen scherm verstuurde -- ronde 1 sloot ze alle 17 (zestien
 weggehaald, een aangesloten; er is geen zender bij verzonnen), en de kaart staat
 nu op <!--getal:edgekaart.dodeKanalen-->0<!--/getal--> dode tegenover
-<!--getal:edgekaart.levendeKanalen-->19<!--/getal--> levende kanalen. Het **Edge
+<!--getal:edgekaart.levendeKanalen-->20<!--/getal--> levende kanalen. Het **Edge
 Blikveld** (`shared/edge/blikveld.js`) is het ene leespad: elke waarde draagt
 herkomst, gezag en sinds, een leeg veld draagt zijn reden, en `autoritatief` is
 voorbehouden aan de server -- die er vandaag niet is, dus staat `bevoegdheid` op
@@ -2563,8 +2563,8 @@ in plaats van aangenomen -- zelfde reden als bij `Asset`: <!--getal:codewereld.r
 loopt over de as ROUTE. De as SYMBOOL is **nul** -- geen register kent een
 functienaam met een plaats, dus het objectvoorbeeld `pay.boeken` met een
 `symbol`-veld belooft iets wat geen enkele meter vult. Die as is
-inmiddels GEBOUWD (`npm run symbolen`, `SYMBOLEN.json`): <!--getal:symbolen.totaal-->29018<!--/getal--> benoemde symbolen
-met een regelnummer en <!--getal:symbolen.kanten-->8348<!--/getal--> require-kanten heen en terug, met de eigen parser
+inmiddels GEBOUWD (`npm run symbolen`, `SYMBOLEN.json`): <!--getal:symbolen.totaal-->29236<!--/getal--> benoemde symbolen
+met een regelnummer en <!--getal:symbolen.kanten-->8477<!--/getal--> require-kanten heen en terug, met de eigen parser
 en <!--getal:symbolen.parsefout-->0<!--/getal--> parsefouten. De <!--getal:symbolen.nietGelezen-->340<!--/getal--> niet-gelezen bestanden staan er MET reden in
 (bundeldelen die pas samengevoegd een programma vormen) -- weglaten zou ze
 onzichtbaar maken. Wat hij met opzet niet doet: aanroepers raden (een naam in

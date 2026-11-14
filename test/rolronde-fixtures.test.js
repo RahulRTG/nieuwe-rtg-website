@@ -75,3 +75,38 @@ test('rolmeter bindt een echt toestel per sessie zonder de bezitsbewijsgrens te 
  assert.equal((await vraag('POST',pad,b.token,{})).status,200);
  assert.equal((await vraag('POST',pad,null,{})).status,401,'anoniem blijft anoniem');
 });
+
+test('rolwereld meet bestaande contractbediening met gesloten instroom en levende tegenrollen', {timeout:120000}, async t=>{
+ const {start}=require('../scripts/lib/wegwerpserver');
+ const {nieuwLid}=require('../scripts/lib/voltooiwereld');
+ const {ROLWERELD,maakVraag,meetRol,beoordeelRoute}=require('../scripts/rolronde');
+ const srv=await start({naam:'rolronde-contract',env:ROLWERELD,gereed:'ready'});t.after(()=>srv.klaar());
+ const vraag=maakVraag(srv.basis),w={post:(p,b,tok)=>vraag('POST',p,tok,b)};
+ const lid=await nieuwLid(w,'rolcontract','guest');await vraag.bindToestel(lid.token);
+ const supplier=await w.post('/api/supplier/login',{username:'rahul',password:'Imran'});
+ const office=await w.post('/api/office/login',{code:ROLWERELD.OFFICE_CODE});
+ assert.equal(supplier.status,200);assert.equal(office.status,200);
+ const prefix='/api/mijn/abonnement/automatisch/';
+ const stand=await w.post(prefix+'stand',{},lid.token);
+ assert.equal(stand.status,200);assert.equal(stand.data.beschikbaar,true);
+ assert.equal(stand.data.instroomBeschikbaar,false,'de rolproef opent geen nieuwe inschrijvingen');
+ assert.equal((await w.post(prefix+'aanbod',{},lid.token)).status,409);
+ for(const actie of ['betalen','herstel','intrekken']){
+  const pad=prefix+actie,anon=await w.post(pad,{}),eigen=await w.post(pad,{},lid.token);
+  assert.equal(eigen.status,actie==='intrekken'?400:404,'lege invoer blijft een gecontroleerd domeinantwoord: '+actie);
+  assert.match(eigen.data.error,/eigen overeenkomst|eigen voorstel/i);
+  assert.equal((await w.post(pad,{contractId:'rolronde-onbekend',aanbodHash:'geen-aanbod'},lid.token)).status,404,
+   'een ingevulde referentie zonder eigen overeenkomst begint geen opdracht: '+actie);
+  const antwoorden={},controles={};
+  for(const [rol,tok] of [['leverancier',supplier.data.token],['kantoor',office.data.token]]){
+   const proef=await meetRol(vraag,rol,tok,'POST',pad,{});
+   antwoorden[rol]=proef.antwoord;controles[rol]=proef;
+   assert.equal(proef.voor.status,200);assert.equal(proef.na.status,200);
+   assert.ok([401,403].includes(proef.antwoord.status),rol+' blijft buiten '+actie);
+  }
+  assert.equal(beoordeelRoute('POST '+pad,anon,eigen,antwoorden,controles,
+   {explicieteLedenbewaker:true}).bewezen,true);
+ }
+ const na=await w.post('/api/auth/me',{},lid.token);
+ assert.equal(na.status,200);assert.equal(na.data.user.tier,'guest','de proef kent geen pas toe');
+});

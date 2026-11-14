@@ -71,6 +71,17 @@ const arg = (naam, std) => { const i = process.argv.indexOf(naam); return i > 0 
 const BASIS_EXTERN = arg('--basis', null);
 const PORT = Number(process.env.ROLRONDE_PORT || 4410);
 const VASTLEGGEN = process.argv.includes('--vastleggen');
+// De bestaande contractbediening vereist duurzame opslag en een terugkeer-URL,
+// ook als nieuwe inschrijvingen dicht zijn. De proef levert die voorwaarden
+// expliciet, maar erft nooit een echte betaalrail of externe database.
+// Dit bewijst rolpassage, geen provideruitvoering of geslaagde betaling.
+const ROLWERELD = Object.freeze({ NODE_ENV: 'test',
+  ...require('./lib/voltooiwereld').KANTOORWERELD,
+  ...require('./lib/postvanger').omgeving(), OFFICE_CODE: 'RTG-OFFICE',
+  RTG_STORE: 'sqlite', DATABASE_URL: '', PG_URL: '', REDIS_URL: '',
+  APP_URL: 'https://rolronde.invalid', RTG_ABONNEMENTEN_ZELFSERVICE: '0',
+  STRIPE_SECRET_KEY: '', STRIPE_PUBLIC_KEY: '', STRIPE_WEBHOOK_SECRET: '',
+  MOLLIE_API_KEY: '', ADYEN_API_KEY: '', PAYMENT_PROVIDER: '', RTG_BETALEN_UIT: '0' });
 
 /* ---- DE METERS ----
    `rolscheidingGaten` telt de leden-endpoints die een niet-leden-token
@@ -313,7 +324,7 @@ async function main() {
   let srv = null, basis = BASIS_EXTERN;
   if (!basis) {
     srv = await require('./lib/wegwerpserver').start({ naam: 'rolronde', poort: PORT, gereed: 'ready',
-      env: { NODE_ENV: 'test', ...require('./lib/voltooiwereld').KANTOORWERELD, OFFICE_CODE: 'RTG-OFFICE' } });
+      env: ROLWERELD });
     basis = srv.basis;
   }
   const vraag = maakVraag(basis);
@@ -504,4 +515,4 @@ async function main() {
 
 if (require.main === module) main().then(c => { process.exitCode = c; }).catch(e => { console.error(e); process.exitCode = 1; });
 module.exports = { maakVraag, meetRol, beoordeelRoute, beoordeel, gedeeldAntwoordGeldig,
-  lidPasseertLedenpoort, redenNietMeetbaarLid, redenNietMeetbareRoute, METER, METER_N };
+  lidPasseertLedenpoort, redenNietMeetbaarLid, redenNietMeetbareRoute, METER, METER_N, ROLWERELD };
